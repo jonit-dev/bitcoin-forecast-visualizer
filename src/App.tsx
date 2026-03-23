@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Activity, TrendingUp, Settings2, RefreshCw, BarChart2, Play, Square } from 'lucide-react';
+import { Activity, TrendingUp, Settings2, RefreshCw, BarChart2, Play, Square, HelpCircle, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
@@ -38,6 +38,7 @@ export default function App() {
   const [showSMA, setShowSMA] = useState(true);
   const [showVolume, setShowVolume] = useState(true);
   const [showModelLine, setShowModelLine] = useState(true);
+  const [showFormulaHelp, setShowFormulaHelp] = useState(false);
 
   // Playback
   const [isPlaying, setIsPlaying] = useState(false);
@@ -294,7 +295,18 @@ export default function App() {
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-5 p-4 pt-0 md:p-6 md:pt-0">
               <div className="space-y-1.5 md:space-y-2">
-                <label className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider">Architecture</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider">Architecture</label>
+                  {model === 'powerlaw' && (
+                    <button
+                      onClick={() => setShowFormulaHelp(true)}
+                      className="text-zinc-500 hover:text-amber-400 transition-colors"
+                      title="View Power Law formula"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
                 <select
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
@@ -395,6 +407,63 @@ export default function App() {
           </Card>
         </div>
       </main>
+
+      {/* Power Law Formula Modal */}
+      {showFormulaHelp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowFormulaHelp(false)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.15 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+              <h3 className="font-semibold text-sm text-zinc-100">BTC Power Law Model</h3>
+              <button onClick={() => setShowFormulaHelp(false)} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4 text-xs md:text-sm">
+              <div>
+                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Core Structural Model</h4>
+                <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre">
+{`P(t) = a * t^b * (1 + c₁·sin(ωt) + c₂·cos(ωt))
+
+where:
+  t  = days since Genesis block (2009-01-03)
+  a  = 9.48 × 10⁻¹⁰
+  b  = 3.6702
+  c₁ = 0.2323   (sine amplitude)
+  c₂ = 0.4288   (cosine amplitude)
+  ω  = 2π / 1460  (≈ 4-year cycle)`}</pre>
+              </div>
+              <div>
+                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Short-Term Correction (h &le; 90 days)</h4>
+                <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-amber-400 overflow-x-auto whitespace-pre">
+{`F(t_future) = P(t_future) * exp(r_t * exp(-h / τ))
+
+where:
+  r_t = ln(current_price) - ln(P(t_now))
+  h   = forecast horizon in days
+  τ   = 15  (mean-reversion half-life)`}</pre>
+              </div>
+              <div>
+                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">For h &gt; 90 days</h4>
+                <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-zinc-400 overflow-x-auto whitespace-pre">
+{`F(t_future) = P(t_future)
+
+(pure power law, no short-term correction)`}</pre>
+              </div>
+              <p className="text-zinc-500 text-[10px] leading-relaxed">
+                The model combines a power-law growth trend with a 4-year sinusoidal cycle aligned to BTC halvings.
+                For near-term forecasts (&le;90 days), a mean-reverting correction anchors the prediction to the current market price,
+                decaying exponentially with time constant &tau;=15 days.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

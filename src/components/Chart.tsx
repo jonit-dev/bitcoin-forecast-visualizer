@@ -1,5 +1,270 @@
 import React, { useEffect, useRef } from 'react';
-import { createChart, ColorType, CrosshairMode, ISeriesApi, CandlestickSeries, HistogramSeries, LineSeries, AreaSeries, createSeriesMarkers } from 'lightweight-charts';
+import { createChart, ColorType, CrosshairMode, ISeriesApi, CandlestickSeries, HistogramSeries, LineSeries, createSeriesMarkers } from 'lightweight-charts';
+import type { CanvasRenderingTarget2D } from 'fancy-canvas';
+
+// Bitcoin halving dates — known + dynamically projected every ~4 years
+const KNOWN_HALVINGS = ['2012-11-28', '2016-07-09', '2020-05-11', '2024-04-20'];
+const HALVING_INTERVAL_MS = 1460 * 86400000; // 1460 days in ms
+
+function generateHalvingDates(untilYear = 2050): { date: string; label: string }[] {
+  const result = KNOWN_HALVINGS.map((date, i) => ({ date, label: `H${i + 1}` }));
+  let last = new Date(KNOWN_HALVINGS[KNOWN_HALVINGS.length - 1] + 'T00:00:00Z');
+  let n = KNOWN_HALVINGS.length + 1;
+  while (last.getUTCFullYear() < untilYear) {
+    last = new Date(last.getTime() + HALVING_INTERVAL_MS);
+    result.push({ date: last.toISOString().split('T')[0], label: `H${n++}` });
+  }
+  return result;
+}
+
+const HALVING_DATES = generateHalvingDates();
+
+// ---- Cycle phase definitions (months after halving) ----
+// Based on historical BTC cycle analysis:
+//   Accumulation: 0-6 months post-halving (consolidation, low vol)
+//   Bull run:     6-12 months (markup begins, breakout)
+//   Peak zone:   12-18 months (blow-off top, avg peak ~16 months)
+//   Bear market: 18-48 months (markdown/correction until next halving)
+
+const CYCLE_PHASES = [
+  { startMonth: 0,  endMonth: 6,  color: 'rgba(96, 165, 250, 0.06)',  label: 'Accumulation' },  // blue
+  { startMonth: 6,  endMonth: 12, color: 'rgba(16, 185, 129, 0.06)',  label: 'Bull Run' },       // green
+  { startMonth: 12, endMonth: 18, color: 'rgba(251, 191, 36, 0.08)',  label: 'Peak Zone' },      // amber
+  { startMonth: 18, endMonth: 48, color: 'rgba(239, 68, 68, 0.05)',   label: 'Bear' },           // red
+];
+
+// ---- ATL↔ATH symmetric cycle model (1064d / 364d pattern) ----
+// Source: BTC cycle timing shows a repeating 1064-day ATL→ATH run
+// followed by a 364-day ATH→ATL correction, then the pattern repeats.
+//
+//  ATL 2015-01-14 → ATH 2017-12-17 = 1064d
+//  ATH 2017-12-17 → ATL 2018-12-15 =  364d
+//  ATL 2018-12-15 → ATH 2021-11-10 = 1061d (≈1064)
+//  ATH 2021-11-10 → ATL 2022-11-09 =  364d
+//  ATL 2022-11-09 → ATH predicted   = 1064d → 2025-10-08
+
+const ATL_TO_ATH_DAYS = 1064;
+const ATH_TO_ATL_DAYS = 364;
+
+// Seed: first known ATL in the pattern
+const CYCLE_SEED_ATL = '2015-01-14';
+
+interface CyclePivot {
+  date: string;
+  type: 'ATL' | 'ATH';
+  known: boolean; // historical (true) vs projected (false)
+}
+
+function addDays(dateStr: string, days: number): string {
+  const d = new Date(dateStr + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+// Known historical pivots (exact dates)
+const KNOWN_PIVOTS: CyclePivot[] = [
+  { date: '2015-01-14', type: 'ATL', known: true },
+  { date: '2017-12-17', type: 'ATH', known: true },
+  { date: '2018-12-15', type: 'ATL', known: true },
+  { date: '2021-11-10', type: 'ATH', known: true },
+  { date: '2022-11-09', type: 'ATL', known: true },
+];
+
+function generateCyclePivots(untilYear = 2040): CyclePivot[] {
+  const pivots = [...KNOWN_PIVOTS];
+  // Continue the pattern from the last known pivot
+  let last = pivots[pivots.length - 1];
+  while (new Date(last.date + 'T00:00:00Z').getUTCFullYear() < untilYear) {
+    const nextDays = last.type === 'ATL' ? ATL_TO_ATH_DAYS : ATH_TO_ATL_DAYS;
+    const nextType = last.type === 'ATL' ? 'ATH' : 'ATL';
+    const nextDate = addDays(last.date, nextDays);
+    const pivot: CyclePivot = { date: nextDate, type: nextType, known: false };
+    pivots.push(pivot);
+    last = pivot;
+  }
+  return pivots;
+}
+
+const CYCLE_PIVOTS = generateCyclePivots();
+
+function addMonths(dateStr: string, months: number): string {
+  const d = new Date(dateStr + 'T00:00:00Z');
+  d.setUTCMonth(d.getUTCMonth() + months);
+  return d.toISOString().split('T')[0];
+}
+
+// ---- Lightweight-charts primitive: halving lines + cycle phase shading ----
+
+class HalvingCycleRenderer {
+  private _dates: { date: string; label: string }[];
+  private _chart: any;
+
+  constructor(dates: { date: string; label: string }[], chart: any) {
+    this._dates = dates;
+    this._chart = chart;
+  }
+
+  draw(target: CanvasRenderingTarget2D): void {
+    if (!this._chart) return;
+    target.useMediaCoordinateSpace(({ context, mediaSize }) => {
+      const timeScale = this._chart.timeScale();
+      const w = mediaSize.width;
+      const h = mediaSize.height;
+
+      // --- Draw cycle phase shading behind everything ---
+      for (const { date } of this._dates) {
+        for (const phase of CYCLE_PHASES) {
+          const startDate = addMonths(date, phase.startMonth);
+          const endDate = addMonths(date, phase.endMonth);
+          const x0 = timeScale.timeToCoordinate(startDate as any);
+          const x1 = timeScale.timeToCoordinate(endDate as any);
+          if (x0 === null || x1 === null) continue;
+          const left = Math.max(0, Math.min(x0, x1));
+          const right = Math.min(w, Math.max(x0, x1));
+          if (right <= 0 || left >= w) continue;
+
+          context.fillStyle = phase.color;
+          context.fillRect(left, 0, right - left, h);
+
+          // Phase label at top (only if wide enough)
+          if (right - left > 40) {
+            context.font = '8px sans-serif';
+            context.fillStyle = phase.startMonth === 12
+              ? 'rgba(251, 191, 36, 0.45)'
+              : phase.startMonth === 18
+                ? 'rgba(239, 68, 68, 0.35)'
+                : phase.startMonth === 6
+                  ? 'rgba(16, 185, 129, 0.35)'
+                  : 'rgba(96, 165, 250, 0.35)';
+            context.fillText(phase.label, left + 4, h - 6);
+          }
+        }
+      }
+
+      // --- Draw halving vertical lines ---
+      for (const { date, label } of this._dates) {
+        const x = timeScale.timeToCoordinate(date as any);
+        if (x === null || x < 0 || x > w) continue;
+
+        // Solid vertical line (more visible)
+        context.beginPath();
+        context.strokeStyle = 'rgba(251, 191, 36, 0.55)';
+        context.lineWidth = 1.5;
+        context.setLineDash([6, 3]);
+        context.moveTo(x, 0);
+        context.lineTo(x, h);
+        context.stroke();
+        context.setLineDash([]);
+
+        // Label with background pill
+        const text = label;
+        context.font = 'bold 10px monospace';
+        const tm = context.measureText(text);
+        const pad = 4;
+        const lx = x + 5;
+        const ly = 6;
+        context.fillStyle = 'rgba(251, 191, 36, 0.15)';
+        context.beginPath();
+        context.roundRect(lx - pad, ly - 1, tm.width + pad * 2, 14, 3);
+        context.fill();
+        context.fillStyle = 'rgba(251, 191, 36, 0.85)';
+        context.fillText(text, lx, ly + 10);
+      }
+
+      // --- Draw ATL↔ATH cycle pivot markers (1064d / 364d pattern) ---
+      for (const pivot of CYCLE_PIVOTS) {
+        const px = timeScale.timeToCoordinate(pivot.date as any);
+        if (px === null || px < 0 || px > w) continue;
+
+        const isATH = pivot.type === 'ATH';
+        const lineColor = isATH
+          ? (pivot.known ? 'rgba(239, 68, 68, 0.65)' : 'rgba(239, 68, 68, 0.45)')
+          : (pivot.known ? 'rgba(16, 185, 129, 0.50)' : 'rgba(16, 185, 129, 0.35)');
+
+        // Vertical line
+        context.beginPath();
+        context.strokeStyle = lineColor;
+        context.lineWidth = pivot.known ? 1.5 : 1;
+        context.setLineDash(pivot.known ? [] : [3, 4]);
+        context.moveTo(px, 0);
+        context.lineTo(px, h);
+        context.stroke();
+        context.setLineDash([]);
+
+        // Diamond marker
+        const dy = isATH ? 28 : h - 28;
+        context.beginPath();
+        context.moveTo(px, dy - 5);
+        context.lineTo(px + 5, dy);
+        context.lineTo(px, dy + 5);
+        context.lineTo(px - 5, dy);
+        context.closePath();
+        context.fillStyle = isATH
+          ? (pivot.known ? 'rgba(239, 68, 68, 0.9)' : 'rgba(239, 68, 68, 0.6)')
+          : (pivot.known ? 'rgba(16, 185, 129, 0.9)' : 'rgba(16, 185, 129, 0.6)');
+        context.fill();
+
+        // Label
+        const prefix = pivot.known ? '' : '~';
+        const pivotLabel = `${pivot.type} ${prefix}${pivot.date.slice(0, 10)}`;
+        context.font = 'bold 9px monospace';
+        const ptm = context.measureText(pivotLabel);
+        const plx = px - ptm.width / 2;
+        const ply = isATH ? 36 : h - 44;
+        const pillColor = isATH ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)';
+        const textColor = isATH
+          ? (pivot.known ? 'rgba(239, 68, 68, 0.9)' : 'rgba(239, 68, 68, 0.7)')
+          : (pivot.known ? 'rgba(16, 185, 129, 0.9)' : 'rgba(16, 185, 129, 0.7)');
+        context.fillStyle = pillColor;
+        context.beginPath();
+        context.roundRect(plx - 3, ply, ptm.width + 6, 13, 3);
+        context.fill();
+        context.fillStyle = textColor;
+        context.fillText(pivotLabel, plx, ply + 10);
+      }
+    });
+  }
+}
+
+class HalvingCyclePaneView {
+  private _renderer: HalvingCycleRenderer;
+
+  constructor(dates: { date: string; label: string }[], chart: any) {
+    this._renderer = new HalvingCycleRenderer(dates, chart);
+  }
+
+  zOrder() { return 'bottom' as const; }
+
+  renderer() { return this._renderer; }
+}
+
+class HalvingCyclePrimitive {
+  private _dates: { date: string; label: string }[];
+  private _chart: any = null;
+  private _paneViews: HalvingCyclePaneView[] = [];
+
+  constructor(dates: { date: string; label: string }[]) {
+    this._dates = dates;
+  }
+
+  updateAllViews() {
+    this._paneViews = [new HalvingCyclePaneView(this._dates, this._chart)];
+  }
+
+  paneViews() { return this._paneViews; }
+
+  attached(param: any) {
+    this._chart = param.chart;
+    this.updateAllViews();
+  }
+
+  detached() {
+    this._chart = null;
+    this._paneViews = [];
+  }
+}
+
+// ---- Chart component ----
 
 interface ForecastChartProps {
   data: any[];
@@ -63,6 +328,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       wickDownColor: '#ef4444',
     });
     seriesRefs.current.candlestick = candlestickSeries;
+
+    // Attach halving-cycle vertical lines + phase shading primitive
+    const halvingPrimitive = new HalvingCyclePrimitive(HALVING_DATES);
+    candlestickSeries.attachPrimitive(halvingPrimitive as any);
 
     // Volume Series
     const volumeSeries = chart.addSeries(HistogramSeries, {
@@ -305,11 +574,11 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
   return (
     <div className="w-full h-[350px] sm:h-[400px] md:h-[500px] relative">
       <div ref={chartContainerRef} className="absolute inset-0" />
-      
+
       {legendData && (
         <div className="absolute top-3 left-3 z-10 pointer-events-none flex flex-wrap gap-x-3 gap-y-1 text-[10px] md:text-xs font-mono bg-zinc-950/50 backdrop-blur-sm p-1.5 rounded border border-white/5">
           <div className="text-zinc-300 font-sans font-medium mr-1">{legendData.time}</div>
-          
+
           {legendData.isForecast && (
             <div className="bg-emerald-500/20 text-emerald-400 px-1.5 rounded text-[9px] uppercase tracking-wider font-sans font-semibold flex items-center">
               Forecast
