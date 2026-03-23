@@ -43,6 +43,18 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackIndex, setPlaybackIndex] = useState<number | null>(null);
 
+  const handleRunForecast = () => {
+    setIsPlaying(false);
+    setPlaybackIndex(null);
+    setIsGenerating(true);
+    setTimeout(() => {
+      setDisplayData(processRealData(marketData.ohlcv, horizon, model));
+      setIsGenerating(false);
+    }, 700);
+  };
+
+  const activeDisplayData = displayData;
+
   const historicalCount = useMemo(() =>
     activeDisplayData.filter((d: any) => !d.isForecast).length,
     [activeDisplayData]
@@ -81,18 +93,6 @@ export default function App() {
     }, 40);
     return () => clearTimeout(timer);
   }, [isPlaying, playbackIndex, historicalCount, startPlaybackIndex]);
-
-  const handleRunForecast = () => {
-    setIsPlaying(false);
-    setPlaybackIndex(null);
-    setIsGenerating(true);
-    setTimeout(() => {
-      setDisplayData(processRealData(marketData.ohlcv, horizon, model));
-      setIsGenerating(false);
-    }, 700);
-  };
-
-  const activeDisplayData = displayData;
 
   // Derived stats
   const currentPrice = marketData?.currentPrice ?? 0;
