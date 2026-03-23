@@ -1,5 +1,12 @@
 import type { OHLCVData } from './api';
 
+export interface HeatmapCell {
+  date: string;
+  priceLow: number;
+  priceHigh: number;
+  density: number; // 0-1 normalized per column
+}
+
 // BTC Power Law model anchored to Genesis block (2009-01-03)
 const GENESIS = new Date('2009-01-03T00:00:00Z');
 
@@ -106,6 +113,125 @@ export function processRealData(ohlcv: OHLCVData[], horizon: number = 14, model:
   }
 
   return data;
+}
+
+// Monte Carlo probability heatmap using GBM with power-law drift
+export function generateHeatmapData(
+  ohlcv: OHLCVData[],
+  horizon: number,
+  model: string,
+  numSimulations: number = 500,
+  numPriceBands: number = 80
+): HeatmapCell[] {
+  if (horizon < 1 || ohlcv.length < 30) return [];
+
+  const lookback = Math.min(90, ohlcv.length - 1);
+  const recent = ohlcv.slice(-lookback - 1);
+  const logReturns = recent.slice(1).map((d, i) => Math.log(d.close / recent[i].close));
+  const meanReturn = logReturns.reduce((s, r) => s + r, 0) / logReturns.length;
+  const variance = logReturns.reduce((s, r) => s + (r - meanReturn) ** 2, 0) / logReturns.length;
+  const dailyVol = Math.sqrt(variance);
+  const halfVolSq = 0.5 * dailyVol * dailyVol;
+
+  const lastPrice = ohlcv[ohlcv.length - 1].close;
+  const lastDateMs = new Date(ohlcv[ohlcv.length - 1].date + 'T00:00:00Z').getTime();
+  const lastDate = new Date(lastDateMs);
+  const isPowerLaw = model === 'powerlaw';
+
+  // Pre-compute drift for each day ONCE (identical across all sims)
+  const drifts = new Float64Array(horizon + 1);
+  if (isPowerLaw) {
+    let prevPl = lastPrice;
+    for (let d = 1; d <= horizon; d++) {
+      const plFut = powerLawForecast(new Date(lastDateMs + d * 86400000), lastPrice, lastDate);
+      drifts[d] = Math.log(plFut / prevPl);
+      prevPl = plFut;
+    }
+  } else {
+    drifts.fill(meanReturn, 1);
+  }
+
+  // Sample output dates for long horizons (sim still runs every day for accuracy)
+  const sampleStep = horizon <= 90 ? 1 : horizon <= 365 ? 2 : horizon <= 1825 ? 5 : 10;
+  const sampledDays: number[] = [];
+  for (let d = 1; d <= horizon; d++) {
+    if (d % sampleStep === 0 || d === 1 || d === horizon) sampledDays.push(d);
+  }
+  const sampledSet = new Set(sampledDays);
+  const sampledCount = sampledDays.length;
+
+  // Pre-generate all random normals (use both Box-Muller outputs)
+  const totalRands = numSimulations * horizon;
+  const normals = new Float64Array(totalRands);
+  for (let i = 0; i < totalRands; i += 2) {
+    const u1 = Math.random();
+    const u2 = Math.random();
+    const r = Math.sqrt(-2 * Math.log(u1));
+    const theta = 6.283185307179586 * u2; // 2*PI
+    normals[i] = r * Math.cos(theta);
+    if (i + 1 < totalRands) normals[i + 1] = r * Math.sin(theta);
+  }
+
+  // Run Monte Carlo — store only sampled days in flat typed array
+  const results = new Float64Array(numSimulations * sampledCount);
+
+  for (let s = 0; s < numSimulations; s++) {
+    let price = lastPrice;
+    let sIdx = 0;
+    const rOff = s * horizon;
+
+    for (let d = 1; d <= horizon; d++) {
+      price = price * Math.exp(drifts[d] - halfVolSq + dailyVol * normals[rOff + d - 1]);
+      if (sampledSet.has(d)) {
+        results[s * sampledCount + sIdx++] = price;
+      }
+    }
+  }
+
+  // Find price range from flat array (0.5–99.5 percentile)
+  const sortBuf = new Float64Array(results);
+  sortBuf.sort();
+  const p005 = sortBuf[Math.floor(sortBuf.length * 0.005)];
+  const p995 = sortBuf[Math.floor(sortBuf.length * 0.995)];
+  const logMin = Math.log(p005);
+  const logMax = Math.log(p995);
+  const bandSize = (logMax - logMin) / numPriceBands;
+  if (bandSize <= 0) return [];
+
+  // Pre-compute date strings for sampled days
+  const dateStrings = sampledDays.map(d =>
+    new Date(lastDateMs + d * 86400000).toISOString().split('T')[0]
+  );
+
+  const cells: HeatmapCell[] = [];
+  const counts = new Uint16Array(numPriceBands);
+  const invBandSize = 1 / bandSize;
+
+  for (let di = 0; di < sampledCount; di++) {
+    counts.fill(0);
+    for (let s = 0; s < numSimulations; s++) {
+      const logP = Math.log(results[s * sampledCount + di]);
+      const idx = Math.min(numPriceBands - 1, Math.max(0, (logP - logMin) * invBandSize | 0));
+      counts[idx]++;
+    }
+
+    let maxCount = 0;
+    for (let b = 0; b < numPriceBands; b++) if (counts[b] > maxCount) maxCount = counts[b];
+    if (maxCount === 0) continue;
+
+    const dateStr = dateStrings[di];
+    for (let b = 0; b < numPriceBands; b++) {
+      if (counts[b] === 0) continue;
+      cells.push({
+        date: dateStr,
+        priceLow: Math.exp(logMin + b * bandSize),
+        priceHigh: Math.exp(logMin + (b + 1) * bandSize),
+        density: counts[b] / maxCount,
+      });
+    }
+  }
+
+  return cells;
 }
 
 // Fallback mock data when API is unavailable

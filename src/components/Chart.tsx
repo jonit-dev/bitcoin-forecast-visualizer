@@ -264,6 +264,176 @@ class HalvingCyclePrimitive {
   }
 }
 
+// ---- Probability heatmap primitive (Monte Carlo density) ----
+
+import type { HeatmapCell } from '../lib/data';
+
+// Heatmap rendering cache
+let _heatmapOffscreen: HTMLCanvasElement | null = null;
+let _heatmapCacheKey = '';
+
+// Pre-computed color LUT (256 entries) to avoid per-cell string building
+const _colorLUT: string[] = (() => {
+  const lut: string[] = new Array(256);
+  lut[0] = 'rgba(0,0,0,0)';
+  for (let i = 1; i < 256; i++) {
+    const d = i / 255;
+    const r = (50 * (1 - d) + 15 * d) | 0;
+    const g = (15 * (1 - d) + 200 * d) | 0;
+    const b = (160 * (1 - d) + 70 * d) | 0;
+    const a = (0.05 + d * 0.22).toFixed(3);
+    lut[i] = `rgba(${r},${g},${b},${a})`;
+  }
+  return lut;
+})();
+
+function densityToColor(d: number): string {
+  return _colorLUT[Math.min(255, Math.max(0, (d * 255) | 0))];
+}
+
+class HeatmapRenderer {
+  private _cells: HeatmapCell[];
+  private _chart: any;
+  private _series: any;
+  private _cellsId: number;
+
+  constructor(cells: HeatmapCell[], chart: any, series: any, cellsId: number) {
+    this._cells = cells;
+    this._chart = chart;
+    this._series = series;
+    this._cellsId = cellsId;
+  }
+
+  draw(target: CanvasRenderingTarget2D): void {
+    if (!this._chart || !this._series || this._cells.length === 0) return;
+
+    target.useMediaCoordinateSpace(({ context, mediaSize }) => {
+      const timeScale = this._chart.timeScale();
+      const w = Math.ceil(mediaSize.width);
+      const h = Math.ceil(mediaSize.height);
+
+      // Build x-coordinate map for unique dates
+      const dateXMap = new Map<string, number>();
+      const uniqueDates: string[] = [];
+      for (const cell of this._cells) {
+        if (!dateXMap.has(cell.date)) {
+          const x = timeScale.timeToCoordinate(cell.date as any);
+          if (x !== null) {
+            dateXMap.set(cell.date, x);
+            uniqueDates.push(cell.date);
+          }
+        }
+      }
+      if (uniqueDates.length < 2) return;
+
+      const x0 = dateXMap.get(uniqueDates[0])!;
+      const x1 = dateXMap.get(uniqueDates[1])!;
+      const barWidth = Math.max(Math.abs(x1 - x0), 2);
+
+      // Check viewport cache — skip re-render if nothing moved
+      const refY = this._series.priceToCoordinate(this._cells[0].priceLow);
+      const cacheKey = `${this._cellsId}:${w}:${h}:${x0.toFixed(1)}:${x1.toFixed(1)}:${refY?.toFixed(1)}`;
+
+      if (cacheKey === _heatmapCacheKey && _heatmapOffscreen) {
+        // Reuse cached offscreen — just composite
+        context.save();
+        context.filter = 'blur(6px)';
+        context.drawImage(_heatmapOffscreen, 0, 0);
+        context.restore();
+        context.save();
+        context.globalAlpha = 0.12;
+        context.drawImage(_heatmapOffscreen, 0, 0);
+        context.restore();
+        return;
+      }
+
+      // Render cells to offscreen canvas
+      if (!_heatmapOffscreen) _heatmapOffscreen = document.createElement('canvas');
+      if (_heatmapOffscreen.width !== w || _heatmapOffscreen.height !== h) {
+        _heatmapOffscreen.width = w;
+        _heatmapOffscreen.height = h;
+      }
+      const offCtx = _heatmapOffscreen.getContext('2d')!;
+      offCtx.clearRect(0, 0, w, h);
+
+      for (const cell of this._cells) {
+        const x = dateXMap.get(cell.date);
+        if (x === undefined || x < -barWidth * 2 || x > w + barWidth * 2) continue;
+
+        const yHigh = this._series.priceToCoordinate(cell.priceHigh);
+        const yLow = this._series.priceToCoordinate(cell.priceLow);
+        if (yHigh === null || yLow === null) continue;
+
+        const cellY = Math.min(yHigh, yLow);
+        const cellH = Math.max(Math.abs(yLow - yHigh), 1);
+
+        offCtx.fillStyle = densityToColor(cell.density);
+        offCtx.fillRect(x - barWidth / 2 - 1, cellY - 1, barWidth + 2, cellH + 2);
+      }
+
+      _heatmapCacheKey = cacheKey;
+
+      // Composite: blurred base + subtle crisp overlay
+      context.save();
+      context.filter = 'blur(6px)';
+      context.drawImage(_heatmapOffscreen, 0, 0);
+      context.restore();
+      context.save();
+      context.globalAlpha = 0.12;
+      context.drawImage(_heatmapOffscreen, 0, 0);
+      context.restore();
+    });
+  }
+}
+
+class HeatmapPaneView {
+  private _renderer: HeatmapRenderer;
+
+  constructor(cells: HeatmapCell[], chart: any, series: any, cellsId: number) {
+    this._renderer = new HeatmapRenderer(cells, chart, series, cellsId);
+  }
+
+  zOrder() { return 'bottom' as const; }
+  renderer() { return this._renderer; }
+}
+
+class HeatmapPrimitive {
+  private _cells: HeatmapCell[] = [];
+  private _chart: any = null;
+  private _series: any = null;
+  private _requestUpdate: (() => void) | null = null;
+  private _paneViews: HeatmapPaneView[] = [];
+  private _cellsId = 0;
+
+  setCells(cells: HeatmapCell[]) {
+    this._cells = cells;
+    this._cellsId++;
+    this._updateViews();
+    this._requestUpdate?.();
+  }
+
+  private _updateViews() {
+    this._paneViews = [new HeatmapPaneView(this._cells, this._chart, this._series, this._cellsId)];
+  }
+
+  updateAllViews() { this._updateViews(); }
+  paneViews() { return this._paneViews; }
+
+  attached(param: any) {
+    this._chart = param.chart;
+    this._series = param.series;
+    this._requestUpdate = param.requestUpdate;
+    this._updateViews();
+  }
+
+  detached() {
+    this._chart = null;
+    this._series = null;
+    this._requestUpdate = null;
+    this._paneViews = [];
+  }
+}
+
 // ---- Chart component ----
 
 interface ForecastChartProps {
@@ -271,11 +441,13 @@ interface ForecastChartProps {
   showSMA: boolean;
   showVolume: boolean;
   showModelLine: boolean;
+  showHeatmap: boolean;
+  heatmapData: HeatmapCell[];
   timeRange: string;
   playbackIndex: number | null;
 }
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, timeRange, playbackIndex }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showHeatmap, heatmapData, timeRange, playbackIndex }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<{
@@ -289,6 +461,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     modelLine?: ISeriesApi<"Line">;
   }>({});
   const markersRef = useRef<any>(null);
+  const heatmapPrimRef = useRef<HeatmapPrimitive | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -308,11 +481,13 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       rightPriceScale: {
         borderColor: '#52525b',
         mode: 1, // logarithmic
+        autoScale: true,
       },
       timeScale: {
         borderColor: '#52525b',
         timeVisible: false,
         rightOffset: 12,
+        barSpacing: 3,
       },
       autoSize: true,
     });
@@ -332,6 +507,11 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     // Attach halving-cycle vertical lines + phase shading primitive
     const halvingPrimitive = new HalvingCyclePrimitive(HALVING_DATES);
     candlestickSeries.attachPrimitive(halvingPrimitive as any);
+
+    // Attach probability heatmap primitive
+    const heatmapPrimitive = new HeatmapPrimitive();
+    candlestickSeries.attachPrimitive(heatmapPrimitive as any);
+    heatmapPrimRef.current = heatmapPrimitive;
 
     // Volume Series
     const volumeSeries = chart.addSeries(HistogramSeries, {
@@ -540,10 +720,27 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
   }, [showSMA, showVolume, showModelLine]);
 
-  // Handle time range (frozen during playback to keep scale stable)
+  // Update probability heatmap
+  useEffect(() => {
+    if (!heatmapPrimRef.current) return;
+    const visible = showHeatmap && playbackIndex === null;
+    heatmapPrimRef.current.setCells(visible ? heatmapData : []);
+  }, [heatmapData, showHeatmap, playbackIndex]);
+
+  // Handle time range — only reacts to explicit timeRange button clicks, not data changes
+  const prevTimeRange = useRef(timeRange);
+  const initialFitDone = useRef(false);
+
   useEffect(() => {
     if (!chartRef.current || !data || data.length === 0) return;
     if (playbackIndex !== null) return;
+
+    const isTimeRangeChange = prevTimeRange.current !== timeRange;
+    prevTimeRange.current = timeRange;
+
+    // Only fit on first load or explicit time range change
+    if (!isTimeRangeChange && initialFitDone.current) return;
+    initialFitDone.current = true;
 
     const chart = chartRef.current;
 
@@ -572,7 +769,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
   }, [timeRange, data, playbackIndex]);
 
   return (
-    <div className="w-full h-[350px] sm:h-[400px] md:h-[500px] relative">
+    <div className="w-full h-full min-h-[350px] relative">
       <div ref={chartContainerRef} className="absolute inset-0" />
 
       {legendData && (

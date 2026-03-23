@@ -4,7 +4,7 @@ import { Activity, TrendingUp, Settings2, RefreshCw, BarChart2, Play, Square, He
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
-import { processRealData } from './lib/data';
+import { processRealData, generateHeatmapData, type HeatmapCell } from './lib/data';
 import { loadBTCData, type MarketData } from './lib/api';
 import { cn } from './lib/utils';
 
@@ -33,11 +33,17 @@ export default function App() {
     processRealData(marketData.ohlcv, 14, 'powerlaw')
   );
 
+  // Heatmap
+  const [heatmapData, setHeatmapData] = useState<HeatmapCell[]>(() =>
+    generateHeatmapData(marketData.ohlcv, 14, 'powerlaw')
+  );
+
   // Chart Controls
-  const [timeRange, setTimeRange] = useState('3M');
+  const [timeRange, setTimeRange] = useState('ALL');
   const [showSMA, setShowSMA] = useState(true);
   const [showVolume, setShowVolume] = useState(true);
   const [showModelLine, setShowModelLine] = useState(true);
+  const [showHeatmap, setShowHeatmap] = useState(true);
   const [showFormulaHelp, setShowFormulaHelp] = useState(false);
 
   // Playback
@@ -50,6 +56,7 @@ export default function App() {
     setIsGenerating(true);
     setTimeout(() => {
       setDisplayData(processRealData(marketData.ohlcv, horizon, model));
+      setHeatmapData(generateHeatmapData(marketData.ohlcv, horizon, model));
       setIsGenerating(false);
     }, 700);
   };
@@ -122,7 +129,7 @@ export default function App() {
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30">
       {/* Header */}
       <header className="border-b border-white/5 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
+        <div className="max-w-[1920px] mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
               <TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-400" />
@@ -140,12 +147,12 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-4 md:py-8 flex flex-col lg:grid lg:grid-cols-4 gap-4 md:gap-6">
+      <main className="max-w-[1920px] mx-auto px-4 py-4 md:py-6 flex flex-col lg:grid lg:grid-cols-[1fr_280px] gap-4 md:gap-5 min-h-[calc(100vh-4rem)]">
 
         {/* Main Content */}
-        <div className="lg:col-span-3 space-y-4 md:space-y-6 order-1 lg:order-2 flex flex-col">
+        <div className="space-y-4 md:space-y-5 order-1 flex flex-col min-h-0">
           {/* Chart */}
-          <Card className="overflow-hidden flex-1 flex flex-col min-h-[450px] md:min-h-[550px]">
+          <Card className="overflow-hidden flex-1 flex flex-col min-h-[450px]">
             <CardHeader className="border-b border-white/5 pb-3 md:pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
               <CardTitle className="text-base md:text-lg">Price Forecast Visualization</CardTitle>
               <div className="flex items-center gap-2 md:gap-4 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide w-full sm:w-auto">
@@ -217,6 +224,17 @@ export default function App() {
                       Model
                     </button>
                   )}
+                  <button
+                    onClick={() => setShowHeatmap(!showHeatmap)}
+                    className={cn(
+                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                      showHeatmap
+                        ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                    )}
+                  >
+                    Heatmap
+                  </button>
                 </div>
               </div>
             </CardHeader>
@@ -232,6 +250,8 @@ export default function App() {
                   showSMA={showSMA}
                   showVolume={showVolume}
                   showModelLine={model === 'powerlaw' && showModelLine}
+                  showHeatmap={showHeatmap}
+                  heatmapData={heatmapData}
                   timeRange={timeRange}
                   playbackIndex={playbackIndex}
                 />
@@ -285,7 +305,7 @@ export default function App() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-4 md:space-y-6 order-2 lg:order-1">
+        <div className="space-y-4 md:space-y-5 order-2">
           <Card>
             <CardHeader className="p-4 md:p-6">
               <CardTitle className="flex items-center gap-2 text-sm">
