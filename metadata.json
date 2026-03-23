@@ -1,0 +1,5 @@
+{
+  "name": "Bitcoin Forecast Visualizer",
+  "description": "A dashboard tool for visualizing Bitcoin price forecasts using candlestick charts and predictive models.",
+  "requestFramePermissions": []
+}
