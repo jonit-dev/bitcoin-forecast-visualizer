@@ -26,16 +26,16 @@ function formatMarketCap(n: number) {
 
 export default function App() {
   const [marketData] = useState<MarketData>(() => loadBTCData());
-  const [horizon, setHorizon] = useState(730);
+  const [horizon, setHorizon] = useState(180);
   const [model, setModel] = useState('powerlaw');
   const [isGenerating, setIsGenerating] = useState(false);
   const [displayData, setDisplayData] = useState<any[]>(() =>
-    processRealData(marketData.ohlcv, 730, 'powerlaw')
+    processRealData(marketData.ohlcv, 180, 'powerlaw')
   );
 
   // Heatmap
   const [heatmapData, setHeatmapData] = useState<HeatmapCell[]>(() =>
-    generateHeatmapData(marketData.ohlcv, 730, 'powerlaw')
+    generateHeatmapData(marketData.ohlcv, 180, 'powerlaw')
   );
 
   // Chart Controls
@@ -459,7 +459,7 @@ where:
   ω  = 2π / 1460  (≈ 4-year cycle)`}</pre>
               </div>
               <div>
-                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Short-Term Correction (h &le; 90 days)</h4>
+                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Mean-Reverting Correction (all horizons)</h4>
                 <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-amber-400 overflow-x-auto whitespace-pre">
 {`F(t_future) = P(t_future) * exp(r_t * exp(-h / τ))
 
@@ -468,17 +468,10 @@ where:
   h   = forecast horizon in days
   τ   = 210  (residual decay constant)`}</pre>
               </div>
-              <div>
-                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">For h &gt; 90 days</h4>
-                <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-zinc-400 overflow-x-auto whitespace-pre">
-{`F(t_future) = P(t_future)
-
-(pure power law, no short-term correction)`}</pre>
-              </div>
               <p className="text-zinc-500 text-[10px] leading-relaxed">
                 The model combines a power-law growth trend with a 4-year sinusoidal cycle aligned to BTC halvings.
-                For near-term forecasts (&le;90 days), a mean-reverting correction anchors the prediction to the current market price,
-                decaying exponentially with time constant &tau;=210 days.
+                A mean-reverting correction anchors the prediction to the current market price for all horizons,
+                decaying exponentially with time constant &tau;=210 days toward the pure power law as h grows.
               </p>
             </div>
           </motion.div>
