@@ -807,7 +807,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       <div ref={chartContainerRef} className="absolute inset-0" />
 
       {legendData && (
-        <div className="absolute top-3 left-3 z-10 pointer-events-none flex flex-wrap gap-x-3 gap-y-1 text-[10px] md:text-xs font-mono bg-zinc-950/50 backdrop-blur-sm p-1.5 rounded border border-white/5">
+        <div className="absolute bottom-3 left-3 z-10 pointer-events-none flex flex-wrap gap-x-3 gap-y-1 text-[10px] md:text-xs font-mono bg-zinc-950/50 backdrop-blur-sm p-1.5 rounded border border-white/5">
           <div className="text-zinc-300 font-sans font-medium mr-1">{legendData.time}</div>
 
           {legendData.isForecast && (
