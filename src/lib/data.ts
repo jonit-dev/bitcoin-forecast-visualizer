@@ -27,13 +27,10 @@ function powerLawForecast(dateFuture: Date, currentPrice: number, currentDate: D
   const tNow = daysSinceGenesis(currentDate);
   const tFut = daysSinceGenesis(dateFuture);
   const hDays = Math.round((dateFuture.getTime() - currentDate.getTime()) / 86400000);
-  if (hDays <= 90) {
-    const rT = Math.log(currentPrice) - Math.log(basePowerLawPrice(tNow));
-    const tau = 15;
-    const corr = Math.exp(rT * Math.exp(-hDays / tau));
-    return basePowerLawPrice(tFut) * corr;
-  }
-  return basePowerLawPrice(tFut);
+  const rT = Math.log(currentPrice) - Math.log(basePowerLawPrice(tNow));
+  const tau = 210;
+  const corr = Math.exp(rT * Math.exp(-hDays / tau));
+  return basePowerLawPrice(tFut) * corr;
 }
 
 export function processRealData(ohlcv: OHLCVData[], horizon: number = 14, model: string = 'transformer'): any[] {

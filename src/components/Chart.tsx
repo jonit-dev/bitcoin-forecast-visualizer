@@ -19,19 +19,51 @@ function generateHalvingDates(untilYear = 2050): { date: string; label: string }
 
 const HALVING_DATES = generateHalvingDates();
 
-// ---- Cycle phase definitions (months after halving) ----
-// Based on historical BTC cycle analysis:
-//   Accumulation: 0-6 months post-halving (consolidation, low vol)
-//   Bull run:     6-12 months (markup begins, breakout)
-//   Peak zone:   12-18 months (blow-off top, avg peak ~16 months)
-//   Bear market: 18-48 months (markdown/correction until next halving)
+// ---- Cycle phase definitions (anchored to ATL/ATH pivots) ----
+// Phases are driven by the market cycle bottoms and tops:
+//   Accumulation: ATL → ATL + 6 months (bottom consolidation)
+//   Bull:         ATL + 6 months → ATH (markup / run-up)
+//   Trim:         ATH → ATH + 4 months (distribution / take-profit)
+//   Bear:         ATH + 4 months → next ATL (markdown / correction)
 
-const CYCLE_PHASES = [
-  { startMonth: 0,  endMonth: 6,  color: 'rgba(96, 165, 250, 0.06)',  label: 'Accumulation' },  // blue
-  { startMonth: 6,  endMonth: 12, color: 'rgba(16, 185, 129, 0.06)',  label: 'Bull Run' },       // green
-  { startMonth: 12, endMonth: 18, color: 'rgba(251, 191, 36, 0.08)',  label: 'Peak Zone' },      // amber
-  { startMonth: 18, endMonth: 48, color: 'rgba(239, 68, 68, 0.05)',   label: 'Bear' },           // red
-];
+const PHASE_STYLES = {
+  Accumulation: { color: 'rgba(96, 165, 250, 0.06)',  textColor: 'rgba(96, 165, 250, 0.7)',  pillColor: 'rgba(96, 165, 250, 0.10)' },
+  Bull:         { color: 'rgba(16, 185, 129, 0.06)',  textColor: 'rgba(16, 185, 129, 0.7)',  pillColor: 'rgba(16, 185, 129, 0.10)' },
+  Trim:         { color: 'rgba(251, 191, 36, 0.08)',  textColor: 'rgba(251, 191, 36, 0.7)',  pillColor: 'rgba(251, 191, 36, 0.10)' },
+  Bear:         { color: 'rgba(239, 68, 68, 0.05)',   textColor: 'rgba(239, 68, 68, 0.6)',   pillColor: 'rgba(239, 68, 68, 0.08)' },
+};
+
+interface PhaseZone {
+  startDate: string;
+  endDate: string;
+  label: string;
+  style: typeof PHASE_STYLES[keyof typeof PHASE_STYLES];
+}
+
+function buildPhaseZones(pivots: CyclePivot[]): PhaseZone[] {
+  const zones: PhaseZone[] = [];
+  for (let i = 0; i < pivots.length; i++) {
+    const pivot = pivots[i];
+    const next = pivots[i + 1];
+    if (pivot.type === 'ATL') {
+      // ATL → next ATH: Accumulation (first 6 months), then Bull (rest)
+      const accumEnd = addMonths(pivot.date, 6);
+      const bullEnd = next ? next.date : addDays(pivot.date, ATL_TO_ATH_DAYS);
+      zones.push({ startDate: pivot.date, endDate: accumEnd, label: 'Accumulation', style: PHASE_STYLES.Accumulation });
+      zones.push({ startDate: accumEnd, endDate: bullEnd, label: 'Bull', style: PHASE_STYLES.Bull });
+    } else {
+      // ATH → next ATL: Trim (first 4 months), then Bear (rest)
+      const trimEnd = addMonths(pivot.date, 4);
+      const bearEnd = next ? next.date : addDays(pivot.date, ATH_TO_ATL_DAYS);
+      zones.push({ startDate: pivot.date, endDate: trimEnd, label: 'Trim', style: PHASE_STYLES.Trim });
+      zones.push({ startDate: trimEnd, endDate: bearEnd, label: 'Bear', style: PHASE_STYLES.Bear });
+    }
+  }
+  return zones;
+}
+
+// PHASE_ZONES initialized after CYCLE_PIVOTS below
+let PHASE_ZONES: PhaseZone[] = [];
 
 // ---- ATL↔ATH symmetric cycle model (1064d / 364d pattern) ----
 // Source: BTC cycle timing shows a repeating 1064-day ATL→ATH run
@@ -86,6 +118,7 @@ function generateCyclePivots(untilYear = 2040): CyclePivot[] {
 }
 
 const CYCLE_PIVOTS = generateCyclePivots();
+PHASE_ZONES = buildPhaseZones(CYCLE_PIVOTS);
 
 function addMonths(dateStr: string, months: number): string {
   const d = new Date(dateStr + 'T00:00:00Z');
@@ -111,33 +144,34 @@ class HalvingCycleRenderer {
       const w = mediaSize.width;
       const h = mediaSize.height;
 
-      // --- Draw cycle phase shading behind everything ---
-      for (const { date } of this._dates) {
-        for (const phase of CYCLE_PHASES) {
-          const startDate = addMonths(date, phase.startMonth);
-          const endDate = addMonths(date, phase.endMonth);
-          const x0 = timeScale.timeToCoordinate(startDate as any);
-          const x1 = timeScale.timeToCoordinate(endDate as any);
-          if (x0 === null || x1 === null) continue;
-          const left = Math.max(0, Math.min(x0, x1));
-          const right = Math.min(w, Math.max(x0, x1));
-          if (right <= 0 || left >= w) continue;
+      // --- Draw cycle phase shading (anchored to ATL/ATH pivots) ---
+      for (const zone of PHASE_ZONES) {
+        const x0 = timeScale.timeToCoordinate(zone.startDate as any);
+        const x1 = timeScale.timeToCoordinate(zone.endDate as any);
+        if (x0 === null || x1 === null) continue;
+        const left = Math.max(0, Math.min(x0, x1));
+        const right = Math.min(w, Math.max(x0, x1));
+        if (right <= 0 || left >= w) continue;
 
-          context.fillStyle = phase.color;
-          context.fillRect(left, 0, right - left, h);
+        context.fillStyle = zone.style.color;
+        context.fillRect(left, 0, right - left, h);
 
-          // Phase label at top (only if wide enough)
-          if (right - left > 40) {
-            context.font = '8px sans-serif';
-            context.fillStyle = phase.startMonth === 12
-              ? 'rgba(251, 191, 36, 0.45)'
-              : phase.startMonth === 18
-                ? 'rgba(239, 68, 68, 0.35)'
-                : phase.startMonth === 6
-                  ? 'rgba(16, 185, 129, 0.35)'
-                  : 'rgba(96, 165, 250, 0.35)';
-            context.fillText(phase.label, left + 4, h - 6);
-          }
+        // Phase label centered at top of zone
+        const phaseText = `Phase: ${zone.label}`;
+        context.font = 'bold 10px sans-serif';
+        const tm = context.measureText(phaseText);
+        if (right - left > tm.width + 16) {
+          const cx = left + (right - left) / 2;
+          const ly = 22;
+          const pad = 6;
+          context.fillStyle = zone.style.pillColor;
+          context.beginPath();
+          context.roundRect(cx - tm.width / 2 - pad, ly - 11, tm.width + pad * 2, 16, 4);
+          context.fill();
+          context.fillStyle = zone.style.textColor;
+          context.textAlign = 'center';
+          context.fillText(phaseText, cx, ly);
+          context.textAlign = 'left';
         }
       }
 

@@ -26,16 +26,16 @@ function formatMarketCap(n: number) {
 
 export default function App() {
   const [marketData] = useState<MarketData>(() => loadBTCData());
-  const [horizon, setHorizon] = useState(14);
+  const [horizon, setHorizon] = useState(730);
   const [model, setModel] = useState('powerlaw');
   const [isGenerating, setIsGenerating] = useState(false);
   const [displayData, setDisplayData] = useState<any[]>(() =>
-    processRealData(marketData.ohlcv, 14, 'powerlaw')
+    processRealData(marketData.ohlcv, 730, 'powerlaw')
   );
 
   // Heatmap
   const [heatmapData, setHeatmapData] = useState<HeatmapCell[]>(() =>
-    generateHeatmapData(marketData.ohlcv, 14, 'powerlaw')
+    generateHeatmapData(marketData.ohlcv, 730, 'powerlaw')
   );
 
   // Chart Controls
@@ -466,7 +466,7 @@ where:
 where:
   r_t = ln(current_price) - ln(P(t_now))
   h   = forecast horizon in days
-  τ   = 15  (mean-reversion half-life)`}</pre>
+  τ   = 210  (residual decay constant)`}</pre>
               </div>
               <div>
                 <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">For h &gt; 90 days</h4>
@@ -478,7 +478,7 @@ where:
               <p className="text-zinc-500 text-[10px] leading-relaxed">
                 The model combines a power-law growth trend with a 4-year sinusoidal cycle aligned to BTC halvings.
                 For near-term forecasts (&le;90 days), a mean-reverting correction anchors the prediction to the current market price,
-                decaying exponentially with time constant &tau;=15 days.
+                decaying exponentially with time constant &tau;=210 days.
               </p>
             </div>
           </motion.div>
