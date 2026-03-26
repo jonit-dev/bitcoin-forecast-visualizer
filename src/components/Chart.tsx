@@ -95,6 +95,7 @@ function addDays(dateStr: string, days: number): string {
 
 // Known historical pivots (exact dates)
 const KNOWN_PIVOTS: CyclePivot[] = [
+  { date: '2013-12-04', type: 'ATH', known: true },
   { date: '2015-01-14', type: 'ATL', known: true },
   { date: '2017-12-17', type: 'ATH', known: true },
   { date: '2018-12-15', type: 'ATL', known: true },
