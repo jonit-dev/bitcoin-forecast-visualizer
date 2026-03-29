@@ -18,8 +18,15 @@ function daysSinceGenesis(date: Date): number {
 // Grid-search optimized against full 2010–2026 dataset (5,731 days).
 // Never breached at any cycle low (2011/2015/2018/2022).
 // Post-2013: 99.96% of days above, max breach 10.1%, only 2 breach days.
+// Capped so the floor never exceeds the base model's cycle trough.
 function floorPowerLawPrice(t: number): number {
-  return Math.exp(-40.234) * Math.pow(t, 5.847);
+  const raw = Math.exp(-40.234) * Math.pow(t, 5.847);
+  // Base model trough ≈ base trend × (1 - cyclic amplitude)
+  const a = 9.48e-10;
+  const b = 3.6702;
+  const cyclicAmplitude = Math.sqrt(0.2323 ** 2 + 0.4288 ** 2); // ~0.489
+  const baseTrough = a * Math.pow(t, b) * (1 - cyclicAmplitude);
+  return Math.min(raw, baseTrough);
 }
 
 function basePowerLawPrice(t: number): number {
