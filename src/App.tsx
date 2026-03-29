@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Activity, TrendingUp, Settings2, RefreshCw, BarChart2, Play, Square, HelpCircle, X } from 'lucide-react';
+import { Activity, TrendingUp, Settings2, RefreshCw, BarChart2, Play, Square, HelpCircle, X, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
 import { processRealData, generateHeatmapData, type HeatmapCell } from './lib/data';
-import { loadBTCData, type MarketData } from './lib/api';
+import { loadBTCData, computeMVRVStats, type MarketData, type MVRVStats } from './lib/api';
 import { cn } from './lib/utils';
 
 function formatHorizonLabel(days: number): string {
@@ -18,6 +18,26 @@ function formatPrice(n: number) {
   return '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 }
 
+function getHalvingInfo() {
+  const lastHalvingDate = '2024-04-20';
+  const HALVING_INTERVAL_MS = 1460 * 86400000;
+  const nextHalving = new Date(new Date(lastHalvingDate + 'T00:00:00Z').getTime() + HALVING_INTERVAL_MS);
+  const daysUntil = Math.ceil((nextHalving.getTime() - Date.now()) / 86400000);
+  const currentReward = 3.125; // post-4th halving
+  const nextReward = currentReward / 2;
+  return {
+    nextDate: nextHalving.toISOString().split('T')[0],
+    daysUntil: Math.max(0, daysUntil),
+    currentReward,
+    nextReward,
+    dailyIssuance: Math.round(144 * currentReward),   // ~450 BTC/day
+    nextDailyIssuance: Math.round(144 * nextReward),  // ~225 BTC/day
+  };
+}
+
+const CIRCULATING_SUPPLY = 19_850_000;
+const MAX_SUPPLY = 21_000_000;
+
 function formatMarketCap(n: number) {
   if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
   if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
@@ -26,6 +46,8 @@ function formatMarketCap(n: number) {
 
 export default function App() {
   const [marketData] = useState<MarketData>(() => loadBTCData());
+  const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
+  const halvingInfo = useMemo(() => getHalvingInfo(), []);
   const [horizon, setHorizon] = useState(180);
   const [model, setModel] = useState('powerlaw');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -431,10 +453,80 @@ export default function App() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs md:text-sm text-zinc-400">Data Source</span>
-                  <span className="text-xs md:text-sm font-mono text-zinc-400">
-                    CryptoCompare
+                  <span className="text-xs md:text-sm font-mono text-zinc-400">CoinGecko</span>
+                </div>
+                {mvrvStats.currentMVRV !== null && (
+                  <>
+                    <div className="border-t border-white/5 my-1" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs md:text-sm text-zinc-400">MVRV Ratio</span>
+                      <span className="text-xs md:text-sm font-mono text-zinc-200">
+                        {mvrvStats.currentMVRV.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs md:text-sm text-zinc-400">MVRV Z-Score</span>
+                      <span className={cn("text-xs md:text-sm font-mono", mvrvStats.signalColor)}>
+                        {mvrvStats.zScore!.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs md:text-sm text-zinc-400">Cycle Signal</span>
+                      <span className={cn("text-xs md:text-sm font-medium", mvrvStats.signalColor)}>
+                        {mvrvStats.signal}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Zap className="w-4 h-4 text-amber-400" />
+                Supply &amp; Halvings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 md:p-6 md:pt-0 space-y-3 md:space-y-4">
+              <div>
+                <div className="flex justify-between items-baseline mb-1">
+                  <span className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider">Next Halving (H5)</span>
+                  <span className="text-xs font-mono text-amber-400">{halvingInfo.daysUntil}d</span>
+                </div>
+                <p className="text-sm md:text-base font-mono text-zinc-200">{halvingInfo.nextDate}</p>
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs md:text-sm text-zinc-400">Block Reward</span>
+                  <span className="text-xs md:text-sm font-mono text-zinc-200">
+                    {halvingInfo.currentReward} <span className="text-zinc-500">→</span> {halvingInfo.nextReward} BTC
                   </span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs md:text-sm text-zinc-400">Daily Issuance</span>
+                  <span className="text-xs md:text-sm font-mono text-zinc-200">
+                    ~{halvingInfo.dailyIssuance} <span className="text-zinc-500">→</span> ~{halvingInfo.nextDailyIssuance} BTC
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className="text-xs md:text-sm text-zinc-400">Circulating Supply</span>
+                  <span className="text-xs font-mono text-zinc-300">
+                    {(CIRCULATING_SUPPLY / 1_000_000).toFixed(2)}M / 21M
+                  </span>
+                </div>
+                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-amber-500/70 rounded-full"
+                    style={{ width: `${(CIRCULATING_SUPPLY / MAX_SUPPLY) * 100}%` }}
+                  />
+                </div>
+                <p className="text-[10px] text-zinc-500 mt-1 text-right">
+                  {((CIRCULATING_SUPPLY / MAX_SUPPLY) * 100).toFixed(1)}% mined
+                </p>
               </div>
             </CardContent>
           </Card>
