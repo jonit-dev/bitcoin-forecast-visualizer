@@ -476,13 +476,14 @@ interface ForecastChartProps {
   showSMA: boolean;
   showVolume: boolean;
   showModelLine: boolean;
+  showFloorLine: boolean;
   showHeatmap: boolean;
   heatmapData: HeatmapCell[];
   timeRange: string;
   playbackIndex: number | null;
 }
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showHeatmap, heatmapData, timeRange, playbackIndex }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showFloorLine, showHeatmap, heatmapData, timeRange, playbackIndex }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<{
@@ -494,6 +495,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     forecastUpper?: ISeriesApi<"Line">;
     forecastLower?: ISeriesApi<"Line">;
     modelLine?: ISeriesApi<"Line">;
+    floorLine?: ISeriesApi<"Line">;
   }>({});
   const markersRef = useRef<any>(null);
   const heatmapPrimRef = useRef<HeatmapPrimitive | null>(null);
@@ -610,6 +612,18 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     });
     seriesRefs.current.modelLine = modelLineSeries;
 
+    // Floor Price Power Law Line (e^-36.562 * d^5.4279)
+    const floorLineSeries = chart.addSeries(LineSeries, {
+      color: 'rgba(96, 165, 250, 0.9)', // blue
+      lineWidth: 2,
+      lineStyle: 1, // Dotted
+      crosshairMarkerVisible: false,
+      lastValueVisible: false,
+      priceLineVisible: false,
+      visible: false,
+    });
+    seriesRefs.current.floorLine = floorLineSeries;
+
     return () => {
       chart.remove();
     };
@@ -647,6 +661,11 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       .filter((d: any) => d.powerLawModel != null && d.powerLawModel > 0)
       .map((d: any) => ({ time: d.date, value: d.powerLawModel }));
 
+    // Floor price line (all data including forecast projection)
+    const floorLineData = [...historical, ...forecast]
+      .filter((d: any) => d.floorPriceModel != null && d.floorPriceModel > 0)
+      .map((d: any) => ({ time: d.date, value: d.floorPriceModel }));
+
     seriesRefs.current.candlestick?.setData(candleData.sort(sortByTime));
     seriesRefs.current.volume?.setData(volumeData.sort(sortByTime));
     seriesRefs.current.sma20?.setData(sma20Data.sort(sortByTime));
@@ -655,6 +674,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.forecastUpper?.setData(forecastUpperData.sort(sortByTime));
     seriesRefs.current.forecastLower?.setData(forecastLowerData.sort(sortByTime));
     seriesRefs.current.modelLine?.setData(modelLineData.sort(sortByTime));
+    seriesRefs.current.floorLine?.setData(floorLineData.sort(sortByTime));
 
     if (lastHist) {
       setLegendData({
@@ -753,7 +773,8 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma50?.applyOptions({ visible: showSMA });
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
     seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
-  }, [showSMA, showVolume, showModelLine]);
+    seriesRefs.current.floorLine?.applyOptions({ visible: showFloorLine });
+  }, [showSMA, showVolume, showModelLine, showFloorLine]);
 
   // Update probability heatmap
   useEffect(() => {

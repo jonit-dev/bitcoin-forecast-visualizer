@@ -43,6 +43,7 @@ export default function App() {
   const [showSMA, setShowSMA] = useState(true);
   const [showVolume, setShowVolume] = useState(true);
   const [showModelLine, setShowModelLine] = useState(true);
+  const [showFloorLine, setShowFloorLine] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showFormulaHelp, setShowFormulaHelp] = useState(false);
 
@@ -225,6 +226,17 @@ export default function App() {
                     </button>
                   )}
                   <button
+                    onClick={() => setShowFloorLine(!showFloorLine)}
+                    className={cn(
+                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                      showFloorLine
+                        ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                    )}
+                  >
+                    Floor
+                  </button>
+                  <button
                     onClick={() => setShowHeatmap(!showHeatmap)}
                     className={cn(
                       "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
@@ -250,6 +262,7 @@ export default function App() {
                   showSMA={showSMA}
                   showVolume={showVolume}
                   showModelLine={model === 'powerlaw' && showModelLine}
+                  showFloorLine={showFloorLine}
                   showHeatmap={showHeatmap}
                   heatmapData={heatmapData}
                   timeRange={timeRange}
