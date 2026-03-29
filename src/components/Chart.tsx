@@ -984,7 +984,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     const chart = chartRef.current;
 
     if (timeRange === 'ALL') {
-      chart.timeScale().fitContent();
+      // Double-RAF ensures ResizeObserver has fired and chart has been sized
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (chartRef.current) chartRef.current.timeScale().fitContent();
+      }));
     } else {
       const forecastCount = data.filter((d: any) => d.isForecast).length;
       const historyCount = data.length - forecastCount;

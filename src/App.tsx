@@ -158,9 +158,9 @@ export default function App() {
   const volColor = volRisk === 'High' ? 'text-red-400' : volRisk === 'Medium' ? 'text-amber-500' : 'text-emerald-400';
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30">
+    <div className="h-screen flex flex-col overflow-hidden bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30">
       {/* Header */}
-      <header className="border-b border-white/5 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-10">
+      <header className="border-b border-white/5 bg-zinc-950/50 shrink-0">
         <div className="max-w-[1920px] mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
@@ -179,12 +179,13 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-[1920px] mx-auto px-4 py-4 md:py-6 flex flex-col lg:grid lg:grid-cols-[1fr_280px] gap-4 md:gap-5 min-h-[calc(100vh-4rem)]">
+      <main className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
+        <div className="max-w-[1920px] mx-auto px-4 py-4 md:py-6 flex flex-col lg:grid lg:grid-cols-[1fr_280px] lg:h-full gap-4 md:gap-5">
 
         {/* Main Content */}
-        <div className="space-y-4 md:space-y-5 order-1 flex flex-col min-h-0">
+        <div className="flex flex-col gap-4 md:gap-5 order-1 min-h-0">
           {/* Chart */}
-          <Card className="overflow-hidden flex-1 flex flex-col min-h-[450px]">
+          <Card className="overflow-hidden flex-1 flex flex-col min-h-[400px]">
             <CardHeader className="border-b border-white/5 pb-3 md:pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
               <CardTitle className="text-base md:text-lg">Price Forecast Visualization</CardTitle>
               <div className="flex items-center gap-2 md:gap-4 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide w-full sm:w-auto">
@@ -305,7 +306,7 @@ export default function App() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-0 pt-4 md:pt-6 flex-1">
+            <CardContent className="p-0 pt-4 md:pt-6 flex-1 min-h-0">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isGenerating ? 0.5 : 1 }}
@@ -331,7 +332,7 @@ export default function App() {
           </Card>
 
           {/* Metrics Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 shrink-0">
             <Card>
               <CardContent className="p-3 md:p-4">
                 <p className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1">Current Price</p>
@@ -376,7 +377,7 @@ export default function App() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-4 md:space-y-5 order-2">
+        <div className="space-y-4 md:space-y-5 order-2 min-h-0 lg:overflow-y-auto lg:scrollbar-hide">
           <Card>
             <CardHeader className="p-4 md:p-6">
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -691,6 +692,7 @@ export default function App() {
               </div>
             </CardContent>
           </Card>
+        </div>
         </div>
       </main>
 
