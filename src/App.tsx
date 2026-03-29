@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Activity, TrendingUp, Settings2, RefreshCw, BarChart2, Play, Square, HelpCircle, X, Zap } from 'lucide-react';
+import { Activity, TrendingUp, TrendingDown, Settings2, RefreshCw, BarChart2, Play, Square, HelpCircle, X, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
-import { processRealData, generateHeatmapData, type HeatmapCell } from './lib/data';
-import { loadBTCData, computeMVRVStats, type MarketData, type MVRVStats } from './lib/api';
+import { processRealData, generateHeatmapData, computeDrawdownStats, HISTORICAL_CYCLE_DRAWDOWNS, type HeatmapCell, type DrawdownStats } from './lib/data';
+import { loadBTCData, computeMVRVStats, computeMVRVZScoreSeries, type MarketData, type MVRVStats } from './lib/api';
 import { cn } from './lib/utils';
 
 function formatHorizonLabel(days: number): string {
@@ -47,6 +47,7 @@ function formatMarketCap(n: number) {
 export default function App() {
   const [marketData] = useState<MarketData>(() => loadBTCData());
   const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
+  const [mvrvZScoreData] = useState(() => computeMVRVZScoreSeries());
   const halvingInfo = useMemo(() => getHalvingInfo(), []);
   const [horizon, setHorizon] = useState(180);
   const [model, setModel] = useState('powerlaw');
@@ -60,13 +61,20 @@ export default function App() {
     generateHeatmapData(marketData.ohlcv, 180, 'powerlaw')
   );
 
+  // Drawdown analysis
+  const [drawdownStats, setDrawdownStats] = useState<DrawdownStats>(() =>
+    computeDrawdownStats(marketData.ohlcv, 180)
+  );
+
   // Chart Controls
   const [timeRange, setTimeRange] = useState('ALL');
   const [showSMA, setShowSMA] = useState(true);
   const [showVolume, setShowVolume] = useState(true);
   const [showModelLine, setShowModelLine] = useState(true);
   const [showFloorLine, setShowFloorLine] = useState(true);
+  const [showPeakLine, setShowPeakLine] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(true);
+  const [showMVRV, setShowMVRV] = useState(false);
   const [showFormulaHelp, setShowFormulaHelp] = useState(false);
 
   // Playback
@@ -80,6 +88,7 @@ export default function App() {
     setTimeout(() => {
       setDisplayData(processRealData(marketData.ohlcv, horizon, model));
       setHeatmapData(generateHeatmapData(marketData.ohlcv, horizon, model));
+      setDrawdownStats(computeDrawdownStats(marketData.ohlcv, horizon));
       setIsGenerating(false);
     }, 700);
   };
@@ -259,6 +268,17 @@ export default function App() {
                     Floor
                   </button>
                   <button
+                    onClick={() => setShowPeakLine(!showPeakLine)}
+                    className={cn(
+                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                      showPeakLine
+                        ? "bg-red-500/10 text-red-400 border-red-500/20"
+                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                    )}
+                  >
+                    Peak
+                  </button>
+                  <button
                     onClick={() => setShowHeatmap(!showHeatmap)}
                     className={cn(
                       "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
@@ -269,6 +289,19 @@ export default function App() {
                   >
                     Heatmap
                   </button>
+                  {mvrvZScoreData.length > 0 && (
+                    <button
+                      onClick={() => setShowMVRV(!showMVRV)}
+                      className={cn(
+                        "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                        showMVRV
+                          ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
+                          : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                      )}
+                    >
+                      MVRV Z
+                    </button>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -285,10 +318,13 @@ export default function App() {
                   showVolume={showVolume}
                   showModelLine={model === 'powerlaw' && showModelLine}
                   showFloorLine={showFloorLine}
+                  showPeakLine={showPeakLine}
                   showHeatmap={showHeatmap}
                   heatmapData={heatmapData}
                   timeRange={timeRange}
                   playbackIndex={playbackIndex}
+                  mvrvData={mvrvZScoreData}
+                  showMVRV={showMVRV}
                 />
               </motion.div>
             </CardContent>
@@ -527,6 +563,131 @@ export default function App() {
                 <p className="text-[10px] text-zinc-500 mt-1 text-right">
                   {((CIRCULATING_SUPPLY / MAX_SUPPLY) * 100).toFixed(1)}% mined
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <TrendingDown className="w-4 h-4 text-red-400" />
+                Drawdown Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 md:p-6 md:pt-0 space-y-4">
+              {/* Cycle 4 bear projection */}
+              <div>
+                <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">
+                  Cycle {drawdownStats.cycleIndex} Bear Projection
+                </p>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-zinc-400">Projected Max DD</span>
+                    <span className="text-xs font-mono text-red-400">
+                      -{drawdownStats.projectedMDD.toFixed(1)}%
+                    </span>
+                  </div>
+                  {drawdownStats.cycleHighPrice > 0 && (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-zinc-400">Cycle ATH</span>
+                        <span className="text-xs font-mono text-zinc-200">
+                          {formatPrice(drawdownStats.cycleHighPrice)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-zinc-400">Current from ATH</span>
+                        <span className={cn(
+                          "text-xs font-mono",
+                          drawdownStats.currentDrawdownPct > 0 ? "text-red-400" : "text-emerald-400"
+                        )}>
+                          -{drawdownStats.currentDrawdownPct.toFixed(1)}%
+                        </span>
+                      </div>
+                      {/* Progress bar */}
+                      <div>
+                        <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden mt-1">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${drawdownStats.drawdownProgress * 100}%`,
+                              backgroundColor: drawdownStats.drawdownProgress < 0.4
+                                ? 'rgb(52 211 153)' // emerald
+                                : drawdownStats.drawdownProgress < 0.75
+                                ? 'rgb(251 146 60)' // orange
+                                : 'rgb(248 113 113)', // red
+                            }}
+                          />
+                        </div>
+                        <p className="text-[10px] text-zinc-500 mt-1 text-right">
+                          {(drawdownStats.drawdownProgress * 100).toFixed(0)}% of projected MDD reached
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-zinc-400">Bear Floor Est.</span>
+                        <span className="text-xs font-mono text-zinc-300">
+                          {formatPrice(drawdownStats.impliedFloorFromCycleHigh)}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* GBM Monte Carlo MDD */}
+              <div className="border-t border-white/5 pt-3">
+                <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">
+                  GBM E[MDD] · {formatHorizonLabel(drawdownStats.gbmHorizonDays)}
+                </p>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-zinc-400">Expected</span>
+                    <span className="text-xs font-mono text-amber-400">
+                      -{drawdownStats.gbmExpectedMDD.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-zinc-400">Worst 5%</span>
+                    <span className="text-xs font-mono text-red-400">
+                      -{drawdownStats.gbmP95MDD.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cycle history mini bar chart */}
+              <div className="border-t border-white/5 pt-3">
+                <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">
+                  Cycle History
+                </p>
+                <div className="space-y-1.5">
+                  {HISTORICAL_CYCLE_DRAWDOWNS.map(({ cycle, label, pct }) => (
+                    <div key={cycle} className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono text-zinc-500 w-14 shrink-0">C{cycle} {label.slice(0, 4)}</span>
+                      <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-zinc-500 rounded-full"
+                          style={{ width: `${(pct / 90) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-mono text-zinc-400 w-10 text-right shrink-0">
+                        -{pct}%
+                      </span>
+                    </div>
+                  ))}
+                  {/* Cycle 4 projection */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-zinc-400 w-14 shrink-0">C4 proj.</span>
+                    <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-red-500/60 rounded-full"
+                        style={{ width: `${(drawdownStats.projectedMDD / 90) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-mono text-red-400 w-10 text-right shrink-0">
+                      -{drawdownStats.projectedMDD.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

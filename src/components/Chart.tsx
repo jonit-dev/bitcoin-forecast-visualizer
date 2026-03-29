@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { createChart, ColorType, CrosshairMode, ISeriesApi, CandlestickSeries, HistogramSeries, LineSeries, createSeriesMarkers } from 'lightweight-charts';
 import type { CanvasRenderingTarget2D } from 'fancy-canvas';
+import { cn } from '../lib/utils';
 
 // Bitcoin halving dates — known + dynamically projected every ~4 years
 const KNOWN_HALVINGS = ['2012-11-28', '2016-07-09', '2020-05-11', '2024-04-20'];
@@ -469,6 +470,98 @@ class HeatmapPrimitive {
   }
 }
 
+// ---- MVRV Z-Score indicator pane primitive ----
+
+const MVRV_ZONES = [
+  { min: 7,   max: 15,  fill: 'rgba(239,68,68,0.10)',   label: 'Extreme',    labelColor: 'rgba(239,68,68,0.65)' },
+  { min: 3.5, max: 7,   fill: 'rgba(251,191,36,0.08)',  label: 'Overvalued', labelColor: 'rgba(251,191,36,0.55)' },
+  { min: 2,   max: 3.5, fill: 'rgba(250,250,250,0.03)', label: '',           labelColor: '' },
+  { min: 0,   max: 2,   fill: 'rgba(16,185,129,0.05)',  label: 'Undervalued',labelColor: 'rgba(16,185,129,0.55)' },
+  { min: -5,  max: 0,   fill: 'rgba(16,185,129,0.12)',  label: 'Deep Value', labelColor: 'rgba(16,185,129,0.70)' },
+];
+
+const MVRV_REF_LINES = [
+  { value: 7,   color: 'rgba(239,68,68,0.55)',   text: '7' },
+  { value: 3.5, color: 'rgba(251,191,36,0.50)',  text: '3.5' },
+  { value: 0,   color: 'rgba(16,185,129,0.55)',  text: '0' },
+];
+
+class MVRVZoneRenderer {
+  private _series: any;
+  constructor(series: any) { this._series = series; }
+
+  draw(target: CanvasRenderingTarget2D): void {
+    target.useMediaCoordinateSpace(({ context, mediaSize }) => {
+      const w = mediaSize.width;
+      const h = mediaSize.height;
+
+      for (const zone of MVRV_ZONES) {
+        const yTop = this._series.priceToCoordinate(zone.max);
+        const yBot = this._series.priceToCoordinate(zone.min);
+        if (yTop === null || yBot === null) continue;
+        const top = Math.max(0, Math.min(yTop, yBot));
+        const bot = Math.min(h, Math.max(yTop, yBot));
+        if (bot <= top) continue;
+        context.fillStyle = zone.fill;
+        context.fillRect(0, top, w, bot - top);
+        if (zone.label) {
+          context.font = 'bold 9px sans-serif';
+          context.fillStyle = zone.labelColor;
+          context.textAlign = 'left';
+          context.fillText(zone.label, 6, top + 11);
+        }
+      }
+
+      for (const ref of MVRV_REF_LINES) {
+        const y = this._series.priceToCoordinate(ref.value);
+        if (y === null || y < 0 || y > h) continue;
+        context.beginPath();
+        context.strokeStyle = ref.color;
+        context.lineWidth = 0.75;
+        context.setLineDash([3, 3]);
+        context.moveTo(0, y);
+        context.lineTo(w, y);
+        context.stroke();
+        context.setLineDash([]);
+        context.font = '9px monospace';
+        context.fillStyle = ref.color;
+        context.textAlign = 'right';
+        context.fillText(ref.text, w - 4, y - 3);
+      }
+
+      // "MVRV Z-Score" label top-left
+      context.font = 'bold 9px sans-serif';
+      context.fillStyle = 'rgba(161,161,170,0.7)';
+      context.textAlign = 'left';
+      context.fillText('MVRV Z-Score', 6, h - 6);
+    });
+  }
+}
+
+class MVRVZonePaneView {
+  private _renderer: MVRVZoneRenderer;
+  constructor(series: any) { this._renderer = new MVRVZoneRenderer(series); }
+  zOrder() { return 'bottom' as const; }
+  renderer() { return this._renderer; }
+}
+
+class MVRVZonePrimitive {
+  private _series: any = null;
+  private _paneViews: MVRVZonePaneView[] = [];
+  updateAllViews() { if (this._series) this._paneViews = [new MVRVZonePaneView(this._series)]; }
+  paneViews() { return this._paneViews; }
+  attached(param: any) { this._series = param.series; this.updateAllViews(); }
+  detached() { this._series = null; this._paneViews = []; }
+}
+
+function mvrvZScoreColor(z: number): string {
+  if (z >= 7)   return 'rgba(239,68,68,0.9)';
+  if (z >= 3.5) return 'rgba(251,191,36,0.9)';
+  if (z >= 2)   return 'rgba(200,200,200,0.75)';
+  if (z >= 0)   return 'rgba(16,185,129,0.7)';
+  return 'rgba(16,185,129,0.95)';
+}
+
 // ---- Chart component ----
 
 interface ForecastChartProps {
@@ -477,13 +570,16 @@ interface ForecastChartProps {
   showVolume: boolean;
   showModelLine: boolean;
   showFloorLine: boolean;
+  showPeakLine: boolean;
   showHeatmap: boolean;
   heatmapData: HeatmapCell[];
   timeRange: string;
   playbackIndex: number | null;
+  mvrvData: { date: string; zScore: number; mvrv: number }[];
+  showMVRV: boolean;
 }
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showFloorLine, showHeatmap, heatmapData, timeRange, playbackIndex }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showFloorLine, showPeakLine, showHeatmap, heatmapData, timeRange, playbackIndex, mvrvData, showMVRV }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<{
@@ -496,9 +592,13 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     forecastLower?: ISeriesApi<"Line">;
     modelLine?: ISeriesApi<"Line">;
     floorLine?: ISeriesApi<"Line">;
+    peakLine?: ISeriesApi<"Line">;
   }>({});
   const markersRef = useRef<any>(null);
   const heatmapPrimRef = useRef<HeatmapPrimitive | null>(null);
+  const mvrvChartContainerRef = useRef<HTMLDivElement>(null);
+  const mvrvChartRef = useRef<any>(null);
+  const mvrvSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -624,8 +724,66 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     });
     seriesRefs.current.floorLine = floorLineSeries;
 
+    // Peak Price Power Law Line (9.89e-7 * d^2.9379)
+    const peakLineSeries = chart.addSeries(LineSeries, {
+      color: 'rgba(239, 68, 68, 0.9)', // red
+      lineWidth: 2,
+      lineStyle: 1, // Dotted
+      crosshairMarkerVisible: false,
+      lastValueVisible: false,
+      priceLineVisible: false,
+      visible: false,
+    });
+    seriesRefs.current.peakLine = peakLineSeries;
+
+    // ---- MVRV Z-Score panel: completely separate chart instance ----
+    if (mvrvChartContainerRef.current) {
+      const mvrvChart = createChart(mvrvChartContainerRef.current, {
+        layout: {
+          background: { type: ColorType.Solid, color: 'transparent' },
+          textColor: '#a1a1aa',
+        },
+        grid: {
+          vertLines: { color: '#27272a', style: 1 },
+          horzLines: { color: '#27272a', style: 1 },
+        },
+        crosshair: { mode: CrosshairMode.Normal },
+        rightPriceScale: { borderColor: '#52525b' },
+        leftPriceScale: { visible: false },
+        timeScale: {
+          borderColor: '#52525b',
+          timeVisible: false,
+          rightOffset: 12,
+          barSpacing: 3,
+          visible: false, // time axis shown only on main chart
+        },
+        handleScroll: false,
+        handleScale: false,
+        autoSize: true,
+      });
+      mvrvChartRef.current = mvrvChart;
+
+      const mvrvSeries = mvrvChart.addSeries(LineSeries, {
+        lineWidth: 2,
+        priceLineVisible: false,
+        lastValueVisible: true,
+        crosshairMarkerVisible: true,
+        crosshairMarkerRadius: 3,
+      });
+      mvrvSeriesRef.current = mvrvSeries;
+      mvrvSeries.attachPrimitive(new MVRVZonePrimitive() as any);
+
+      // Sync main chart time range → MVRV panel (one-way; MVRV panel is non-interactive)
+      // Guard with try/catch: MVRV chart throws if called before its data is loaded
+      chart.timeScale().subscribeVisibleTimeRangeChange((range) => {
+        if (!range) return;
+        try { mvrvChart.timeScale().setVisibleRange(range); } catch { /* not ready */ }
+      });
+    }
+
     return () => {
       chart.remove();
+      mvrvChartRef.current?.remove();
     };
   }, []);
 
@@ -666,6 +824,11 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       .filter((d: any) => d.floorPriceModel != null && d.floorPriceModel > 0)
       .map((d: any) => ({ time: d.date, value: d.floorPriceModel }));
 
+    // Peak price line (all data including forecast projection)
+    const peakLineData = [...historical, ...forecast]
+      .filter((d: any) => d.peakPriceModel != null && d.peakPriceModel > 0)
+      .map((d: any) => ({ time: d.date, value: d.peakPriceModel }));
+
     seriesRefs.current.candlestick?.setData(candleData.sort(sortByTime));
     seriesRefs.current.volume?.setData(volumeData.sort(sortByTime));
     seriesRefs.current.sma20?.setData(sma20Data.sort(sortByTime));
@@ -675,6 +838,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.forecastLower?.setData(forecastLowerData.sort(sortByTime));
     seriesRefs.current.modelLine?.setData(modelLineData.sort(sortByTime));
     seriesRefs.current.floorLine?.setData(floorLineData.sort(sortByTime));
+    seriesRefs.current.peakLine?.setData(peakLineData.sort(sortByTime));
 
     if (lastHist) {
       setLegendData({
@@ -766,6 +930,24 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     return () => { chart.unsubscribeCrosshairMove(handleCrosshairMove); };
   }, [data]);
 
+  // Load MVRV Z-Score data into the separate indicator chart
+  useEffect(() => {
+    if (!mvrvSeriesRef.current || !mvrvData?.length) return;
+    const lineData = mvrvData.map(d => ({
+      time: d.date as any,
+      value: d.zScore,
+      color: mvrvZScoreColor(d.zScore),
+    }));
+    mvrvSeriesRef.current.setData(lineData);
+    // Once MVRV data is loaded, sync current main chart range into the MVRV chart
+    if (chartRef.current && mvrvChartRef.current) {
+      try {
+        const range = chartRef.current.timeScale().getVisibleRange();
+        if (range) mvrvChartRef.current.timeScale().setVisibleRange(range);
+      } catch { /* ignore */ }
+    }
+  }, [mvrvData]);
+
   // Handle visibility toggles
   useEffect(() => {
     if (!chartRef.current) return;
@@ -774,7 +956,8 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
     seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
     seriesRefs.current.floorLine?.applyOptions({ visible: showFloorLine });
-  }, [showSMA, showVolume, showModelLine, showFloorLine]);
+    seriesRefs.current.peakLine?.applyOptions({ visible: showPeakLine });
+  }, [showSMA, showVolume, showModelLine, showFloorLine, showPeakLine]);
 
   // Update probability heatmap
   useEffect(() => {
@@ -825,8 +1008,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
   }, [timeRange, data, playbackIndex]);
 
   return (
-    <div className="w-full h-full min-h-[350px] relative">
-      <div ref={chartContainerRef} className="absolute inset-0" />
+    <div className="w-full h-full min-h-[350px] flex flex-col">
+      {/* Main price chart */}
+      <div className="relative flex-1 min-h-0">
+        <div ref={chartContainerRef} className="absolute inset-0" />
 
       {legendData && (
         <div className="absolute bottom-8 left-3 z-10 pointer-events-none flex flex-wrap gap-x-3 gap-y-1 text-[10px] md:text-xs font-mono bg-zinc-950/50 backdrop-blur-sm p-1.5 rounded border border-white/5">
@@ -896,6 +1081,18 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
           )}
         </div>
       )}
+      </div>{/* end main chart wrapper */}
+
+      {/* MVRV Z-Score indicator panel — separate chart, synced time range */}
+      <div
+        ref={mvrvChartContainerRef}
+        className={cn(
+          "shrink-0 transition-all duration-200",
+          showMVRV && mvrvData?.length > 0
+            ? "h-[130px] border-t border-white/5"
+            : "h-0 overflow-hidden"
+        )}
+      />
     </div>
   );
 });

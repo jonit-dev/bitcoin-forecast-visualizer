@@ -32,6 +32,24 @@ export interface MVRVStats {
   signalColor: string;
 }
 
+export function computeMVRVZScoreSeries(): { date: string; zScore: number; mvrv: number }[] {
+  const data = mvrvHistory as MVRVPoint[];
+  if (data.length < 30) return [];
+
+  const filtered = data.filter(d => d.mvrv > 0 && d.marketCap > 0);
+  const diffs = filtered.map(d => d.marketCap - d.marketCap / d.mvrv);
+  const mean = diffs.reduce((s, v) => s + v, 0) / diffs.length;
+  const variance = diffs.reduce((s, v) => s + (v - mean) ** 2, 0) / diffs.length;
+  const stddev = Math.sqrt(variance);
+  if (stddev === 0) return [];
+
+  return filtered.map((d, i) => ({
+    date: d.date,
+    zScore: parseFloat(((diffs[i] - mean) / stddev).toFixed(3)),
+    mvrv: d.mvrv,
+  }));
+}
+
 export function computeMVRVStats(): MVRVStats {
   const data = mvrvHistory as MVRVPoint[];
   if (data.length < 30) return { currentMVRV: null, zScore: null, signal: '—', signalColor: 'text-zinc-400' };
