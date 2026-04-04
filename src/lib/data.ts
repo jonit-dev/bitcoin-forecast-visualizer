@@ -1,4 +1,12 @@
 import type { OHLCVData } from './api';
+import {
+  basePowerLawPrice,
+  daysSinceGenesis,
+  floorPowerLawPrice,
+  peakPowerLawPrice,
+  POWER_LAW_MEAN_REVERSION_TAU_DAYS,
+  powerLawForecast,
+} from './powerLaw';
 
 export interface HeatmapCell {
   date: string;
@@ -7,51 +15,32 @@ export interface HeatmapCell {
   density: number; // 0-1 normalized per column
 }
 
-// BTC Power Law model anchored to Genesis block (2009-01-03)
-const GENESIS = new Date('2009-01-03T00:00:00Z');
+// Holdout-calibrated blend: recent vol reacts quickly, long vol keeps the band from overfitting
+// the latest regime. The log-drift scale keeps the modal path close to realized outcomes.
+const POWER_LAW_HEATMAP_RECENT_VOL_WEIGHT = 0.55;
+const POWER_LAW_HEATMAP_LOG_DRIFT_SCALE = 0.3;
 
-function daysSinceGenesis(date: Date): number {
-  return Math.floor((date.getTime() - GENESIS.getTime()) / 86400000);
+function computeLogReturnStats(ohlcv: OHLCVData[], lookback: number) {
+  const cappedLookback = Math.min(Math.max(1, lookback), ohlcv.length - 1);
+  const recent = ohlcv.slice(-cappedLookback - 1);
+  const logReturns = recent.slice(1).map((d, i) => Math.log(d.close / recent[i].close));
+  const meanReturn = logReturns.reduce((sum, value) => sum + value, 0) / logReturns.length;
+  const variance = logReturns.reduce((sum, value) => sum + (value - meanReturn) ** 2, 0) / logReturns.length;
+
+  return {
+    meanReturn,
+    dailyVol: Math.sqrt(variance),
+  };
 }
 
-// Power-law peak (cycle tops): price = 9.89e-7 * d^2.9379
-// OLS on ln(price) vs ln(d) for 2017/2021/2025 cycle peaks (R²=0.986).
-function peakPowerLawPrice(t: number): number {
-  return 9.89e-7 * Math.pow(t, 2.9379);
-}
+function blendedPowerLawHeatmapVol(ohlcv: OHLCVData[]) {
+  const recentVol = computeLogReturnStats(ohlcv, 90).dailyVol;
+  const structuralVol = computeLogReturnStats(ohlcv, 365).dailyVol;
 
-// Power-law floor: price = e^(-40.234) * d^5.847
-// Grid-search optimized against full 2010–2026 dataset (5,731 days).
-// Never breached at any cycle low (2011/2015/2018/2022).
-// Post-2013: 99.96% of days above, max breach 10.1%, only 2 breach days.
-// Capped so the floor never exceeds the base model's cycle trough.
-function floorPowerLawPrice(t: number): number {
-  const raw = Math.exp(-40.234) * Math.pow(t, 5.847);
-  // Base model trough ≈ base trend × (1 - cyclic amplitude)
-  const a = 9.48e-10;
-  const b = 3.6702;
-  const cyclicAmplitude = Math.sqrt(0.2323 ** 2 + 0.4288 ** 2); // ~0.489
-  const baseTrough = a * Math.pow(t, b) * (1 - cyclicAmplitude);
-  return Math.min(raw, baseTrough);
-}
-
-function basePowerLawPrice(t: number): number {
-  const a = 9.48e-10;
-  const b = 3.6702;
-  const c1 = 0.2323;
-  const c2 = 0.4288;
-  const omega = (2 * Math.PI) / 1460;
-  return a * Math.pow(t, b) * (1 + c1 * Math.sin(omega * t) + c2 * Math.cos(omega * t));
-}
-
-function powerLawForecast(dateFuture: Date, currentPrice: number, currentDate: Date): number {
-  const tNow = daysSinceGenesis(currentDate);
-  const tFut = daysSinceGenesis(dateFuture);
-  const hDays = Math.round((dateFuture.getTime() - currentDate.getTime()) / 86400000);
-  const rT = Math.log(currentPrice) - Math.log(basePowerLawPrice(tNow));
-  const tau = 210;
-  const corr = Math.exp(rT * Math.exp(-hDays / tau));
-  return basePowerLawPrice(tFut) * corr;
+  return Math.sqrt(
+    POWER_LAW_HEATMAP_RECENT_VOL_WEIGHT * recentVol * recentVol +
+    (1 - POWER_LAW_HEATMAP_RECENT_VOL_WEIGHT) * structuralVol * structuralVol
+  );
 }
 
 export function processRealData(ohlcv: OHLCVData[], horizon: number = 14, model: string = 'transformer'): any[] {
@@ -136,7 +125,7 @@ export function processRealData(ohlcv: OHLCVData[], horizon: number = 14, model:
   return data;
 }
 
-// Monte Carlo probability heatmap using GBM with power-law drift
+// Monte Carlo probability heatmap using a calibrated power-law residual process.
 export function generateHeatmapData(
   ohlcv: OHLCVData[],
   horizon: number,
@@ -146,31 +135,30 @@ export function generateHeatmapData(
 ): HeatmapCell[] {
   if (horizon < 1 || ohlcv.length < 30) return [];
 
-  const lookback = Math.min(90, ohlcv.length - 1);
-  const recent = ohlcv.slice(-lookback - 1);
-  const logReturns = recent.slice(1).map((d, i) => Math.log(d.close / recent[i].close));
-  const meanReturn = logReturns.reduce((s, r) => s + r, 0) / logReturns.length;
-  const variance = logReturns.reduce((s, r) => s + (r - meanReturn) ** 2, 0) / logReturns.length;
-  const dailyVol = Math.sqrt(variance);
-  const halfVolSq = 0.5 * dailyVol * dailyVol;
+  const { meanReturn, dailyVol: recentVol } = computeLogReturnStats(ohlcv, 90);
 
   const lastPrice = ohlcv[ohlcv.length - 1].close;
   const lastDateMs = new Date(ohlcv[ohlcv.length - 1].date + 'T00:00:00Z').getTime();
   const lastDate = new Date(lastDateMs);
   const isPowerLaw = model === 'powerlaw';
+  const dailyVol = isPowerLaw ? blendedPowerLawHeatmapVol(ohlcv) : recentVol;
+  const fixedHalfVolSq = 0.5 * dailyVol * dailyVol;
 
-  // Pre-compute drift for each day ONCE (identical across all sims)
+  // Random-walk drift is fixed; power-law paths need path-dependent re-anchoring.
   const drifts = new Float64Array(horizon + 1);
-  if (isPowerLaw) {
-    let prevPl = lastPrice;
-    for (let d = 1; d <= horizon; d++) {
-      const plFut = powerLawForecast(new Date(lastDateMs + d * 86400000), lastPrice, lastDate);
-      drifts[d] = Math.log(plFut / prevPl);
-      prevPl = plFut;
-    }
-  } else {
+  if (!isPowerLaw) {
     drifts.fill(meanReturn, 1);
   }
+
+  const futureBasePrices = new Float64Array(horizon + 1);
+  const lastBasePrice = basePowerLawPrice(daysSinceGenesis(lastDate));
+  if (isPowerLaw) {
+    const tNow = daysSinceGenesis(lastDate);
+    futureBasePrices[0] = lastBasePrice;
+    for (let d = 1; d <= horizon; d++) futureBasePrices[d] = basePowerLawPrice(tNow + d);
+  }
+  const residualDecay = Math.exp(-1 / POWER_LAW_MEAN_REVERSION_TAU_DAYS);
+  const powerLawShockDrift = -POWER_LAW_HEATMAP_LOG_DRIFT_SCALE * dailyVol * dailyVol;
 
   // Sample output dates for long horizons (sim still runs every day for accuracy)
   const sampleStep = horizon <= 90 ? 1 : horizon <= 365 ? 2 : horizon <= 1825 ? 5 : 10;
@@ -197,14 +185,28 @@ export function generateHeatmapData(
   const results = new Float64Array(numSimulations * sampledCount);
 
   for (let s = 0; s < numSimulations; s++) {
-    let price = lastPrice;
     let sIdx = 0;
     const rOff = s * horizon;
 
-    for (let d = 1; d <= horizon; d++) {
-      price = price * Math.exp(drifts[d] - halfVolSq + dailyVol * normals[rOff + d - 1]);
-      if (sampledSet.has(d)) {
-        results[s * sampledCount + sIdx++] = price;
+    if (isPowerLaw) {
+      let residual = Math.log(lastPrice / lastBasePrice);
+
+      for (let d = 1; d <= horizon; d++) {
+        residual = residual * residualDecay + powerLawShockDrift + dailyVol * normals[rOff + d - 1];
+        const price = futureBasePrices[d] * Math.exp(residual);
+
+        if (sampledSet.has(d)) {
+          results[s * sampledCount + sIdx++] = price;
+        }
+      }
+    } else {
+      let price = lastPrice;
+
+      for (let d = 1; d <= horizon; d++) {
+        price = price * Math.exp(drifts[d] - fixedHalfVolSq + dailyVol * normals[rOff + d - 1]);
+        if (sampledSet.has(d)) {
+          results[s * sampledCount + sIdx++] = price;
+        }
       }
     }
   }

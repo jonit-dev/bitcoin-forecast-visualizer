@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { createChart, ColorType, CrosshairMode, ISeriesApi, CandlestickSeries, HistogramSeries, LineSeries, createSeriesMarkers } from 'lightweight-charts';
 import type { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { cn } from '../lib/utils';
+import { CYCLE_PIVOTS, PHASE_ZONES, type PhaseLabel } from '../lib/cycle';
 
 // Bitcoin halving dates — known + dynamically projected every ~4 years
 const KNOWN_HALVINGS = ['2012-11-28', '2016-07-09', '2020-05-11', '2024-04-20'];
@@ -34,99 +35,7 @@ const PHASE_STYLES = {
   Bear:         { color: 'rgba(239, 68, 68, 0.05)',   textColor: 'rgba(239, 68, 68, 0.6)',   pillColor: 'rgba(239, 68, 68, 0.08)' },
 };
 
-interface PhaseZone {
-  startDate: string;
-  endDate: string;
-  label: string;
-  style: typeof PHASE_STYLES[keyof typeof PHASE_STYLES];
-}
-
-function buildPhaseZones(pivots: CyclePivot[]): PhaseZone[] {
-  const zones: PhaseZone[] = [];
-  for (let i = 0; i < pivots.length; i++) {
-    const pivot = pivots[i];
-    const next = pivots[i + 1];
-    if (pivot.type === 'ATL') {
-      // ATL → next ATH: Accumulation (first 6 months), then Bull (rest)
-      const accumEnd = addMonths(pivot.date, 6);
-      const bullEnd = next ? next.date : addDays(pivot.date, ATL_TO_ATH_DAYS);
-      zones.push({ startDate: pivot.date, endDate: accumEnd, label: 'Accumulation', style: PHASE_STYLES.Accumulation });
-      zones.push({ startDate: accumEnd, endDate: bullEnd, label: 'Bull', style: PHASE_STYLES.Bull });
-    } else {
-      // ATH → next ATL: Trim (first 4 months), then Bear (rest)
-      const trimEnd = addMonths(pivot.date, 4);
-      const bearEnd = next ? next.date : addDays(pivot.date, ATH_TO_ATL_DAYS);
-      zones.push({ startDate: pivot.date, endDate: trimEnd, label: 'Trim', style: PHASE_STYLES.Trim });
-      zones.push({ startDate: trimEnd, endDate: bearEnd, label: 'Bear', style: PHASE_STYLES.Bear });
-    }
-  }
-  return zones;
-}
-
-// PHASE_ZONES initialized after CYCLE_PIVOTS below
-let PHASE_ZONES: PhaseZone[] = [];
-
-// ---- ATL↔ATH symmetric cycle model (1064d / 364d pattern) ----
-// Source: BTC cycle timing shows a repeating 1064-day ATL→ATH run
-// followed by a 364-day ATH→ATL correction, then the pattern repeats.
-//
-//  ATL 2015-01-14 → ATH 2017-12-17 = 1064d
-//  ATH 2017-12-17 → ATL 2018-12-15 =  364d
-//  ATL 2018-12-15 → ATH 2021-11-10 = 1061d (≈1064)
-//  ATH 2021-11-10 → ATL 2022-11-09 =  364d
-//  ATL 2022-11-09 → ATH predicted   = 1064d → 2025-10-08
-
-const ATL_TO_ATH_DAYS = 1064;
-const ATH_TO_ATL_DAYS = 364;
-
-// Seed: first known ATL in the pattern
-const CYCLE_SEED_ATL = '2015-01-14';
-
-interface CyclePivot {
-  date: string;
-  type: 'ATL' | 'ATH';
-  known: boolean; // historical (true) vs projected (false)
-}
-
-function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr + 'T00:00:00Z');
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().split('T')[0];
-}
-
-// Known historical pivots (exact dates)
-const KNOWN_PIVOTS: CyclePivot[] = [
-  { date: '2013-12-04', type: 'ATH', known: true },
-  { date: '2015-01-14', type: 'ATL', known: true },
-  { date: '2017-12-17', type: 'ATH', known: true },
-  { date: '2018-12-15', type: 'ATL', known: true },
-  { date: '2021-11-10', type: 'ATH', known: true },
-  { date: '2022-11-09', type: 'ATL', known: true },
-];
-
-function generateCyclePivots(untilYear = 2040): CyclePivot[] {
-  const pivots = [...KNOWN_PIVOTS];
-  // Continue the pattern from the last known pivot
-  let last = pivots[pivots.length - 1];
-  while (new Date(last.date + 'T00:00:00Z').getUTCFullYear() < untilYear) {
-    const nextDays = last.type === 'ATL' ? ATL_TO_ATH_DAYS : ATH_TO_ATL_DAYS;
-    const nextType = last.type === 'ATL' ? 'ATH' : 'ATL';
-    const nextDate = addDays(last.date, nextDays);
-    const pivot: CyclePivot = { date: nextDate, type: nextType, known: false };
-    pivots.push(pivot);
-    last = pivot;
-  }
-  return pivots;
-}
-
-const CYCLE_PIVOTS = generateCyclePivots();
-PHASE_ZONES = buildPhaseZones(CYCLE_PIVOTS);
-
-function addMonths(dateStr: string, months: number): string {
-  const d = new Date(dateStr + 'T00:00:00Z');
-  d.setUTCMonth(d.getUTCMonth() + months);
-  return d.toISOString().split('T')[0];
-}
+const getPhaseStyle = (label: PhaseLabel) => PHASE_STYLES[label];
 
 // ---- Lightweight-charts primitive: halving lines + cycle phase shading ----
 
@@ -148,6 +57,7 @@ class HalvingCycleRenderer {
 
       // --- Draw cycle phase shading (anchored to ATL/ATH pivots) ---
       for (const zone of PHASE_ZONES) {
+        const style = getPhaseStyle(zone.label);
         const x0 = timeScale.timeToCoordinate(zone.startDate as any);
         const x1 = timeScale.timeToCoordinate(zone.endDate as any);
         if (x0 === null || x1 === null) continue;
@@ -155,7 +65,7 @@ class HalvingCycleRenderer {
         const right = Math.min(w, Math.max(x0, x1));
         if (right <= 0 || left >= w) continue;
 
-        context.fillStyle = zone.style.color;
+        context.fillStyle = style.color;
         context.fillRect(left, 0, right - left, h);
 
         // Phase label centered at top of zone
@@ -166,11 +76,11 @@ class HalvingCycleRenderer {
           const cx = left + (right - left) / 2;
           const ly = 22;
           const pad = 6;
-          context.fillStyle = zone.style.pillColor;
+          context.fillStyle = style.pillColor;
           context.beginPath();
           context.roundRect(cx - tm.width / 2 - pad, ly - 11, tm.width + pad * 2, 16, 4);
           context.fill();
-          context.fillStyle = zone.style.textColor;
+          context.fillStyle = style.textColor;
           context.textAlign = 'center';
           context.fillText(phaseText, cx, ly);
           context.textAlign = 'left';

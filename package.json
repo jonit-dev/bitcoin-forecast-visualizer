@@ -9,6 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
+    "analyze:phase-signal": "tsx scripts/analyze-phase-signal.ts",
+    "analyze:heatmap-model": "tsx scripts/analyze-heatmap-model.ts",
     "lint": "tsc --noEmit",
     "deploy": "bash -c 'set -a; source .env; set +a; node scripts/update-btc-data.mjs && vite build && wrangler pages deploy dist --branch main'"
   },
