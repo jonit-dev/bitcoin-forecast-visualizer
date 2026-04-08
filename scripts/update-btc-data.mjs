@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Patches src/data/btc-history.json with missing days from CoinGecko.
+ * Patches src/data/btc-history.json with recent OHLC from CoinGecko and volume from CryptoCompare.
  * Patches src/data/mvrv-history.json with missing days from CoinMetrics.
  * Runs automatically as a predev hook before `yarn dev`.
  */
@@ -11,68 +11,177 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '../src/data/btc-history.json');
 const MVRV_DATA_PATH = join(__dirname, '../src/data/mvrv-history.json');
+const MS_PER_DAY = 86400000;
+const BTC_REPAIR_LOOKBACK_DAYS = 180;
+const BTC_HOURLY_CHUNK_DAYS = 90;
+
+function parseUtcDate(date) {
+  return new Date(`${date}T00:00:00Z`);
+}
+
+function toUtcDateString(value) {
+  return new Date(value).toISOString().split('T')[0];
+}
+
+function addUtcDays(date, days) {
+  const next = parseUtcDate(date);
+  next.setUTCDate(next.getUTCDate() + days);
+  return toUtcDateString(next);
+}
+
+function diffUtcDays(fromDate, toDate) {
+  return Math.round((parseUtcDate(toDate).getTime() - parseUtcDate(fromDate).getTime()) / MS_PER_DAY);
+}
+
+function maxDate(...dates) {
+  return dates.filter(Boolean).sort().at(-1);
+}
+
+function buildRangeChunks(fromDateInclusive, toDateExclusive, chunkDays) {
+  const chunks = [];
+  let cursor = fromDateInclusive;
+
+  while (cursor < toDateExclusive) {
+    const endExclusive = [addUtcDays(cursor, chunkDays), toDateExclusive].sort()[0];
+    chunks.push({ from: cursor, to: endExclusive });
+    cursor = endExclusive;
+  }
+
+  return chunks;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchJson(url, retries = 3) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch(url);
+    if (res.ok) {
+      return res.json();
+    }
+
+    if (res.status === 429 && attempt < retries) {
+      const retryAfter = Number(res.headers.get('retry-after'));
+      const delayMs = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1500 * (attempt + 1);
+      console.warn(`[BTC data] API rate limit hit, retrying in ${delayMs}ms…`);
+      await sleep(delayMs);
+      continue;
+    }
+
+    throw new Error(`${res.status} ${res.statusText} for ${url}`);
+  }
+}
+
+async function fetchCryptoCompareDailyVolumes(fromDateInclusive, toDateInclusive) {
+  const volumeByDate = new Map();
+  let cursorTo = toDateInclusive;
+
+  while (cursorTo >= fromDateInclusive) {
+    const spanDays = diffUtcDays(fromDateInclusive, cursorTo);
+    const limit = Math.min(2000, Math.max(0, spanDays));
+    const toTs = Math.floor(parseUtcDate(cursorTo).getTime() / 1000);
+    const json = await fetchJson(
+      `https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=${limit}&toTs=${toTs}`
+    );
+
+    if (json.Response !== 'Success') {
+      throw new Error(`CryptoCompare request failed: ${json.Message || 'unknown error'}`);
+    }
+
+    const rows = json.Data?.Data || [];
+    if (rows.length === 0) break;
+
+    for (const row of rows) {
+      const date = toUtcDateString(row.time * 1000);
+      if (date < fromDateInclusive || date > toDateInclusive) continue;
+      volumeByDate.set(date, Math.round(row.volumeto || 0));
+    }
+
+    const firstDate = toUtcDateString(rows[0].time * 1000);
+    if (firstDate <= fromDateInclusive) break;
+    cursorTo = addUtcDays(firstDate, -1);
+  }
+
+  return volumeByDate;
+}
+
+async function fetchRecentDailyCandles(fromDateInclusive, toDateInclusive) {
+  const toDateExclusive = addUtcDays(toDateInclusive, 1);
+  const priceByDate = new Map();
+
+  for (const { from, to } of buildRangeChunks(fromDateInclusive, toDateExclusive, BTC_HOURLY_CHUNK_DAYS)) {
+    const chart = await fetchJson(
+      `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}&interval=hourly`
+    );
+
+    for (const [ts, price] of chart.prices || []) {
+      const date = toUtcDateString(ts);
+      if (date < fromDateInclusive || date > toDateInclusive) continue;
+
+      const candle = priceByDate.get(date);
+      if (!candle) {
+        priceByDate.set(date, {
+          open: price,
+          high: price,
+          low: price,
+          close: price,
+        });
+        continue;
+      }
+
+      candle.high = Math.max(candle.high, price);
+      candle.low = Math.min(candle.low, price);
+      candle.close = price;
+    }
+  }
+
+  const volumeByDate = await fetchCryptoCompareDailyVolumes(fromDateInclusive, toDateInclusive);
+
+  const candles = [];
+  for (let date = fromDateInclusive; date <= toDateInclusive; date = addUtcDays(date, 1)) {
+    const price = priceByDate.get(date);
+    if (!price) continue;
+
+    candles.push({
+      date,
+      open: +price.open.toFixed(2),
+      high: +price.high.toFixed(2),
+      low: +price.low.toFixed(2),
+      close: +price.close.toFixed(2),
+      volume: volumeByDate.get(date) ?? 0,
+    });
+  }
+
+  return candles;
+}
 
 async function updateBTCData() {
   const existing = JSON.parse(readFileSync(DATA_PATH, 'utf8'));
   const lastDate = existing[existing.length - 1].date;
-  const lastTime = new Date(lastDate + 'T00:00:00Z').getTime();
-  const daysSince = Math.ceil((Date.now() - lastTime) / 86400000);
+  const todayUtc = toUtcDateString(Date.now());
+  const lastCompletedUtcDate = addUtcDays(todayUtc, -1);
+  const daysSince = Math.max(0, diffUtcDays(lastDate, lastCompletedUtcDate));
+  const repairStart = maxDate(existing[0].date, addUtcDays(lastCompletedUtcDate, -(BTC_REPAIR_LOOKBACK_DAYS - 1)));
 
-  if (daysSince < 1) {
-    console.log(`[BTC data] Up to date (${lastDate})`);
-    return;
-  }
-
-  console.log(`[BTC data] ${daysSince} day(s) missing since ${lastDate}, fetching…`);
+  console.log(`[BTC data] Rebuilding daily candles from ${repairStart} to ${lastCompletedUtcDate} (last saved ${lastDate})`);
 
   try {
-    // Request at least 90 days so CoinGecko returns daily OHLC granularity
-    const days = Math.max(90, daysSince + 5);
-
-    const [ohlcRes, chartRes] = await Promise.all([
-      fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=${days}`),
-      fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}&interval=daily`),
-    ]);
-
-    if (!ohlcRes.ok) throw new Error(`OHLC request failed: ${ohlcRes.status}`);
-
-    const ohlcRaw = await ohlcRes.json(); // [[ts_ms, o, h, l, c], ...]
-    const chartData = chartRes.ok ? await chartRes.json() : null;
-
-    // Build volume lookup: date -> volume (USD)
-    const volumeByDate = new Map();
-    if (chartData?.total_volumes) {
-      for (const [ts, vol] of chartData.total_volumes) {
-        volumeByDate.set(new Date(ts).toISOString().split('T')[0], vol);
-      }
-    }
-
-    const existingDates = new Set(existing.map(d => d.date));
-    const toAdd = [];
-
-    for (const [ts, open, high, low, close] of ohlcRaw) {
-      const date = new Date(ts).toISOString().split('T')[0];
-      if (date > lastDate && !existingDates.has(date)) {
-        toAdd.push({
-          date,
-          open: +open.toFixed(2),
-          high: +high.toFixed(2),
-          low: +low.toFixed(2),
-          close: +close.toFixed(2),
-          volume: volumeByDate.has(date) ? Math.round(volumeByDate.get(date)) : 0,
-        });
-      }
-    }
-
-    if (toAdd.length === 0) {
-      console.log('[BTC data] No new entries available yet (CoinGecko may lag ~1 day).');
+    const rebuiltTail = await fetchRecentDailyCandles(repairStart, lastCompletedUtcDate);
+    if (rebuiltTail.length === 0) {
+      console.log('[BTC data] No rebuilt candles available yet (CoinGecko may still be caching the last UTC close).');
       return;
     }
 
-    toAdd.sort((a, b) => a.date.localeCompare(b.date));
-    const updated = [...existing, ...toAdd];
+    const preserved = existing.filter((row) => row.date < repairStart);
+    const updated = [...preserved, ...rebuiltTail];
     writeFileSync(DATA_PATH, JSON.stringify(updated));
-    console.log(`[BTC data] Added ${toAdd.length} entries. Latest: ${updated[updated.length - 1].date}`);
+
+    const repairedDays = rebuiltTail.length;
+    const latest = updated[updated.length - 1].date;
+    console.log(
+      `[BTC data] Rebuilt ${repairedDays} day(s) from market_chart hourly data. Latest: ${latest}. Missing-days delta vs previous tail: ${daysSince}`
+    );
   } catch (err) {
     console.warn('[BTC data] Update skipped (continuing with cached data):', err.message);
   }
@@ -88,7 +197,7 @@ async function updateMVRVData() {
 
   const lastDate = existing.length > 0 ? existing[existing.length - 1].date : '2010-07-17';
   const lastTime = new Date(lastDate + 'T00:00:00Z').getTime();
-  const daysSince = Math.ceil((Date.now() - lastTime) / 86400000);
+  const daysSince = Math.ceil((Date.now() - lastTime) / MS_PER_DAY);
 
   if (daysSince < 1) {
     console.log(`[MVRV data] Up to date (${lastDate})`);

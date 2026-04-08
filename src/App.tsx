@@ -490,7 +490,7 @@ export default function App() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs md:text-sm text-zinc-400">Data Source</span>
-                  <span className="text-xs md:text-sm font-mono text-zinc-400">CoinGecko</span>
+                  <span className="text-xs md:text-sm font-mono text-zinc-400">CoinGecko + CryptoCompare</span>
                 </div>
                 {mvrvStats.currentMVRV !== null && (
                   <>
