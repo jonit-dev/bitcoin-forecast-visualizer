@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Activity, TrendingUp, TrendingDown, Settings2, RefreshCw, BarChart2, Play, Square, HelpCircle, X, Zap } from 'lucide-react';
+import { Activity, TrendingUp, TrendingDown, RefreshCw, BarChart2, Play, Square, HelpCircle, X, Zap, Bitcoin, CalendarClock, Gauge, Layers3, CircleDollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
@@ -37,6 +37,17 @@ function getHalvingInfo() {
 
 const CIRCULATING_SUPPLY = 19_850_000;
 const MAX_SUPPLY = 21_000_000;
+const HORIZON_OPTIONS = [
+  { value: 7, label: '7D' },
+  { value: 14, label: '14D' },
+  { value: 30, label: '30D' },
+  { value: 90, label: '3M' },
+  { value: 180, label: '6M' },
+  { value: 365, label: '1Y' },
+  { value: 730, label: '2Y' },
+  { value: 1825, label: '5Y' },
+  { value: 3650, label: '10Y' },
+];
 
 function formatMarketCap(n: number) {
   if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
@@ -76,22 +87,34 @@ export default function App() {
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showMVRV, setShowMVRV] = useState(false);
   const [showFormulaHelp, setShowFormulaHelp] = useState(false);
+  const [lastRunAt, setLastRunAt] = useState(() => new Date());
 
   // Playback
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackIndex, setPlaybackIndex] = useState<number | null>(null);
 
-  const handleRunForecast = () => {
+  const refreshForecast = (delay = 300) => {
     setIsPlaying(false);
     setPlaybackIndex(null);
     setIsGenerating(true);
-    setTimeout(() => {
+    const timer = window.setTimeout(() => {
       setDisplayData(processRealData(marketData.ohlcv, horizon, model));
       setHeatmapData(generateHeatmapData(marketData.ohlcv, horizon, model));
       setDrawdownStats(computeDrawdownStats(marketData.ohlcv, horizon));
+      setLastRunAt(new Date());
       setIsGenerating(false);
-    }, 700);
+    }, delay);
+
+    return () => window.clearTimeout(timer);
   };
+
+  const handleRunForecast = () => {
+    refreshForecast(0);
+  };
+
+  useEffect(() => {
+    return refreshForecast(350);
+  }, [horizon, model]);
 
   const activeDisplayData = displayData;
 
@@ -158,38 +181,46 @@ export default function App() {
   const volColor = volRisk === 'High' ? 'text-red-400' : volRisk === 'Medium' ? 'text-amber-500' : 'text-emerald-400';
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30">
+    <div className="h-screen flex flex-col overflow-hidden bg-[#070806] text-zinc-50 font-sans selection:bg-amber-400/30">
       {/* Header */}
-      <header className="border-b border-white/5 bg-zinc-950/50 shrink-0">
-        <div className="max-w-[1920px] mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-              <TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-400" />
+      <header className="border-b border-white/10 bg-[#0b0d0a]/95 shrink-0 shadow-[0_1px_0_rgba(251,191,36,0.14)]">
+        <div className="max-w-[1920px] mx-auto px-4 h-16 md:h-[72px] flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative w-9 h-9 rounded-lg bg-amber-400 text-black flex items-center justify-center shadow-[0_0_28px_rgba(251,191,36,0.24)]">
+              <Bitcoin className="w-4 h-4" />
             </div>
-            <h1 className="font-semibold tracking-tight text-sm md:text-base">Nexus Forecast</h1>
-            <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-[10px] md:text-xs font-medium text-zinc-400 border border-zinc-700">
-              BTC/USD
-            </span>
+            <div className="min-w-0">
+              <h1 className="font-semibold tracking-tight text-base md:text-lg leading-tight">Block Signal</h1>
+              <p className="text-[10px] md:text-xs uppercase tracking-[0.24em] text-zinc-500 truncate">Bitcoin forecast workspace</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3 text-xs md:text-sm text-zinc-400">
-            <span className="hidden sm:block text-[10px] text-zinc-500">
-              Data: 2010–{new Date(marketData.ohlcv[marketData.ohlcv.length - 1].date).getFullYear()}
+          <div className="flex items-center gap-2 md:gap-3 text-xs text-zinc-400">
+            <span className="hidden sm:inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Data through {new Date(marketData.ohlcv[marketData.ohlcv.length - 1].date).getFullYear()}
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-md border border-amber-400/20 bg-amber-400/10 px-2.5 py-1.5 text-amber-200">
+              <RefreshCw className={cn("h-3.5 w-3.5", isGenerating && "animate-spin")} />
+              <span className="hidden sm:inline">{isGenerating ? 'Recomputing' : `Updated ${lastRunAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`}</span>
             </span>
           </div>
         </div>
       </header>
 
       <main className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
-        <div className="max-w-[1920px] mx-auto px-4 py-4 md:py-6 flex flex-col lg:grid lg:grid-cols-[1fr_280px] lg:h-full gap-4 md:gap-5">
+        <div className="max-w-[1920px] mx-auto px-4 py-4 md:py-5 flex flex-col lg:grid lg:grid-cols-[1fr_320px] lg:h-full gap-4 md:gap-5">
 
         {/* Main Content */}
         <div className="flex flex-col gap-4 md:gap-5 order-1 min-h-0">
           {/* Chart */}
-          <Card className="overflow-hidden flex-1 flex flex-col min-h-[400px]">
-            <CardHeader className="border-b border-white/5 pb-3 md:pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
-              <CardTitle className="text-base md:text-lg">Price Forecast Visualization</CardTitle>
+          <Card className="overflow-hidden flex-1 flex flex-col min-h-[400px] rounded-lg border-white/10 bg-[#0c0f0b] shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
+            <CardHeader className="border-b border-white/10 bg-white/[0.015] pb-3 md:pb-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3 md:gap-4">
+              <div>
+                <CardTitle className="text-sm md:text-base uppercase tracking-[0.18em] text-zinc-300">BTC/USD Forward View</CardTitle>
+                <p className="mt-1 text-xs text-zinc-500">Forecast auto-refreshes when horizon or model changes.</p>
+              </div>
               <div className="flex items-center gap-2 md:gap-4 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide w-full sm:w-auto">
-                <div className="flex items-center bg-zinc-900/50 rounded-lg p-1 border border-white/5 shrink-0">
+                <div className="flex items-center bg-black/30 rounded-lg p-1 border border-white/10 shrink-0">
                   {['1M', '3M', '6M', '1Y', 'ALL'].map(range => (
                     <button
                       key={range}
@@ -197,8 +228,8 @@ export default function App() {
                       className={cn(
                         "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors",
                         timeRange === range
-                          ? "bg-zinc-800 text-zinc-100 shadow-sm"
-                          : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                          ? "bg-amber-400 text-black shadow-sm"
+                          : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
                       )}
                     >
                       {range}
@@ -332,11 +363,14 @@ export default function App() {
           </Card>
 
           {/* Metrics Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 shrink-0">
-            <Card>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-3 shrink-0">
+            <Card className="rounded-lg border-white/10 bg-[#11140f]">
               <CardContent className="p-3 md:p-4">
-                <p className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1">Current Price</p>
-                <p className="text-lg md:text-2xl font-semibold font-mono">
+                <div className="mb-2 flex items-center gap-2 text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                  <CircleDollarSign className="h-3.5 w-3.5 text-amber-400" />
+                  Current Price
+                </div>
+                <p className="text-lg md:text-2xl font-semibold font-mono text-zinc-100">
                   {currentPrice ? formatPrice(currentPrice) : '—'}
                 </p>
                 {priceChange24h !== 0 && (
@@ -346,25 +380,34 @@ export default function App() {
                 )}
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-lg border-amber-400/20 bg-amber-400/[0.06]">
               <CardContent className="p-3 md:p-4">
-                <p className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1">Predicted ({formatHorizonLabel(horizon)})</p>
-                <p className="text-lg md:text-2xl font-semibold font-mono">
+                <div className="mb-2 flex items-center gap-2 text-[10px] md:text-xs font-medium text-amber-200/80 uppercase tracking-wider">
+                  <CalendarClock className="h-3.5 w-3.5 text-amber-300" />
+                  Target {formatHorizonLabel(horizon)}
+                </div>
+                <p className="text-lg md:text-2xl font-semibold font-mono text-amber-100">
                   {forecastPrice ? formatPrice(forecastPrice) : '—'}
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-lg border-white/10 bg-[#11140f]">
               <CardContent className="p-3 md:p-4">
-                <p className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1">Forecast Change</p>
+                <div className="mb-2 flex items-center gap-2 text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                  <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
+                  Forecast Delta
+                </div>
                 <p className={cn("text-lg md:text-2xl font-semibold font-mono", forecastChange >= 0 ? "text-emerald-400" : "text-red-400")}>
                   {forecastChange >= 0 ? '+' : ''}{forecastChange.toFixed(2)}%
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-lg border-white/10 bg-[#11140f]">
               <CardContent className="p-3 md:p-4">
-                <p className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1">30D Volatility</p>
+                <div className="mb-2 flex items-center gap-2 text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                  <Gauge className="h-3.5 w-3.5 text-sky-400" />
+                  30D Volatility
+                </div>
                 <div className="flex items-baseline gap-2">
                   <p className={cn("text-lg md:text-2xl font-semibold font-mono", volColor)}>
                     {annualizedVol ? annualizedVol.toFixed(0) + '%' : '—'}
@@ -378,21 +421,29 @@ export default function App() {
 
         {/* Sidebar */}
         <div className="space-y-4 md:space-y-5 order-2 min-h-0 lg:overflow-y-auto lg:scrollbar-hide">
-          <Card>
-            <CardHeader className="p-4 md:p-6">
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <Settings2 className="w-4 h-4 text-zinc-400" />
-                Model Parameters
+          <Card className="rounded-lg border-amber-400/20 bg-[#11110c]">
+            <CardHeader className="p-4 md:p-5">
+              <CardTitle className="flex items-center justify-between gap-2 text-sm">
+                <span className="flex items-center gap-2">
+                  <Layers3 className="w-4 h-4 text-amber-300" />
+                  Forecast Console
+                </span>
+                <span className={cn(
+                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                  isGenerating ? "bg-amber-400/15 text-amber-200" : "bg-emerald-400/10 text-emerald-300"
+                )}>
+                  {isGenerating ? 'Live' : 'Ready'}
+                </span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 md:space-y-5 p-4 pt-0 md:p-6 md:pt-0">
+            <CardContent className="space-y-4 md:space-y-5 p-4 pt-0 md:p-5 md:pt-0">
               <div className="space-y-1.5 md:space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider">Architecture</label>
+                  <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">Model</label>
                   {model === 'powerlaw' && (
                     <button
                       onClick={() => setShowFormulaHelp(true)}
-                      className="text-zinc-500 hover:text-amber-400 transition-colors"
+                      className="rounded-md p-1 text-zinc-500 hover:bg-white/5 hover:text-amber-300 transition-colors"
                       title="View Power Law formula"
                     >
                       <HelpCircle className="w-3.5 h-3.5" />
@@ -402,7 +453,7 @@ export default function App() {
                 <select
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
                 >
                   <option value="powerlaw">BTC Power Law</option>
                   <option value="transformer">Temporal Fusion Transformer</option>
@@ -412,28 +463,33 @@ export default function App() {
                 </select>
               </div>
 
-              <div className="space-y-1.5 md:space-y-2">
-                <label className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider">Forecast Horizon</label>
-                <select
-                  value={horizon}
-                  onChange={(e) => setHorizon(Number(e.target.value))}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                >
-                  <option value={7}>7 Days</option>
-                  <option value={14}>14 Days</option>
-                  <option value={30}>30 Days</option>
-                  <option value={90}>3 Months</option>
-                  <option value={180}>6 Months</option>
-                  <option value={365}>1 Year</option>
-                  <option value={730}>2 Years</option>
-                  <option value={1825}>5 Years</option>
-                  <option value={3650}>10 Years</option>
-                </select>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">Forecast Horizon</label>
+                  <span className="text-[10px] text-amber-200/70">auto-run</span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {HORIZON_OPTIONS.map(option => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setHorizon(option.value)}
+                      className={cn(
+                        "h-8 rounded-md border text-xs font-semibold transition-colors",
+                        horizon === option.value
+                          ? "border-amber-300 bg-amber-300 text-black"
+                          : "border-white/10 bg-black/20 text-zinc-400 hover:border-amber-300/50 hover:text-zinc-100"
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-1.5 md:space-y-2">
-                <label className="text-[10px] md:text-xs font-medium text-zinc-400 uppercase tracking-wider">Confidence Interval</label>
-                <select className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">Confidence Interval</label>
+                <select className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-amber-400">
                   <option>95% (2σ)</option>
                   <option>90% (1.64σ)</option>
                   <option>80% (1.28σ)</option>
@@ -443,14 +499,14 @@ export default function App() {
               <Button
                 onClick={handleRunForecast}
                 disabled={isGenerating}
-                className="w-full mt-2 md:mt-4"
+                className="w-full mt-2 md:mt-4 bg-zinc-100 text-black hover:bg-amber-300"
               >
                 {isGenerating ? (
                   <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
                   <Activity className="w-4 h-4 mr-2" />
                 )}
-                {isGenerating ? 'Computing…' : 'Run Forecast'}
+                {isGenerating ? 'Computing...' : 'Refresh Now'}
               </Button>
             </CardContent>
           </Card>
