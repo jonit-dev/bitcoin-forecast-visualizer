@@ -18,6 +18,7 @@ export interface PhaseState extends PhaseZone {
 
 export const ATL_TO_ATH_DAYS = 1064;
 export const ATH_TO_ATL_DAYS = 364;
+export const TRIM_BEFORE_ATH_DAYS = 30;
 
 const CYCLE_SEED_ATL = '2015-01-14';
 
@@ -67,14 +68,14 @@ export function buildPhaseZones(pivots: CyclePivot[]): PhaseZone[] {
 
     if (pivot.type === 'ATL') {
       const accumEnd = addMonths(pivot.date, 6);
-      const bullEnd = next ? next.date : addDays(pivot.date, ATL_TO_ATH_DAYS);
+      const athDate = next?.type === 'ATH' ? next.date : addDays(pivot.date, ATL_TO_ATH_DAYS);
+      const trimStart = addDays(athDate, -TRIM_BEFORE_ATH_DAYS);
       zones.push({ startDate: pivot.date, endDate: accumEnd, label: 'Accumulation' });
-      zones.push({ startDate: accumEnd, endDate: bullEnd, label: 'Bull' });
+      zones.push({ startDate: accumEnd, endDate: trimStart, label: 'Bull' });
+      zones.push({ startDate: trimStart, endDate: athDate, label: 'Trim' });
     } else {
-      const trimEnd = addMonths(pivot.date, 4);
       const bearEnd = next ? next.date : addDays(pivot.date, ATH_TO_ATL_DAYS);
-      zones.push({ startDate: pivot.date, endDate: trimEnd, label: 'Trim' });
-      zones.push({ startDate: trimEnd, endDate: bearEnd, label: 'Bear' });
+      zones.push({ startDate: pivot.date, endDate: bearEnd, label: 'Bear' });
     }
   }
 

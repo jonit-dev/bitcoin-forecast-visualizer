@@ -24,9 +24,9 @@ const HALVING_DATES = generateHalvingDates();
 // ---- Cycle phase definitions (anchored to ATL/ATH pivots) ----
 // Phases are driven by the market cycle bottoms and tops:
 //   Accumulation: ATL → ATL + 6 months (bottom consolidation)
-//   Bull:         ATL + 6 months → ATH (markup / run-up)
-//   Trim:         ATH → ATH + 4 months (distribution / take-profit)
-//   Bear:         ATH + 4 months → next ATL (markdown / correction)
+//   Bull:         ATL + 6 months → ATH - 30 days (markup / run-up)
+//   Trim:         ATH - 30 days → ATH (late-cycle take-profit window)
+//   Bear:         ATH → next ATL (markdown / correction)
 
 const PHASE_STYLES = {
   Accumulation: { color: 'rgba(96, 165, 250, 0.06)',  textColor: 'rgba(96, 165, 250, 0.7)',  pillColor: 'rgba(96, 165, 250, 0.10)' },
