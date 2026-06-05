@@ -292,7 +292,7 @@ export default function App() {
                           : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
                       )}
                     >
-                      Median
+                      Path
                     </button>
                   )}
                   {model === 'powerlaw' && (
@@ -522,7 +522,7 @@ export default function App() {
                 </select>
                 {model === 'powerlaw' && (
                   <p className="text-[10px] leading-relaxed text-zinc-500">
-                    Smooth amber line = median forecast path. Scenario traces are hidden by default because they are exploratory sketches, not the primary prediction; turn on Scenarios only when comparing sampled residual paths.
+                    Amber path = one calibrated sample path. Dotted bands and the target card show the model median/interval. Extra scenario sketches are hidden by default; turn on Scenarios only when comparing sampled residual paths.
                   </p>
                 )}
               </div>

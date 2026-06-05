@@ -760,7 +760,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     ] : [];
     const forecastUpperData = lastHist && forecast.length > 0 ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastUpper }))] : [];
     const forecastLowerData = lastHist && forecast.length > 0 ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastLower }))] : [];
-    const traceRows = !showScenarios || isInPlayback ? [] : [...historical, ...forecast].filter((d: any) => Array.isArray(d.stochasticTraces));
+    const traceRows = !showModelLine && !showScenarios || isInPlayback ? [] : [...historical, ...forecast].filter((d: any) => Array.isArray(d.stochasticTraces));
     const stochasticTraceData = seriesRefs.current.stochasticTraces.map((_, traceIndex) =>
       traceRows
         .map((d: any) => ({ time: d.date, value: d.stochasticTraces?.[traceIndex] }))
@@ -829,7 +829,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
 
     if (!isInPlayback && forecast.length > 0 && probabilityForecast && seriesRefs.current.forecast) {
       if (!forecastMarkersRef.current) {
-        forecastMarkersRef.current = createSeriesMarkers(seriesRefs.current.forecastMedian ?? seriesRefs.current.forecast, []);
+        forecastMarkersRef.current = createSeriesMarkers(seriesRefs.current.forecast, []);
       }
       const terminal = forecast[forecast.length - 1];
       const pUp = Math.round(probabilityForecast.probabilityUp * 100);
@@ -933,9 +933,11 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma20?.applyOptions({ visible: showSMA });
     seriesRefs.current.sma50?.applyOptions({ visible: showSMA });
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
-    seriesRefs.current.forecastMedian?.applyOptions({ visible: showModelLine });
-    seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
-    seriesRefs.current.stochasticTraces.forEach(series => series.applyOptions({ visible: showScenarios }));
+    seriesRefs.current.forecastMedian?.applyOptions({ visible: false });
+    seriesRefs.current.modelLine?.applyOptions({ visible: false });
+    seriesRefs.current.stochasticTraces.forEach((series, index) => {
+      series.applyOptions({ visible: index === 0 ? showModelLine || showScenarios : showScenarios });
+    });
     seriesRefs.current.floorLine?.applyOptions({ visible: showFloorLine });
     seriesRefs.current.peakLine?.applyOptions({ visible: showPeakLine });
   }, [showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine]);
