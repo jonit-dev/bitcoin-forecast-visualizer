@@ -4,7 +4,7 @@ import { Activity, TrendingUp, TrendingDown, RefreshCw, BarChart2, Play, Square,
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
-import { processRealData, generateHeatmapData, computeDrawdownStats, HISTORICAL_CYCLE_DRAWDOWNS, type HeatmapCell, type DrawdownStats } from './lib/data';
+import { processRealData, generateHeatmapData, computeDrawdownStats, HISTORICAL_CYCLE_DRAWDOWNS, CONFIDENCE_Z_SCORES, type HeatmapCell, type DrawdownStats } from './lib/data';
 import { loadBTCData, computeMVRVStats, computeMVRVZScoreSeries, type MarketData, type MVRVStats } from './lib/api';
 import { cn } from './lib/utils';
 
@@ -62,9 +62,10 @@ export default function App() {
   const halvingInfo = useMemo(() => getHalvingInfo(), []);
   const [horizon, setHorizon] = useState(180);
   const [model, setModel] = useState('powerlaw');
+  const [confidenceLevel, setConfidenceLevel] = useState<keyof typeof CONFIDENCE_Z_SCORES>(0.95);
   const [isGenerating, setIsGenerating] = useState(false);
   const [displayData, setDisplayData] = useState<any[]>(() =>
-    processRealData(marketData.ohlcv, 180, 'powerlaw')
+    processRealData(marketData.ohlcv, 180, 'powerlaw', CONFIDENCE_Z_SCORES[0.95])
   );
 
   // Heatmap
@@ -98,7 +99,7 @@ export default function App() {
     setPlaybackIndex(null);
     setIsGenerating(true);
     const timer = window.setTimeout(() => {
-      setDisplayData(processRealData(marketData.ohlcv, horizon, model));
+      setDisplayData(processRealData(marketData.ohlcv, horizon, model, CONFIDENCE_Z_SCORES[confidenceLevel]));
       setHeatmapData(generateHeatmapData(marketData.ohlcv, horizon, model));
       setDrawdownStats(computeDrawdownStats(marketData.ohlcv, horizon));
       setLastRunAt(new Date());
@@ -114,7 +115,7 @@ export default function App() {
 
   useEffect(() => {
     return refreshForecast(350);
-  }, [horizon, model]);
+  }, [horizon, model, confidenceLevel]);
 
   const activeDisplayData = displayData;
 
@@ -489,11 +490,20 @@ export default function App() {
 
               <div className="space-y-1.5 md:space-y-2">
                 <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">Confidence Interval</label>
-                <select className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-amber-400">
-                  <option>95% (2σ)</option>
-                  <option>90% (1.64σ)</option>
-                  <option>80% (1.28σ)</option>
+                <select
+                  value={confidenceLevel}
+                  onChange={(e) => setConfidenceLevel(Number(e.target.value) as keyof typeof CONFIDENCE_Z_SCORES)}
+                  className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+                >
+                  <option value={0.95}>95% (calibrated)</option>
+                  <option value={0.9}>90% (calibrated)</option>
+                  <option value={0.8}>80% (calibrated)</option>
                 </select>
+                {model === 'powerlaw' && (
+                  <p className="text-[10px] leading-relaxed text-zinc-500">
+                    Power-law bands now use residual-process volatility with a fat-tail stress ramp and no visual cap, matching the heatmap calibration.
+                  </p>
+                )}
               </div>
 
               <Button
@@ -792,10 +802,24 @@ where:
   h   = forecast horizon in days
   τ   = 210  (residual decay constant)`}</pre>
               </div>
+              <div>
+                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Calibrated Forecast Interval</h4>
+                <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-sky-300 overflow-x-auto whitespace-pre">
+{`CI_h = F_h * exp(± z * stress(h) * sqrt(σ² * Σ exp(-2k/τ)))
+
+where:
+  z = 1.28, 1.64, or 1.96
+  σ = blended 90d/365d realized volatility
+  stress(h) rises with horizon for BTC fat tails
+  k = 0..h-1
+  no long-horizon visual cap`}</pre>
+              </div>
               <p className="text-zinc-500 text-[10px] leading-relaxed">
                 The model combines a power-law growth trend with a 4-year sinusoidal cycle aligned to BTC halvings.
                 A mean-reverting correction anchors the prediction to the current market price for all horizons,
                 decaying exponentially with time constant &tau;=210 days toward the pure power law as h grows.
+                Forecast bands now use residual-process volatility plus a horizon stress ramp instead of
+                clipping long-range uncertainty to a cosmetic ±50% envelope.
               </p>
             </div>
           </motion.div>

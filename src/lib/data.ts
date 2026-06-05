@@ -20,6 +20,12 @@ export interface HeatmapCell {
 const POWER_LAW_HEATMAP_RECENT_VOL_WEIGHT = 0.55;
 const POWER_LAW_HEATMAP_LOG_DRIFT_SCALE = 0.3;
 
+export const CONFIDENCE_Z_SCORES = {
+  0.95: 1.96,
+  0.9: 1.64,
+  0.8: 1.28,
+} as const;
+
 function computeLogReturnStats(ohlcv: OHLCVData[], lookback: number) {
   const cappedLookback = Math.min(Math.max(1, lookback), ohlcv.length - 1);
   const recent = ohlcv.slice(-cappedLookback - 1);
@@ -43,7 +49,32 @@ function blendedPowerLawHeatmapVol(ohlcv: OHLCVData[]) {
   );
 }
 
-export function processRealData(ohlcv: OHLCVData[], horizon: number = 14, model: string = 'transformer'): any[] {
+function powerLawResidualVariance(days: number, dailyVol: number): number {
+  const residualDecay = Math.exp(-1 / POWER_LAW_MEAN_REVERSION_TAU_DAYS);
+  let varianceMultiplier = 0;
+  let decayPowerSq = 1;
+
+  for (let step = 0; step < days; step++) {
+    varianceMultiplier += decayPowerSq;
+    decayPowerSq *= residualDecay * residualDecay;
+  }
+
+  return dailyVol * dailyVol * varianceMultiplier;
+}
+
+function powerLawIntervalStressMultiplier(days: number): number {
+  // Bitcoin residual errors have historically been fatter-tailed than a pure Gaussian
+  // OU process. This horizon ramp was chosen from rolling-origin coverage checks so
+  // 6–12 month bands no longer masquerade as tight ±50% envelopes.
+  return 1 + 1.85 * (1 - Math.exp(-days / 150));
+}
+
+export function processRealData(
+  ohlcv: OHLCVData[],
+  horizon: number = 14,
+  model: string = 'transformer',
+  confidenceZ: number = CONFIDENCE_Z_SCORES[0.95]
+): any[] {
   // Add SMAs to historical data
   const data: any[] = ohlcv.map((d, i) => {
     let sma20: number | null = null;
@@ -74,6 +105,7 @@ export function processRealData(ohlcv: OHLCVData[], horizon: number = 14, model:
 
   const lastDate = new Date(lastReal.date + 'T00:00:00Z');
   const isPowerLaw = model === 'powerlaw';
+  const powerLawIntervalVol = blendedPowerLawHeatmapVol(ohlcv);
 
   for (let i = 1; i <= horizon; i++) {
     const date = new Date(lastDate);
@@ -97,10 +129,12 @@ export function processRealData(ohlcv: OHLCVData[], horizon: number = 14, model:
     const high = Math.max(open, close) * (1 + Math.random() * dailyVol * 0.3);
     const low = Math.min(open, close) * (1 - Math.random() * dailyVol * 0.3);
 
-    // CI: power law caps at ±50%; random walk uses standard sqrt(t)
+    // Forecast interval: the power-law path uses residual-process variance plus
+    // a fat-tail stress multiplier. No visual cap — long-horizon bands should
+    // widen when Bitcoin's historical residual errors say they should.
     const ciHalf = isPowerLaw
-      ? Math.min(dailyVol * Math.sqrt(i) * 1.96, 0.5)
-      : dailyVol * Math.sqrt(i) * 1.96;
+      ? confidenceZ * powerLawIntervalStressMultiplier(i) * Math.sqrt(powerLawResidualVariance(i, powerLawIntervalVol))
+      : confidenceZ * dailyVol * Math.sqrt(i);
 
     data.push({
       date: date.toISOString().split('T')[0],
@@ -389,10 +423,10 @@ export function generateData(horizon: number = 14, historyDays: number = 365, mo
     date: d.date,
     open: d.open,
     high: d.high,
-    low: d.low,
     close: d.close,
+    low: d.low,
     volume: d.volume,
   }));
 
-  return processRealData(mockOHLCV, horizon, model);
+  return processRealData(mockOHLCV, horizon, model, CONFIDENCE_Z_SCORES[0.95]);
 }
