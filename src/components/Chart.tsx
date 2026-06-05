@@ -507,6 +507,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     sma20?: ISeriesApi<"Line">;
     sma50?: ISeriesApi<"Line">;
     forecast?: ISeriesApi<"Candlestick">;
+    forecastMedian?: ISeriesApi<"Line">;
     forecastUpper?: ISeriesApi<"Line">;
     forecastLower?: ISeriesApi<"Line">;
     stochasticTraces: ISeriesApi<"Line">[];
@@ -600,6 +601,16 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       wickDownColor: 'rgba(239, 68, 68, 0.5)',
     });
     seriesRefs.current.forecast = forecastSeries;
+
+    const forecastMedianSeries = chart.addSeries(LineSeries, {
+      color: 'rgba(251, 191, 36, 0.95)',
+      lineWidth: 3,
+      lineStyle: 0,
+      crosshairMarkerVisible: true,
+      lastValueVisible: false,
+      priceLineVisible: false,
+    });
+    seriesRefs.current.forecastMedian = forecastMedianSeries;
 
     const forecastUpperSeries = chart.addSeries(LineSeries, {
       color: 'rgba(16, 185, 129, 0.5)',
@@ -743,6 +754,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       { time: lastHist.date, open: lastHist.close, high: lastHist.close, low: lastHist.close, close: lastHist.close },
       ...forecast.map((d: any) => ({ time: d.date, open: d.open, high: d.high, low: d.low, close: d.close }))
     ] : [];
+    const forecastMedianData = lastHist && forecast.length > 0 ? [
+      { time: lastHist.date, value: lastHist.close },
+      ...forecast.map((d: any) => ({ time: d.date, value: d.close }))
+    ] : [];
     const forecastUpperData = lastHist && forecast.length > 0 ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastUpper }))] : [];
     const forecastLowerData = lastHist && forecast.length > 0 ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastLower }))] : [];
     const traceRows = !showScenarios || isInPlayback ? [] : [...historical, ...forecast].filter((d: any) => Array.isArray(d.stochasticTraces));
@@ -774,6 +789,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma20?.setData(sma20Data.sort(sortByTime));
     seriesRefs.current.sma50?.setData(sma50Data.sort(sortByTime));
     seriesRefs.current.forecast?.setData(forecastData.sort(sortByTime));
+    seriesRefs.current.forecastMedian?.setData(forecastMedianData.sort(sortByTime));
     seriesRefs.current.forecastUpper?.setData(forecastUpperData.sort(sortByTime));
     seriesRefs.current.forecastLower?.setData(forecastLowerData.sort(sortByTime));
     seriesRefs.current.stochasticTraces.forEach((series, traceIndex) => {
@@ -813,7 +829,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
 
     if (!isInPlayback && forecast.length > 0 && probabilityForecast && seriesRefs.current.forecast) {
       if (!forecastMarkersRef.current) {
-        forecastMarkersRef.current = createSeriesMarkers(seriesRefs.current.forecast, []);
+        forecastMarkersRef.current = createSeriesMarkers(seriesRefs.current.forecastMedian ?? seriesRefs.current.forecast, []);
       }
       const terminal = forecast[forecast.length - 1];
       const pUp = Math.round(probabilityForecast.probabilityUp * 100);
@@ -917,6 +933,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma20?.applyOptions({ visible: showSMA });
     seriesRefs.current.sma50?.applyOptions({ visible: showSMA });
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
+    seriesRefs.current.forecastMedian?.applyOptions({ visible: showModelLine });
     seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
     seriesRefs.current.stochasticTraces.forEach(series => series.applyOptions({ visible: showScenarios }));
     seriesRefs.current.floorLine?.applyOptions({ visible: showFloorLine });
