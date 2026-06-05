@@ -1,29 +1,31 @@
-const GENESIS = new Date('2009-01-03T00:00:00Z');
-export const POWER_LAW_MEAN_REVERSION_TAU_DAYS = 210;
+import { POWER_LAW_CONFIG } from './modelConfig';
+
+const GENESIS = new Date(POWER_LAW_CONFIG.genesisDate);
+export const POWER_LAW_MEAN_REVERSION_TAU_DAYS = POWER_LAW_CONFIG.meanReversionTauDays;
 
 export function daysSinceGenesis(date: Date): number {
   return Math.floor((date.getTime() - GENESIS.getTime()) / 86400000);
 }
 
 export function peakPowerLawPrice(t: number): number {
-  return 9.89e-7 * Math.pow(t, 2.9379);
+  return POWER_LAW_CONFIG.peak.coefficient * Math.pow(t, POWER_LAW_CONFIG.peak.exponent);
 }
 
 export function floorPowerLawPrice(t: number): number {
-  const raw = Math.exp(-40.234) * Math.pow(t, 5.847);
-  const a = 9.48e-10;
-  const b = 3.6702;
-  const cyclicAmplitude = Math.sqrt(0.2323 ** 2 + 0.4288 ** 2);
+  const raw = POWER_LAW_CONFIG.floor.rawCoefficient * Math.pow(t, POWER_LAW_CONFIG.floor.rawExponent);
+  const a = POWER_LAW_CONFIG.floor.cyclicCoefficient;
+  const b = POWER_LAW_CONFIG.floor.cyclicExponent;
+  const cyclicAmplitude = Math.sqrt(POWER_LAW_CONFIG.floor.sinAmplitude ** 2 + POWER_LAW_CONFIG.floor.cosAmplitude ** 2);
   const baseTrough = a * Math.pow(t, b) * (1 - cyclicAmplitude);
   return Math.min(raw, baseTrough);
 }
 
 export function basePowerLawPrice(t: number): number {
-  const a = 9.48e-10;
-  const b = 3.6702;
-  const c1 = 0.2323;
-  const c2 = 0.4288;
-  const omega = (2 * Math.PI) / 1460;
+  const a = POWER_LAW_CONFIG.base.coefficient;
+  const b = POWER_LAW_CONFIG.base.exponent;
+  const c1 = POWER_LAW_CONFIG.base.sinAmplitude;
+  const c2 = POWER_LAW_CONFIG.base.cosAmplitude;
+  const omega = (2 * Math.PI) / POWER_LAW_CONFIG.base.cycleDays;
   return a * Math.pow(t, b) * (1 + c1 * Math.sin(omega * t) + c2 * Math.cos(omega * t));
 }
 
