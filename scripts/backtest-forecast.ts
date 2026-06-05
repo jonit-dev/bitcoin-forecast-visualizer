@@ -5,7 +5,8 @@ import btcHistory from '../src/data/btc-history.json';
 import type { OHLCVData } from '../src/lib/api';
 import { aggregateForecastMetrics, type BacktestMetricRow, type MetricInput } from '../src/lib/backtestMetrics';
 import { getBacktestModels, type BacktestModelId } from '../src/lib/backtestModels';
-import { BACKTEST_CONFIG, INTERVAL_CONFIG, POWER_LAW_CONFIG } from '../src/lib/modelConfig';
+import { BACKTEST_CONFIG, ENSEMBLE_CONFIG, INTERVAL_CONFIG, POWER_LAW_CONFIG } from '../src/lib/modelConfig';
+import { classifyRegime, type RegimeState } from '../src/lib/regimeModel';
 
 interface BacktestReport {
   metadata: {
@@ -49,6 +50,20 @@ interface BacktestReport {
       reason: string;
     }[];
   };
+  regimeSummary?: Record<string, Partial<Record<RegimeState, BacktestMetricRow>>>;
+  ablation: {
+    modes: {
+      id: string;
+      enabled: boolean;
+      status: 'baseline' | 'disabled' | 'context-only';
+      reason: string;
+      metrics?: Record<string, BacktestMetricRow>;
+    }[];
+    enablementGate: {
+      defaultEnsembleEnabled: boolean;
+      reason: string;
+    };
+  };
 }
 
 const REPORT_DIR = join(process.cwd(), 'docs', 'reports', 'results');
@@ -57,12 +72,15 @@ function main(): void {
   const ohlcv = btcHistory as OHLCVData[];
   const models = getBacktestModels();
   const metricInputs = new Map<string, Map<BacktestModelId, MetricInput[]>>();
+  const featureRows = loadFeatureRowsByDate();
+  const regimeInputs = new Map<string, Map<RegimeState, MetricInput[]>>();
   let skippedWindowCount = 0;
 
   for (const horizon of BACKTEST_CONFIG.horizons) {
     const byModel = new Map<BacktestModelId, MetricInput[]>();
     for (const model of models) byModel.set(model.id, []);
     metricInputs.set(String(horizon), byModel);
+    regimeInputs.set(String(horizon), new Map());
 
     for (
       let originIndex = BACKTEST_CONFIG.minimumLookbackDays;
@@ -80,7 +98,14 @@ function main(): void {
       for (const model of models) {
         const forecast = model.forecast(ohlcv, originIndex, horizon);
         if (!forecast || !Number.isFinite(forecast.median) || forecast.median <= 0) continue;
-        byModel.get(model.id)?.push({ actual: target.close, forecast });
+        const input = { actual: target.close, forecast };
+        byModel.get(model.id)?.push(input);
+        if (model.id === 'powerlaw-current' && featureRows.size > 0) {
+          const state = classifyRegime(featureRows.get(origin.date)).topState;
+          const byState = regimeInputs.get(String(horizon))!;
+          if (!byState.has(state)) byState.set(state, []);
+          byState.get(state)!.push(input);
+        }
       }
     }
   }
@@ -121,6 +146,8 @@ function main(): void {
     models: models.map(({ id, description, config }) => ({ id, description, config })),
     metrics,
     qualityGate: evaluateQualityGate(metrics),
+    regimeSummary: renderRegimeSummary(regimeInputs),
+    ablation: buildAblationSummary(metrics),
   };
 
   writeReports(report);
@@ -141,6 +168,57 @@ function loadFeatureTableMetadata(): BacktestReport['metadata']['featureTable'] 
     lastDate: rows[rows.length - 1].date,
     latestFeatureCount: Object.keys(rows[rows.length - 1].features ?? {}).length,
   };
+}
+
+function loadFeatureRowsByDate(): Map<string, any> {
+  const path = join(process.cwd(), 'src', 'data', 'feature-table.json');
+  if (!existsSync(path)) return new Map();
+  const rows = JSON.parse(readFileSync(path, 'utf8')) as any[];
+  if (!Array.isArray(rows)) return new Map();
+  return new Map(rows.map(row => [row.date, row]));
+}
+
+function buildAblationSummary(metrics: BacktestReport['metrics']): BacktestReport['ablation'] {
+  const baselineMetrics = Object.fromEntries(
+    BACKTEST_CONFIG.horizons.map(horizon => [String(horizon), metrics[String(horizon)]['powerlaw-current']])
+  );
+
+  return {
+    modes: [
+      {
+        id: 'baseline-only',
+        enabled: true,
+        status: 'baseline',
+        reason: 'Calibrated power-law remains the default forecast baseline.',
+        metrics: baselineMetrics,
+      },
+      ...ENSEMBLE_CONFIG.featureFamilies.map(featureFamily => ({
+        id: `plus-${featureFamily}`,
+        enabled: false,
+        status: 'context-only' as const,
+        reason: `${featureFamily} signals are loaded for context but not enabled until ablation beats baseline.`,
+      })),
+      {
+        id: 'full-regime-ensemble',
+        enabled: false,
+        status: 'disabled',
+        reason: ENSEMBLE_CONFIG.enablementReason,
+      },
+    ],
+    enablementGate: {
+      defaultEnsembleEnabled: ENSEMBLE_CONFIG.defaultEnabled,
+      reason: ENSEMBLE_CONFIG.enablementReason,
+    },
+  };
+}
+
+function renderRegimeSummary(regimeInputs: Map<string, Map<RegimeState, MetricInput[]>>): BacktestReport['regimeSummary'] {
+  return Object.fromEntries(
+    [...regimeInputs.entries()].map(([horizon, byState]) => [
+      horizon,
+      Object.fromEntries([...byState.entries()].map(([state, inputs]) => [state, aggregateForecastMetrics(inputs)])),
+    ])
+  ) as BacktestReport['regimeSummary'];
 }
 
 function evaluateQualityGate(metrics: BacktestReport['metrics']): BacktestReport['qualityGate'] {
@@ -231,6 +309,32 @@ function renderMarkdown(report: BacktestReport): string {
     }
     lines.push('');
   }
+
+  lines.push('## Regime Summary', '');
+  if (report.regimeSummary) {
+    for (const horizon of report.horizons) {
+      const byState = report.regimeSummary[String(horizon)] ?? {};
+      lines.push(`### ${horizon} Day Horizon`, '');
+      lines.push('| Top state | Samples | Median abs log error | Bias log error |');
+      lines.push('| --- | ---: | ---: | ---: |');
+      for (const [state, metric] of Object.entries(byState)) {
+        lines.push(`| \`${state}\` | ${metric.samples} | ${formatMetric(metric.medianAbsLogError)} | ${formatMetric(metric.biasLogError)} |`);
+      }
+      lines.push('');
+    }
+  } else {
+    lines.push('No feature table was available for regime grouping.', '');
+  }
+
+  lines.push('## Ablation And Enablement', '');
+  lines.push(`Default ensemble enabled: ${report.ablation.enablementGate.defaultEnsembleEnabled ? 'yes' : 'no'}`);
+  lines.push(report.ablation.enablementGate.reason, '');
+  lines.push('| Mode | Status | Enabled | Reason |');
+  lines.push('| --- | --- | --- | --- |');
+  for (const mode of report.ablation.modes) {
+    lines.push(`| \`${mode.id}\` | ${mode.status} | ${mode.enabled ? 'yes' : 'no'} | ${mode.reason} |`);
+  }
+  lines.push('');
 
   lines.push('## Model Config Snapshot', '', '```json', JSON.stringify(report.metadata.modelConfig, null, 2), '```', '');
   return `${lines.join('\n')}\n`;

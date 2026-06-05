@@ -2,7 +2,7 @@
   "metadata": {
     "source": "FRED",
     "status": "missing-credential",
-    "fetchedAt": "2026-06-05T06:05:48.474Z",
+    "fetchedAt": "2026-06-05T06:13:23.607Z",
     "series": [
       "WALCL",
       "FEDFUNDS",

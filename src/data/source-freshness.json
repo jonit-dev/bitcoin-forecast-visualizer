@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-06-05T06:13:29.263Z",
+  "sources": {
+    "btc": {
+      "status": "fresh",
+      "latestDate": "2026-06-04",
+      "lagDays": 1,
+      "required": true
+    },
+    "mvrv": {
+      "status": "fresh",
+      "latestDate": "2026-06-04",
+      "lagDays": 1,
+      "required": true
+    },
+    "onchain": {
+      "status": "fresh",
+      "latestDate": "2026-06-04",
+      "lagDays": 1,
+      "required": true
+    },
+    "features": {
+      "status": "fresh",
+      "latestDate": "2026-06-04",
+      "lagDays": 1,
+      "required": true
+    },
+    "derivatives": {
+      "status": "unavailable",
+      "latestDate": null,
+      "lagDays": null,
+      "required": false
+    },
+    "etf": {
+      "status": "unavailable",
+      "latestDate": null,
+      "lagDays": null,
+      "required": false
+    },
+    "macro": {
+      "status": "missing-credential",
+      "latestDate": null,
+      "lagDays": null,
+      "required": false
+    },
+    "sentiment": {
+      "status": "deferred",
+      "latestDate": null,
+      "lagDays": null,
+      "required": false
+    }
+  }
+}

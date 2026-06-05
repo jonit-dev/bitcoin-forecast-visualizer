@@ -59,3 +59,13 @@ export const BACKTEST_CONFIG = {
     'powerlaw-current',
   ],
 } as const;
+
+export const ENSEMBLE_CONFIG = {
+  defaultEnabled: false,
+  enablementReason: 'Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample.',
+  weights: {
+    powerlaw: 1,
+    regimeAdjustment: 0,
+  },
+  featureFamilies: ['mvrv', 'onchain', 'volatility', 'macro', 'derivatives', 'etf-flow'],
+} as const;

@@ -7,6 +7,7 @@ import { ForecastChart } from './components/Chart';
 import { processRealData, generateHeatmapData, computeDrawdownStats, computeProbabilityForecast, HISTORICAL_CYCLE_DRAWDOWNS, CONFIDENCE_Z_SCORES, type HeatmapCell, type DrawdownStats } from './lib/data';
 import { loadBTCData, computeMVRVStats, computeMVRVZScoreSeries, type MarketData, type MVRVStats } from './lib/api';
 import { cn } from './lib/utils';
+import { loadCurrentRegimeSummary, loadReliabilitySummary, loadSourceFreshness } from './lib/reliabilityReport';
 
 function formatHorizonLabel(days: number): string {
   if (days < 30) return `${days}d`;
@@ -66,6 +67,11 @@ export default function App() {
   const [marketData] = useState<MarketData>(() => loadBTCData());
   const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
   const [mvrvZScoreData] = useState(() => computeMVRVZScoreSeries());
+  const [reliabilitySummary] = useState(() => loadReliabilitySummary());
+  const [sourceFreshness] = useState(() => loadSourceFreshness());
+  const [currentRegimeSummary] = useState(() => loadCurrentRegimeSummary());
+  const regimeContext = currentRegimeSummary.regime;
+  const tailRisk = currentRegimeSummary.tailRisk;
   const halvingInfo = useMemo(() => getHalvingInfo(), []);
   const [horizon, setHorizon] = useState(180);
   const [model, setModel] = useState('powerlaw');
@@ -490,10 +496,10 @@ export default function App() {
                   className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
                 >
                   <option value="powerlaw">BTC Power Law</option>
-                  <option value="transformer">Temporal Fusion Transformer</option>
-                  <option value="lstm">LSTM Network</option>
-                  <option value="prophet">Facebook Prophet</option>
-                  <option value="arima">ARIMA (Baseline)</option>
+                  <option value="transformer">Transformer (unvalidated)</option>
+                  <option value="lstm">LSTM (unvalidated)</option>
+                  <option value="prophet">Prophet (unvalidated)</option>
+                  <option value="arima">ARIMA baseline (unvalidated)</option>
                 </select>
               </div>
 
@@ -553,6 +559,96 @@ export default function App() {
                 )}
                 {isGenerating ? 'Computing...' : 'Refresh Now'}
               </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Gauge className="w-4 h-4 text-sky-400" />
+                Model Trust
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 md:p-6 md:pt-0 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs md:text-sm text-zinc-400">Backtest Gate</span>
+                <span className={cn("text-xs md:text-sm font-mono", reliabilitySummary.qualityGateStatus === 'PASS' ? "text-emerald-400" : "text-red-400")}>
+                  {reliabilitySummary.qualityGateStatus}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs md:text-sm text-zinc-400">Reliability Score</span>
+                <span className="text-xs md:text-sm font-mono text-zinc-200">{reliabilitySummary.reliabilityScore}/100</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs md:text-sm text-zinc-400">Default Model</span>
+                <span className="text-xs md:text-sm font-medium text-amber-200">
+                  {reliabilitySummary.ensembleEnabled ? 'Regime ensemble' : 'Power-law'}
+                </span>
+              </div>
+              {horizon >= 180 && (
+                <p className="text-[10px] leading-relaxed text-zinc-500">
+                  Long-horizon output is a scenario range, not an exact confidence target.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Layers3 className="w-4 h-4 text-amber-300" />
+                Regime Context
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 md:p-6 md:pt-0 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs md:text-sm text-zinc-400">Top State</span>
+                <span className="text-xs md:text-sm font-medium text-zinc-200">{regimeContext.topState}</span>
+              </div>
+              <div className="space-y-1">
+                {(Object.entries(regimeContext.probabilities) as [string, number][])
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 3)
+                  .map(([state, probability]) => (
+                    <div key={state} className="flex justify-between items-center">
+                      <span className="text-[10px] text-zinc-500">{state}</span>
+                      <span className="text-[10px] font-mono text-zinc-300">{Math.round(probability * 100)}%</span>
+                    </div>
+                  ))}
+              </div>
+              <div className="border-t border-white/5 pt-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-zinc-400">Tail Risk</span>
+                  <span className="text-xs font-mono text-zinc-200">{tailRisk.riskFlag}</span>
+                </div>
+                <p className="mt-1 text-[10px] leading-relaxed text-zinc-500">
+                  {regimeContext.reasonCodes.slice(0, 3).join(' · ')}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <RefreshCw className="w-4 h-4 text-zinc-400" />
+                Source Freshness
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 md:p-6 md:pt-0 space-y-2">
+              {(Object.entries(sourceFreshness.sources) as [string, { status: string; latestDate: string | null; required: boolean }][])
+                .map(([name, source]) => (
+                <div key={name} className="flex justify-between items-center">
+                  <span className="text-xs text-zinc-400">{name}</span>
+                  <span className={cn(
+                    "text-[10px] font-mono",
+                    source.required && source.status !== 'fresh' ? "text-red-400" : source.status === 'fresh' || source.status === 'available' ? "text-emerald-400" : "text-zinc-500"
+                  )}>
+                    {source.latestDate ?? source.status}
+                  </span>
+                </div>
+              ))}
             </CardContent>
           </Card>
 

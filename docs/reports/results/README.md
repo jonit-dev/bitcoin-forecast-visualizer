@@ -15,3 +15,10 @@ Report fields:
 - `models`: benchmark model ids and their configs.
 - `metrics`: per-horizon, per-model samples, log-error metrics, NLL where a distribution exists, pinball losses, and interval coverage.
 - `qualityGate`: pass/fail checks for the required horizons.
+- `regimeSummary`: context-only error grouping by top lag-safe regime state.
+- `ablation`: baseline/per-feature/full-regime enablement status; regime signals remain disabled unless the gate says otherwise.
+
+Automation:
+
+- `npm run reports:refresh` updates required data, refreshes optional caches where possible, validates data, runs backtest, writes runtime summaries, and checks freshness.
+- `.github/workflows/update-data-and-backtest.yml` runs the same refresh on a schedule and via manual dispatch.

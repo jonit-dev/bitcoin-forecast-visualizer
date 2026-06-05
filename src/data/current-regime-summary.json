@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-06-05T06:13:29.264Z",
+  "featureDate": "2026-06-04",
+  "regime": {
+    "probabilities": {
+      "accumulation-value": 0.3516483516483516,
+      "trend-expansion": 0.12087912087912087,
+      "late-cycle-overheating": 0.0879120879120879,
+      "deleveraging-bear": 0.3516483516483516,
+      "sideways-chop": 0.0879120879120879
+    },
+    "topState": "accumulation-value",
+    "reasonCodes": [
+      "value-discount",
+      "drawdown-or-negative-momentum",
+      "hashrate-available"
+    ],
+    "contextOnly": true
+  },
+  "tailRisk": {
+    "riskFlag": "two-sided",
+    "direction": "both",
+    "drivers": [
+      "large-cycle-drawdown"
+    ],
+    "intervalMultiplierAdjustment": 1.08
+  }
+}

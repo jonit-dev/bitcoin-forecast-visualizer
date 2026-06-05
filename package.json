@@ -22,6 +22,10 @@
     "update:etf-flow": "node scripts/update-etf-flow-data.mjs",
     "update:macro": "node scripts/update-macro-data.mjs",
     "validate:regime-data": "node scripts/validate-regime-data.mjs",
+    "write:runtime-summaries": "tsx scripts/write-runtime-summaries.ts",
+    "check:freshness": "tsx scripts/check-data-freshness.ts",
+    "validate:data": "npm run validate:mvrv && npm run validate:onchain && npm run validate:features && npm run validate:regime-data",
+    "reports:refresh": "node scripts/reports-refresh.mjs",
     "validate:mvrv": "node scripts/validate-mvrv-data.mjs",
     "lint": "tsc --noEmit",
     "deploy": "bash -c 'set -a; source .env; set +a; node scripts/update-btc-data.mjs && vite build && wrangler pages deploy dist --branch main'"

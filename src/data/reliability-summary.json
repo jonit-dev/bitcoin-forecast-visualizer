@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-06-05T06:13:29.263Z",
+  "reportPath": "docs/reports/results/backtest-2026-06-05T06-13-28-626Z.json",
+  "qualityGateStatus": "PASS",
+  "reliabilityScore": 98,
+  "horizonConfidence": {
+    "14d": {
+      "powerlawError": 0.05265544518723682,
+      "naiveError": 0.05414553132172716,
+      "status": "beats-naive"
+    },
+    "30d": {
+      "powerlawError": 0.08259744166777964,
+      "naiveError": 0.08619281765063183,
+      "status": "beats-naive"
+    },
+    "60d": {
+      "powerlawError": 0.14017098338199765,
+      "naiveError": 0.14228638563056029,
+      "status": "beats-naive"
+    },
+    "90d": {
+      "powerlawError": 0.1561971538353467,
+      "naiveError": 0.19003365370333095,
+      "status": "beats-naive"
+    }
+  },
+  "ensembleEnabled": false,
+  "ensembleReason": "Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample."
+}
