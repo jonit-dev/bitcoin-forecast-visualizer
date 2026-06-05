@@ -35,6 +35,9 @@ const POWER_LAW_HEATMAP_LOG_DRIFT_SCALE = 0.3;
 const STOCHASTIC_TRACE_COUNT = 12;
 const STOCHASTIC_TRACE_BACKCAST_DAYS = 7;
 const STOCHASTIC_TRACE_BLOCK_DAYS = 14;
+// Use recent regime history for visible scenario paths. Full-history BTC residuals include
+// early-era shocks that are not calibrated to the displayed confidence interval scale.
+const STOCHASTIC_TRACE_LOOKBACK_DAYS = 730;
 
 export const CONFIDENCE_Z_SCORES = {
   0.95: 1.96,
@@ -193,10 +196,11 @@ function dateKey(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number): number[] {
+function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lookbackDays?: number): number[] {
   const innovations: number[] = [];
+  const startIndex = lookbackDays ? Math.max(1, endIndex - lookbackDays + 1) : 1;
 
-  for (let i = 1; i <= endIndex; i++) {
+  for (let i = startIndex; i <= endIndex; i++) {
     const prev = ohlcv[i - 1];
     const curr = ohlcv[i];
     if (prev.close <= 0 || curr.close <= 0) continue;
@@ -210,6 +214,13 @@ function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number): n
   }
 
   return innovations;
+}
+
+function sampleStandardDeviation(values: number[]): number {
+  if (values.length < 2) return 0;
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (values.length - 1);
+  return Math.sqrt(variance);
 }
 
 function generatePowerLawStochasticTraces(
@@ -227,12 +238,21 @@ function generatePowerLawStochasticTraces(
   const lastDate = new Date(ohlcv[lastIndex].date + 'T00:00:00Z');
   const backcastDays = Math.round((lastDate.getTime() - anchorDate.getTime()) / 86400000);
   const totalDays = backcastDays + horizon;
-  const innovations = buildPowerLawInnovationHistory(ohlcv, anchorIndex);
+  const innovations = buildPowerLawInnovationHistory(ohlcv, anchorIndex, STOCHASTIC_TRACE_LOOKBACK_DAYS);
   if (innovations.length < STOCHASTIC_TRACE_BLOCK_DAYS * 4) return tracesByDate;
 
   const rng = mulberry32(0xB17C01A + horizon * 131 + anchorIndex);
   const centeredMean = innovations.reduce((sum, value) => sum + value, 0) / innovations.length;
-  const centeredInnovations = innovations.map(value => value - centeredMean);
+  const rawCenteredInnovations = innovations.map(value => value - centeredMean);
+  const rawInnovationSd = sampleStandardDeviation(rawCenteredInnovations);
+  if (!Number.isFinite(rawInnovationSd) || rawInnovationSd <= 0) return tracesByDate;
+
+  // Visible traces should be plausible samples from the same volatility scale as the
+  // displayed forecast interval. Keep empirical block-bootstrap shape/clustering,
+  // but rescale the recent residual innovations to the interval model's blended vol.
+  const targetDailyVol = blendedPowerLawHeatmapVol(ohlcv);
+  const innovationScale = targetDailyVol / rawInnovationSd;
+  const centeredInnovations = rawCenteredInnovations.map(value => value * innovationScale);
 
   const paths: number[][] = Array.from({ length: STOCHASTIC_TRACE_COUNT }, () => []);
   const anchorValues = Array.from({ length: STOCHASTIC_TRACE_COUNT }, () => anchor.close);
@@ -244,6 +264,17 @@ function generatePowerLawStochasticTraces(
     let blockOffset = STOCHASTIC_TRACE_BLOCK_DAYS;
 
     for (let day = 1; day <= totalDays; day++) {
+      // Future paths must be conditioned on the latest known candle. The 7-day
+      // backcast is only a diagnostic lead-in; without this reset, scenarios
+      // that drifted away during the backcast start the actual forecast from a
+      // fake price, which makes them violate the forecast bands for the wrong reason.
+      if (day === backcastDays) {
+        price = ohlcv[lastIndex].close;
+        paths[pathIndex][day] = price;
+        blockOffset = STOCHASTIC_TRACE_BLOCK_DAYS;
+        continue;
+      }
+
       if (blockOffset >= STOCHASTIC_TRACE_BLOCK_DAYS) {
         blockStart = Math.floor(rng() * Math.max(1, centeredInnovations.length - STOCHASTIC_TRACE_BLOCK_DAYS));
         blockOffset = 0;

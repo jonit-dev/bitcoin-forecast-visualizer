@@ -479,6 +479,7 @@ interface ForecastChartProps {
   showSMA: boolean;
   showVolume: boolean;
   showModelLine: boolean;
+  showScenarios: boolean;
   showFloorLine: boolean;
   showPeakLine: boolean;
   showHeatmap: boolean;
@@ -497,7 +498,7 @@ interface ForecastChartProps {
   } | null;
 }
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showFloorLine, showPeakLine, showHeatmap, heatmapData, timeRange, playbackIndex, mvrvData, showMVRV, probabilityForecast }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, timeRange, playbackIndex, mvrvData, showMVRV, probabilityForecast }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<{
@@ -630,6 +631,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       crosshairMarkerVisible: false,
       lastValueVisible: false,
       priceLineVisible: false,
+      visible: false,
     }));
 
     // Power Law Model Line
@@ -743,7 +745,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     ] : [];
     const forecastUpperData = lastHist && forecast.length > 0 ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastUpper }))] : [];
     const forecastLowerData = lastHist && forecast.length > 0 ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastLower }))] : [];
-    const traceRows = isInPlayback ? [] : [...historical, ...forecast].filter((d: any) => Array.isArray(d.stochasticTraces));
+    const traceRows = !showScenarios || isInPlayback ? [] : [...historical, ...forecast].filter((d: any) => Array.isArray(d.stochasticTraces));
     const stochasticTraceData = seriesRefs.current.stochasticTraces.map((_, traceIndex) =>
       traceRows
         .map((d: any) => ({ time: d.date, value: d.stochasticTraces?.[traceIndex] }))
@@ -828,7 +830,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     } else if (forecastMarkersRef.current) {
       forecastMarkersRef.current.setMarkers([]);
     }
-  }, [data, playbackIndex, probabilityForecast]);
+  }, [data, playbackIndex, probabilityForecast, showScenarios]);
 
   // Crosshair subscription (only re-subscribes when data changes, not every playback tick)
   useEffect(() => {
@@ -916,9 +918,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma50?.applyOptions({ visible: showSMA });
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
     seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
+    seriesRefs.current.stochasticTraces.forEach(series => series.applyOptions({ visible: showScenarios }));
     seriesRefs.current.floorLine?.applyOptions({ visible: showFloorLine });
     seriesRefs.current.peakLine?.applyOptions({ visible: showPeakLine });
-  }, [showSMA, showVolume, showModelLine, showFloorLine, showPeakLine]);
+  }, [showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine]);
 
   // Update probability heatmap
   useEffect(() => {

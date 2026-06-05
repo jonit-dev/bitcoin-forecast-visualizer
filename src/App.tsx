@@ -83,6 +83,7 @@ export default function App() {
   const [showSMA, setShowSMA] = useState(true);
   const [showVolume, setShowVolume] = useState(true);
   const [showModelLine, setShowModelLine] = useState(true);
+  const [showScenarios, setShowScenarios] = useState(false);
   const [showFloorLine, setShowFloorLine] = useState(true);
   const [showPeakLine, setShowPeakLine] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(true);
@@ -291,7 +292,20 @@ export default function App() {
                           : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
                       )}
                     >
-                      Model
+                      Median
+                    </button>
+                  )}
+                  {model === 'powerlaw' && (
+                    <button
+                      onClick={() => setShowScenarios(!showScenarios)}
+                      className={cn(
+                        "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                        showScenarios
+                          ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
+                          : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                      )}
+                    >
+                      Scenarios
                     </button>
                   )}
                   <button
@@ -355,6 +369,7 @@ export default function App() {
                   showSMA={showSMA}
                   showVolume={showVolume}
                   showModelLine={model === 'powerlaw' && showModelLine}
+                  showScenarios={model === 'powerlaw' && showScenarios}
                   showFloorLine={showFloorLine}
                   showPeakLine={showPeakLine}
                   showHeatmap={showHeatmap}
@@ -507,7 +522,7 @@ export default function App() {
                 </select>
                 {model === 'powerlaw' && (
                   <p className="text-[10px] leading-relaxed text-zinc-500">
-                    Smooth amber line = median trend. Faint amber traces are seeded block-bootstrap volatility scenarios that begin 7 days before the latest candle, so recent realized BTC action can be compared against the scenario fan.
+                    Smooth amber line = median forecast path. Scenario traces are hidden by default because they are exploratory sketches, not the primary prediction; turn on Scenarios only when comparing sampled residual paths.
                   </p>
                 )}
               </div>
