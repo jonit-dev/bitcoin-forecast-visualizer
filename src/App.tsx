@@ -18,6 +18,13 @@ function formatPrice(n: number) {
   return '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 }
 
+function formatIntervalOption(level: number, horizonDays: number, calibrationLabel?: string): string {
+  const pct = `${Math.round(level * 100)}%`;
+  if (horizonDays >= 180) return `${pct} scenario envelope`;
+  const label = calibrationLabel === 'Conservative' ? 'conservative band' : 'calibrated band';
+  return `${pct} ${label}`;
+}
+
 function getHalvingInfo() {
   const lastHalvingDate = '2024-04-20';
   const HALVING_INTERVAL_MS = 1460 * 86400000;
@@ -411,6 +418,11 @@ export default function App() {
                 <p className="text-lg md:text-2xl font-semibold font-mono text-amber-100">
                   {forecastPrice ? formatPrice(forecastPrice) : '—'}
                 </p>
+                {probabilityForecast && (
+                  <p className="mt-0.5 text-[10px] font-medium text-amber-200/70">
+                    {probabilityForecast.calibrationLabel}
+                  </p>
+                )}
               </CardContent>
             </Card>
             <Card className="rounded-lg border-white/10 bg-[#11140f]">
@@ -510,19 +522,21 @@ export default function App() {
               </div>
 
               <div className="space-y-1.5 md:space-y-2">
-                <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">Confidence Interval</label>
+                <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                  {horizon >= 180 ? 'Scenario Envelope' : 'Interval Band'}
+                </label>
                 <select
                   value={confidenceLevel}
                   onChange={(e) => setConfidenceLevel(Number(e.target.value) as keyof typeof CONFIDENCE_Z_SCORES)}
                   className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
                 >
-                  <option value={0.95}>95% (calibrated)</option>
-                  <option value={0.9}>90% (calibrated)</option>
-                  <option value={0.8}>80% (calibrated)</option>
+                  <option value={0.95}>{formatIntervalOption(0.95, horizon, probabilityForecast?.calibrationLabel)}</option>
+                  <option value={0.9}>{formatIntervalOption(0.9, horizon, probabilityForecast?.calibrationLabel)}</option>
+                  <option value={0.8}>{formatIntervalOption(0.8, horizon, probabilityForecast?.calibrationLabel)}</option>
                 </select>
                 {model === 'powerlaw' && (
                   <p className="text-[10px] leading-relaxed text-zinc-500">
-                    Amber path = one calibrated sample path. Dotted bands and the target card show the model median/interval. Extra scenario sketches are hidden by default; turn on Scenarios only when comparing sampled residual paths.
+                    Amber path = median path. Dotted bands show {horizon >= 180 ? 'scenario range' : 'calibrated risk range'}. Scenario sketches stay hidden unless enabled.
                   </p>
                 )}
               </div>

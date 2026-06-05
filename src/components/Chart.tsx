@@ -841,7 +841,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
         position: 'aboveBar',
         color: pUp >= 50 ? '#34d399' : '#fbbf24',
         shape: 'circle',
-        text: `${pUp}% up · median ${medianK} · ${rangeLowK}-${rangeHighK}`,
+        text: `${probabilityForecast.calibrationLabel} · ${pUp}% up · median ${medianK} · ${rangeLowK}-${rangeHighK}`,
       }]);
     } else if (forecastMarkersRef.current) {
       forecastMarkersRef.current.setMarkers([]);

@@ -30,6 +30,19 @@ export const INTERVAL_CONFIG = {
     amplitude: 1.85,
     tauDays: 150,
   },
+  fittedMultipliers: [
+    { horizonDays: 14, multiplier: 1.01, coverageStatus: 'calibrated', label: 'Calibrated' },
+    { horizonDays: 30, multiplier: 0.98, coverageStatus: 'calibrated', label: 'Calibrated' },
+    { horizonDays: 60, multiplier: 0.99, coverageStatus: 'conservative', label: 'Conservative' },
+    { horizonDays: 90, multiplier: 0.87, coverageStatus: 'calibrated', label: 'Calibrated' },
+    { horizonDays: 180, multiplier: 0.86, coverageStatus: 'scenario', label: 'Scenario range' },
+    { horizonDays: 365, multiplier: 0.59, coverageStatus: 'scenario', label: 'Scenario range' },
+  ],
+  scenarioPolicy: {
+    maxFittedHorizonDays: 365,
+    aboveMaxMultiplier: 0.59,
+    label: 'Scenario range',
+  },
 } as const;
 
 export const BACKTEST_CONFIG = {
