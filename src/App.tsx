@@ -4,7 +4,7 @@ import { Activity, TrendingUp, TrendingDown, RefreshCw, BarChart2, Play, Square,
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
-import { processRealData, generateHeatmapData, computeDrawdownStats, HISTORICAL_CYCLE_DRAWDOWNS, CONFIDENCE_Z_SCORES, type HeatmapCell, type DrawdownStats } from './lib/data';
+import { processRealData, generateHeatmapData, computeDrawdownStats, computeProbabilityForecast, HISTORICAL_CYCLE_DRAWDOWNS, CONFIDENCE_Z_SCORES, type HeatmapCell, type DrawdownStats } from './lib/data';
 import { loadBTCData, computeMVRVStats, computeMVRVZScoreSeries, type MarketData, type MVRVStats } from './lib/api';
 import { cn } from './lib/utils';
 
@@ -167,6 +167,11 @@ export default function App() {
   }, [activeDisplayData]);
 
   const forecastChange = currentPrice ? ((forecastPrice - currentPrice) / currentPrice) * 100 : 0;
+
+  const probabilityForecast = useMemo(() =>
+    computeProbabilityForecast(marketData.ohlcv, horizon),
+    [marketData.ohlcv, horizon]
+  );
 
   const { annualizedVol, volRisk } = useMemo(() => {
     if (!marketData?.ohlcv || marketData.ohlcv.length < 2) return { annualizedVol: 0, volRisk: 'High' };
@@ -358,6 +363,7 @@ export default function App() {
                   playbackIndex={playbackIndex}
                   mvrvData={mvrvZScoreData}
                   showMVRV={showMVRV}
+                  probabilityForecast={probabilityForecast}
                 />
               </motion.div>
             </CardContent>
@@ -501,7 +507,7 @@ export default function App() {
                 </select>
                 {model === 'powerlaw' && (
                   <p className="text-[10px] leading-relaxed text-zinc-500">
-                    Power-law bands now use residual-process volatility with a fat-tail stress ramp and no visual cap, matching the heatmap calibration.
+                    Smooth amber line = median trend. Faint amber traces are seeded block-bootstrap volatility scenarios that begin 7 days before the latest candle, so recent realized BTC action can be compared against the scenario fan.
                   </p>
                 )}
               </div>

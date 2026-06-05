@@ -487,9 +487,17 @@ interface ForecastChartProps {
   playbackIndex: number | null;
   mvrvData: { date: string; zScore: number; mvrv: number }[];
   showMVRV: boolean;
+  probabilityForecast?: {
+    horizonDays: number;
+    probabilityUp: number;
+    median: number;
+    q10: number;
+    q90: number;
+    calibrationLabel: string;
+  } | null;
 }
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showFloorLine, showPeakLine, showHeatmap, heatmapData, timeRange, playbackIndex, mvrvData, showMVRV }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showFloorLine, showPeakLine, showHeatmap, heatmapData, timeRange, playbackIndex, mvrvData, showMVRV, probabilityForecast }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<{
@@ -500,11 +508,13 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     forecast?: ISeriesApi<"Candlestick">;
     forecastUpper?: ISeriesApi<"Line">;
     forecastLower?: ISeriesApi<"Line">;
+    stochasticTraces: ISeriesApi<"Line">[];
     modelLine?: ISeriesApi<"Line">;
     floorLine?: ISeriesApi<"Line">;
     peakLine?: ISeriesApi<"Line">;
-  }>({});
+  }>({ stochasticTraces: [] });
   const markersRef = useRef<any>(null);
+  const forecastMarkersRef = useRef<any>(null);
   const heatmapPrimRef = useRef<HeatmapPrimitive | null>(null);
   const mvrvChartContainerRef = useRef<HTMLDivElement>(null);
   const mvrvChartRef = useRef<any>(null);
@@ -609,6 +619,18 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       priceLineVisible: false,
     });
     seriesRefs.current.forecastLower = forecastLowerSeries;
+
+    // Stochastic scenario traces: seeded block-bootstrap paths around the
+    // power-law median. They start a few days before the latest candle so the
+    // user can see how sampled paths behaved against recent realized prices.
+    seriesRefs.current.stochasticTraces = Array.from({ length: 12 }, (_, index) => chart.addSeries(LineSeries, {
+      color: index === 0 ? 'rgba(251, 191, 36, 0.55)' : 'rgba(251, 191, 36, 0.22)',
+      lineWidth: index === 0 ? 2 : 1,
+      lineStyle: 0,
+      crosshairMarkerVisible: false,
+      lastValueVisible: false,
+      priceLineVisible: false,
+    }));
 
     // Power Law Model Line
     const modelLineSeries = chart.addSeries(LineSeries, {
@@ -721,6 +743,12 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     ] : [];
     const forecastUpperData = lastHist && forecast.length > 0 ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastUpper }))] : [];
     const forecastLowerData = lastHist && forecast.length > 0 ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastLower }))] : [];
+    const traceRows = isInPlayback ? [] : [...historical, ...forecast].filter((d: any) => Array.isArray(d.stochasticTraces));
+    const stochasticTraceData = seriesRefs.current.stochasticTraces.map((_, traceIndex) =>
+      traceRows
+        .map((d: any) => ({ time: d.date, value: d.stochasticTraces?.[traceIndex] }))
+        .filter((point: any) => Number.isFinite(point.value) && point.value > 0)
+    );
 
     const sortByTime = (a: any, b: any) => new Date(a.time).getTime() - new Date(b.time).getTime();
 
@@ -746,6 +774,9 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.forecast?.setData(forecastData.sort(sortByTime));
     seriesRefs.current.forecastUpper?.setData(forecastUpperData.sort(sortByTime));
     seriesRefs.current.forecastLower?.setData(forecastLowerData.sort(sortByTime));
+    seriesRefs.current.stochasticTraces.forEach((series, traceIndex) => {
+      series.setData(stochasticTraceData[traceIndex].sort(sortByTime));
+    });
     seriesRefs.current.modelLine?.setData(modelLineData.sort(sortByTime));
     seriesRefs.current.floorLine?.setData(floorLineData.sort(sortByTime));
     seriesRefs.current.peakLine?.setData(peakLineData.sort(sortByTime));
@@ -777,7 +808,27 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     } else if (isInPlayback && markersRef.current) {
       markersRef.current.setMarkers([]);
     }
-  }, [data, playbackIndex]);
+
+    if (!isInPlayback && forecast.length > 0 && probabilityForecast && seriesRefs.current.forecast) {
+      if (!forecastMarkersRef.current) {
+        forecastMarkersRef.current = createSeriesMarkers(seriesRefs.current.forecast, []);
+      }
+      const terminal = forecast[forecast.length - 1];
+      const pUp = Math.round(probabilityForecast.probabilityUp * 100);
+      const medianK = `$${Math.round(probabilityForecast.median / 1000)}k`;
+      const rangeLowK = `$${Math.round(probabilityForecast.q10 / 1000)}k`;
+      const rangeHighK = `$${Math.round(probabilityForecast.q90 / 1000)}k`;
+      forecastMarkersRef.current.setMarkers([{
+        time: terminal.date,
+        position: 'aboveBar',
+        color: pUp >= 50 ? '#34d399' : '#fbbf24',
+        shape: 'circle',
+        text: `${pUp}% up · median ${medianK} · ${rangeLowK}-${rangeHighK}`,
+      }]);
+    } else if (forecastMarkersRef.current) {
+      forecastMarkersRef.current.setMarkers([]);
+    }
+  }, [data, playbackIndex, probabilityForecast]);
 
   // Crosshair subscription (only re-subscribes when data changes, not every playback tick)
   useEffect(() => {

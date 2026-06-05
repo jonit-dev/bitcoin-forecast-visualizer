@@ -15,10 +15,26 @@ export interface HeatmapCell {
   density: number; // 0-1 normalized per column
 }
 
+export interface ProbabilityForecast {
+  horizonDays: number;
+  targetDate: string;
+  median: number;
+  probabilityUp: number;
+  q05: number;
+  q10: number;
+  q90: number;
+  q95: number;
+  calibrationLabel: string;
+  verdict: string;
+}
+
 // Holdout-calibrated blend: recent vol reacts quickly, long vol keeps the band from overfitting
 // the latest regime. The log-drift scale keeps the modal path close to realized outcomes.
 const POWER_LAW_HEATMAP_RECENT_VOL_WEIGHT = 0.55;
 const POWER_LAW_HEATMAP_LOG_DRIFT_SCALE = 0.3;
+const STOCHASTIC_TRACE_COUNT = 12;
+const STOCHASTIC_TRACE_BACKCAST_DAYS = 7;
+const STOCHASTIC_TRACE_BLOCK_DAYS = 14;
 
 export const CONFIDENCE_Z_SCORES = {
   0.95: 1.96,
@@ -69,12 +85,195 @@ function powerLawIntervalStressMultiplier(days: number): number {
   return 1 + 1.85 * (1 - Math.exp(-days / 150));
 }
 
+function normalCdf(value: number): number {
+  return 0.5 * (1 + erf(value / Math.SQRT2));
+}
+
+function erf(value: number): number {
+  const sign = value < 0 ? -1 : 1;
+  const x = Math.abs(value);
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+  return sign * y;
+}
+
+function normalQuantile(probability: number): number {
+  const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.38357751867269e2, -3.066479806614716e1, 2.506628277459239];
+  const b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1];
+  const c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
+  const d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996, 3.754408661907416];
+  const pLow = 0.02425;
+  const pHigh = 1 - pLow;
+  const p = Math.min(Math.max(probability, 1e-9), 1 - 1e-9);
+
+  if (p < pLow) {
+    const q = Math.sqrt(-2 * Math.log(p));
+    return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+      ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+  }
+  if (p > pHigh) {
+    const q = Math.sqrt(-2 * Math.log(1 - p));
+    return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+      ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+  }
+
+  const q = p - 0.5;
+  const r = q * q;
+  return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+    (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+}
+
+function probabilityVerdict(horizonDays: number, probabilityUp: number): string {
+  if (horizonDays <= 14) return probabilityUp >= 0.53 ? 'Slight upside tilt' : probabilityUp <= 0.47 ? 'Slight downside tilt' : 'Coin flip';
+  if (probabilityUp < 0.4) return 'Downside-biased median';
+  if (probabilityUp < 0.47) return 'Range-bound / soft bias';
+  if (probabilityUp > 0.6) return 'Upside-biased median';
+  return 'Balanced distribution';
+}
+
+function calibrationLabel(horizonDays: number): string {
+  if (horizonDays <= 14) return 'OK calibration · low edge';
+  if (horizonDays <= 30) return 'Conservative · low edge';
+  if (horizonDays <= 90) return 'Candidate · very wide';
+  if (horizonDays <= 180) return 'Directional only';
+  return 'Regime-sensitive';
+}
+
+export function computeProbabilityForecast(
+  ohlcv: OHLCVData[],
+  horizonDays: number
+): ProbabilityForecast | null {
+  if (ohlcv.length < 365 || horizonDays < 1) return null;
+
+  const last = ohlcv[ohlcv.length - 1];
+  const lastDate = new Date(last.date + 'T00:00:00Z');
+  const targetDate = addUtcDays(lastDate, horizonDays);
+  const median = powerLawForecast(targetDate, last.close, lastDate);
+  const dailyVol = blendedPowerLawHeatmapVol(ohlcv);
+  const sigma = powerLawIntervalStressMultiplier(horizonDays) * Math.sqrt(powerLawResidualVariance(horizonDays, dailyVol));
+  const probabilityUp = 1 - normalCdf((Math.log(last.close) - Math.log(median)) / sigma);
+  const quantilePrice = (p: number) => median * Math.exp(sigma * normalQuantile(p));
+
+  return {
+    horizonDays,
+    targetDate: dateKey(targetDate),
+    median,
+    probabilityUp,
+    q05: quantilePrice(0.05),
+    q10: quantilePrice(0.10),
+    q90: quantilePrice(0.90),
+    q95: quantilePrice(0.95),
+    calibrationLabel: calibrationLabel(horizonDays),
+    verdict: probabilityVerdict(horizonDays, probabilityUp),
+  };
+}
+
+function mulberry32(seed: number) {
+  return () => {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function addUtcDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setUTCDate(next.getUTCDate() + days);
+  return next;
+}
+
+function dateKey(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
+function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number): number[] {
+  const innovations: number[] = [];
+
+  for (let i = 1; i <= endIndex; i++) {
+    const prev = ohlcv[i - 1];
+    const curr = ohlcv[i];
+    if (prev.close <= 0 || curr.close <= 0) continue;
+
+    const prevDate = new Date(prev.date + 'T00:00:00Z');
+    const currDate = new Date(curr.date + 'T00:00:00Z');
+    const expected = powerLawForecast(currDate, prev.close, prevDate);
+    if (!Number.isFinite(expected) || expected <= 0) continue;
+
+    innovations.push(Math.log(curr.close / expected));
+  }
+
+  return innovations;
+}
+
+function generatePowerLawStochasticTraces(
+  ohlcv: OHLCVData[],
+  horizon: number,
+  model: string
+): Map<string, number[]> {
+  const tracesByDate = new Map<string, number[]>();
+  if (model !== 'powerlaw' || horizon < 1 || ohlcv.length < 120) return tracesByDate;
+
+  const lastIndex = ohlcv.length - 1;
+  const anchorIndex = Math.max(30, lastIndex - STOCHASTIC_TRACE_BACKCAST_DAYS);
+  const anchor = ohlcv[anchorIndex];
+  const anchorDate = new Date(anchor.date + 'T00:00:00Z');
+  const lastDate = new Date(ohlcv[lastIndex].date + 'T00:00:00Z');
+  const backcastDays = Math.round((lastDate.getTime() - anchorDate.getTime()) / 86400000);
+  const totalDays = backcastDays + horizon;
+  const innovations = buildPowerLawInnovationHistory(ohlcv, anchorIndex);
+  if (innovations.length < STOCHASTIC_TRACE_BLOCK_DAYS * 4) return tracesByDate;
+
+  const rng = mulberry32(0xB17C01A + horizon * 131 + anchorIndex);
+  const centeredMean = innovations.reduce((sum, value) => sum + value, 0) / innovations.length;
+  const centeredInnovations = innovations.map(value => value - centeredMean);
+
+  const paths: number[][] = Array.from({ length: STOCHASTIC_TRACE_COUNT }, () => []);
+  const anchorValues = Array.from({ length: STOCHASTIC_TRACE_COUNT }, () => anchor.close);
+  tracesByDate.set(anchor.date, anchorValues);
+
+  for (let pathIndex = 0; pathIndex < STOCHASTIC_TRACE_COUNT; pathIndex++) {
+    let price = anchor.close;
+    let blockStart = 0;
+    let blockOffset = STOCHASTIC_TRACE_BLOCK_DAYS;
+
+    for (let day = 1; day <= totalDays; day++) {
+      if (blockOffset >= STOCHASTIC_TRACE_BLOCK_DAYS) {
+        blockStart = Math.floor(rng() * Math.max(1, centeredInnovations.length - STOCHASTIC_TRACE_BLOCK_DAYS));
+        blockOffset = 0;
+      }
+
+      const prevDate = addUtcDays(anchorDate, day - 1);
+      const currDate = addUtcDays(anchorDate, day);
+      const expected = powerLawForecast(currDate, price, prevDate);
+      const innovation = centeredInnovations[blockStart + blockOffset++];
+      price = expected * Math.exp(innovation);
+      paths[pathIndex][day] = price;
+    }
+  }
+
+  for (let day = 1; day <= totalDays; day++) {
+    const key = dateKey(addUtcDays(anchorDate, day));
+    tracesByDate.set(key, paths.map(path => path[day]));
+  }
+
+  return tracesByDate;
+}
+
 export function processRealData(
   ohlcv: OHLCVData[],
   horizon: number = 14,
   model: string = 'transformer',
   confidenceZ: number = CONFIDENCE_Z_SCORES[0.95]
 ): any[] {
+  const stochasticTracesByDate = generatePowerLawStochasticTraces(ohlcv, horizon, model);
+
   // Add SMAs to historical data
   const data: any[] = ohlcv.map((d, i) => {
     let sma20: number | null = null;
@@ -82,7 +281,17 @@ export function processRealData(
     if (i >= 19) sma20 = ohlcv.slice(i - 19, i + 1).reduce((s, x) => s + x.close, 0) / 20;
     if (i >= 49) sma50 = ohlcv.slice(i - 49, i + 1).reduce((s, x) => s + x.close, 0) / 50;
     const t = daysSinceGenesis(new Date(d.date + 'T00:00:00Z'));
-    return { ...d, sma20, sma50, isForecast: false, powerLawModel: basePowerLawPrice(t), floorPriceModel: floorPowerLawPrice(t), peakPriceModel: peakPowerLawPrice(t) };
+    const stochasticTraces = stochasticTracesByDate.get(d.date);
+    return {
+      ...d,
+      sma20,
+      sma50,
+      isForecast: false,
+      powerLawModel: basePowerLawPrice(t),
+      floorPriceModel: floorPowerLawPrice(t),
+      peakPriceModel: peakPowerLawPrice(t),
+      stochasticTraces,
+    };
   });
 
   // Compute log-return based volatility from last 30 days
@@ -148,6 +357,7 @@ export function processRealData(
       forecastLower: close * Math.exp(-ciHalf),
       forecastRange: [close * Math.exp(-ciHalf), close * Math.exp(ciHalf)],
       isForecast: true,
+      stochasticTraces: stochasticTracesByDate.get(date.toISOString().split('T')[0]),
       powerLawModel: basePowerLawPrice(daysSinceGenesis(date)),
       floorPriceModel: floorPowerLawPrice(daysSinceGenesis(date)),
       peakPriceModel: peakPowerLawPrice(daysSinceGenesis(date)),
