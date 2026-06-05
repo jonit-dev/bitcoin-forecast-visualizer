@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "source": "not configured",
+    "status": "unavailable",
+    "fetchedAt": "2026-06-05T06:05:33.035Z",
+    "fields": [
+      "netFlowBTC",
+      "cumulativeNetFlowBTC",
+      "aumUSD"
+    ],
+    "cadence": "daily business days",
+    "credentialRequired": false,
+    "note": "No stable free machine-readable ETF flow source is enabled for baseline v2. This cache is optional and must stay context-only until a source is selected and validated."
+  },
+  "rows": []
+}

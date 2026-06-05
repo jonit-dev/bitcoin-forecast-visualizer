@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import btcHistory from '../src/data/btc-history.json';
 import type { OHLCVData } from '../src/lib/api';
@@ -24,6 +24,12 @@ interface BacktestReport {
       powerLaw: typeof POWER_LAW_CONFIG;
       interval: typeof INTERVAL_CONFIG;
       backtest: typeof BACKTEST_CONFIG;
+    };
+    featureTable?: {
+      rowCount: number;
+      firstDate: string;
+      lastDate: string;
+      latestFeatureCount: number;
     };
   };
   horizons: number[];
@@ -109,6 +115,7 @@ function main(): void {
         interval: INTERVAL_CONFIG,
         backtest: BACKTEST_CONFIG,
       },
+      featureTable: loadFeatureTableMetadata(),
     },
     horizons: [...BACKTEST_CONFIG.horizons],
     models: models.map(({ id, description, config }) => ({ id, description, config })),
@@ -121,6 +128,19 @@ function main(): void {
   if (report.qualityGate.status === 'FAIL' && !process.argv.includes('--report-only')) {
     process.exitCode = 1;
   }
+}
+
+function loadFeatureTableMetadata(): BacktestReport['metadata']['featureTable'] {
+  const path = join(process.cwd(), 'src', 'data', 'feature-table.json');
+  if (!existsSync(path)) return undefined;
+  const rows = JSON.parse(readFileSync(path, 'utf8')) as { date: string; features?: Record<string, number> }[];
+  if (!Array.isArray(rows) || rows.length === 0) return undefined;
+  return {
+    rowCount: rows.length,
+    firstDate: rows[0].date,
+    lastDate: rows[rows.length - 1].date,
+    latestFeatureCount: Object.keys(rows[rows.length - 1].features ?? {}).length,
+  };
 }
 
 function evaluateQualityGate(metrics: BacktestReport['metrics']): BacktestReport['qualityGate'] {

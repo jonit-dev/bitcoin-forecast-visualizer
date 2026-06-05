@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "source": "FRED",
+    "status": "missing-credential",
+    "fetchedAt": "2026-06-05T06:05:48.474Z",
+    "series": [
+      "WALCL",
+      "FEDFUNDS",
+      "DGS10",
+      "BAMLH0A0HYM2",
+      "M2SL"
+    ],
+    "cadence": "mixed daily/weekly/monthly",
+    "credentialRequired": true,
+    "note": "FRED_API_KEY is required to populate macro rows. This unavailable cache is optional and should not block required BTC/MVRV/on-chain validation."
+  },
+  "rows": []
+}
