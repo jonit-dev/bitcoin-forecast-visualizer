@@ -43,19 +43,6 @@ const STOCHASTIC_TRACE_LOOKBACK_DAYS = 730;
 
 export { CONFIDENCE_Z_SCORES };
 
-function computeLogReturnStats(ohlcv: OHLCVData[], lookback: number) {
-  const cappedLookback = Math.min(Math.max(1, lookback), ohlcv.length - 1);
-  const recent = ohlcv.slice(-cappedLookback - 1);
-  const logReturns = recent.slice(1).map((d, i) => Math.log(d.close / recent[i].close));
-  const meanReturn = logReturns.reduce((sum, value) => sum + value, 0) / logReturns.length;
-  const variance = logReturns.reduce((sum, value) => sum + (value - meanReturn) ** 2, 0) / logReturns.length;
-
-  return {
-    meanReturn,
-    dailyVol: Math.sqrt(variance),
-  };
-}
-
 function probabilityVerdict(horizonDays: number, probabilityUp: number): string {
   if (horizonDays <= 14) return probabilityUp >= 0.53 ? 'Slight upside tilt' : probabilityUp <= 0.47 ? 'Slight downside tilt' : 'Coin flip';
   if (probabilityUp < 0.4) return 'Downside-biased median';
@@ -165,11 +152,10 @@ function sampleStandardDeviation(values: number[]): number {
 
 function generatePowerLawStochasticTraces(
   ohlcv: OHLCVData[],
-  horizon: number,
-  model: string
+  horizon: number
 ): Map<string, number[]> {
   const tracesByDate = new Map<string, number[]>();
-  if (model !== 'powerlaw' || horizon < 1 || ohlcv.length < 120) return tracesByDate;
+  if (horizon < 1 || ohlcv.length < 120) return tracesByDate;
 
   const lastIndex = ohlcv.length - 1;
   const anchorIndex = Math.max(30, lastIndex - STOCHASTIC_TRACE_BACKCAST_DAYS);
@@ -240,10 +226,9 @@ function generatePowerLawStochasticTraces(
 export function processRealData(
   ohlcv: OHLCVData[],
   horizon: number = 14,
-  model: string = 'transformer',
   confidenceZ: number = CONFIDENCE_Z_SCORES[0.95]
 ): any[] {
-  const stochasticTracesByDate = generatePowerLawStochasticTraces(ohlcv, horizon, model);
+  const stochasticTracesByDate = generatePowerLawStochasticTraces(ohlcv, horizon);
 
   // Add SMAs to historical data
   const data: any[] = ohlcv.map((d, i) => {
@@ -284,25 +269,14 @@ export function processRealData(
   data[data.length - 1].forecastLower = forecastPrice;
 
   const lastDate = new Date(lastReal.date + 'T00:00:00Z');
-  const isPowerLaw = model === 'powerlaw';
   for (let i = 1; i <= horizon; i++) {
     const date = new Date(lastDate);
     date.setUTCDate(date.getUTCDate() + i);
 
-    let open: number;
-    let close: number;
-
-    if (isPowerLaw) {
-      const prevDate = new Date(lastDate);
-      prevDate.setUTCDate(prevDate.getUTCDate() + i - 1);
-      open = i === 1 ? lastReal.close : channelGuardedPowerLawForecast(prevDate, lastReal.close, lastDate);
-      close = channelGuardedPowerLawForecast(date, lastReal.close, lastDate);
-    } else {
-      const shock = (Math.random() - 0.5) * 2 * dailyVol;
-      open = forecastPrice;
-      forecastPrice = forecastPrice * Math.exp(meanReturn + shock);
-      close = forecastPrice;
-    }
+    const prevDate = new Date(lastDate);
+    prevDate.setUTCDate(prevDate.getUTCDate() + i - 1);
+    const open = i === 1 ? lastReal.close : channelGuardedPowerLawForecast(prevDate, lastReal.close, lastDate);
+    const close = channelGuardedPowerLawForecast(date, lastReal.close, lastDate);
 
     const high = Math.max(open, close) * (1 + Math.random() * dailyVol * 0.3);
     const low = Math.min(open, close) * (1 - Math.random() * dailyVol * 0.3);
@@ -310,9 +284,7 @@ export function processRealData(
     // Forecast interval: the power-law path uses residual-process variance plus
     // a fat-tail stress multiplier. No visual cap — long-horizon bands should
     // widen when Bitcoin's historical residual errors say they should.
-    const interval = isPowerLaw
-      ? computePowerLawInterval({ ohlcv, horizonDays: i, median: close, currentPrice: lastReal.close })
-      : null;
+    const interval = computePowerLawInterval({ ohlcv, horizonDays: i, median: close, currentPrice: lastReal.close });
     const ciHalf = interval ? confidenceZ * interval.sigma : confidenceZ * dailyVol * Math.sqrt(i);
 
     data.push({
@@ -343,34 +315,21 @@ export function processRealData(
 export function generateHeatmapData(
   ohlcv: OHLCVData[],
   horizon: number,
-  model: string,
   numSimulations: number = 500,
   numPriceBands: number = 80
 ): HeatmapCell[] {
   if (horizon < 1 || ohlcv.length < 30) return [];
 
-  const { meanReturn, dailyVol: recentVol } = computeLogReturnStats(ohlcv, 90);
-
   const lastPrice = ohlcv[ohlcv.length - 1].close;
   const lastDateMs = new Date(ohlcv[ohlcv.length - 1].date + 'T00:00:00Z').getTime();
   const lastDate = new Date(lastDateMs);
-  const isPowerLaw = model === 'powerlaw';
-  const dailyVol = isPowerLaw ? blendedPowerLawHeatmapVol(ohlcv) : recentVol;
-  const fixedHalfVolSq = 0.5 * dailyVol * dailyVol;
-
-  // Random-walk drift is fixed; power-law paths need path-dependent re-anchoring.
-  const drifts = new Float64Array(horizon + 1);
-  if (!isPowerLaw) {
-    drifts.fill(meanReturn, 1);
-  }
+  const dailyVol = blendedPowerLawHeatmapVol(ohlcv);
 
   const futureBasePrices = new Float64Array(horizon + 1);
   const lastBasePrice = basePowerLawPrice(daysSinceGenesis(lastDate));
-  if (isPowerLaw) {
-    const tNow = daysSinceGenesis(lastDate);
-    futureBasePrices[0] = lastBasePrice;
-    for (let d = 1; d <= horizon; d++) futureBasePrices[d] = basePowerLawPrice(tNow + d);
-  }
+  const tNow = daysSinceGenesis(lastDate);
+  futureBasePrices[0] = lastBasePrice;
+  for (let d = 1; d <= horizon; d++) futureBasePrices[d] = basePowerLawPrice(tNow + d);
   const residualDecay = Math.exp(-1 / POWER_LAW_MEAN_REVERSION_TAU_DAYS);
   const powerLawShockDrift = -INTERVAL_CONFIG.logDriftScale * dailyVol * dailyVol;
 
@@ -401,26 +360,14 @@ export function generateHeatmapData(
   for (let s = 0; s < numSimulations; s++) {
     let sIdx = 0;
     const rOff = s * horizon;
+    let residual = Math.log(lastPrice / lastBasePrice);
 
-    if (isPowerLaw) {
-      let residual = Math.log(lastPrice / lastBasePrice);
+    for (let d = 1; d <= horizon; d++) {
+      residual = residual * residualDecay + powerLawShockDrift + dailyVol * normals[rOff + d - 1];
+      const price = futureBasePrices[d] * Math.exp(residual);
 
-      for (let d = 1; d <= horizon; d++) {
-        residual = residual * residualDecay + powerLawShockDrift + dailyVol * normals[rOff + d - 1];
-        const price = futureBasePrices[d] * Math.exp(residual);
-
-        if (sampledSet.has(d)) {
-          results[s * sampledCount + sIdx++] = price;
-        }
-      }
-    } else {
-      let price = lastPrice;
-
-      for (let d = 1; d <= horizon; d++) {
-        price = price * Math.exp(drifts[d] - fixedHalfVolSq + dailyVol * normals[rOff + d - 1]);
-        if (sampledSet.has(d)) {
-          results[s * sampledCount + sIdx++] = price;
-        }
+      if (sampledSet.has(d)) {
+        results[s * sampledCount + sIdx++] = price;
       }
     }
   }
@@ -571,7 +518,7 @@ export function computeDrawdownStats(ohlcv: OHLCVData[], horizonDays: number): D
 }
 
 // Fallback mock data when API is unavailable
-export function generateData(horizon: number = 14, historyDays: number = 365, model: string = 'transformer') {
+export function generateData(horizon: number = 14, historyDays: number = 365) {
   let price = 85000;
   const rawHistory = [];
   const now = new Date();
@@ -608,5 +555,5 @@ export function generateData(horizon: number = 14, historyDays: number = 365, mo
     volume: d.volume,
   }));
 
-  return processRealData(mockOHLCV, horizon, model, CONFIDENCE_Z_SCORES[0.95]);
+  return processRealData(mockOHLCV, horizon, CONFIDENCE_Z_SCORES[0.95]);
 }

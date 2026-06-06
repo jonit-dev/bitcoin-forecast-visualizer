@@ -74,16 +74,15 @@ export default function App() {
   const tailRisk = currentRegimeSummary.tailRisk;
   const halvingInfo = useMemo(() => getHalvingInfo(), []);
   const [horizon, setHorizon] = useState(180);
-  const [model, setModel] = useState('powerlaw');
   const [confidenceLevel, setConfidenceLevel] = useState<keyof typeof CONFIDENCE_Z_SCORES>(0.95);
   const [isGenerating, setIsGenerating] = useState(false);
   const [displayData, setDisplayData] = useState<any[]>(() =>
-    processRealData(marketData.ohlcv, 180, 'powerlaw', CONFIDENCE_Z_SCORES[0.95])
+    processRealData(marketData.ohlcv, 180, CONFIDENCE_Z_SCORES[0.95])
   );
 
   // Heatmap
   const [heatmapData, setHeatmapData] = useState<HeatmapCell[]>(() =>
-    generateHeatmapData(marketData.ohlcv, 180, 'powerlaw')
+    generateHeatmapData(marketData.ohlcv, 180)
   );
 
   // Drawdown analysis
@@ -107,14 +106,15 @@ export default function App() {
   // Playback
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackIndex, setPlaybackIndex] = useState<number | null>(null);
+  const forecastInitialized = React.useRef(false);
 
   const refreshForecast = (delay = 300) => {
     setIsPlaying(false);
     setPlaybackIndex(null);
     setIsGenerating(true);
     const timer = window.setTimeout(() => {
-      setDisplayData(processRealData(marketData.ohlcv, horizon, model, CONFIDENCE_Z_SCORES[confidenceLevel]));
-      setHeatmapData(generateHeatmapData(marketData.ohlcv, horizon, model));
+      setDisplayData(processRealData(marketData.ohlcv, horizon, CONFIDENCE_Z_SCORES[confidenceLevel]));
+      setHeatmapData(generateHeatmapData(marketData.ohlcv, horizon));
       setDrawdownStats(computeDrawdownStats(marketData.ohlcv, horizon));
       setLastRunAt(new Date());
       setIsGenerating(false);
@@ -128,8 +128,12 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (!forecastInitialized.current) {
+      forecastInitialized.current = true;
+      return;
+    }
     return refreshForecast(350);
-  }, [horizon, model, confidenceLevel]);
+  }, [horizon, confidenceLevel]);
 
   const activeDisplayData = displayData;
 
@@ -237,7 +241,7 @@ export default function App() {
             <CardHeader className="border-b border-white/10 bg-white/[0.015] pb-3 md:pb-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3 md:gap-4">
               <div>
                 <CardTitle className="text-sm md:text-base uppercase tracking-[0.18em] text-zinc-300">BTC/USD Forward View</CardTitle>
-                <p className="mt-1 text-xs text-zinc-500">Forecast auto-refreshes when horizon or model changes.</p>
+                <p className="mt-1 text-xs text-zinc-500">Forecast auto-refreshes when horizon or interval changes.</p>
               </div>
               <div className="flex items-center gap-2 md:gap-4 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide w-full sm:w-auto">
                 <div className="flex items-center bg-black/30 rounded-lg p-1 border border-white/10 shrink-0">
@@ -295,32 +299,28 @@ export default function App() {
                   >
                     Vol
                   </button>
-                  {model === 'powerlaw' && (
-                    <button
-                      onClick={() => setShowModelLine(!showModelLine)}
-                      className={cn(
-                        "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
-                        showModelLine
-                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                          : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
-                      )}
-                    >
-                      Path
-                    </button>
-                  )}
-                  {model === 'powerlaw' && (
-                    <button
-                      onClick={() => setShowScenarios(!showScenarios)}
-                      className={cn(
-                        "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
-                        showScenarios
-                          ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
-                          : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
-                      )}
-                    >
-                      Scenarios
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setShowModelLine(!showModelLine)}
+                    className={cn(
+                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                      showModelLine
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                    )}
+                  >
+                    Path
+                  </button>
+                  <button
+                    onClick={() => setShowScenarios(!showScenarios)}
+                    className={cn(
+                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                      showScenarios
+                        ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
+                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                    )}
+                  >
+                    Scenarios
+                  </button>
                   <button
                     onClick={() => setShowFloorLine(!showFloorLine)}
                     className={cn(
@@ -372,7 +372,7 @@ export default function App() {
             </CardHeader>
             <CardContent className="p-0 pt-4 md:pt-6 flex-1 min-h-0">
               <motion.div
-                initial={{ opacity: 0 }}
+                initial={false}
                 animate={{ opacity: isGenerating ? 0.5 : 1 }}
                 transition={{ duration: 0.3 }}
                 className="h-full w-full"
@@ -381,8 +381,8 @@ export default function App() {
                   data={activeDisplayData}
                   showSMA={showSMA}
                   showVolume={showVolume}
-                  showModelLine={model === 'powerlaw' && showModelLine}
-                  showScenarios={model === 'powerlaw' && showScenarios}
+                  showModelLine={showModelLine}
+                  showScenarios={showScenarios}
                   showFloorLine={showFloorLine}
                   showPeakLine={showPeakLine}
                   showHeatmap={showHeatmap}
@@ -480,27 +480,17 @@ export default function App() {
               <div className="space-y-1.5 md:space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">Model</label>
-                  {model === 'powerlaw' && (
-                    <button
-                      onClick={() => setShowFormulaHelp(true)}
-                      className="rounded-md p-1 text-zinc-500 hover:bg-white/5 hover:text-amber-300 transition-colors"
-                      title="View Power Law formula"
-                    >
-                      <HelpCircle className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setShowFormulaHelp(true)}
+                    className="rounded-md p-1 text-zinc-500 hover:bg-white/5 hover:text-amber-300 transition-colors"
+                    title="View Power Law formula"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-                <select
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                  className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
-                >
-                  <option value="powerlaw">BTC Power Law</option>
-                  <option value="transformer">Transformer (unvalidated)</option>
-                  <option value="lstm">LSTM (unvalidated)</option>
-                  <option value="prophet">Prophet (unvalidated)</option>
-                  <option value="arima">ARIMA baseline (unvalidated)</option>
-                </select>
+                <div className="rounded-md border border-white/10 bg-black/25 px-3 py-2 text-xs md:text-sm text-zinc-200">
+                  BTC Power Law
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -540,11 +530,9 @@ export default function App() {
                   <option value={0.9}>{formatIntervalOption(0.9, horizon, probabilityForecast?.calibrationLabel)}</option>
                   <option value={0.8}>{formatIntervalOption(0.8, horizon, probabilityForecast?.calibrationLabel)}</option>
                 </select>
-                {model === 'powerlaw' && (
-                  <p className="text-[10px] leading-relaxed text-zinc-500">
-                    Amber path = median path. Dotted bands show {horizon >= 180 ? 'scenario range' : 'calibrated risk range'}. Scenario sketches stay hidden unless enabled.
-                  </p>
-                )}
+                <p className="text-[10px] leading-relaxed text-zinc-500">
+                  Amber path = median path. Dotted bands show {horizon >= 180 ? 'scenario range' : 'calibrated risk range'}. Scenario sketches stay hidden unless enabled.
+                </p>
               </div>
 
               <Button
