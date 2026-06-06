@@ -1,13 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Activity, TrendingUp, TrendingDown, RefreshCw, BarChart2, Play, Square, HelpCircle, X, Zap, Bitcoin, CalendarClock, Gauge, Layers3, CircleDollarSign } from 'lucide-react';
+import { Activity, TrendingUp, TrendingDown, RefreshCw, BarChart2, Play, Square, Zap, Bitcoin, CalendarClock, Gauge, Layers3, CircleDollarSign, LineChart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
-import { processRealData, generateHeatmapData, computeDrawdownStats, computeProbabilityForecast, HISTORICAL_CYCLE_DRAWDOWNS, CONFIDENCE_Z_SCORES, type HeatmapCell, type DrawdownStats } from './lib/data';
-import { loadBTCData, computeMVRVStats, computeMVRVZScoreSeries, type MarketData, type MVRVStats } from './lib/api';
+import { HISTORICAL_CYCLE_DRAWDOWNS, CONFIDENCE_Z_SCORES } from './lib/data';
+import { computeMVRVStats, computeMVRVZScoreSeries, loadMarketData, type MarketAssetId, type MarketData, type MVRVStats } from './lib/api';
 import { cn } from './lib/utils';
 import { loadCurrentRegimeSummary, loadReliabilitySummary, loadSourceFreshness } from './lib/reliabilityReport';
+import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from './lib/marketForecast';
 
 function formatHorizonLabel(days: number): string {
   if (days < 30) return `${days}d`;
@@ -64,7 +65,11 @@ function formatMarketCap(n: number) {
 }
 
 export default function App() {
-  const [marketData] = useState<MarketData>(() => loadBTCData());
+  const [activeAssetId, setActiveAssetId] = useState<MarketAssetId>('btc');
+  const [marketDataByAsset] = useState<Record<MarketAssetId, MarketData>>(() => ({
+    btc: loadMarketData('btc'),
+    sp500: loadMarketData('sp500'),
+  }));
   const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
   const [mvrvZScoreData] = useState(() => computeMVRVZScoreSeries());
   const [reliabilitySummary] = useState(() => loadReliabilitySummary());
@@ -76,19 +81,11 @@ export default function App() {
   const [horizon, setHorizon] = useState(180);
   const [confidenceLevel, setConfidenceLevel] = useState<keyof typeof CONFIDENCE_Z_SCORES>(0.95);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [displayData, setDisplayData] = useState<any[]>(() =>
-    processRealData(marketData.ohlcv, 180, CONFIDENCE_Z_SCORES[0.95])
+  const initialForecast = useMemo(() =>
+    buildMarketForecast('btc', marketDataByAsset.btc, 180, CONFIDENCE_Z_SCORES[0.95]),
+    [marketDataByAsset]
   );
-
-  // Heatmap
-  const [heatmapData, setHeatmapData] = useState<HeatmapCell[]>(() =>
-    generateHeatmapData(marketData.ohlcv, 180)
-  );
-
-  // Drawdown analysis
-  const [drawdownStats, setDrawdownStats] = useState<DrawdownStats>(() =>
-    computeDrawdownStats(marketData.ohlcv, 180)
-  );
+  const [forecastResult, setForecastResult] = useState(() => initialForecast);
 
   // Chart Controls
   const [timeRange, setTimeRange] = useState('ALL');
@@ -100,8 +97,10 @@ export default function App() {
   const [showPeakLine, setShowPeakLine] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showMVRV, setShowMVRV] = useState(false);
-  const [showFormulaHelp, setShowFormulaHelp] = useState(false);
   const [lastRunAt, setLastRunAt] = useState(() => new Date());
+  const activeAsset = getMarketAssetConfig(activeAssetId);
+  const marketData = marketDataByAsset[activeAssetId];
+  const canShowBitcoinOverlays = activeAsset.capabilities.bitcoinOverlays;
 
   // Playback
   const [isPlaying, setIsPlaying] = useState(false);
@@ -113,9 +112,7 @@ export default function App() {
     setPlaybackIndex(null);
     setIsGenerating(true);
     const timer = window.setTimeout(() => {
-      setDisplayData(processRealData(marketData.ohlcv, horizon, CONFIDENCE_Z_SCORES[confidenceLevel]));
-      setHeatmapData(generateHeatmapData(marketData.ohlcv, horizon));
-      setDrawdownStats(computeDrawdownStats(marketData.ohlcv, horizon));
+      setForecastResult(buildMarketForecast(activeAssetId, marketData, horizon, CONFIDENCE_Z_SCORES[confidenceLevel]));
       setLastRunAt(new Date());
       setIsGenerating(false);
     }, delay);
@@ -133,9 +130,12 @@ export default function App() {
       return;
     }
     return refreshForecast(350);
-  }, [horizon, confidenceLevel]);
+  }, [horizon, confidenceLevel, activeAssetId]);
 
-  const activeDisplayData = displayData;
+  const activeDisplayData = forecastResult.displayData;
+  const heatmapData = forecastResult.heatmapData;
+  const drawdownStats = forecastResult.drawdownStats;
+  const probabilityForecast = forecastResult.probabilityForecast;
 
   const historicalCount = useMemo(() =>
     activeDisplayData.filter((d: any) => !d.isForecast).length,
@@ -159,6 +159,12 @@ export default function App() {
     setIsPlaying(false);
     setPlaybackIndex(null);
   };
+
+  useEffect(() => {
+    if (!canShowBitcoinOverlays) {
+      setShowMVRV(false);
+    }
+  }, [canShowBitcoinOverlays]);
 
   useEffect(() => {
     if (!isPlaying || playbackIndex === null) return;
@@ -186,21 +192,19 @@ export default function App() {
 
   const forecastChange = currentPrice ? ((forecastPrice - currentPrice) / currentPrice) * 100 : 0;
 
-  const probabilityForecast = useMemo(() =>
-    computeProbabilityForecast(marketData.ohlcv, horizon),
-    [marketData.ohlcv, horizon]
-  );
-
   const { annualizedVol, volRisk } = useMemo(() => {
     if (!marketData?.ohlcv || marketData.ohlcv.length < 2) return { annualizedVol: 0, volRisk: 'High' };
     const recent = marketData.ohlcv.slice(-30);
     const returns = recent.slice(1).map((d, i) => Math.log(d.close / recent[i].close));
     const mean = returns.reduce((s, r) => s + r, 0) / returns.length;
     const variance = returns.reduce((s, r) => s + (r - mean) ** 2, 0) / returns.length;
-    const vol = Math.sqrt(variance * 365) * 100;
-    const risk = vol > 80 ? 'High' : vol > 50 ? 'Medium' : 'Low';
+    const annualizationDays = activeAssetId === 'sp500' ? 252 : 365;
+    const vol = Math.sqrt(variance * annualizationDays) * 100;
+    const risk = activeAssetId === 'sp500'
+      ? (vol > 30 ? 'High' : vol > 18 ? 'Medium' : 'Low')
+      : (vol > 80 ? 'High' : vol > 50 ? 'Medium' : 'Low');
     return { annualizedVol: vol, volRisk: risk };
-  }, [marketData]);
+  }, [marketData, activeAssetId]);
 
   const volColor = volRisk === 'High' ? 'text-red-400' : volRisk === 'Medium' ? 'text-amber-500' : 'text-emerald-400';
 
@@ -211,17 +215,34 @@ export default function App() {
         <div className="max-w-[1920px] mx-auto px-4 h-16 md:h-[72px] flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-9 h-9 rounded-lg bg-amber-400 text-black flex items-center justify-center shadow-[0_0_28px_rgba(251,191,36,0.24)]">
-              <Bitcoin className="w-4 h-4" />
+              {activeAssetId === 'btc' ? <Bitcoin className="w-4 h-4" /> : <LineChart className="w-4 h-4" />}
             </div>
             <div className="min-w-0">
               <h1 className="font-semibold tracking-tight text-base md:text-lg leading-tight">Block Signal</h1>
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.24em] text-zinc-500 truncate">Bitcoin forecast workspace</p>
+              <p className="text-[10px] md:text-xs uppercase tracking-[0.24em] text-zinc-500 truncate">{activeAsset.subtitle}</p>
             </div>
+          </div>
+          <div className="hidden md:flex items-center bg-black/30 rounded-lg p-1 border border-white/10 shrink-0">
+            {MARKET_ASSETS.map((asset) => (
+              <button
+                key={asset.id}
+                type="button"
+                onClick={() => setActiveAssetId(asset.id)}
+                className={cn(
+                  "h-8 px-3 rounded-md text-xs font-semibold transition-colors",
+                  activeAssetId === asset.id
+                    ? "bg-amber-400 text-black"
+                    : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+                )}
+              >
+                {asset.shortLabel}
+              </button>
+            ))}
           </div>
           <div className="flex items-center gap-2 md:gap-3 text-xs text-zinc-400">
             <span className="hidden sm:inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              Data through {new Date(marketData.ohlcv[marketData.ohlcv.length - 1].date).getFullYear()}
+              {activeAsset.ticker} through {marketData.ohlcv[marketData.ohlcv.length - 1].date}
             </span>
             <span className="inline-flex items-center gap-2 rounded-md border border-amber-400/20 bg-amber-400/10 px-2.5 py-1.5 text-amber-200">
               <RefreshCw className={cn("h-3.5 w-3.5", isGenerating && "animate-spin")} />
@@ -236,12 +257,29 @@ export default function App() {
 
         {/* Main Content */}
         <div className="flex flex-col gap-4 md:gap-5 order-1 min-h-0">
+          <div className="md:hidden flex items-center bg-black/30 rounded-lg p-1 border border-white/10 shrink-0">
+            {MARKET_ASSETS.map((asset) => (
+              <button
+                key={asset.id}
+                type="button"
+                onClick={() => setActiveAssetId(asset.id)}
+                className={cn(
+                  "h-8 flex-1 rounded-md text-xs font-semibold transition-colors",
+                  activeAssetId === asset.id
+                    ? "bg-amber-400 text-black"
+                    : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+                )}
+              >
+                {asset.shortLabel}
+              </button>
+            ))}
+          </div>
           {/* Chart */}
           <Card className="overflow-hidden flex-1 flex flex-col min-h-[400px] rounded-lg border-white/10 bg-[#0c0f0b] shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
             <CardHeader className="border-b border-white/10 bg-white/[0.015] pb-3 md:pb-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3 md:gap-4">
               <div>
-                <CardTitle className="text-sm md:text-base uppercase tracking-[0.18em] text-zinc-300">BTC/USD Forward View</CardTitle>
-                <p className="mt-1 text-xs text-zinc-500">Forecast auto-refreshes when horizon or interval changes.</p>
+                <CardTitle className="text-sm md:text-base uppercase tracking-[0.18em] text-zinc-300">{activeAsset.chartTitle}</CardTitle>
+                <p className="mt-1 text-xs text-zinc-500">{activeAsset.instrumentLabel}. Forecast auto-refreshes when horizon or interval changes.</p>
               </div>
               <div className="flex items-center gap-2 md:gap-4 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide w-full sm:w-auto">
                 <div className="flex items-center bg-black/30 rounded-lg p-1 border border-white/10 shrink-0">
@@ -321,28 +359,32 @@ export default function App() {
                   >
                     Scenarios
                   </button>
-                  <button
-                    onClick={() => setShowFloorLine(!showFloorLine)}
-                    className={cn(
-                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
-                      showFloorLine
-                        ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
-                    )}
-                  >
-                    Floor
-                  </button>
-                  <button
-                    onClick={() => setShowPeakLine(!showPeakLine)}
-                    className={cn(
-                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
-                      showPeakLine
-                        ? "bg-red-500/10 text-red-400 border-red-500/20"
-                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
-                    )}
-                  >
-                    Peak
-                  </button>
+                  {canShowBitcoinOverlays && (
+                    <>
+                      <button
+                        onClick={() => setShowFloorLine(!showFloorLine)}
+                        className={cn(
+                          "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                          showFloorLine
+                            ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                            : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                        )}
+                      >
+                        Floor
+                      </button>
+                      <button
+                        onClick={() => setShowPeakLine(!showPeakLine)}
+                        className={cn(
+                          "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                          showPeakLine
+                            ? "bg-red-500/10 text-red-400 border-red-500/20"
+                            : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                        )}
+                      >
+                        Peak
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => setShowHeatmap(!showHeatmap)}
                     className={cn(
@@ -354,7 +396,7 @@ export default function App() {
                   >
                     Heatmap
                   </button>
-                  {mvrvZScoreData.length > 0 && (
+                  {canShowBitcoinOverlays && mvrvZScoreData.length > 0 && (
                     <button
                       onClick={() => setShowMVRV(!showMVRV)}
                       className={cn(
@@ -391,6 +433,8 @@ export default function App() {
                   playbackIndex={playbackIndex}
                   mvrvData={mvrvZScoreData}
                   showMVRV={showMVRV}
+                  showBitcoinOverlays={canShowBitcoinOverlays}
+                  showCoreModelLine={!canShowBitcoinOverlays}
                   probabilityForecast={probabilityForecast}
                 />
               </motion.div>
@@ -477,22 +521,6 @@ export default function App() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-5 p-4 pt-0 md:p-5 md:pt-0">
-              <div className="space-y-1.5 md:space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">Model</label>
-                  <button
-                    onClick={() => setShowFormulaHelp(true)}
-                    className="rounded-md p-1 text-zinc-500 hover:bg-white/5 hover:text-amber-300 transition-colors"
-                    title="View Power Law formula"
-                  >
-                    <HelpCircle className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <div className="rounded-md border border-white/10 bg-black/25 px-3 py-2 text-xs md:text-sm text-zinc-200">
-                  BTC Power Law
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">Forecast Horizon</label>
@@ -550,6 +578,7 @@ export default function App() {
             </CardContent>
           </Card>
 
+          {activeAsset.capabilities.modelTrust && (
           <Card>
             <CardHeader className="p-4 md:p-6">
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -581,7 +610,9 @@ export default function App() {
               )}
             </CardContent>
           </Card>
+          )}
 
+          {activeAsset.capabilities.bitcoinOverlays && (
           <Card>
             <CardHeader className="p-4 md:p-6">
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -616,7 +647,9 @@ export default function App() {
               </div>
             </CardContent>
           </Card>
+          )}
 
+          {activeAsset.capabilities.sourceFreshness && (
           <Card>
             <CardHeader className="p-4 md:p-6">
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -639,6 +672,7 @@ export default function App() {
               ))}
             </CardContent>
           </Card>
+          )}
 
           <Card>
             <CardHeader className="p-4 md:p-6">
@@ -658,7 +692,7 @@ export default function App() {
                 <div className="flex justify-between items-center">
                   <span className="text-xs md:text-sm text-zinc-400">Market Cap</span>
                   <span className="text-xs md:text-sm font-mono text-zinc-200">
-                    {formatMarketCap(marketData.marketCap)}
+                    {marketData.marketCap > 0 ? formatMarketCap(marketData.marketCap) : 'N/A'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -675,9 +709,13 @@ export default function App() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs md:text-sm text-zinc-400">Data Source</span>
-                  <span className="text-xs md:text-sm font-mono text-zinc-400">CoinGecko + CryptoCompare</span>
+                  <span className="text-xs md:text-sm font-mono text-zinc-400">{activeAsset.dataSourceLabel}</span>
                 </div>
-                {mvrvStats.currentMVRV !== null && (
+                <div className="flex justify-between items-center">
+                  <span className="text-xs md:text-sm text-zinc-400">Instrument</span>
+                  <span className="text-xs md:text-sm font-mono text-zinc-400">{activeAsset.instrumentLabel}</span>
+                </div>
+                {canShowBitcoinOverlays && mvrvStats.currentMVRV !== null && (
                   <>
                     <div className="border-t border-white/5 my-1" />
                     <div className="flex justify-between items-center">
@@ -704,6 +742,7 @@ export default function App() {
             </CardContent>
           </Card>
 
+          {activeAsset.capabilities.halvings && (
           <Card>
             <CardHeader className="p-4 md:p-6">
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -752,6 +791,8 @@ export default function App() {
               </div>
             </CardContent>
           </Card>
+          )}
+          {activeAsset.capabilities.drawdownCycle && drawdownStats && (
           <Card>
             <CardHeader className="p-4 md:p-6">
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -877,73 +918,11 @@ export default function App() {
               </div>
             </CardContent>
           </Card>
+          )}
         </div>
         </div>
       </main>
 
-      {/* Power Law Formula Modal */}
-      {showFormulaHelp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowFormulaHelp(false)}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.15 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
-          >
-            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-              <h3 className="font-semibold text-sm text-zinc-100">BTC Power Law Model</h3>
-              <button onClick={() => setShowFormulaHelp(false)} className="text-zinc-500 hover:text-zinc-300 transition-colors">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="p-4 space-y-4 text-xs md:text-sm">
-              <div>
-                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Core Structural Model</h4>
-                <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre">
-{`P(t) = a * t^b * (1 + c₁·sin(ωt) + c₂·cos(ωt))
-
-where:
-  t  = days since Genesis block (2009-01-03)
-  a  = 9.48 × 10⁻¹⁰
-  b  = 3.6702
-  c₁ = 0.2323   (sine amplitude)
-  c₂ = 0.4288   (cosine amplitude)
-  ω  = 2π / 1460  (≈ 4-year cycle)`}</pre>
-              </div>
-              <div>
-                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Mean-Reverting Correction (all horizons)</h4>
-                <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-amber-400 overflow-x-auto whitespace-pre">
-{`F(t_future) = P(t_future) * exp(r_t * exp(-h / τ))
-
-where:
-  r_t = ln(current_price) - ln(P(t_now))
-  h   = forecast horizon in days
-  τ   = 210  (residual decay constant)`}</pre>
-              </div>
-              <div>
-                <h4 className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Calibrated Forecast Interval</h4>
-                <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-[11px] md:text-xs font-mono text-sky-300 overflow-x-auto whitespace-pre">
-{`CI_h = F_h * exp(± z * stress(h) * sqrt(σ² * Σ exp(-2k/τ)))
-
-where:
-  z = 1.28, 1.64, or 1.96
-  σ = blended 90d/365d realized volatility
-  stress(h) rises with horizon for BTC fat tails
-  k = 0..h-1
-  no long-horizon visual cap`}</pre>
-              </div>
-              <p className="text-zinc-500 text-[10px] leading-relaxed">
-                The model combines a power-law growth trend with a 4-year sinusoidal cycle aligned to BTC halvings.
-                A mean-reverting correction anchors the prediction to the current market price for all horizons,
-                decaying exponentially with time constant &tau;=210 days toward the pure power law as h grows.
-                Forecast bands now use residual-process volatility plus a horizon stress ramp instead of
-                clipping long-range uncertainty to a cosmetic ±50% envelope.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      )}
     </div>
   );
 }

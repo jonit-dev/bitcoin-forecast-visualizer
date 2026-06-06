@@ -488,6 +488,8 @@ interface ForecastChartProps {
   playbackIndex: number | null;
   mvrvData: { date: string; zScore: number; mvrv: number }[];
   showMVRV: boolean;
+  showBitcoinOverlays?: boolean;
+  showCoreModelLine?: boolean;
   probabilityForecast?: {
     horizonDays: number;
     probabilityUp: number;
@@ -498,7 +500,7 @@ interface ForecastChartProps {
   } | null;
 }
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, timeRange, playbackIndex, mvrvData, showMVRV, probabilityForecast }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<{
@@ -563,9 +565,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     });
     seriesRefs.current.candlestick = candlestickSeries;
 
-    // Attach halving-cycle vertical lines + phase shading primitive
-    const halvingPrimitive = new HalvingCyclePrimitive(HALVING_DATES);
-    candlestickSeries.attachPrimitive(halvingPrimitive as any);
+    if (showBitcoinOverlays) {
+      const halvingPrimitive = new HalvingCyclePrimitive(HALVING_DATES);
+      candlestickSeries.attachPrimitive(halvingPrimitive as any);
+    }
 
     // Attach probability heatmap primitive
     const heatmapPrimitive = new HeatmapPrimitive();
@@ -682,7 +685,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.peakLine = peakLineSeries;
 
     // ---- MVRV Z-Score panel: completely separate chart instance ----
-    if (mvrvChartContainerRef.current) {
+    if (showBitcoinOverlays && mvrvChartContainerRef.current) {
       const mvrvChart = createChart(mvrvChartContainerRef.current, {
         layout: {
           background: { type: ColorType.Solid, color: 'transparent' },
@@ -729,8 +732,15 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     return () => {
       chart.remove();
       mvrvChartRef.current?.remove();
+      chartRef.current = null;
+      mvrvChartRef.current = null;
+      mvrvSeriesRef.current = null;
+      heatmapPrimRef.current = null;
+      markersRef.current = null;
+      forecastMarkersRef.current = null;
+      seriesRefs.current = { stochasticTraces: [] };
     };
-  }, []);
+  }, [showBitcoinOverlays]);
 
   const [legendData, setLegendData] = React.useState<any>(null);
 
@@ -933,14 +943,14 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma20?.applyOptions({ visible: showSMA });
     seriesRefs.current.sma50?.applyOptions({ visible: showSMA });
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
-    seriesRefs.current.forecastMedian?.applyOptions({ visible: false });
-    seriesRefs.current.modelLine?.applyOptions({ visible: false });
+    seriesRefs.current.forecastMedian?.applyOptions({ visible: showCoreModelLine && showModelLine });
+    seriesRefs.current.modelLine?.applyOptions({ visible: showCoreModelLine && showModelLine });
     seriesRefs.current.stochasticTraces.forEach((series, index) => {
-      series.applyOptions({ visible: index === 0 ? showModelLine || showScenarios : showScenarios });
+      series.applyOptions({ visible: showCoreModelLine ? showScenarios : index === 0 ? showModelLine || showScenarios : showScenarios });
     });
-    seriesRefs.current.floorLine?.applyOptions({ visible: showFloorLine });
-    seriesRefs.current.peakLine?.applyOptions({ visible: showPeakLine });
-  }, [showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine]);
+    seriesRefs.current.floorLine?.applyOptions({ visible: showBitcoinOverlays && showFloorLine });
+    seriesRefs.current.peakLine?.applyOptions({ visible: showBitcoinOverlays && showPeakLine });
+  }, [showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showBitcoinOverlays, showCoreModelLine]);
 
   // Update probability heatmap
   useEffect(() => {
@@ -1074,7 +1084,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
         ref={mvrvChartContainerRef}
         className={cn(
           "shrink-0 transition-all duration-200",
-          showMVRV && mvrvData?.length > 0
+          showBitcoinOverlays && showMVRV && mvrvData?.length > 0
             ? "h-[130px] border-t border-white/5"
             : "h-0 overflow-hidden"
         )}

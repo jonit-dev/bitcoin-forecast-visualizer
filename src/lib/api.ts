@@ -1,4 +1,5 @@
 import btcHistory from '../data/btc-history.json';
+import vooHistory from '../data/voo-history.json';
 import mvrvHistory from '../data/mvrv-history.json';
 
 export interface OHLCVData {
@@ -18,6 +19,8 @@ export interface MarketData {
   volume24h: number;
   fetchedAt: number;
 }
+
+export type MarketAssetId = 'btc' | 'sp500';
 
 export interface MVRVPoint {
   date: string;
@@ -95,4 +98,24 @@ export function loadBTCData(): MarketData {
     volume24h: last.volume,
     fetchedAt: Date.now(),
   };
+}
+
+export function loadVOOData(): MarketData {
+  const ohlcv: OHLCVData[] = vooHistory as OHLCVData[];
+  const last = ohlcv[ohlcv.length - 1];
+  const prev = ohlcv[ohlcv.length - 2];
+  const priceChange24h = prev ? ((last.close - prev.close) / prev.close) * 100 : 0;
+
+  return {
+    ohlcv,
+    currentPrice: last.close,
+    priceChange24h,
+    marketCap: 0,
+    volume24h: last.volume,
+    fetchedAt: Date.now(),
+  };
+}
+
+export function loadMarketData(assetId: MarketAssetId): MarketData {
+  return assetId === 'sp500' ? loadVOOData() : loadBTCData();
 }
