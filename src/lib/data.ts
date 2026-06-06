@@ -73,7 +73,7 @@ export function computeProbabilityForecast(
   const last = ohlcv[ohlcv.length - 1];
   const lastDate = new Date(last.date + 'T00:00:00Z');
   const targetDate = addUtcDays(lastDate, horizonDays);
-  const median = powerLawForecast(targetDate, last.close, lastDate);
+  const median = channelGuardedPowerLawForecast(targetDate, last.close, lastDate);
   const interval = computePowerLawInterval({ ohlcv, horizonDays, median, currentPrice: last.close });
   if (!interval) return null;
 
@@ -110,6 +110,32 @@ function dateKey(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
+function powerLawChannelGuard(price: number, date: Date): number {
+  const t = daysSinceGenesis(date);
+  const floorPrice = floorPowerLawPrice(t);
+  const peakPrice = peakPowerLawPrice(t);
+  if (!Number.isFinite(price) || price <= 0) return floorPrice;
+
+  // Treat the floor/peak curves as historically validated support/resistance
+  // priors, not as decorative chart lines. Reflect excursions back into the
+  // channel instead of hard-clamping, so the visible stochastic path keeps
+  // probabilistic texture without casually implying a structural regime break.
+  if (price < floorPrice) {
+    const breach = Math.log(floorPrice / price);
+    return floorPrice * Math.exp(Math.min(breach * 0.18, 0.035));
+  }
+  if (price > peakPrice) {
+    const breach = Math.log(price / peakPrice);
+    return peakPrice * Math.exp(-Math.min(breach * 0.18, 0.035));
+  }
+  return price;
+}
+
+function channelGuardedPowerLawForecast(dateFuture: Date, currentPrice: number, currentDate: Date): number {
+  const rawForecast = powerLawForecast(dateFuture, currentPrice, currentDate);
+  return powerLawChannelGuard(rawForecast, dateFuture);
+}
+
 function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lookbackDays?: number): number[] {
   const innovations: number[] = [];
   const startIndex = lookbackDays ? Math.max(1, endIndex - lookbackDays + 1) : 1;
@@ -121,7 +147,7 @@ function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lo
 
     const prevDate = new Date(prev.date + 'T00:00:00Z');
     const currDate = new Date(curr.date + 'T00:00:00Z');
-    const expected = powerLawForecast(currDate, prev.close, prevDate);
+    const expected = channelGuardedPowerLawForecast(currDate, prev.close, prevDate);
     if (!Number.isFinite(expected) || expected <= 0) continue;
 
     innovations.push(Math.log(curr.close / expected));
@@ -196,9 +222,9 @@ function generatePowerLawStochasticTraces(
 
       const prevDate = addUtcDays(anchorDate, day - 1);
       const currDate = addUtcDays(anchorDate, day);
-      const expected = powerLawForecast(currDate, price, prevDate);
+      const expected = channelGuardedPowerLawForecast(currDate, price, prevDate);
       const innovation = centeredInnovations[blockStart + blockOffset++];
-      price = expected * Math.exp(innovation);
+      price = powerLawChannelGuard(expected * Math.exp(innovation), currDate);
       paths[pathIndex][day] = price;
     }
   }
@@ -269,8 +295,8 @@ export function processRealData(
     if (isPowerLaw) {
       const prevDate = new Date(lastDate);
       prevDate.setUTCDate(prevDate.getUTCDate() + i - 1);
-      open = i === 1 ? lastReal.close : powerLawForecast(prevDate, lastReal.close, lastDate);
-      close = powerLawForecast(date, lastReal.close, lastDate);
+      open = i === 1 ? lastReal.close : channelGuardedPowerLawForecast(prevDate, lastReal.close, lastDate);
+      close = channelGuardedPowerLawForecast(date, lastReal.close, lastDate);
     } else {
       const shock = (Math.random() - 0.5) * 2 * dailyVol;
       open = forecastPrice;
