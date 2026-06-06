@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-06-06T06:04:51.681Z",
+  "alignedTradingRows": 3958,
+  "firstDate": "2010-09-10",
+  "latestDate": "2026-06-05",
+  "latestBtcClose": 61658.39,
+  "latestSp500Close": 678,
+  "windows": {
+    "30": {
+      "latest": {
+        "date": "2026-06-05",
+        "corr": 0.3211091030007149,
+        "beta": 1.109883762717299,
+        "btcVol": 0.3200118616286872,
+        "sp500Vol": 0.09258512043242724,
+        "btcRelReturn": -0.2784352330643214
+      },
+      "corrP10": -0.21309781417613638,
+      "corrMedian": 0.132226720847049,
+      "corrP90": 0.5307598015081318,
+      "betaMedian": 0.5794945745527715,
+      "samples": 3928
+    },
+    "90": {
+      "latest": {
+        "date": "2026-06-05",
+        "corr": 0.502482957852702,
+        "beta": 1.85456460955458,
+        "btcVol": 0.5002832512317595,
+        "sp500Vol": 0.13554869242516016,
+        "btcRelReturn": -0.4296704380936166
+      },
+      "corrP10": -0.10830340249049271,
+      "corrMedian": 0.1186431729188152,
+      "corrP90": 0.5238244941536383,
+      "betaMedian": 0.610190903978242,
+      "samples": 3868
+    },
+    "180": {
+      "latest": {
+        "date": "2026-06-05",
+        "corr": 0.5214008105989923,
+        "beta": 1.8983421008262729,
+        "btcVol": 0.4604813429766896,
+        "sp500Vol": 0.12647633184200813,
+        "btcRelReturn": -0.7571326785697401
+      },
+      "corrP10": -0.0639528650756478,
+      "corrMedian": 0.10685089696578702,
+      "corrP90": 0.47789785366615917,
+      "betaMedian": 0.6408599443523917,
+      "samples": 3778
+    },
+    "365": {
+      "latest": {
+        "date": "2026-06-05",
+        "corr": 0.43280988957694105,
+        "beta": 1.0911240830742193,
+        "btcVol": 0.4314429433036043,
+        "sp500Vol": 0.17113798104782704,
+        "btcRelReturn": -0.7327769667684125
+      },
+      "corrP10": -0.05654850388095241,
+      "corrMedian": 0.1201718365878942,
+      "corrP90": 0.4214032916904779,
+      "betaMedian": 0.7607967323654641,
+      "samples": 3593
+    }
+  },
+  "verdict": "PROMOTE AS CONTEXT: rolling BTC↔S&P correlation/beta is not a point-forecast edge by itself, but it is valuable regime context because it tells whether BTC is behaving like high-beta risk-on tech/liquidity exposure or idiosyncratic crypto. Use for UI interpretation, not forecast override."
+}

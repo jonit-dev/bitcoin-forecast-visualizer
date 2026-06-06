@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "analyze:phase-signal": "tsx scripts/analyze-phase-signal.ts",
+    "analyze:cross-market": "tsx scripts/analyze-cross-market-context.ts",
     "analyze:heatmap-model": "tsx scripts/analyze-heatmap-model.ts",
     "backtest": "tsx scripts/backtest-forecast.ts",
     "backtest:report-only": "tsx scripts/backtest-forecast.ts --report-only",

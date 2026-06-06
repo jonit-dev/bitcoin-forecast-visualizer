@@ -14,6 +14,7 @@ import { computeMVRVStats, computeMVRVZScoreSeries, loadMarketData, type MarketA
 import { cn } from './lib/utils';
 import { loadCurrentRegimeSummary, loadPowerLawStabilitySummary, loadReliabilitySummary, loadSourceFreshness } from './lib/reliabilityReport';
 import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from './lib/marketForecast';
+import { computeCrossMarketContext } from './lib/crossMarket';
 
 function formatHorizonLabel(days: number): string {
   if (days < 30) return `${days}d`;
@@ -25,6 +26,9 @@ function formatPrice(n: number) {
   return '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 }
 
+function formatSignedPercent(value: number, digits = 1): string {
+  return `${value >= 0 ? '+' : ''}${(value * 100).toFixed(digits)}%`;
+}
 
 function formatIntervalOption(level: number, horizonDays: number, calibrationLabel?: string): string {
   const pct = `${Math.round(level * 100)}%`;
@@ -108,6 +112,10 @@ export default function App() {
   const activeAsset = getMarketAssetConfig(activeAssetId);
   const marketData = marketDataByAsset[activeAssetId];
   const canShowBitcoinOverlays = activeAsset.capabilities.bitcoinOverlays;
+  const crossMarketContext = useMemo(() =>
+    computeCrossMarketContext(marketDataByAsset.btc.ohlcv, marketDataByAsset.sp500.ohlcv, 90),
+    [marketDataByAsset]
+  );
 
   // Playback
   const [isPlaying, setIsPlaying] = useState(false);
@@ -680,6 +688,57 @@ export default function App() {
           </Card>
           )}
 
+          {crossMarketContext && (
+          <Card className="rounded-lg border-sky-400/20 bg-[#0d1114]">
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="flex items-center justify-between gap-2 text-sm">
+                <span className="flex items-center gap-2">
+                  <LineChart className="w-4 h-4 text-sky-300" />
+                  Cross-Market Context
+                </span>
+                <span className={cn(
+                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                  crossMarketContext.regime === 'Risk-on linked' ? "bg-sky-400/10 text-sky-200" :
+                    crossMarketContext.regime === 'Crypto-specific' ? "bg-violet-400/10 text-violet-200" :
+                    crossMarketContext.regime === 'Inverse stress' ? "bg-red-400/10 text-red-200" :
+                    "bg-zinc-400/10 text-zinc-200"
+                )}>
+                  {crossMarketContext.regime}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 md:p-6 md:pt-0 space-y-3">
+              <p className="text-[10px] leading-relaxed text-zinc-500">{crossMarketContext.summary}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-md border border-white/5 bg-black/20 p-2">
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-500">90D Corr</p>
+                  <p className="mt-1 font-mono text-lg text-sky-200">{crossMarketContext.correlation.toFixed(2)}</p>
+                </div>
+                <div className="rounded-md border border-white/5 bg-black/20 p-2">
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-500">BTC Beta</p>
+                  <p className="mt-1 font-mono text-lg text-zinc-100">{crossMarketContext.beta.toFixed(2)}x</p>
+                </div>
+              </div>
+              <div className="space-y-2 border-t border-white/5 pt-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-zinc-400">BTC vs S&P 90D</span>
+                  <span className={cn("text-xs font-mono", crossMarketContext.btcRelativeReturn >= 0 ? "text-emerald-300" : "text-red-300")}>
+                    {formatSignedPercent(crossMarketContext.btcRelativeReturn)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-zinc-400">BTC / S&P Vol</span>
+                  <span className="text-xs font-mono text-zinc-200">
+                    {formatSignedPercent(crossMarketContext.btcAnnualizedVol, 0).replace('+', '')} / {formatSignedPercent(crossMarketContext.sp500AnnualizedVol, 0).replace('+', '')}
+                  </span>
+                </div>
+                <p className="text-[10px] leading-relaxed text-zinc-500">
+                  Promoted as context only: useful for interpreting whether BTC is trading as high-beta risk/liquidity exposure, not a point-forecast override.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          )}
 
           {activeAsset.capabilities.sourceFreshness && (
           <Card>
