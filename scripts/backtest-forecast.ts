@@ -1,11 +1,12 @@
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import btcHistory from '../src/data/btc-history.json';
 import type { OHLCVData } from '../src/lib/api';
 import { aggregateForecastMetrics, type BacktestMetricRow, type MetricInput } from '../src/lib/backtestMetrics';
 import { getBacktestModels, type BacktestModelId } from '../src/lib/backtestModels';
 import { BACKTEST_CONFIG, ENSEMBLE_CONFIG, INTERVAL_CONFIG, POWER_LAW_CONFIG } from '../src/lib/modelConfig';
+import type { PowerLawFitCoefficients } from '../src/lib/powerLawFit';
 import { classifyRegime, type RegimeState } from '../src/lib/regimeModel';
 
 interface BacktestReport {
@@ -64,13 +65,32 @@ interface BacktestReport {
       reason: string;
     };
   };
+  candidateComparison?: {
+    candidateModelId: 'powerlaw-refit-candidate';
+    source: string;
+    status: 'disabled' | 'watch' | 'eligible-for-manual-config-update';
+    reasons: string[];
+    checks: {
+      horizonDays: number;
+      currentMedianAbsLogError: number | null;
+      candidateMedianAbsLogError: number | null;
+      currentBiasLogError: number | null;
+      candidateBiasLogError: number | null;
+      currentInterval90Coverage: number | null;
+      candidateInterval90Coverage: number | null;
+      passed: boolean;
+      reason: string;
+    }[];
+  };
 }
 
 const REPORT_DIR = join(process.cwd(), 'docs', 'reports', 'results');
 
 function main(): void {
   const ohlcv = btcHistory as OHLCVData[];
-  const models = getBacktestModels();
+  const candidateSource = parseCandidateArg(process.argv.slice(2));
+  const candidate = candidateSource ? loadCandidateConfig(candidateSource) : null;
+  const models = getBacktestModels({ powerLawCandidate: candidate?.coefficients });
   const metricInputs = new Map<string, Map<BacktestModelId, MetricInput[]>>();
   const featureRows = loadFeatureRowsByDate();
   const regimeInputs = new Map<string, Map<RegimeState, MetricInput[]>>();
@@ -125,7 +145,7 @@ function main(): void {
   const report: BacktestReport = {
     metadata: {
       generatedAt: new Date().toISOString(),
-      command: 'npm run backtest',
+      command: ['npm run backtest', candidateSource ? `-- --candidate-powerlaw ${candidateSource}` : ''].filter(Boolean).join(' '),
       gitCommit: gitCommit(),
       dataset: {
         firstDate: ohlcv[0]?.date ?? '',
@@ -148,6 +168,7 @@ function main(): void {
     qualityGate: evaluateQualityGate(metrics),
     regimeSummary: renderRegimeSummary(regimeInputs),
     ablation: buildAblationSummary(metrics),
+    candidateComparison: candidate ? evaluateCandidateComparison(metrics, candidate.source) : undefined,
   };
 
   writeReports(report);
@@ -209,6 +230,62 @@ function buildAblationSummary(metrics: BacktestReport['metrics']): BacktestRepor
       defaultEnsembleEnabled: ENSEMBLE_CONFIG.defaultEnabled,
       reason: ENSEMBLE_CONFIG.enablementReason,
     },
+  };
+}
+
+function evaluateCandidateComparison(
+  metrics: BacktestReport['metrics'],
+  source: string
+): BacktestReport['candidateComparison'] {
+  const requiredHorizons = [14, 30, 60, 90, 180, 365];
+  const checks = requiredHorizons.map(horizon => {
+    const row = metrics[String(horizon)];
+    const current = row?.['powerlaw-current'];
+    const candidate = row?.['powerlaw-refit-candidate'];
+    const currentMedian = current?.medianAbsLogError ?? null;
+    const candidateMedian = candidate?.medianAbsLogError ?? null;
+    const currentBias = current?.biasLogError ?? null;
+    const candidateBias = candidate?.biasLogError ?? null;
+    const currentCoverage = current?.coverage.interval90 ?? null;
+    const candidateCoverage = candidate?.coverage.interval90 ?? null;
+    const medianPassed = candidateMedian !== null && currentMedian !== null && candidateMedian <= currentMedian * 1.005;
+    const biasPassed = candidateBias !== null && currentBias !== null && Math.abs(candidateBias) <= Math.abs(currentBias) * 1.05 + 0.001;
+    const coveragePassed = candidateCoverage === null || currentCoverage === null || candidateCoverage >= currentCoverage - 0.02;
+    const passed = medianPassed && biasPassed && coveragePassed;
+    return {
+      horizonDays: horizon,
+      currentMedianAbsLogError: currentMedian,
+      candidateMedianAbsLogError: candidateMedian,
+      currentBiasLogError: currentBias,
+      candidateBiasLogError: candidateBias,
+      currentInterval90Coverage: currentCoverage,
+      candidateInterval90Coverage: candidateCoverage,
+      passed,
+      reason: passed
+        ? 'candidate preserved median error, bias, and 90% interval coverage'
+        : [
+            medianPassed ? null : 'median error degraded',
+            biasPassed ? null : 'bias degraded',
+            coveragePassed ? null : '90% coverage degraded',
+          ].filter(Boolean).join('; '),
+    };
+  });
+
+  const failed = checks.filter(check => !check.passed);
+  const status = failed.length === 0
+    ? 'eligible-for-manual-config-update'
+    : failed.length <= 2
+      ? 'watch'
+      : 'disabled';
+
+  return {
+    candidateModelId: 'powerlaw-refit-candidate',
+    source,
+    status,
+    reasons: failed.length === 0
+      ? ['Candidate preserved or improved required current-model metrics across all comparison horizons.']
+      : failed.map(check => `${check.horizonDays}d ${check.reason}`),
+    checks,
   };
 }
 
@@ -336,8 +413,59 @@ function renderMarkdown(report: BacktestReport): string {
   }
   lines.push('');
 
+  lines.push('## Power-Law Refit Candidate', '');
+  if (report.candidateComparison) {
+    lines.push(`Source: \`${report.candidateComparison.source}\``);
+    lines.push(`Enablement status: ${report.candidateComparison.status}`, '');
+    lines.push('| Horizon | Result | Current median error | Candidate median error | Current bias | Candidate bias | Current 90% coverage | Candidate 90% coverage | Reason |');
+    lines.push('| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |');
+    for (const check of report.candidateComparison.checks) {
+      lines.push([
+        `| ${check.horizonDays}d`,
+        check.passed ? 'PASS' : 'FAIL',
+        formatMetric(check.currentMedianAbsLogError),
+        formatMetric(check.candidateMedianAbsLogError),
+        formatMetric(check.currentBiasLogError),
+        formatMetric(check.candidateBiasLogError),
+        formatPercent(check.currentInterval90Coverage),
+        formatPercent(check.candidateInterval90Coverage),
+        check.reason,
+        '|',
+      ].join(' | '));
+    }
+    lines.push('');
+  } else {
+    lines.push('No candidate was supplied. Run `npm run backtest -- --candidate-powerlaw latest` after `npm run refit:powerlaw` to compare refit coefficients.', '');
+  }
+
   lines.push('## Model Config Snapshot', '', '```json', JSON.stringify(report.metadata.modelConfig, null, 2), '```', '');
   return `${lines.join('\n')}\n`;
+}
+
+function parseCandidateArg(args: string[]): string | null {
+  const index = args.indexOf('--candidate-powerlaw');
+  if (index < 0) return null;
+  return args[index + 1] ?? 'latest';
+}
+
+function loadCandidateConfig(sourceArg: string): { source: string; coefficients: PowerLawFitCoefficients } {
+  const source = sourceArg === 'latest' ? latestRefitReportPath() : sourceArg;
+  const report = JSON.parse(readFileSync(source, 'utf8')) as { suggestedConfig?: PowerLawFitCoefficients };
+  if (!report.suggestedConfig) {
+    throw new Error(`Candidate report ${source} does not include suggestedConfig`);
+  }
+  return { source, coefficients: report.suggestedConfig };
+}
+
+function latestRefitReportPath(): string {
+  const reports = readdirSync(REPORT_DIR)
+    .filter(file => /^powerlaw-refit-.*\.json$/.test(file))
+    .sort();
+  const latest = reports[reports.length - 1];
+  if (!latest) {
+    throw new Error('No powerlaw-refit JSON reports found. Run npm run refit:powerlaw first.');
+  }
+  return join(REPORT_DIR, latest);
 }
 
 function isContiguous(data: OHLCVData[], start: number, horizon: number): boolean {

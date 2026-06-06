@@ -1,6 +1,7 @@
 import reliabilitySummary from '../data/reliability-summary.json';
 import sourceFreshness from '../data/source-freshness.json';
 import currentRegimeSummary from '../data/current-regime-summary.json';
+import powerLawStabilitySummary from '../data/powerlaw-stability-summary.json';
 
 export interface ReliabilitySummary {
   generatedAt: string;
@@ -34,6 +35,15 @@ export interface CurrentRegimeSummary {
   };
 }
 
+export interface PowerLawStabilitySummary {
+  generatedAt: string;
+  reportPath: string;
+  verdict: 'stable' | 'watch' | 'unstable';
+  reasons: string[];
+  coefficientSummary: Record<string, unknown>;
+  forecastImpact: unknown[];
+}
+
 export function loadReliabilitySummary(): ReliabilitySummary {
   return reliabilitySummary as ReliabilitySummary;
 }
@@ -44,4 +54,8 @@ export function loadSourceFreshness(): SourceFreshness {
 
 export function loadCurrentRegimeSummary(): CurrentRegimeSummary {
   return currentRegimeSummary as CurrentRegimeSummary;
+}
+
+export function loadPowerLawStabilitySummary(): PowerLawStabilitySummary {
+  return powerLawStabilitySummary as PowerLawStabilitySummary;
 }

@@ -13,6 +13,7 @@
     "analyze:heatmap-model": "tsx scripts/analyze-heatmap-model.ts",
     "backtest": "tsx scripts/backtest-forecast.ts",
     "backtest:report-only": "tsx scripts/backtest-forecast.ts --report-only",
+    "refit:powerlaw": "tsx scripts/refit-power-law.ts",
     "backtest:market": "tsx scripts/backtest-market-forecast.ts",
     "calibrate:intervals": "tsx scripts/calibrate-intervals.ts",
     "update:onchain": "node scripts/update-onchain-data.mjs",

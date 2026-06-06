@@ -2,6 +2,7 @@ import type { OHLCVData } from './api';
 import { computePowerLawInterval, normalQuantile } from './forecastInterval';
 import { INTERVAL_CONFIG } from './modelConfig';
 import { powerLawForecast, POWER_LAW_MEAN_REVERSION_TAU_DAYS } from './powerLaw';
+import { forecastWithPowerLawCoefficients, type PowerLawFitCoefficients } from './powerLawFit';
 import type { ForecastDistribution } from './backtestMetrics';
 
 export type BacktestModelId =
@@ -9,7 +10,8 @@ export type BacktestModelId =
   | 'gbm-driftless'
   | 'gbm-recent-drift'
   | 'ma-trend-20-50-200'
-  | 'powerlaw-current';
+  | 'powerlaw-current'
+  | 'powerlaw-refit-candidate';
 
 export interface BacktestModel {
   id: BacktestModelId;
@@ -21,8 +23,12 @@ export interface BacktestModel {
 const RECENT_LOOKBACK = 90;
 const STRUCTURAL_LOOKBACK = 365;
 
-export function getBacktestModels(): BacktestModel[] {
-  return [
+export interface BacktestModelOptions {
+  powerLawCandidate?: PowerLawFitCoefficients | null;
+}
+
+export function getBacktestModels(options: BacktestModelOptions = {}): BacktestModel[] {
+  const models: BacktestModel[] = [
     {
       id: 'naive-current-price',
       description: 'Endpoint forecast equal to the origin close.',
@@ -85,6 +91,34 @@ export function getBacktestModels(): BacktestModel[] {
       },
     },
   ];
+
+  if (options.powerLawCandidate) {
+    const candidate = options.powerLawCandidate;
+    models.push({
+      id: 'powerlaw-refit-candidate',
+      description: 'Opt-in refit candidate from a coefficient stability report.',
+      config: {
+        coefficients: candidate,
+        interval: INTERVAL_CONFIG,
+        meanReversionTauDays: POWER_LAW_MEAN_REVERSION_TAU_DAYS,
+      },
+      forecast: (ohlcv, originIndex, horizonDays) => {
+        const current = ohlcv[originIndex];
+        const currentDate = parseDate(current.date);
+        const targetDate = addUtcDays(currentDate, horizonDays);
+        const median = forecastWithPowerLawCoefficients(candidate, targetDate, current.close, currentDate);
+        const interval = computePowerLawInterval({
+          ohlcv: ohlcv.slice(0, originIndex + 1),
+          horizonDays,
+          median,
+          currentPrice: current.close,
+        });
+        return interval ? withLogNormalQuantiles(median, interval.sigma) : null;
+      },
+    });
+  }
+
+  return models;
 }
 
 export function computeLogReturnStats(ohlcv: OHLCVData[], endIndex: number, lookback: number) {

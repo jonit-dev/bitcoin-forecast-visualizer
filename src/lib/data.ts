@@ -34,6 +34,8 @@ export interface ProbabilityForecast {
   verdict: string;
 }
 
+export type CoefficientStabilityVerdict = 'stable' | 'watch' | 'unstable';
+
 const STOCHASTIC_TRACE_COUNT = 12;
 const STOCHASTIC_TRACE_BACKCAST_DAYS = 7;
 const STOCHASTIC_TRACE_BLOCK_DAYS = 14;
@@ -42,6 +44,26 @@ const STOCHASTIC_TRACE_BLOCK_DAYS = 14;
 const STOCHASTIC_TRACE_LOOKBACK_DAYS = 730;
 
 export { CONFIDENCE_Z_SCORES };
+
+export function coefficientAwareCalibrationLabel(
+  horizonDays: number,
+  baseLabel: string,
+  stabilityVerdict?: CoefficientStabilityVerdict
+): string {
+  if (horizonDays < 180) return baseLabel;
+  if (stabilityVerdict === 'unstable') return 'Directional only';
+  return 'Scenario range';
+}
+
+export function coefficientStabilityTrustCopy(
+  horizonDays: number,
+  stabilityVerdict?: CoefficientStabilityVerdict
+): string {
+  if (horizonDays < 180) return 'Amber path = median path. Dotted bands show calibrated risk range. Scenario sketches stay hidden unless enabled.';
+  if (stabilityVerdict === 'stable') return 'Long-horizon output is a scenario range backed by the latest coefficient stability check.';
+  if (stabilityVerdict === 'unstable') return 'Coefficient stability is unstable, so 180+ day output is directional only rather than exact-confidence guidance.';
+  return 'Fixed structural coefficients are under review at 180-365 day horizons; treat the output as a scenario range.';
+}
 
 function probabilityVerdict(horizonDays: number, probabilityUp: number): string {
   if (horizonDays <= 14) return probabilityUp >= 0.53 ? 'Slight upside tilt' : probabilityUp <= 0.47 ? 'Slight downside tilt' : 'Coin flip';
