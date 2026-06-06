@@ -45,12 +45,12 @@ Purpose: make every future model/data change measurable.
 
 Tasks:
 
-- [ ] Add `scripts/backtest-forecast.ts`.
-- [ ] Add `npm run backtest`.
-- [ ] Measure median error, bias, NLL, quantile loss, and interval coverage.
-- [ ] Test horizons: `7, 14, 30, 60, 90, 180, 365`.
-- [ ] Test rolling holdout windows, not only one fixed `2022-01-01` holdout.
-- [ ] Include deterministic seeds for Monte Carlo or simulation-based metrics.
+- [✅] Add `scripts/backtest-forecast.ts`.
+- [✅] Add `npm run backtest`.
+- [✅] Measure median error, bias, NLL, quantile loss, and interval coverage.
+- [✅] Test horizons: `7, 14, 30, 60, 90, 180, 365`.
+- [✅] Test rolling holdout windows, not only one fixed `2022-01-01` holdout.
+- [✅] Include deterministic seeds for Monte Carlo or simulation-based metrics.
 
 Likely files:
 
@@ -72,10 +72,10 @@ Purpose: preserve before/after evidence.
 
 Tasks:
 
-- [ ] Create `docs/reports/results/`.
-- [ ] Write machine-readable backtest JSON per run.
-- [ ] Write human-readable Markdown summaries per run.
-- [ ] Add a latest summary file for the UI or docs to reference.
+- [✅] Create `docs/reports/results/`.
+- [✅] Write machine-readable backtest JSON per run.
+- [✅] Write human-readable Markdown summaries per run.
+- [✅] Add a latest summary file for the UI or docs to reference.
 
 Likely files:
 
@@ -100,9 +100,9 @@ Current issue:
 Tasks:
 
 - [ ] Fit separate interval multipliers for `7, 14, 30, 60, 90, 180, 365`.
-- [ ] Evaluate 80%, 90%, and 95% interval coverage independently.
-- [ ] Separate median forecast logic from interval-width calibration.
-- [ ] Keep long-horizon outputs wide when warranted, but stop presenting trivially over-wide bands as precise probabilities.
+- [✅] Evaluate 80%, 90%, and 95% interval coverage independently.
+- [✅] Separate median forecast logic from interval-width calibration.
+- [✅] Keep long-horizon outputs wide when warranted, but stop presenting trivially over-wide bands as precise probabilities.
 
 Likely files:
 
@@ -122,9 +122,9 @@ Purpose: make experiments auditable.
 
 Tasks:
 
-- [ ] Add a model config module or JSON file.
-- [ ] Move power-law coefficients, residual tau, volatility blend, and stress multipliers out of scattered implementation code.
-- [ ] Include config version in backtest outputs.
+- [✅] Add a model config module or JSON file.
+- [✅] Move power-law coefficients, residual tau, volatility blend, and stress multipliers out of scattered implementation code.
+- [✅] Include config version in backtest outputs.
 
 Likely files:
 
@@ -160,11 +160,11 @@ Suggested fields:
 
 Tasks:
 
-- [ ] Create `src/data/onchain-history.json`.
-- [ ] Add `scripts/update-onchain-data.mjs`.
-- [ ] Add `scripts/validate-onchain-data.mjs`.
-- [ ] Normalize all rows to UTC dates.
-- [ ] Track missing dates and source lag explicitly.
+- [✅] Create `src/data/onchain-history.json`.
+- [✅] Add `scripts/update-onchain-data.mjs`.
+- [✅] Add `scripts/validate-onchain-data.mjs`.
+- [✅] Normalize all rows to UTC dates.
+- [✅] Track missing dates and source lag explicitly.
 - [ ] Update `.env.example` only if API-key support becomes required.
 
 Acceptance criteria:
@@ -191,9 +191,9 @@ Candidate features:
 
 Tasks:
 
-- [ ] Add a feature builder script.
-- [ ] Generate a daily feature table from BTC, MVRV, and on-chain history.
-- [ ] Lag every feature correctly to prevent lookahead bias.
+- [✅] Add a feature builder script.
+- [✅] Generate a daily feature table from BTC, MVRV, and on-chain history.
+- [✅] Lag every feature correctly to prevent lookahead bias.
 - [ ] Add feature ablation support to `npm run backtest`.
 
 Likely files:
@@ -225,8 +225,8 @@ Suggested fields:
 Tasks:
 
 - [ ] Choose a stable source and document rate limits/API-key requirements.
-- [ ] Create `src/data/derivatives-history.json`.
-- [ ] Add update and validation scripts.
+- [✅] Create `src/data/derivatives-history.json`.
+- [✅] Add update and validation scripts.
 - [ ] Add daily open-interest and funding features first.
 - [ ] Backtest impact at 7-30 day horizons before adding more fields.
 
@@ -249,8 +249,8 @@ Suggested fields:
 Tasks:
 
 - [ ] Choose a reproducible source.
-- [ ] Create `src/data/etf-flow-history.json`.
-- [ ] Add update and validation scripts.
+- [✅] Create `src/data/etf-flow-history.json`.
+- [✅] Add update and validation scripts.
 - [ ] Backtest feature value only from 2024 onward.
 
 Acceptance criteria:
@@ -273,9 +273,9 @@ Suggested fields:
 
 Tasks:
 
-- [ ] Create `src/data/macro-history.json`.
-- [ ] Add `FRED_API_KEY` support in `.env.example`.
-- [ ] Align weekly/monthly macro series to daily rows using last-known value.
+- [✅] Create `src/data/macro-history.json`.
+- [✅] Add `FRED_API_KEY` support in `.env.example`.
+- [✅] Align weekly/monthly macro series to daily rows using last-known value.
 - [ ] Avoid lookahead bias by respecting publication dates where possible.
 
 Acceptance criteria:
@@ -391,13 +391,13 @@ Purpose: make model limits obvious to users.
 
 Tasks:
 
-- [ ] Add a model reliability panel.
-- [ ] Show latest backtest score.
-- [ ] Show horizon-specific confidence.
-- [ ] Show dataset freshness.
-- [ ] Label forecast modes clearly: "Median path", "Scenario range", "Historical power-law band", "Regime context".
+- [✅] Add a model reliability panel.
+- [✅] Show latest backtest score.
+- [✅] Show horizon-specific confidence.
+- [✅] Show dataset freshness.
+- [✅] Label forecast modes clearly: "Median path", "Scenario range", "Historical power-law band", "Regime context".
 - [ ] Add a "why this forecast moved" panel.
-- [ ] Add long-horizon caveats for 180-365 day forecasts.
+- [✅] Add long-horizon caveats for 180-365 day forecasts.
 
 Likely files:
 
@@ -421,8 +421,8 @@ Tasks:
 - [ ] Add scheduled data update workflow.
 - [ ] Add scheduled backtest/report generation.
 - [ ] Fail builds when data validation fails.
-- [ ] Store previous reports for trend comparison.
-- [ ] Add alert if latest source data is stale.
+- [✅] Store previous reports for trend comparison.
+- [✅] Add alert if latest source data is stale.
 
 Acceptance criteria:
 
