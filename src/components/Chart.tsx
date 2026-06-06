@@ -61,8 +61,8 @@ class HalvingCycleRenderer {
         const x0 = timeScale.timeToCoordinate(zone.startDate as any);
         const x1 = timeScale.timeToCoordinate(zone.endDate as any);
         if (x0 === null || x1 === null) continue;
-        const left = Math.max(0, Math.min(x0, x1));
-        const right = Math.min(w, Math.max(x0, x1));
+        const left = Math.max(0, Math.floor(Math.min(x0, x1)) - 1);
+        const right = Math.min(w, Math.ceil(Math.max(x0, x1)) + 1);
         if (right <= 0 || left >= w) continue;
 
         context.fillStyle = style.color;
@@ -762,7 +762,24 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     const lastHist = historical[historical.length - 1];
     const forecastData = lastHist && forecast.length > 0 ? [
       { time: lastHist.date, open: lastHist.close, high: lastHist.close, low: lastHist.close, close: lastHist.close },
-      ...forecast.map((d: any) => ({ time: d.date, open: d.open, high: d.high, low: d.low, close: d.close }))
+      ...forecast.map((d: any, index: number) => {
+        const primaryTraceClose = d.stochasticTraces?.[0];
+        const previousForecast = index > 0 ? forecast[index - 1] : null;
+        const primaryTraceOpen = previousForecast?.stochasticTraces?.[0];
+        const close = Number.isFinite(primaryTraceClose) && primaryTraceClose > 0 ? primaryTraceClose : d.close;
+        const open = Number.isFinite(primaryTraceOpen) && primaryTraceOpen > 0
+          ? primaryTraceOpen
+          : index === 0
+            ? lastHist.close
+            : forecast[index - 1].close;
+        return {
+          time: d.date,
+          open,
+          high: Math.max(open, close),
+          low: Math.min(open, close),
+          close,
+        };
+      })
     ] : [];
     const forecastMedianData = lastHist && forecast.length > 0 ? [
       { time: lastHist.date, value: lastHist.close },
@@ -944,9 +961,9 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma50?.applyOptions({ visible: showSMA });
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
     seriesRefs.current.forecastMedian?.applyOptions({ visible: showCoreModelLine && showModelLine });
-    seriesRefs.current.modelLine?.applyOptions({ visible: showCoreModelLine && showModelLine });
+    seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
     seriesRefs.current.stochasticTraces.forEach((series, index) => {
-      series.applyOptions({ visible: showCoreModelLine ? showScenarios : index === 0 ? showModelLine || showScenarios : showScenarios });
+      series.applyOptions({ visible: index === 0 ? showModelLine || showScenarios : showScenarios });
     });
     seriesRefs.current.floorLine?.applyOptions({ visible: showBitcoinOverlays && showFloorLine });
     seriesRefs.current.peakLine?.applyOptions({ visible: showBitcoinOverlays && showPeakLine });
