@@ -31,8 +31,11 @@ Implementation PRDs live under `docs/PRDs/v2/`.
 | P0 | `02-horizon-calibration.md` | Horizon-specific interval calibration and probability/scenario labeling. |
 | P1 | `03-regime-data-feature-pipeline.md` | On-chain data first, then lag-safe feature table, derivatives, ETF, and macro data. |
 | P2/P3 | `04-regime-model-ui-automation.md` | Regime model, ensemble/tail-risk gates, trust UI, and later automation guardrails. |
+| P2 | `05-power-law-coefficient-stability.md` | Refit and stress-test fixed power-law coefficients before changing structural model assumptions. |
+| P3 | `06-sentiment-data-context.md` | Optional sentiment cache, lag-safe context features, and context-only trust UI/freshness wiring. |
+| P3 | `07-market-data-quality-upgrade.md` | BTC OHLCV validation, source metadata, report-only candidate-source evaluation, and promotion gates. |
 
-Ordering rule: implement the PRDs in numeric order. Inside each PRD, complete phases in priority order and do not enable model/UI features until the backtest and ablation gates pass.
+Ordering rule: implement PRDs `01` through `04` in numeric order. PRD `05` can start after the P0 gates and validated feature-table foundation exist. PRDs `06` and `07` are P3 work and should not displace P0/P1/P2 validation work. Inside each PRD, complete phases in priority order and do not enable model/UI features until the backtest and ablation gates pass.
 
 ## P0: Must Do First
 
