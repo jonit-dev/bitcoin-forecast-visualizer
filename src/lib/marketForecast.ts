@@ -130,6 +130,25 @@ function computeLogReturns(ohlcv: OHLCVData[]): number[] {
   });
 }
 
+const GENERIC_STOCHASTIC_TRACE_COUNT = 12;
+const GENERIC_RETURN_BOOTSTRAP_LOOKBACK_DAYS = 504;
+const GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS = 10;
+
+function buildScaledEmpiricalInnovations(returns: number[], dailyVol: number): number[] {
+  const recent = returns
+    .slice(-GENERIC_RETURN_BOOTSTRAP_LOOKBACK_DAYS)
+    .filter((value) => Number.isFinite(value));
+  if (recent.length < GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS * 4) return [];
+
+  const returnMean = mean(recent);
+  const centered = recent.map((value) => value - returnMean);
+  const empiricalVol = sampleStandardDeviation(centered);
+  if (!Number.isFinite(empiricalVol) || empiricalVol <= 0) return [];
+
+  const scale = dailyVol / empiricalVol;
+  return centered.map((value) => value * scale);
+}
+
 export function computeSP500ModelInputs(ohlcv: OHLCVData[]) {
   const returns = computeLogReturns(ohlcv);
   const recent90 = returns.slice(-90);
@@ -152,20 +171,44 @@ function rollingTrend(ohlcv: OHLCVData[], index: number): number | null {
   return window.reduce((sum, row) => sum + row.close, 0) / window.length;
 }
 
-function generateGenericStochasticTraces(ohlcv: OHLCVData[], horizon: number, drift: number, dailyVol: number): Map<string, number[]> {
+function generateGenericStochasticTraces(
+  ohlcv: OHLCVData[],
+  horizon: number,
+  drift: number,
+  dailyVol: number,
+  returns: number[]
+): Map<string, number[]> {
   const traces = new Map<string, number[]>();
   const last = ohlcv[ohlcv.length - 1];
   if (!last || horizon < 1) return traces;
 
   const rng = mulberry32(0x5A500 + horizon * 97 + ohlcv.length);
   const lastDate = new Date(`${last.date}T00:00:00Z`);
-  const prices = Array.from({ length: 12 }, () => last.close);
+  const prices = Array.from({ length: GENERIC_STOCHASTIC_TRACE_COUNT }, () => last.close);
+  const empiricalInnovations = buildScaledEmpiricalInnovations(returns, dailyVol);
+  const blockStarts = Array.from({ length: GENERIC_STOCHASTIC_TRACE_COUNT }, () => 0);
+  const blockOffsets = Array.from(
+    { length: GENERIC_STOCHASTIC_TRACE_COUNT },
+    () => GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS
+  );
   traces.set(last.date, [...prices]);
 
   for (let day = 1; day <= horizon; day++) {
     const date = dateKey(addUtcDays(lastDate, day));
     for (let i = 0; i < prices.length; i++) {
-      prices[i] *= Math.exp(drift - 0.5 * dailyVol * dailyVol + dailyVol * normalFromRng(rng));
+      let innovation: number;
+      if (empiricalInnovations.length > 0) {
+        if (blockOffsets[i] >= GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS) {
+          blockStarts[i] = Math.floor(
+            rng() * Math.max(1, empiricalInnovations.length - GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS)
+          );
+          blockOffsets[i] = 0;
+        }
+        innovation = empiricalInnovations[blockStarts[i] + blockOffsets[i]++];
+      } else {
+        innovation = dailyVol * normalFromRng(rng);
+      }
+      prices[i] *= Math.exp(drift - 0.5 * dailyVol * dailyVol + innovation);
     }
     traces.set(date, [...prices]);
   }
@@ -174,8 +217,8 @@ function generateGenericStochasticTraces(ohlcv: OHLCVData[], horizon: number, dr
 }
 
 function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: number): any[] {
-  const { drift, dailyVol } = computeSP500ModelInputs(ohlcv);
-  const tracesByDate = generateGenericStochasticTraces(ohlcv, horizon, drift, dailyVol);
+  const { returns, drift, dailyVol } = computeSP500ModelInputs(ohlcv);
+  const tracesByDate = generateGenericStochasticTraces(ohlcv, horizon, drift, dailyVol, returns);
   const data: any[] = ohlcv.map((row, index) => {
     const sma20 = index >= 19 ? mean(ohlcv.slice(index - 19, index + 1).map((d) => d.close)) : null;
     const sma50 = index >= 49 ? mean(ohlcv.slice(index - 49, index + 1).map((d) => d.close)) : null;
@@ -201,6 +244,11 @@ function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: nu
     const date = dateKey(addUtcDays(lastDate, day));
     const prevMedian = day === 1 ? last.close : last.close * Math.exp(drift * (day - 1));
     const median = last.close * Math.exp(drift * day);
+    const representativePath = tracesByDate.get(date);
+    const representativeClose = representativePath?.[0] ?? median;
+    const previousDate = dateKey(addUtcDays(lastDate, day - 1));
+    const previousRepresentativePath = day === 1 ? null : tracesByDate.get(previousDate);
+    const representativeOpen = previousRepresentativePath?.[0] ?? prevMedian;
     const sigma = dailyVol * Math.sqrt(day);
     const rangeLow = median * Math.exp(-confidenceZ * sigma);
     const rangeHigh = median * Math.exp(confidenceZ * sigma);
@@ -208,10 +256,10 @@ function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: nu
 
     data.push({
       date,
-      open: prevMedian,
-      high: Math.max(prevMedian, median) * (1 + candleSpread),
-      low: Math.min(prevMedian, median) * (1 - candleSpread),
-      close: median,
+      open: representativeOpen,
+      high: Math.max(representativeOpen, representativeClose) * (1 + candleSpread),
+      low: Math.min(representativeOpen, representativeClose) * (1 - candleSpread),
+      close: representativeClose,
       volume: 0,
       forecast: median,
       forecastUpper: rangeHigh,

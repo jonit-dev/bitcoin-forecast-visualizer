@@ -186,9 +186,12 @@ export default function App() {
   const currentPrice = marketData?.currentPrice ?? 0;
   const priceChange24h = marketData?.priceChange24h ?? 0;
   const forecastPrice = useMemo(() => {
+    if (activeAssetId === 'sp500' && probabilityForecast?.median) {
+      return probabilityForecast.median;
+    }
     const fcast = activeDisplayData.filter(d => d.isForecast);
     return fcast.length > 0 ? fcast[fcast.length - 1].close : 0;
-  }, [activeDisplayData]);
+  }, [activeAssetId, activeDisplayData, probabilityForecast]);
 
   const forecastChange = currentPrice ? ((forecastPrice - currentPrice) / currentPrice) * 100 : 0;
 
