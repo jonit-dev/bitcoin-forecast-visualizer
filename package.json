@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/update-btc-data.mjs && npm run update:derivatives && npm run build:features && npm run write:runtime-summaries",
+    "predev": "node scripts/update-btc-data.mjs && node scripts/update-market-data.mjs && npm run update:derivatives && npm run build:features && npm run write:runtime-summaries",
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",

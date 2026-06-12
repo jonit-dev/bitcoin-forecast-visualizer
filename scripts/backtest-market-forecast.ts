@@ -1,8 +1,13 @@
 import vooHistory from '../src/data/voo-history.json';
+import gldHistory from '../src/data/gld-history.json';
 import type { OHLCVData } from '../src/lib/api';
 import {
+  computeGoldChannelBounds,
+  computeGoldModelInputs,
   computeSP500ChannelBounds,
   computeSP500ModelInputs,
+  GOLD_CHANNEL_CONFIG,
+  GOLD_MOMENTUM_CONFIG,
   SP500_CHANNEL_CONFIG,
 } from '../src/lib/marketForecast';
 
@@ -32,6 +37,11 @@ interface ChannelResult {
   aboveRate: number;
   meanLogWidth: number;
   pass: boolean;
+}
+
+interface ModelInputs {
+  drift: number;
+  dailyVol: number;
 }
 
 function mean(values: number[]): number {
@@ -78,7 +88,11 @@ function binomialTwoSidedPValue(successes: number, trials: number): number {
   return Math.min(1, tail * 2);
 }
 
-function backtestHorizon(rows: OHLCVData[], horizon: number): HorizonResult {
+function backtestHorizon(
+  rows: OHLCVData[],
+  horizon: number,
+  computeInputs: (rows: OHLCVData[]) => ModelInputs
+): HorizonResult {
   const logErrorDiffs: number[] = [];
   let hits = 0;
   let modelAbsLogError = 0;
@@ -88,7 +102,7 @@ function backtestHorizon(rows: OHLCVData[], horizon: number): HorizonResult {
 
   for (let index = MIN_TRAINING_ROWS; index + horizon < rows.length; index += STEP_ROWS) {
     const trainingRows = rows.slice(0, index + 1);
-    const { drift, dailyVol } = computeSP500ModelInputs(trainingRows);
+    const { drift, dailyVol } = computeInputs(trainingRows);
     const current = rows[index].close;
     const actual = rows[index + horizon].close;
     const forecast = current * Math.exp(drift * horizon);
@@ -132,8 +146,11 @@ function backtestHorizon(rows: OHLCVData[], horizon: number): HorizonResult {
   };
 }
 
-function backtestChannel(rows: OHLCVData[]): ChannelResult {
-  const bounds = computeSP500ChannelBounds(rows);
+function backtestChannel(
+  rows: OHLCVData[],
+  computeBounds: (rows: OHLCVData[]) => { lower: number | null; upper: number | null }[]
+): ChannelResult {
+  const bounds = computeBounds(rows);
   let samples = 0;
   let inBand = 0;
   let below = 0;
@@ -176,35 +193,72 @@ function formatPct(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
 
-function main(): void {
-  const rows = vooHistory as OHLCVData[];
-  const results = HORIZONS.map((horizon) => backtestHorizon(rows, horizon));
-  const channel = backtestChannel(rows);
+function printHorizonResult(label: string, result: HorizonResult): void {
+  console.log(
+    `[${label} backtest] h=${result.horizon}d samples=${result.samples} hit=${(result.hitRate * 100).toFixed(1)}% p_dir=${result.directionPValue.toExponential(3)} mae=${result.meanAbsoluteLogError.toFixed(5)} baseline=${result.baselineMeanAbsoluteLogError.toFixed(5)} improvement=${result.maeImprovementPct.toFixed(2)}% t=${result.pairedT.toFixed(2)} p_mae=${result.pairedPValue.toExponential(3)} cov90=${(result.coverage90 * 100).toFixed(1)}% ${result.pass ? 'PASS' : 'FAIL'}`
+  );
+}
+
+function runAssetBacktest({
+  label,
+  rows,
+  computeInputs,
+  computeBounds,
+  channelConfigLabel,
+}: {
+  label: string;
+  rows: OHLCVData[];
+  computeInputs: (rows: OHLCVData[]) => ModelInputs;
+  computeBounds: (rows: OHLCVData[]) => { lower: number | null; upper: number | null }[];
+  channelConfigLabel: string;
+}): boolean {
+  const results = HORIZONS.map((horizon) => backtestHorizon(rows, horizon, computeInputs));
+  const channel = backtestChannel(rows, computeBounds);
   const latest = rows.at(-1)?.date ?? 'unknown';
 
-  console.log(`[S&P 500 backtest] VOO rows=${rows.length} latest=${latest}`);
+  console.log(`[${label} backtest] rows=${rows.length} latest=${latest}`);
   console.log(
-    `[S&P 500 channel] trend=${SP500_CHANNEL_CONFIG.trendWindowDays}d residuals=${SP500_CHANNEL_CONFIG.residualLookbackDays}d q=${SP500_CHANNEL_CONFIG.lowerResidualQuantile}-${SP500_CHANNEL_CONFIG.upperResidualQuantile} samples=${channel.samples} coverage=${formatPct(channel.coverage)} below=${formatPct(channel.belowRate)} above=${formatPct(channel.aboveRate)} meanWidth=${formatPct(Math.exp(channel.meanLogWidth) - 1)} ${channel.pass ? 'PASS' : 'FAIL'}`
+    `[${label} channel] ${channelConfigLabel} samples=${channel.samples} coverage=${formatPct(channel.coverage)} below=${formatPct(channel.belowRate)} above=${formatPct(channel.aboveRate)} meanWidth=${formatPct(Math.exp(channel.meanLogWidth) - 1)} ${channel.pass ? 'PASS' : 'FAIL'}`
   );
   for (const result of results) {
-    console.log(
-      `[S&P 500 backtest] h=${result.horizon}d samples=${result.samples} hit=${(result.hitRate * 100).toFixed(1)}% p_dir=${result.directionPValue.toExponential(3)} mae=${result.meanAbsoluteLogError.toFixed(5)} baseline=${result.baselineMeanAbsoluteLogError.toFixed(5)} improvement=${result.maeImprovementPct.toFixed(2)}% t=${result.pairedT.toFixed(2)} p_mae=${result.pairedPValue.toExponential(3)} cov90=${(result.coverage90 * 100).toFixed(1)}% ${result.pass ? 'PASS' : 'FAIL'}`
-    );
+    printHorizonResult(label, result);
   }
 
   if (!channel.pass) {
-    console.error('[S&P 500 backtest] FAIL: statistical channel did not satisfy the walk-forward coverage gate.');
-    process.exitCode = 1;
-    return;
+    console.error(`[${label} backtest] FAIL: statistical channel did not satisfy the walk-forward coverage gate.`);
+    return false;
   }
 
   if (results.some((result) => !result.pass)) {
-    console.error('[S&P 500 backtest] FAIL: model did not prove statistically significant relevance at every configured horizon.');
-    process.exitCode = 1;
-    return;
+    console.error(`[${label} backtest] FAIL: model did not prove statistically significant relevance at every configured horizon.`);
+    return false;
   }
 
-  console.log('[S&P 500 backtest] PASS: median-error improvement and directional relevance are statistically significant at every configured horizon.');
+  console.log(`[${label} backtest] PASS: median-error improvement and directional relevance are statistically significant at every configured horizon.`);
+  return true;
+}
+
+function main(): void {
+  const sp500Rows = vooHistory as OHLCVData[];
+  const goldRows = gldHistory as OHLCVData[];
+  const sp500Pass = runAssetBacktest({
+    label: 'S&P 500',
+    rows: sp500Rows,
+    computeInputs: computeSP500ModelInputs,
+    computeBounds: computeSP500ChannelBounds,
+    channelConfigLabel: `trend=${SP500_CHANNEL_CONFIG.trendWindowDays}d residuals=${SP500_CHANNEL_CONFIG.residualLookbackDays}d q=${SP500_CHANNEL_CONFIG.lowerResidualQuantile}-${SP500_CHANNEL_CONFIG.upperResidualQuantile}`,
+  });
+  const goldPass = runAssetBacktest({
+    label: 'Gold',
+    rows: goldRows,
+    computeInputs: computeGoldModelInputs,
+    computeBounds: computeGoldChannelBounds,
+    channelConfigLabel: `momentum=${GOLD_MOMENTUM_CONFIG.shortMomentumDays}/${GOLD_MOMENTUM_CONFIG.longMomentumDays}d trend=${GOLD_CHANNEL_CONFIG.trendWindowDays}d residuals=${GOLD_CHANNEL_CONFIG.residualLookbackDays}d q=${GOLD_CHANNEL_CONFIG.lowerResidualQuantile}-${GOLD_CHANNEL_CONFIG.upperResidualQuantile}`,
+  });
+
+  if (!sp500Pass || !goldPass) {
+    process.exitCode = 1;
+  }
 }
 
 main();

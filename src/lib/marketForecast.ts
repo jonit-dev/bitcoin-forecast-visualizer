@@ -75,6 +75,25 @@ export const MARKET_ASSETS: MarketAssetConfig[] = [
       sourceFreshness: false,
     },
   },
+  {
+    id: 'gold',
+    label: 'Gold',
+    shortLabel: 'Gold',
+    ticker: 'GLD',
+    quote: 'USD',
+    chartTitle: 'Gold / GLD Forward View',
+    subtitle: 'Gold proxy forecast workspace',
+    dataSourceLabel: 'Yahoo Finance chart API',
+    instrumentLabel: 'GLD ETF, adjusted daily OHLCV',
+    capabilities: {
+      bitcoinOverlays: false,
+      mvrv: false,
+      halvings: false,
+      drawdownCycle: false,
+      modelTrust: false,
+      sourceFreshness: false,
+    },
+  },
 ];
 
 export function getMarketAssetConfig(assetId: MarketAssetId): MarketAssetConfig {
@@ -141,6 +160,29 @@ export const SP500_CHANNEL_CONFIG = {
   minResidualSamples: 756,
 } as const;
 
+export const GOLD_MOMENTUM_CONFIG = {
+  shortMomentumDays: 252,
+  longMomentumDays: 504,
+  shortMomentumWeight: 0.25,
+  longMomentumWeight: 0.25,
+  maxDailyDrift: 0.0006,
+  volatilityWindowDays: 252,
+} as const;
+
+export const GOLD_CHANNEL_CONFIG = {
+  trendWindowDays: 252,
+  residualLookbackDays: 1260,
+  lowerResidualQuantile: 0.025,
+  upperResidualQuantile: 0.99,
+  minResidualSamples: 756,
+} as const;
+
+interface GenericModelInputs {
+  returns: number[];
+  drift: number;
+  dailyVol: number;
+}
+
 function quantileInterpolated(values: number[], q: number): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
@@ -166,8 +208,44 @@ export interface SP500ChannelPoint {
   upperResidual: number | null;
 }
 
+export type MarketChannelPoint = SP500ChannelPoint;
+
 export function computeSP500ChannelBounds(ohlcv: OHLCVData[]): SP500ChannelPoint[] {
   const config = SP500_CHANNEL_CONFIG;
+  const trends = ohlcv.map((_, index) => rollingMeanAt(ohlcv, index, config.trendWindowDays));
+  const residuals = ohlcv.map((row, index) => {
+    const trend = trends[index];
+    return trend && trend > 0 && row.close > 0 ? Math.log(row.close / trend) : null;
+  });
+
+  return ohlcv.map((_, index) => {
+    const trend = trends[index];
+    if (!trend || trend <= 0) {
+      return { trend, lower: null, upper: null, lowerResidual: null, upperResidual: null };
+    }
+
+    const start = Math.max(0, index - config.residualLookbackDays);
+    const history = residuals
+      .slice(start, index)
+      .filter((value): value is number => value !== null && Number.isFinite(value));
+    if (history.length < config.minResidualSamples) {
+      return { trend, lower: null, upper: null, lowerResidual: null, upperResidual: null };
+    }
+
+    const lowerResidual = quantileInterpolated(history, config.lowerResidualQuantile);
+    const upperResidual = quantileInterpolated(history, config.upperResidualQuantile);
+    return {
+      trend,
+      lower: trend * Math.exp(lowerResidual),
+      upper: trend * Math.exp(upperResidual),
+      lowerResidual,
+      upperResidual,
+    };
+  });
+}
+
+export function computeGoldChannelBounds(ohlcv: OHLCVData[]): MarketChannelPoint[] {
+  const config = GOLD_CHANNEL_CONFIG;
   const trends = ohlcv.map((_, index) => rollingMeanAt(ohlcv, index, config.trendWindowDays));
   const residuals = ohlcv.map((row, index) => {
     const trend = trends[index];
@@ -231,6 +309,32 @@ export function computeSP500ModelInputs(ohlcv: OHLCVData[]) {
   return { returns, drift, dailyVol, expandingEquityPremium };
 }
 
+export function computeGoldModelInputs(ohlcv: OHLCVData[]): GenericModelInputs {
+  const returns = computeLogReturns(ohlcv);
+  const config = GOLD_MOMENTUM_CONFIG;
+  const last = ohlcv[ohlcv.length - 1];
+
+  const dailyMomentum = (days: number): number => {
+    if (!last || ohlcv.length <= days) return 0;
+    const anchor = ohlcv[ohlcv.length - 1 - days];
+    return anchor.close > 0 ? Math.log(last.close / anchor.close) / days : 0;
+  };
+
+  const rawDrift = (
+    config.shortMomentumWeight * dailyMomentum(config.shortMomentumDays) +
+    config.longMomentumWeight * dailyMomentum(config.longMomentumDays)
+  );
+  const drift = Math.max(-config.maxDailyDrift, Math.min(config.maxDailyDrift, rawDrift));
+  const recentVolWindow = returns.slice(-config.volatilityWindowDays);
+  const fallbackVolWindow = returns.slice(-Math.min(returns.length, 756));
+  const dailyVol = Math.max(
+    0.0001,
+    sampleStandardDeviation(recentVolWindow.length >= 60 ? recentVolWindow : fallbackVolWindow)
+  );
+
+  return { returns, drift, dailyVol };
+}
+
 function generateGenericStochasticTraces(
   ohlcv: OHLCVData[],
   horizon: number,
@@ -276,10 +380,83 @@ function generateGenericStochasticTraces(
   return traces;
 }
 
-function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: number): any[] {
-  const { returns, drift, dailyVol } = computeSP500ModelInputs(ohlcv);
+function projectTraceAboveLowerBound(primary: number, lowerBound: number | null): number {
+  if (!lowerBound || lowerBound <= 0) return primary;
+  const supportBuffer = 1.002;
+  if (primary >= lowerBound * supportBuffer) return primary;
+
+  const downsideGap = Math.max(0, Math.log(lowerBound / primary));
+  const bounce = Math.min(Math.log(1.04), Math.log(supportBuffer) + downsideGap * 0.35);
+  return lowerBound * Math.exp(bounce);
+}
+
+function selectPrimaryTraceIndex(rows: any[]): number {
+  const traceCount = rows.reduce((max, row) => Math.max(max, row.stochasticTraces?.length ?? 0), 0);
+  if (traceCount <= 1) return 0;
+
+  let best = { index: 0, score: Number.POSITIVE_INFINITY };
+  for (let index = 0; index < traceCount; index++) {
+    const validRows = rows.filter((row) =>
+      Number.isFinite(row.stochasticTraces?.[index]) &&
+      Number.isFinite(row.floorPriceModel) &&
+      Number.isFinite(row.close)
+    );
+    if (validRows.length === 0) continue;
+
+    const breaches = validRows.filter((row) => row.stochasticTraces[index] < row.floorPriceModel).length;
+    const avgMedianDistance = validRows.reduce(
+      (sum, row) => sum + Math.abs(Math.log(row.stochasticTraces[index] / row.close)),
+      0
+    ) / validRows.length;
+    const first = validRows[0];
+    const terminal = validRows[validRows.length - 1];
+    const firstDistance = Math.abs(Math.log(first.stochasticTraces[index] / first.close));
+    const terminalDistance = Math.abs(Math.log(terminal.stochasticTraces[index] / terminal.close));
+    const breachRate = breaches / validRows.length;
+    const score = avgMedianDistance + breachRate * 0.2 + firstDistance * 0.8 + terminalDistance * 0.25;
+    if (score < best.score) best = { index, score };
+  }
+
+  return best.index;
+}
+
+function promotePrimaryTrace(rows: any[], initialPrice: number): void {
+  const primaryIndex = selectPrimaryTraceIndex(rows);
+  let previousRaw = initialPrice;
+  let previousProjected = initialPrice;
+
+  for (const row of rows) {
+    const traces = row.stochasticTraces;
+    if (!Array.isArray(traces) || traces.length === 0) continue;
+
+    const rawPrimary = traces[primaryIndex];
+    const rawReturn = Number.isFinite(rawPrimary) && rawPrimary > 0 && previousRaw > 0
+      ? Math.log(rawPrimary / previousRaw)
+      : 0;
+    const proposedPrimary = previousProjected * Math.exp(rawReturn);
+    const primary = projectTraceAboveLowerBound(proposedPrimary, row.floorPriceModel);
+    const reordered = primaryIndex === 0
+      ? traces.slice(1)
+      : [...traces.slice(0, primaryIndex), ...traces.slice(primaryIndex + 1)];
+    row.stochasticTraces = [
+      primary,
+      ...reordered,
+    ];
+    previousRaw = Number.isFinite(rawPrimary) && rawPrimary > 0 ? rawPrimary : previousRaw;
+    previousProjected = primary;
+  }
+}
+
+function processGenericData(
+  ohlcv: OHLCVData[],
+  horizon: number,
+  confidenceZ: number,
+  modelInputs: GenericModelInputs,
+  channelBounds: MarketChannelPoint[],
+  supportAwarePrimaryTrace = false
+): any[] {
+  const { returns, drift, dailyVol } = modelInputs;
   const tracesByDate = generateGenericStochasticTraces(ohlcv, horizon, drift, dailyVol, returns);
-  const channelBounds = computeSP500ChannelBounds(ohlcv);
   const latestChannel = [...channelBounds].reverse().find((point) =>
     point.lowerResidual !== null && point.upperResidual !== null
   );
@@ -309,11 +486,8 @@ function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: nu
     const date = dateKey(addUtcDays(lastDate, day));
     const prevMedian = day === 1 ? last.close : last.close * Math.exp(drift * (day - 1));
     const median = last.close * Math.exp(drift * day);
-    const representativePath = tracesByDate.get(date);
-    const representativeClose = representativePath?.[0] ?? median;
-    const previousDate = dateKey(addUtcDays(lastDate, day - 1));
-    const previousRepresentativePath = day === 1 ? null : tracesByDate.get(previousDate);
-    const representativeOpen = previousRepresentativePath?.[0] ?? prevMedian;
+    const representativeClose = median;
+    const representativeOpen = prevMedian;
     const sigma = dailyVol * Math.sqrt(day);
     const rangeLow = median * Math.exp(-confidenceZ * sigma);
     const rangeHigh = median * Math.exp(confidenceZ * sigma);
@@ -327,7 +501,6 @@ function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: nu
     const upperBound = channelTrend && latestChannel?.upperResidual !== null && latestChannel?.upperResidual !== undefined
       ? channelTrend * Math.exp(latestChannel.upperResidual)
       : null;
-
     data.push({
       date,
       open: representativeOpen,
@@ -349,14 +522,24 @@ function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: nu
     });
   }
 
+  if (supportAwarePrimaryTrace) {
+    promotePrimaryTrace(data.filter((row) => row.isForecast), last.close);
+  }
+
   return data;
 }
 
-function generateGenericHeatmapData(ohlcv: OHLCVData[], horizon: number, numSimulations = 500, numPriceBands = 80): HeatmapCell[] {
+function generateGenericHeatmapData(
+  ohlcv: OHLCVData[],
+  horizon: number,
+  modelInputs: GenericModelInputs,
+  numSimulations = 500,
+  numPriceBands = 80
+): HeatmapCell[] {
   const last = ohlcv[ohlcv.length - 1];
   if (!last || horizon < 1) return [];
 
-  const { drift, dailyVol } = computeSP500ModelInputs(ohlcv);
+  const { drift, dailyVol } = modelInputs;
   const lastDate = new Date(`${last.date}T00:00:00Z`);
   const rng = mulberry32(0x500500 + horizon * 53 + ohlcv.length);
   const sampleStep = horizon <= 90 ? 1 : horizon <= 365 ? 2 : horizon <= 1825 ? 5 : 10;
@@ -379,10 +562,10 @@ function generateGenericHeatmapData(ohlcv: OHLCVData[], horizon: number, numSimu
   }
 
   const sorted = Array.from(results).sort((a, b) => a - b);
-  const p005 = quantile(sorted, 0.005);
-  const p995 = quantile(sorted, 0.995);
-  const logMin = Math.log(p005);
-  const logMax = Math.log(p995);
+  const p05 = quantile(sorted, 0.05);
+  const p95 = quantile(sorted, 0.95);
+  const logMin = Math.log(p05);
+  const logMax = Math.log(p95);
   const bandSize = (logMax - logMin) / numPriceBands;
   if (!Number.isFinite(bandSize) || bandSize <= 0) return [];
 
@@ -412,11 +595,16 @@ function generateGenericHeatmapData(ohlcv: OHLCVData[], horizon: number, numSimu
   return cells;
 }
 
-function computeGenericProbabilityForecast(ohlcv: OHLCVData[], horizonDays: number): ProbabilityForecast | null {
+function computeGenericProbabilityForecast(
+  ohlcv: OHLCVData[],
+  horizonDays: number,
+  modelInputs: GenericModelInputs,
+  calibrationLabel = 'Log-return interval'
+): ProbabilityForecast | null {
   const last = ohlcv[ohlcv.length - 1];
   if (!last || horizonDays < 1 || ohlcv.length < 252) return null;
 
-  const { drift, dailyVol } = computeSP500ModelInputs(ohlcv);
+  const { drift, dailyVol } = modelInputs;
   const targetDate = dateKey(addUtcDays(new Date(`${last.date}T00:00:00Z`), horizonDays));
   const median = last.close * Math.exp(drift * horizonDays);
   const sigma = dailyVol * Math.sqrt(horizonDays);
@@ -436,7 +624,7 @@ function computeGenericProbabilityForecast(ohlcv: OHLCVData[], horizonDays: numb
     q10,
     q90,
     q95,
-    calibrationLabel: 'Log-return interval',
+    calibrationLabel,
     verdict: probabilityUp > 0.57 ? 'Upside-biased scenario' : probabilityUp < 0.43 ? 'Downside-biased scenario' : 'Balanced distribution',
   };
 }
@@ -463,10 +651,39 @@ export function buildMarketForecast(
     };
   }
 
+  if (assetId === 'gold') {
+    const modelInputs = computeGoldModelInputs(marketData.ohlcv);
+    return {
+      displayData: processGenericData(
+        marketData.ohlcv,
+        horizon,
+        confidenceZ,
+        modelInputs,
+        computeGoldChannelBounds(marketData.ohlcv),
+        true
+      ),
+      heatmapData: generateGenericHeatmapData(marketData.ohlcv, horizon, modelInputs),
+      drawdownStats: null,
+      probabilityForecast: computeGenericProbabilityForecast(
+        marketData.ohlcv,
+        horizon,
+        modelInputs,
+        'Slow momentum interval'
+      ),
+    };
+  }
+
+  const modelInputs = computeSP500ModelInputs(marketData.ohlcv);
   return {
-    displayData: processGenericData(marketData.ohlcv, horizon, confidenceZ),
-    heatmapData: generateGenericHeatmapData(marketData.ohlcv, horizon),
+    displayData: processGenericData(
+      marketData.ohlcv,
+      horizon,
+      confidenceZ,
+      modelInputs,
+      computeSP500ChannelBounds(marketData.ohlcv)
+    ),
+    heatmapData: generateGenericHeatmapData(marketData.ohlcv, horizon, modelInputs),
     drawdownStats: null,
-    probabilityForecast: computeGenericProbabilityForecast(marketData.ohlcv, horizon),
+    probabilityForecast: computeGenericProbabilityForecast(marketData.ohlcv, horizon, modelInputs),
   };
 }

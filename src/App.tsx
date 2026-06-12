@@ -79,9 +79,9 @@ function formatMarketCap(n: number) {
 }
 
 function formatCompactCount(n: number): string {
-  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
-  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(0)}K`;
   return n.toLocaleString();
 }
 
@@ -90,6 +90,7 @@ export default function App() {
   const [marketDataByAsset] = useState<Record<MarketAssetId, MarketData>>(() => ({
     btc: loadMarketData('btc'),
     sp500: loadMarketData('sp500'),
+    gold: loadMarketData('gold'),
   }));
   const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
   const [mvrvZScoreData] = useState(() => computeMVRVZScoreSeries());
@@ -226,7 +227,7 @@ export default function App() {
   const currentPrice = marketData?.currentPrice ?? 0;
   const priceChange24h = marketData?.priceChange24h ?? 0;
   const forecastPrice = useMemo(() => {
-    if (activeAssetId === 'sp500' && probabilityForecast?.median) {
+    if ((activeAssetId === 'sp500' || activeAssetId === 'gold') && probabilityForecast?.median) {
       return probabilityForecast.median;
     }
     const fcast = activeDisplayData.filter(d => d.isForecast);
@@ -241,9 +242,9 @@ export default function App() {
     const returns = recent.slice(1).map((d, i) => Math.log(d.close / recent[i].close));
     const mean = returns.reduce((s, r) => s + r, 0) / returns.length;
     const variance = returns.reduce((s, r) => s + (r - mean) ** 2, 0) / returns.length;
-    const annualizationDays = activeAssetId === 'sp500' ? 252 : 365;
+    const annualizationDays = activeAssetId === 'btc' ? 365 : 252;
     const vol = Math.sqrt(variance * annualizationDays) * 100;
-    const risk = activeAssetId === 'sp500'
+    const risk = activeAssetId !== 'btc'
       ? (vol > 30 ? 'High' : vol > 18 ? 'Medium' : 'Low')
       : (vol > 80 ? 'High' : vol > 50 ? 'Medium' : 'Low');
     return { annualizedVol: vol, volRisk: risk };
@@ -473,7 +474,6 @@ export default function App() {
                   mvrvData={mvrvZScoreData}
                   showMVRV={showMVRV}
                   showBitcoinOverlays={canShowBitcoinOverlays}
-                  showCoreModelLine={!canShowBitcoinOverlays}
                   probabilityForecast={adjustedProbabilityForecast}
                 />
               </motion.div>
@@ -743,7 +743,7 @@ export default function App() {
                       <p className="text-xs font-mono text-zinc-200">
                         {networkContext.transferActivityPercentile === null
                           ? networkContext.networkState
-                          : formatUnsignedPercent(networkContext.transferActivityPercentile, 0) + ' · ' + networkContext.networkState}
+                          : `${formatUnsignedPercent(networkContext.transferActivityPercentile, 0)} · ${networkContext.networkState}`}
                       </p>
                     </div>
                     <div>

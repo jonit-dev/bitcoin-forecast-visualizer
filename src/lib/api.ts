@@ -1,5 +1,6 @@
 import btcHistory from '../data/btc-history.json';
 import vooHistory from '../data/voo-history.json';
+import gldHistory from '../data/gld-history.json';
 import mvrvHistory from '../data/mvrv-history.json';
 
 export interface OHLCVData {
@@ -20,7 +21,7 @@ export interface MarketData {
   fetchedAt: number;
 }
 
-export type MarketAssetId = 'btc' | 'sp500';
+export type MarketAssetId = 'btc' | 'sp500' | 'gold';
 
 export interface MVRVPoint {
   date: string;
@@ -116,6 +117,24 @@ export function loadVOOData(): MarketData {
   };
 }
 
+export function loadGLDData(): MarketData {
+  const ohlcv: OHLCVData[] = gldHistory as OHLCVData[];
+  const last = ohlcv[ohlcv.length - 1];
+  const prev = ohlcv[ohlcv.length - 2];
+  const priceChange24h = prev ? ((last.close - prev.close) / prev.close) * 100 : 0;
+
+  return {
+    ohlcv,
+    currentPrice: last.close,
+    priceChange24h,
+    marketCap: 0,
+    volume24h: last.volume,
+    fetchedAt: Date.now(),
+  };
+}
+
 export function loadMarketData(assetId: MarketAssetId): MarketData {
-  return assetId === 'sp500' ? loadVOOData() : loadBTCData();
+  if (assetId === 'sp500') return loadVOOData();
+  if (assetId === 'gold') return loadGLDData();
+  return loadBTCData();
 }

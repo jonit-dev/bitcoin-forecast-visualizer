@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Fetches no-key daily OHLCV data for market proxies used by the tab workspace.
- * VOO is sourced from Yahoo Finance's chart endpoint as the first S&P 500
- * investable proxy. OHLC values are adjusted by the adjusted-close ratio.
+ * VOO and GLD are sourced from Yahoo Finance's chart endpoint as investable
+ * proxies. OHLC values are adjusted by the adjusted-close ratio.
  */
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
@@ -10,8 +10,14 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const VOO_DATA_PATH = join(__dirname, '../src/data/voo-history.json');
+const GLD_DATA_PATH = join(__dirname, '../src/data/gld-history.json');
 const VOO_FIRST_TRADE_DATE = '2010-09-09';
-const VOO_YAHOO_SYMBOL = 'VOO';
+const GLD_FIRST_TRADE_DATE = '2004-11-18';
+
+const MARKET_SERIES = [
+  { label: 'VOO', symbol: 'VOO', firstTradeDate: VOO_FIRST_TRADE_DATE, dataPath: VOO_DATA_PATH },
+  { label: 'GLD', symbol: 'GLD', firstTradeDate: GLD_FIRST_TRADE_DATE, dataPath: GLD_DATA_PATH },
+];
 
 function isValidRow(row) {
   return /^\d{4}-\d{2}-\d{2}$/.test(row.date)
@@ -35,10 +41,10 @@ function validateSortedRows(rows) {
   }
 }
 
-async function fetchVooRows() {
-  const period1 = Math.floor(new Date(`${VOO_FIRST_TRADE_DATE}T00:00:00Z`).getTime() / 1000);
+async function fetchYahooRows({ symbol, firstTradeDate }) {
+  const period1 = Math.floor(new Date(`${firstTradeDate}T00:00:00Z`).getTime() / 1000);
   const period2 = Math.floor(Date.now() / 1000);
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${VOO_YAHOO_SYMBOL}?period1=${period1}&period2=${period2}&interval=1d&events=history&includeAdjustedClose=true`;
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=1d&events=history&includeAdjustedClose=true`;
   const res = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0',
@@ -52,7 +58,7 @@ async function fetchVooRows() {
   const timestamps = result?.timestamp || [];
   const quote = result?.indicators?.quote?.[0];
   const adjClose = result?.indicators?.adjclose?.[0]?.adjclose || [];
-  if (!quote || timestamps.length === 0) throw new Error('Yahoo chart response did not include VOO candles');
+  if (!quote || timestamps.length === 0) throw new Error(`Yahoo chart response did not include ${symbol} candles`);
 
   const rows = timestamps.flatMap((timestamp, index) => {
     const open = quote.open?.[index];
@@ -78,10 +84,10 @@ async function fetchVooRows() {
   return rows;
 }
 
-function readCachedRows() {
-  if (!existsSync(VOO_DATA_PATH)) return [];
+function readCachedRows(dataPath) {
+  if (!existsSync(dataPath)) return [];
   try {
-    const rows = JSON.parse(readFileSync(VOO_DATA_PATH, 'utf8'));
+    const rows = JSON.parse(readFileSync(dataPath, 'utf8'));
     validateSortedRows(rows);
     return rows;
   } catch {
@@ -90,23 +96,31 @@ function readCachedRows() {
 }
 
 async function main() {
-  try {
-    const rows = await fetchVooRows();
-    const tempPath = `${VOO_DATA_PATH}.tmp`;
-    writeFileSync(tempPath, JSON.stringify(rows));
-    renameSync(tempPath, VOO_DATA_PATH);
+  let failures = 0;
 
-    const latest = rows[rows.length - 1];
-    console.log(`[Market data] VOO rows=${rows.length} latest=${latest.date} close=${latest.close}`);
-  } catch (err) {
-    const cached = readCachedRows();
-    if (cached.length > 0) {
-      const latest = cached[cached.length - 1];
-      console.warn(`[Market data] VOO update skipped, using cached rows=${cached.length} latest=${latest.date}: ${err.message}`);
-      return;
+  for (const series of MARKET_SERIES) {
+    try {
+      const rows = await fetchYahooRows(series);
+      const tempPath = `${series.dataPath}.tmp`;
+      writeFileSync(tempPath, JSON.stringify(rows));
+      renameSync(tempPath, series.dataPath);
+
+      const latest = rows[rows.length - 1];
+      console.log(`[Market data] ${series.label} rows=${rows.length} latest=${latest.date} close=${latest.close}`);
+    } catch (err) {
+      const cached = readCachedRows(series.dataPath);
+      if (cached.length > 0) {
+        const latest = cached[cached.length - 1];
+        console.warn(`[Market data] ${series.label} update skipped, using cached rows=${cached.length} latest=${latest.date}: ${err.message}`);
+        continue;
+      }
+
+      console.error(`[Market data] ${series.label} update failed and no valid cache exists: ${err.message}`);
+      failures++;
     }
+  }
 
-    console.error(`[Market data] VOO update failed and no valid cache exists: ${err.message}`);
+  if (failures > 0) {
     process.exitCode = 1;
   }
 }
