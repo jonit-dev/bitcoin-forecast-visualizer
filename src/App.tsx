@@ -30,6 +30,10 @@ function formatSignedPercent(value: number, digits = 1): string {
   return `${value >= 0 ? '+' : ''}${(value * 100).toFixed(digits)}%`;
 }
 
+function formatUnsignedPercent(value: number, digits = 1): string {
+  return `${(value * 100).toFixed(digits)}%`;
+}
+
 function formatIntervalOption(level: number, horizonDays: number, calibrationLabel?: string): string {
   const pct = `${Math.round(level * 100)}%`;
   if (horizonDays >= 180) return `${pct} ${(calibrationLabel ?? 'Scenario range').toLowerCase()}`;
@@ -88,6 +92,7 @@ export default function App() {
   const [currentRegimeSummary] = useState(() => loadCurrentRegimeSummary());
   const regimeContext = currentRegimeSummary.regime;
   const tailRisk = currentRegimeSummary.tailRisk;
+  const derivativesContext = currentRegimeSummary.derivativesContext;
   const halvingInfo = useMemo(() => getHalvingInfo(), []);
   const [horizon, setHorizon] = useState(180);
   const [confidenceLevel, setConfidenceLevel] = useState<keyof typeof CONFIDENCE_Z_SCORES>(0.95);
@@ -682,9 +687,40 @@ export default function App() {
                   <span className="text-xs font-mono text-zinc-200">{tailRisk.riskFlag}</span>
                 </div>
                 <p className="mt-1 text-[10px] leading-relaxed text-zinc-500">
-                  {regimeContext.reasonCodes.slice(0, 3).join(' · ')}
+                  {tailRisk.drivers.slice(0, 3).join(' · ')}
                 </p>
               </div>
+              {derivativesContext && (
+                <div className="space-y-2 border-t border-white/5 pt-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <p className="text-[10px] text-zinc-500">Futures OI</p>
+                      <p className="text-xs font-mono text-zinc-200">
+                        {derivativesContext.openInterestToMarketCap === null
+                          ? 'n/a'
+                          : `${formatUnsignedPercent(derivativesContext.openInterestToMarketCap, 2)} · ${derivativesContext.leverageState}`}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-zinc-500">Daily Funding</p>
+                      <p className={cn(
+                        "text-xs font-mono",
+                        derivativesContext.fundingState === 'long-crowded' ? "text-amber-300" :
+                          derivativesContext.fundingState === 'short-stress' ? "text-sky-300" :
+                            "text-zinc-200"
+                      )}>
+                        {derivativesContext.fundingRateDailySum === null
+                          ? 'n/a'
+                          : `${formatSignedPercent(derivativesContext.fundingRateDailySum, 3)} · ${derivativesContext.fundingState}`}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] leading-relaxed text-zinc-500">{derivativesContext.insight}</p>
+                  <p className="text-[10px] leading-relaxed text-zinc-600">
+                    Binance derivatives context only; not applied to forecast price or bands.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
           )}

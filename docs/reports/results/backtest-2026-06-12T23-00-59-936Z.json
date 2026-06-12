@@ -1,0 +1,1930 @@
+{
+  "metadata": {
+    "generatedAt": "2026-06-12T23:00:59.936Z",
+    "command": "npm run backtest",
+    "gitCommit": "d0d9f7af1a58b9894d39dcfc80669f19fbac8f59",
+    "dataset": {
+      "firstDate": "2010-07-17",
+      "lastDate": "2026-06-11",
+      "rowCount": 5809
+    },
+    "holdoutStartDate": "2022-01-01",
+    "rollingOriginSpacingDays": 1,
+    "skippedWindowCount": 0,
+    "modelConfig": {
+      "powerLaw": {
+        "genesisDate": "2009-01-03T00:00:00Z",
+        "meanReversionTauDays": 210,
+        "peak": {
+          "coefficient": 9.89e-7,
+          "exponent": 2.9379
+        },
+        "floor": {
+          "rawCoefficient": 3.3619853380352767e-18,
+          "rawExponent": 5.847,
+          "cyclicCoefficient": 9.48e-10,
+          "cyclicExponent": 3.6702,
+          "sinAmplitude": 0.2323,
+          "cosAmplitude": 0.4288
+        },
+        "base": {
+          "coefficient": 9.48e-10,
+          "exponent": 3.6702,
+          "sinAmplitude": 0.2323,
+          "cosAmplitude": 0.4288,
+          "cycleDays": 1460
+        }
+      },
+      "interval": {
+        "recentVolWeight": 0.55,
+        "logDriftScale": 0.3,
+        "stressMultiplier": {
+          "base": 1,
+          "amplitude": 1.85,
+          "tauDays": 150
+        },
+        "fittedMultipliers": [
+          {
+            "horizonDays": 14,
+            "multiplier": 1.01,
+            "coverageStatus": "calibrated",
+            "label": "Calibrated"
+          },
+          {
+            "horizonDays": 30,
+            "multiplier": 0.98,
+            "coverageStatus": "calibrated",
+            "label": "Calibrated"
+          },
+          {
+            "horizonDays": 60,
+            "multiplier": 0.99,
+            "coverageStatus": "conservative",
+            "label": "Conservative"
+          },
+          {
+            "horizonDays": 90,
+            "multiplier": 0.87,
+            "coverageStatus": "calibrated",
+            "label": "Calibrated"
+          },
+          {
+            "horizonDays": 180,
+            "multiplier": 0.86,
+            "coverageStatus": "scenario",
+            "label": "Scenario range"
+          },
+          {
+            "horizonDays": 365,
+            "multiplier": 0.59,
+            "coverageStatus": "scenario",
+            "label": "Scenario range"
+          }
+        ],
+        "scenarioPolicy": {
+          "maxFittedHorizonDays": 365,
+          "aboveMaxMultiplier": 0.59,
+          "label": "Scenario range"
+        }
+      },
+      "backtest": {
+        "horizons": [
+          7,
+          14,
+          30,
+          60,
+          90,
+          180,
+          365
+        ],
+        "requiredGateHorizons": [
+          14,
+          30,
+          60,
+          90
+        ],
+        "rollingOriginSpacingDays": 1,
+        "minimumLookbackDays": 365,
+        "holdoutStartDate": "2022-01-01",
+        "benchmarkModels": [
+          "naive-current-price",
+          "gbm-driftless",
+          "gbm-recent-drift",
+          "ma-trend-20-50-200",
+          "powerlaw-current"
+        ]
+      }
+    },
+    "featureTable": {
+      "rowCount": 5808,
+      "firstDate": "2010-07-18",
+      "lastDate": "2026-06-11",
+      "latestFeatureCount": 18
+    }
+  },
+  "horizons": [
+    7,
+    14,
+    30,
+    60,
+    90,
+    180,
+    365
+  ],
+  "models": [
+    {
+      "id": "naive-current-price",
+      "description": "Endpoint forecast equal to the origin close.",
+      "config": {}
+    },
+    {
+      "id": "gbm-driftless",
+      "description": "Driftless geometric Brownian benchmark centered on the origin close.",
+      "config": {
+        "lookbackDays": 365
+      }
+    },
+    {
+      "id": "gbm-recent-drift",
+      "description": "Recent-drift geometric Brownian benchmark using trailing 90-day log returns.",
+      "config": {
+        "lookbackDays": 90
+      }
+    },
+    {
+      "id": "ma-trend-20-50-200",
+      "description": "Moving-average trend benchmark blended from 20/50/200-day slopes.",
+      "config": {
+        "windows": [
+          20,
+          50,
+          200
+        ]
+      }
+    },
+    {
+      "id": "powerlaw-current",
+      "description": "Current app power-law endpoint forecast.",
+      "config": {
+        "interval": {
+          "recentVolWeight": 0.55,
+          "logDriftScale": 0.3,
+          "stressMultiplier": {
+            "base": 1,
+            "amplitude": 1.85,
+            "tauDays": 150
+          },
+          "fittedMultipliers": [
+            {
+              "horizonDays": 14,
+              "multiplier": 1.01,
+              "coverageStatus": "calibrated",
+              "label": "Calibrated"
+            },
+            {
+              "horizonDays": 30,
+              "multiplier": 0.98,
+              "coverageStatus": "calibrated",
+              "label": "Calibrated"
+            },
+            {
+              "horizonDays": 60,
+              "multiplier": 0.99,
+              "coverageStatus": "conservative",
+              "label": "Conservative"
+            },
+            {
+              "horizonDays": 90,
+              "multiplier": 0.87,
+              "coverageStatus": "calibrated",
+              "label": "Calibrated"
+            },
+            {
+              "horizonDays": 180,
+              "multiplier": 0.86,
+              "coverageStatus": "scenario",
+              "label": "Scenario range"
+            },
+            {
+              "horizonDays": 365,
+              "multiplier": 0.59,
+              "coverageStatus": "scenario",
+              "label": "Scenario range"
+            }
+          ],
+          "scenarioPolicy": {
+            "maxFittedHorizonDays": 365,
+            "aboveMaxMultiplier": 0.59,
+            "label": "Scenario range"
+          }
+        },
+        "meanReversionTauDays": 210
+      }
+    }
+  ],
+  "metrics": {
+    "7": {
+      "naive-current-price": {
+        "samples": 1616,
+        "medianAbsLogError": 0.036767567027112154,
+        "approximateMultiplicativeError": 0.03745185479293478,
+        "meanAbsLogError": 0.05117032092185307,
+        "biasLogError": -0.0013976582032198472,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.025703332539896092,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "gbm-driftless": {
+        "samples": 1616,
+        "medianAbsLogError": 0.036767567027112154,
+        "approximateMultiplicativeError": 0.03745185479293478,
+        "meanAbsLogError": 0.05117032092185307,
+        "biasLogError": -0.0013976582032198472,
+        "nll": -1.2309022068137714,
+        "pinballLoss": {
+          "q05": 0.00818447064792497,
+          "q10": 0.013009894222520657,
+          "q50": 0.025703332539896092,
+          "q90": 0.013480823125998135,
+          "q95": 0.008418586574331446
+        },
+        "coverage": {
+          "interval80": 0.8483910891089109,
+          "interval90": 0.9214108910891089,
+          "interval95": 0.9455445544554455
+        }
+      },
+      "gbm-recent-drift": {
+        "samples": 1616,
+        "medianAbsLogError": 0.04233466990496792,
+        "approximateMultiplicativeError": 0.043243562557522264,
+        "meanAbsLogError": 0.054614157253955936,
+        "biasLogError": -0.0001957548392926696,
+        "nll": -1.1631338395535118,
+        "pinballLoss": {
+          "q05": 0.008498685781832297,
+          "q10": 0.01345117526700946,
+          "q50": 0.027413350592718582,
+          "q90": 0.01380839120210949,
+          "q95": 0.008730932716726453
+        },
+        "coverage": {
+          "interval80": 0.8081683168316832,
+          "interval90": 0.8849009900990099,
+          "interval95": 0.9201732673267327
+        }
+      },
+      "ma-trend-20-50-200": {
+        "samples": 1616,
+        "medianAbsLogError": 0.03835506892719551,
+        "approximateMultiplicativeError": 0.03910011954922199,
+        "meanAbsLogError": 0.051840689532678605,
+        "biasLogError": -0.0010309842780005514,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.02602804991949984,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "powerlaw-current": {
+        "samples": 1616,
+        "medianAbsLogError": 0.035889655088447624,
+        "approximateMultiplicativeError": 0.036541463104160954,
+        "meanAbsLogError": 0.05002728730772695,
+        "biasLogError": 0.0019507388920533652,
+        "nll": -1.2506607184165721,
+        "pinballLoss": {
+          "q05": 0.008139866497979178,
+          "q10": 0.012761152306750321,
+          "q50": 0.025193007136055712,
+          "q90": 0.013187589763767086,
+          "q95": 0.008274960223263324
+        },
+        "coverage": {
+          "interval80": 0.8514851485148515,
+          "interval90": 0.9096534653465347,
+          "interval95": 0.9399752475247525
+        }
+      }
+    },
+    "14": {
+      "naive-current-price": {
+        "samples": 1609,
+        "medianAbsLogError": 0.05416838433249539,
+        "approximateMultiplicativeError": 0.05566234418934002,
+        "meanAbsLogError": 0.0742926328979118,
+        "biasLogError": -0.0035390214458019403,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.037321507553716694,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "gbm-driftless": {
+        "samples": 1609,
+        "medianAbsLogError": 0.05416838433249539,
+        "approximateMultiplicativeError": 0.05566234418934002,
+        "meanAbsLogError": 0.0742926328979118,
+        "biasLogError": -0.0035390214458019403,
+        "nll": -0.8727236054391802,
+        "pinballLoss": {
+          "q05": 0.011045859835505425,
+          "q10": 0.01807179990990903,
+          "q50": 0.037321507553716694,
+          "q90": 0.0200257585566478,
+          "q95": 0.012619751342138523
+        },
+        "coverage": {
+          "interval80": 0.8421379738968303,
+          "interval90": 0.8999378495960224,
+          "interval95": 0.9359850839030454
+        }
+      },
+      "gbm-recent-drift": {
+        "samples": 1609,
+        "medianAbsLogError": 0.06893376311998643,
+        "approximateMultiplicativeError": 0.07136524290703572,
+        "meanAbsLogError": 0.0835127989565863,
+        "biasLogError": -0.001130521687850594,
+        "nll": -0.7827886266717539,
+        "pinballLoss": {
+          "q05": 0.01132828269892516,
+          "q10": 0.01858247739763464,
+          "q50": 0.04184629062609468,
+          "q90": 0.020598175376765237,
+          "q95": 0.012910162298834389
+        },
+        "coverage": {
+          "interval80": 0.7799875699192045,
+          "interval90": 0.8607830950901181,
+          "interval95": 0.9092604101926662
+        }
+      },
+      "ma-trend-20-50-200": {
+        "samples": 1609,
+        "medianAbsLogError": 0.05957637301328587,
+        "approximateMultiplicativeError": 0.06138681919381073,
+        "meanAbsLogError": 0.0770657879587845,
+        "biasLogError": -0.0027817108806851413,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.03863173478817716,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "powerlaw-current": {
+        "samples": 1609,
+        "medianAbsLogError": 0.05295976255101852,
+        "approximateMultiplicativeError": 0.05438721841388272,
+        "meanAbsLogError": 0.07137907340772458,
+        "biasLogError": 0.0032240237654814334,
+        "nll": -0.922757943094714,
+        "pinballLoss": {
+          "q05": 0.010621357751064656,
+          "q10": 0.017421246675317734,
+          "q50": 0.03602488876166867,
+          "q90": 0.018976298392664126,
+          "q95": 0.01186606029806607
+        },
+        "coverage": {
+          "interval80": 0.839030453697949,
+          "interval90": 0.8968303293971411,
+          "interval95": 0.9322560596643878
+        }
+      }
+    },
+    "30": {
+      "naive-current-price": {
+        "samples": 1593,
+        "medianAbsLogError": 0.08705149379219239,
+        "approximateMultiplicativeError": 0.09095285557154797,
+        "meanAbsLogError": 0.11350758649859766,
+        "biasLogError": -0.010466447726592653,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.0567232863214572,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "gbm-driftless": {
+        "samples": 1593,
+        "medianAbsLogError": 0.08705149379219239,
+        "approximateMultiplicativeError": 0.09095285557154797,
+        "meanAbsLogError": 0.11350758649859766,
+        "biasLogError": -0.010466447726592653,
+        "nll": -0.4659539891631244,
+        "pinballLoss": {
+          "q05": 0.014322798734079385,
+          "q10": 0.024654322020307307,
+          "q50": 0.0567232863214572,
+          "q90": 0.031378270002622964,
+          "q95": 0.019453050813646743
+        },
+        "coverage": {
+          "interval80": 0.8185812931575643,
+          "interval90": 0.8807281858129316,
+          "interval95": 0.9347143753923415
+        }
+      },
+      "gbm-recent-drift": {
+        "samples": 1593,
+        "medianAbsLogError": 0.11861228798241977,
+        "approximateMultiplicativeError": 0.1259332957821575,
+        "meanAbsLogError": 0.13815240694675196,
+        "biasLogError": -0.00570704853298425,
+        "nll": -0.3186031208038883,
+        "pinballLoss": {
+          "q05": 0.013376137801768686,
+          "q10": 0.02493591055070932,
+          "q50": 0.06882581471595749,
+          "q90": 0.03406608273235618,
+          "q95": 0.02104209334153042
+        },
+        "coverage": {
+          "interval80": 0.7087256748273697,
+          "interval90": 0.8411801632140615,
+          "interval95": 0.9146264908976773
+        }
+      },
+      "ma-trend-20-50-200": {
+        "samples": 1593,
+        "medianAbsLogError": 0.10052579138269623,
+        "approximateMultiplicativeError": 0.10575216021344125,
+        "meanAbsLogError": 0.12322639183651694,
+        "biasLogError": -0.008987558236339234,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.06143385532363786,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "powerlaw-current": {
+        "samples": 1593,
+        "medianAbsLogError": 0.08298569588394204,
+        "approximateMultiplicativeError": 0.08652626663926366,
+        "meanAbsLogError": 0.10393667833306314,
+        "biasLogError": 0.004481249055724076,
+        "nll": -0.5891516060327263,
+        "pinballLoss": {
+          "q05": 0.01245947064826464,
+          "q10": 0.021944414756645575,
+          "q50": 0.05251660290127724,
+          "q90": 0.02695871431037965,
+          "q95": 0.016466568024580873
+        },
+        "coverage": {
+          "interval80": 0.7978656622724419,
+          "interval90": 0.8976773383553045,
+          "interval95": 0.9453860640301318
+        }
+      }
+    },
+    "60": {
+      "naive-current-price": {
+        "samples": 1563,
+        "medianAbsLogError": 0.14222123729788122,
+        "approximateMultiplicativeError": 0.15283166968938344,
+        "meanAbsLogError": 0.17490496988950266,
+        "biasLogError": -0.02310735308640894,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.08711994690604187,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "gbm-driftless": {
+        "samples": 1563,
+        "medianAbsLogError": 0.14222123729788122,
+        "approximateMultiplicativeError": 0.15283166968938344,
+        "meanAbsLogError": 0.17490496988950266,
+        "biasLogError": -0.02310735308640894,
+        "nll": -0.08507448021574428,
+        "pinballLoss": {
+          "q05": 0.018153675032410083,
+          "q10": 0.032337680859850164,
+          "q50": 0.08711994690604187,
+          "q90": 0.04762544188391984,
+          "q95": 0.030099589549375676
+        },
+        "coverage": {
+          "interval80": 0.7965451055662188,
+          "interval90": 0.8848368522072937,
+          "interval95": 0.9328214971209213
+        }
+      },
+      "gbm-recent-drift": {
+        "samples": 1563,
+        "medianAbsLogError": 0.19396246074295373,
+        "approximateMultiplicativeError": 0.21405070753922728,
+        "meanAbsLogError": 0.22683904404963418,
+        "biasLogError": -0.012647021913636374,
+        "nll": 0.24616162944688275,
+        "pinballLoss": {
+          "q05": 0.024608637984491057,
+          "q10": 0.04332736110752044,
+          "q50": 0.11363533363252235,
+          "q90": 0.0579680309983156,
+          "q95": 0.03424641836463639
+        },
+        "coverage": {
+          "interval80": 0.6110044785668586,
+          "interval90": 0.7543186180422264,
+          "interval95": 0.854766474728087
+        }
+      },
+      "ma-trend-20-50-200": {
+        "samples": 1563,
+        "medianAbsLogError": 0.1544238743257667,
+        "approximateMultiplicativeError": 0.1669854371227779,
+        "meanAbsLogError": 0.1834015030321291,
+        "biasLogError": -0.020334151270056496,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.09072961864856831,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "powerlaw-current": {
+        "samples": 1563,
+        "medianAbsLogError": 0.139283603438968,
+        "approximateMultiplicativeError": 0.14945004176708498,
+        "meanAbsLogError": 0.14663369413618096,
+        "biasLogError": 0.008461078368957068,
+        "nll": -0.32347254916990054,
+        "pinballLoss": {
+          "q05": 0.014328739902738427,
+          "q10": 0.025479599533045228,
+          "q50": 0.07465822257311114,
+          "q90": 0.03499987138108138,
+          "q95": 0.020836605911329662
+        },
+        "coverage": {
+          "interval80": 0.7907869481765835,
+          "interval90": 0.9296225207933462,
+          "interval95": 0.9788867562380038
+        }
+      }
+    },
+    "90": {
+      "naive-current-price": {
+        "samples": 1533,
+        "medianAbsLogError": 0.18897599783635985,
+        "approximateMultiplicativeError": 0.20801195723425203,
+        "meanAbsLogError": 0.2238758474518746,
+        "biasLogError": -0.03360646366410863,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.11171534523202396,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "gbm-driftless": {
+        "samples": 1533,
+        "medianAbsLogError": 0.18897599783635985,
+        "approximateMultiplicativeError": 0.20801195723425203,
+        "meanAbsLogError": 0.2238758474518746,
+        "biasLogError": -0.03360646366410863,
+        "nll": 0.15380868670904138,
+        "pinballLoss": {
+          "q05": 0.02143682109075806,
+          "q10": 0.03861638838033626,
+          "q50": 0.11171534523202396,
+          "q90": 0.06432649942474548,
+          "q95": 0.03785825606348146
+        },
+        "coverage": {
+          "interval80": 0.7390737116764514,
+          "interval90": 0.8584474885844748,
+          "interval95": 0.928897586431833
+        }
+      },
+      "gbm-recent-drift": {
+        "samples": 1533,
+        "medianAbsLogError": 0.2580431024084619,
+        "approximateMultiplicativeError": 0.2943946089470262,
+        "meanAbsLogError": 0.299282249402913,
+        "biasLogError": -0.012871619247448252,
+        "nll": 0.6255962343985444,
+        "pinballLoss": {
+          "q05": 0.03595237183540349,
+          "q10": 0.0632970597106754,
+          "q50": 0.152576938349938,
+          "q90": 0.08255077163116777,
+          "q95": 0.05142084449553222
+        },
+        "coverage": {
+          "interval80": 0.5577299412915852,
+          "interval90": 0.6940639269406392,
+          "interval95": 0.7977821265492498
+        }
+      },
+      "ma-trend-20-50-200": {
+        "samples": 1533,
+        "medianAbsLogError": 0.20638802152125366,
+        "approximateMultiplicativeError": 0.2292300791957087,
+        "meanAbsLogError": 0.23613838345484675,
+        "biasLogError": -0.02801324057818658,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.11777641546353818,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "powerlaw-current": {
+        "samples": 1533,
+        "medianAbsLogError": 0.15546004332117405,
+        "approximateMultiplicativeError": 0.16819525793197942,
+        "meanAbsLogError": 0.16577611905792894,
+        "biasLogError": 0.015399298981768146,
+        "nll": -0.2246994039540447,
+        "pinballLoss": {
+          "q05": 0.015621145466527013,
+          "q10": 0.02924520495217353,
+          "q50": 0.08527787156225813,
+          "q90": 0.03839215900592801,
+          "q95": 0.02302521904139175
+        },
+        "coverage": {
+          "interval80": 0.7645140247879973,
+          "interval90": 0.9015003261578604,
+          "interval95": 0.9575994781474233
+        }
+      }
+    },
+    "180": {
+      "naive-current-price": {
+        "samples": 1443,
+        "medianAbsLogError": 0.3367156784316578,
+        "approximateMultiplicativeError": 0.40034086002272984,
+        "meanAbsLogError": 0.3570467579430921,
+        "biasLogError": -0.09305662153520416,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.17806839669214147,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "gbm-driftless": {
+        "samples": 1443,
+        "medianAbsLogError": 0.3367156784316578,
+        "approximateMultiplicativeError": 0.40034086002272984,
+        "meanAbsLogError": 0.3570467579430921,
+        "biasLogError": -0.09305662153520416,
+        "nll": 0.5821577557888115,
+        "pinballLoss": {
+          "q05": 0.025146553661278225,
+          "q10": 0.05072518922100365,
+          "q50": 0.17806839669214147,
+          "q90": 0.09250512283723941,
+          "q95": 0.06167735764769558
+        },
+        "coverage": {
+          "interval80": 0.7456687456687456,
+          "interval90": 0.893970893970894,
+          "interval95": 0.9452529452529452
+        }
+      },
+      "gbm-recent-drift": {
+        "samples": 1443,
+        "medianAbsLogError": 0.5574838161211277,
+        "approximateMultiplicativeError": 0.7462730236409454,
+        "meanAbsLogError": 0.5521657219022637,
+        "biasLogError": -0.015112921539336781,
+        "nll": 1.7949016704131358,
+        "pinballLoss": {
+          "q05": 0.09836358544191677,
+          "q10": 0.15181919104375288,
+          "q50": 0.300835446582107,
+          "q90": 0.16314254977682413,
+          "q95": 0.10665408097041044
+        },
+        "coverage": {
+          "interval80": 0.41094941094941095,
+          "interval90": 0.5232155232155232,
+          "interval95": 0.6410256410256411
+        }
+      },
+      "ma-trend-20-50-200": {
+        "samples": 1443,
+        "medianAbsLogError": 0.3710085164593812,
+        "approximateMultiplicativeError": 0.4491954153479798,
+        "meanAbsLogError": 0.3842991678944821,
+        "biasLogError": -0.06421134652896839,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.19241982583233974,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "powerlaw-current": {
+        "samples": 1443,
+        "medianAbsLogError": 0.138216971997637,
+        "approximateMultiplicativeError": 0.1482246558460496,
+        "meanAbsLogError": 0.17289621112609221,
+        "biasLogError": 0.01995729167493309,
+        "nll": -0.12335787412973402,
+        "pinballLoss": {
+          "q05": 0.017582421356160016,
+          "q10": 0.031470581934084495,
+          "q50": 0.08926496642602193,
+          "q90": 0.04610754957730385,
+          "q95": 0.028046028138364248
+        },
+        "coverage": {
+          "interval80": 0.7997227997227997,
+          "interval90": 0.9009009009009009,
+          "interval95": 0.9459459459459459
+        }
+      }
+    },
+    "365": {
+      "naive-current-price": {
+        "samples": 1258,
+        "medianAbsLogError": 0.5469788762328285,
+        "approximateMultiplicativeError": 0.7280245478848282,
+        "meanAbsLogError": 0.5366203675903254,
+        "biasLogError": -0.35894804868377056,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.21685546686932658,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "gbm-driftless": {
+        "samples": 1258,
+        "medianAbsLogError": 0.5469788762328285,
+        "approximateMultiplicativeError": 0.7280245478848282,
+        "meanAbsLogError": 0.5366203675903254,
+        "biasLogError": -0.35894804868377056,
+        "nll": 0.9776302800344937,
+        "pinballLoss": {
+          "q05": 0.03476942233327538,
+          "q10": 0.06249596539670581,
+          "q50": 0.21685546686932658,
+          "q90": 0.12178305414423748,
+          "q95": 0.07064719547073718
+        },
+        "coverage": {
+          "interval80": 0.6589825119236884,
+          "interval90": 0.8585055643879174,
+          "interval95": 0.9634340222575517
+        }
+      },
+      "gbm-recent-drift": {
+        "samples": 1258,
+        "medianAbsLogError": 0.8394015393748018,
+        "approximateMultiplicativeError": 1.3149811370785884,
+        "meanAbsLogError": 0.9751057349055936,
+        "biasLogError": -0.20782277383837625,
+        "nll": 2.7294446633289406,
+        "pinballLoss": {
+          "q05": 0.24806281361611113,
+          "q10": 0.3417530423249471,
+          "q50": 0.608868542970826,
+          "q90": 0.35858050733336533,
+          "q95": 0.2521073367714581
+        },
+        "coverage": {
+          "interval80": 0.39666136724960255,
+          "interval90": 0.49205087440381556,
+          "interval95": 0.5588235294117647
+        }
+      },
+      "ma-trend-20-50-200": {
+        "samples": 1258,
+        "medianAbsLogError": 0.5668904835009928,
+        "approximateMultiplicativeError": 0.7627771357778474,
+        "meanAbsLogError": 0.6244397963563333,
+        "biasLogError": -0.29355677464214297,
+        "nll": null,
+        "pinballLoss": {
+          "q05": null,
+          "q10": null,
+          "q50": 0.27957674954342315,
+          "q90": null,
+          "q95": null
+        },
+        "coverage": {
+          "interval80": null,
+          "interval90": null,
+          "interval95": null
+        }
+      },
+      "powerlaw-current": {
+        "samples": 1258,
+        "medianAbsLogError": 0.12731010733599069,
+        "approximateMultiplicativeError": 0.1357691735283273,
+        "meanAbsLogError": 0.1383066647468657,
+        "biasLogError": -0.021367715645927158,
+        "nll": -0.37590293374011513,
+        "pinballLoss": {
+          "q05": 0.014915076363725181,
+          "q10": 0.0277236837766424,
+          "q50": 0.06864598617071338,
+          "q90": 0.026562876527663058,
+          "q95": 0.016569895341065486
+        },
+        "coverage": {
+          "interval80": 0.794912559618442,
+          "interval90": 0.9220985691573926,
+          "interval95": 0.9666136724960255
+        }
+      }
+    }
+  },
+  "qualityGate": {
+    "status": "PASS",
+    "checks": [
+      {
+        "horizonDays": 14,
+        "powerlawMedianAbsLogError": 0.05295976255101852,
+        "naiveMedianAbsLogError": 0.05416838433249539,
+        "passed": true,
+        "reason": "powerlaw-current median absolute log error 0.05296 beat naive 0.05417"
+      },
+      {
+        "horizonDays": 30,
+        "powerlawMedianAbsLogError": 0.08298569588394204,
+        "naiveMedianAbsLogError": 0.08705149379219239,
+        "passed": true,
+        "reason": "powerlaw-current median absolute log error 0.08299 beat naive 0.08705"
+      },
+      {
+        "horizonDays": 60,
+        "powerlawMedianAbsLogError": 0.139283603438968,
+        "naiveMedianAbsLogError": 0.14222123729788122,
+        "passed": true,
+        "reason": "powerlaw-current median absolute log error 0.13928 beat naive 0.14222"
+      },
+      {
+        "horizonDays": 90,
+        "powerlawMedianAbsLogError": 0.15546004332117405,
+        "naiveMedianAbsLogError": 0.18897599783635985,
+        "passed": true,
+        "reason": "powerlaw-current median absolute log error 0.15546 beat naive 0.18898"
+      }
+    ]
+  },
+  "robustness": {
+    "status": "PASS",
+    "blockBootstrapIterations": 400,
+    "checks": [
+      {
+        "horizonDays": 14,
+        "benchmarkModelId": "naive-current-price",
+        "samples": 1609,
+        "blockLength": 14,
+        "medianAbsLogErrorImprovement": 0.002256605569325828,
+        "meanAbsLogErrorImprovement": 0.002913559490187133,
+        "bootstrapLower95MeanImprovement": 0.0003874674214996582,
+        "passed": true,
+        "reason": "powerlaw-current beat naive-current-price after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 14,
+        "benchmarkModelId": "gbm-driftless",
+        "samples": 1609,
+        "blockLength": 14,
+        "medianAbsLogErrorImprovement": 0.002256605569325828,
+        "meanAbsLogErrorImprovement": 0.002913559490187133,
+        "bootstrapLower95MeanImprovement": 0.0004477946481308463,
+        "passed": true,
+        "reason": "powerlaw-current beat gbm-driftless after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 14,
+        "benchmarkModelId": "gbm-recent-drift",
+        "samples": 1609,
+        "blockLength": 14,
+        "medianAbsLogErrorImprovement": 0.011871752193892821,
+        "meanAbsLogErrorImprovement": 0.012133725548861801,
+        "bootstrapLower95MeanImprovement": 0.007939981122521625,
+        "passed": true,
+        "reason": "powerlaw-current beat gbm-recent-drift after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 14,
+        "benchmarkModelId": "ma-trend-20-50-200",
+        "samples": 1609,
+        "blockLength": 14,
+        "medianAbsLogErrorImprovement": 0.005780953992927829,
+        "meanAbsLogErrorImprovement": 0.005686714551059865,
+        "bootstrapLower95MeanImprovement": 0.0028863951494658346,
+        "passed": true,
+        "reason": "powerlaw-current beat ma-trend-20-50-200 after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 30,
+        "benchmarkModelId": "naive-current-price",
+        "samples": 1593,
+        "blockLength": 30,
+        "medianAbsLogErrorImprovement": 0.008943929635143427,
+        "meanAbsLogErrorImprovement": 0.009570908165534664,
+        "bootstrapLower95MeanImprovement": 0.001610135595023122,
+        "passed": true,
+        "reason": "powerlaw-current beat naive-current-price after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 30,
+        "benchmarkModelId": "gbm-driftless",
+        "samples": 1593,
+        "blockLength": 30,
+        "medianAbsLogErrorImprovement": 0.008943929635143427,
+        "meanAbsLogErrorImprovement": 0.009570908165534664,
+        "bootstrapLower95MeanImprovement": 0.0014785186429824774,
+        "passed": true,
+        "reason": "powerlaw-current beat gbm-driftless after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 30,
+        "benchmarkModelId": "gbm-recent-drift",
+        "samples": 1593,
+        "blockLength": 30,
+        "medianAbsLogErrorImprovement": 0.036357940679309995,
+        "meanAbsLogErrorImprovement": 0.034215728613688934,
+        "bootstrapLower95MeanImprovement": 0.02219071038091386,
+        "passed": true,
+        "reason": "powerlaw-current beat gbm-recent-drift after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 30,
+        "benchmarkModelId": "ma-trend-20-50-200",
+        "samples": 1593,
+        "blockLength": 30,
+        "medianAbsLogErrorImprovement": 0.01826068424897624,
+        "meanAbsLogErrorImprovement": 0.019289713503453824,
+        "bootstrapLower95MeanImprovement": 0.011562487678504508,
+        "passed": true,
+        "reason": "powerlaw-current beat ma-trend-20-50-200 after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 60,
+        "benchmarkModelId": "naive-current-price",
+        "samples": 1563,
+        "blockLength": 60,
+        "medianAbsLogErrorImprovement": 0.027039549086495918,
+        "meanAbsLogErrorImprovement": 0.02827127575332164,
+        "bootstrapLower95MeanImprovement": 0.009560067851647007,
+        "passed": true,
+        "reason": "powerlaw-current beat naive-current-price after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 60,
+        "benchmarkModelId": "gbm-driftless",
+        "samples": 1563,
+        "blockLength": 60,
+        "medianAbsLogErrorImprovement": 0.027039549086495918,
+        "meanAbsLogErrorImprovement": 0.02827127575332164,
+        "bootstrapLower95MeanImprovement": 0.007070726212020441,
+        "passed": true,
+        "reason": "powerlaw-current beat gbm-driftless after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 60,
+        "benchmarkModelId": "gbm-recent-drift",
+        "samples": 1563,
+        "blockLength": 60,
+        "medianAbsLogErrorImprovement": 0.0848449188421058,
+        "meanAbsLogErrorImprovement": 0.08020534991345299,
+        "bootstrapLower95MeanImprovement": 0.052432431516423995,
+        "passed": true,
+        "reason": "powerlaw-current beat gbm-recent-drift after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 60,
+        "benchmarkModelId": "ma-trend-20-50-200",
+        "samples": 1563,
+        "blockLength": 60,
+        "medianAbsLogErrorImprovement": 0.03565928312121856,
+        "meanAbsLogErrorImprovement": 0.03676780889594853,
+        "bootstrapLower95MeanImprovement": 0.014504374312345886,
+        "passed": true,
+        "reason": "powerlaw-current beat ma-trend-20-50-200 after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 90,
+        "benchmarkModelId": "naive-current-price",
+        "samples": 1533,
+        "blockLength": 90,
+        "medianAbsLogErrorImprovement": 0.05515751667150187,
+        "meanAbsLogErrorImprovement": 0.05809972839394598,
+        "bootstrapLower95MeanImprovement": 0.023640086740288738,
+        "passed": true,
+        "reason": "powerlaw-current beat naive-current-price after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 90,
+        "benchmarkModelId": "gbm-driftless",
+        "samples": 1533,
+        "blockLength": 90,
+        "medianAbsLogErrorImprovement": 0.05515751667150187,
+        "meanAbsLogErrorImprovement": 0.05809972839394598,
+        "bootstrapLower95MeanImprovement": 0.02327283194295687,
+        "passed": true,
+        "reason": "powerlaw-current beat gbm-driftless after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 90,
+        "benchmarkModelId": "gbm-recent-drift",
+        "samples": 1533,
+        "blockLength": 90,
+        "medianAbsLogErrorImprovement": 0.1316033404064935,
+        "meanAbsLogErrorImprovement": 0.13350613034498474,
+        "bootstrapLower95MeanImprovement": 0.08908368808893555,
+        "passed": true,
+        "reason": "powerlaw-current beat gbm-recent-drift after block-bootstrap overlap adjustment"
+      },
+      {
+        "horizonDays": 90,
+        "benchmarkModelId": "ma-trend-20-50-200",
+        "samples": 1533,
+        "blockLength": 90,
+        "medianAbsLogErrorImprovement": 0.06498688682954885,
+        "meanAbsLogErrorImprovement": 0.0703622643969184,
+        "bootstrapLower95MeanImprovement": 0.03999825317969848,
+        "passed": true,
+        "reason": "powerlaw-current beat ma-trend-20-50-200 after block-bootstrap overlap adjustment"
+      }
+    ]
+  },
+  "regimeSummary": {
+    "7": {
+      "deleveraging-bear": {
+        "samples": 488,
+        "medianAbsLogError": 0.03470977502351337,
+        "approximateMultiplicativeError": 0.035319189705170784,
+        "meanAbsLogError": 0.051852352025008715,
+        "biasLogError": 0.004898537106327227,
+        "nll": -1.2350610093592551,
+        "pinballLoss": {
+          "q05": 0.008089963883855618,
+          "q10": 0.013063169766994568,
+          "q50": 0.02620568503972657,
+          "q90": 0.01373411618691481,
+          "q95": 0.008297455796790672
+        },
+        "coverage": {
+          "interval80": 0.8032786885245902,
+          "interval90": 0.8811475409836066,
+          "interval95": 0.9159836065573771
+        }
+      },
+      "trend-expansion": {
+        "samples": 640,
+        "medianAbsLogError": 0.03897341757157172,
+        "approximateMultiplicativeError": 0.0397428443930552,
+        "meanAbsLogError": 0.04974245145445221,
+        "biasLogError": 0.003563451724064504,
+        "nll": -1.2809480376572588,
+        "pinballLoss": {
+          "q05": 0.0073744039544501126,
+          "q10": 0.011756870979451457,
+          "q50": 0.025031898518135448,
+          "q90": 0.012563508514871835,
+          "q95": 0.007874323442329573
+        },
+        "coverage": {
+          "interval80": 0.8625,
+          "interval90": 0.9203125,
+          "interval95": 0.9546875
+        }
+      },
+      "sideways-chop": {
+        "samples": 209,
+        "medianAbsLogError": 0.03203797155496474,
+        "approximateMultiplicativeError": 0.032556712344694594,
+        "meanAbsLogError": 0.04097914958976185,
+        "biasLogError": 0.002704012431609973,
+        "nll": -1.4386920188651575,
+        "pinballLoss": {
+          "q05": 0.006961711896106476,
+          "q10": 0.010845154616642174,
+          "q50": 0.020614321701350743,
+          "q90": 0.010633767940520312,
+          "q95": 0.006709220035493879
+        },
+        "coverage": {
+          "interval80": 0.8708133971291866,
+          "interval90": 0.9186602870813397,
+          "interval95": 0.9425837320574163
+        }
+      },
+      "accumulation-value": {
+        "samples": 279,
+        "medianAbsLogError": 0.036341487964424504,
+        "approximateMultiplicativeError": 0.03700991243693941,
+        "meanAbsLogError": 0.05426644195689194,
+        "biasLogError": -0.007468959713036636,
+        "nll": -1.067614954660936,
+        "pinballLoss": {
+          "q05": 0.010865611355836977,
+          "q10": 0.015971901575942634,
+          "q50": 0.02722120768921285,
+          "q90": 0.015576320465758003,
+          "q95": 0.010327538714876395
+        },
+        "coverage": {
+          "interval80": 0.8960573476702509,
+          "interval90": 0.9283154121863799,
+          "interval95": 0.946236559139785
+        }
+      }
+    },
+    "14": {
+      "deleveraging-bear": {
+        "samples": 483,
+        "medianAbsLogError": 0.05888364842927732,
+        "approximateMultiplicativeError": 0.060651825054658826,
+        "meanAbsLogError": 0.07577980611883163,
+        "biasLogError": 0.010630536191565225,
+        "nll": -0.918979589171476,
+        "pinballLoss": {
+          "q05": 0.010022341554348507,
+          "q10": 0.017014223548454055,
+          "q50": 0.038437735000305055,
+          "q90": 0.018902440229319542,
+          "q95": 0.011037263745842171
+        },
+        "coverage": {
+          "interval80": 0.7867494824016563,
+          "interval90": 0.8881987577639752,
+          "interval95": 0.9420289855072463
+        }
+      },
+      "trend-expansion": {
+        "samples": 640,
+        "medianAbsLogError": 0.048233799332754054,
+        "approximateMultiplicativeError": 0.04941597940081577,
+        "meanAbsLogError": 0.06607587655854132,
+        "biasLogError": 0.008041875562264834,
+        "nll": -0.9748945664011035,
+        "pinballLoss": {
+          "q05": 0.009531891776282326,
+          "q10": 0.015707977881216945,
+          "q50": 0.033405832811722935,
+          "q90": 0.018584266603461217,
+          "q95": 0.011891158781745135
+        },
+        "coverage": {
+          "interval80": 0.865625,
+          "interval90": 0.90625,
+          "interval95": 0.9421875
+        }
+      },
+      "sideways-chop": {
+        "samples": 209,
+        "medianAbsLogError": 0.05724222536839711,
+        "approximateMultiplicativeError": 0.05891227474901117,
+        "meanAbsLogError": 0.06783915184699582,
+        "biasLogError": 0.007464151491421938,
+        "nll": -1.0408511427028142,
+        "pinballLoss": {
+          "q05": 0.0099380108615674,
+          "q10": 0.01613440274317661,
+          "q50": 0.034462077845200174,
+          "q90": 0.014739404756001698,
+          "q95": 0.009089948443104177
+        },
+        "coverage": {
+          "interval80": 0.84688995215311,
+          "interval90": 0.9138755980861244,
+          "interval95": 0.9330143540669856
+        }
+      },
+      "accumulation-value": {
+        "samples": 277,
+        "medianAbsLogError": 0.05264647770723201,
+        "approximateMultiplicativeError": 0.05405694661614713,
+        "meanAbsLogError": 0.07862938275864512,
+        "biasLogError": -0.02402130961524567,
+        "nll": -0.7197833124475753,
+        "pinballLoss": {
+          "q05": 0.014698623262904206,
+          "q10": 0.023060360683682918,
+          "q50": 0.03904806044486628,
+          "q90": 0.023207650768287638,
+          "q95": 0.015347840380580804
+        },
+        "coverage": {
+          "interval80": 0.8628158844765343,
+          "interval90": 0.8772563176895307,
+          "interval95": 0.8916967509025271
+        }
+      }
+    },
+    "30": {
+      "deleveraging-bear": {
+        "samples": 473,
+        "medianAbsLogError": 0.07480427754960459,
+        "approximateMultiplicativeError": 0.07767320540143485,
+        "meanAbsLogError": 0.09550163184807646,
+        "biasLogError": 0.0029295868010292903,
+        "nll": -0.6712108200258906,
+        "pinballLoss": {
+          "q05": 0.010237326671265439,
+          "q10": 0.018385915908405295,
+          "q50": 0.04803471637385573,
+          "q90": 0.02583491770087194,
+          "q95": 0.016356003493236387
+        },
+        "coverage": {
+          "interval80": 0.8202959830866807,
+          "interval90": 0.9386892177589852,
+          "interval95": 0.9640591966173362
+        }
+      },
+      "trend-expansion": {
+        "samples": 634,
+        "medianAbsLogError": 0.0846370795749919,
+        "approximateMultiplicativeError": 0.08832202072730078,
+        "meanAbsLogError": 0.09773562575194952,
+        "biasLogError": 0.015763247333354647,
+        "nll": -0.6407808681849244,
+        "pinballLoss": {
+          "q05": 0.012362581962286298,
+          "q10": 0.020750576812049826,
+          "q50": 0.04979920281652755,
+          "q90": 0.025234913302117756,
+          "q95": 0.015395975732057648
+        },
+        "coverage": {
+          "interval80": 0.8296529968454258,
+          "interval90": 0.9148264984227129,
+          "interval95": 0.9542586750788643
+        }
+      },
+      "sideways-chop": {
+        "samples": 209,
+        "medianAbsLogError": 0.1019658959635743,
+        "approximateMultiplicativeError": 0.10734570612565975,
+        "meanAbsLogError": 0.11515415267005663,
+        "biasLogError": 0.01789351856223997,
+        "nll": -0.5300345424406033,
+        "pinballLoss": {
+          "q05": 0.01339912451242743,
+          "q10": 0.0238360096052852,
+          "q50": 0.05875413789948874,
+          "q90": 0.02687843281927243,
+          "q95": 0.015831204216861728
+        },
+        "coverage": {
+          "interval80": 0.7129186602870813,
+          "interval90": 0.8325358851674641,
+          "interval95": 0.9043062200956937
+        }
+      },
+      "accumulation-value": {
+        "samples": 277,
+        "medianAbsLogError": 0.08217456865567367,
+        "approximateMultiplicativeError": 0.08564531293123379,
+        "meanAbsLogError": 0.12406950211426547,
+        "biasLogError": -0.028811223826618767,
+        "nll": -0.3754639015832404,
+        "pinballLoss": {
+          "q05": 0.015766740938592694,
+          "q10": 0.029326075004752504,
+          "q50": 0.06168309808747008,
+          "q90": 0.03288371238682979,
+          "q95": 0.019585136878728836
+        },
+        "coverage": {
+          "interval80": 0.7509025270758123,
+          "interval90": 0.8375451263537906,
+          "interval95": 0.924187725631769
+        }
+      }
+    },
+    "60": {
+      "deleveraging-bear": {
+        "samples": 469,
+        "medianAbsLogError": 0.13684125611315892,
+        "approximateMultiplicativeError": 0.1466461110116164,
+        "meanAbsLogError": 0.15316885116517087,
+        "biasLogError": 0.008841140841756303,
+        "nll": -0.2688072221850701,
+        "pinballLoss": {
+          "q05": 0.017849362914436798,
+          "q10": 0.030847138120231668,
+          "q50": 0.07983341717293559,
+          "q90": 0.037916115268991114,
+          "q95": 0.02277633219489856
+        },
+        "coverage": {
+          "interval80": 0.7739872068230277,
+          "interval90": 0.8742004264392325,
+          "interval95": 0.9402985074626866
+        }
+      },
+      "trend-expansion": {
+        "samples": 608,
+        "medianAbsLogError": 0.12498277770260018,
+        "approximateMultiplicativeError": 0.13312893781521873,
+        "meanAbsLogError": 0.13353491138639814,
+        "biasLogError": 0.027809321000148726,
+        "nll": -0.405640248331975,
+        "pinballLoss": {
+          "q05": 0.011941515796934194,
+          "q10": 0.02155495859423353,
+          "q50": 0.06849251766461394,
+          "q90": 0.03406401921252374,
+          "q95": 0.02063740591514531
+        },
+        "coverage": {
+          "interval80": 0.8174342105263158,
+          "interval90": 0.9523026315789473,
+          "interval95": 0.9950657894736842
+        }
+      },
+      "sideways-chop": {
+        "samples": 209,
+        "medianAbsLogError": 0.16477339265517746,
+        "approximateMultiplicativeError": 0.17912588984741262,
+        "meanAbsLogError": 0.15404979409243208,
+        "biasLogError": 0.04564623664950593,
+        "nll": -0.3326887743080282,
+        "pinballLoss": {
+          "q05": 0.010170030992288102,
+          "q10": 0.021391640423431342,
+          "q50": 0.07976406306337755,
+          "q90": 0.03397917614151561,
+          "q95": 0.019745196821768476
+        },
+        "coverage": {
+          "interval80": 0.7177033492822966,
+          "interval90": 0.9282296650717703,
+          "interval95": 0.9904306220095693
+        }
+      },
+      "accumulation-value": {
+        "samples": 277,
+        "medianAbsLogError": 0.14152414027133722,
+        "approximateMultiplicativeError": 0.15202831420123042,
+        "meanAbsLogError": 0.15872433086692217,
+        "biasLogError": -0.06270743751603222,
+        "nll": -0.2287212358539278,
+        "pinballLoss": {
+          "q05": 0.01674545552052374,
+          "q10": 0.028090392122634936,
+          "q50": 0.0755768567051799,
+          "q90": 0.03288653217574718,
+          "q95": 0.018813091364053604
+        },
+        "coverage": {
+          "interval80": 0.8158844765342961,
+          "interval90": 0.9747292418772563,
+          "interval95": 1
+        }
+      }
+    },
+    "90": {
+      "deleveraging-bear": {
+        "samples": 463,
+        "medianAbsLogError": 0.16049202782332592,
+        "approximateMultiplicativeError": 0.17408841306304623,
+        "meanAbsLogError": 0.16704872238499632,
+        "biasLogError": 0.022345432892564316,
+        "nll": -0.2202912332082964,
+        "pinballLoss": {
+          "q05": 0.01491165074476679,
+          "q10": 0.029251537417689925,
+          "q50": 0.08739836829868859,
+          "q90": 0.03757782292654802,
+          "q95": 0.021929669447825827
+        },
+        "coverage": {
+          "interval80": 0.7321814254859611,
+          "interval90": 0.8876889848812095,
+          "interval95": 0.9740820734341252
+        }
+      },
+      "trend-expansion": {
+        "samples": 596,
+        "medianAbsLogError": 0.14526970552375845,
+        "approximateMultiplicativeError": 0.15635140257536384,
+        "meanAbsLogError": 0.1571150886372893,
+        "biasLogError": 0.04217475696667151,
+        "nll": -0.27859505350300756,
+        "pinballLoss": {
+          "q05": 0.017004730834674887,
+          "q10": 0.031608314352761256,
+          "q50": 0.08371642405747443,
+          "q90": 0.0368444869025526,
+          "q95": 0.022522013333726592
+        },
+        "coverage": {
+          "interval80": 0.7885906040268457,
+          "interval90": 0.9110738255033557,
+          "interval95": 0.9580536912751678
+        }
+      },
+      "sideways-chop": {
+        "samples": 209,
+        "medianAbsLogError": 0.16144905122800152,
+        "approximateMultiplicativeError": 0.17521258099521542,
+        "meanAbsLogError": 0.1632682126176015,
+        "biasLogError": 0.0460466292912093,
+        "nll": -0.3100074858585343,
+        "pinballLoss": {
+          "q05": 0.010984163461671213,
+          "q10": 0.022291720152577958,
+          "q50": 0.08475961872772557,
+          "q90": 0.03295744034101122,
+          "q95": 0.0194721901579756
+        },
+        "coverage": {
+          "interval80": 0.7416267942583732,
+          "interval90": 0.9425837320574163,
+          "interval95": 0.9904306220095693
+        }
+      },
+      "accumulation-value": {
+        "samples": 265,
+        "medianAbsLogError": 0.1550108643291913,
+        "approximateMultiplicativeError": 0.16767064699450906,
+        "meanAbsLogError": 0.18500974636471118,
+        "biasLogError": -0.08112721043096473,
+        "nll": -0.04390614661842751,
+        "pinballLoss": {
+          "q05": 0.017406082884541,
+          "q10": 0.02940344340059302,
+          "q50": 0.0854935227558473,
+          "q90": 0.047581994399634814,
+          "q95": 0.02887326847619729
+        },
+        "coverage": {
+          "interval80": 0.7849056603773585,
+          "interval90": 0.8716981132075472,
+          "interval95": 0.9018867924528302
+        }
+      }
+    },
+    "180": {
+      "deleveraging-bear": {
+        "samples": 455,
+        "medianAbsLogError": 0.13878164598902862,
+        "approximateMultiplicativeError": 0.1488732115395135,
+        "meanAbsLogError": 0.1633287350564009,
+        "biasLogError": 0.02149423949603406,
+        "nll": -0.16592737203265537,
+        "pinballLoss": {
+          "q05": 0.013898332817493055,
+          "q10": 0.023467071529792407,
+          "q50": 0.08464746802047148,
+          "q90": 0.0523061296552067,
+          "q95": 0.033064441364631235
+        },
+        "coverage": {
+          "interval80": 0.8549450549450549,
+          "interval90": 0.8945054945054945,
+          "interval95": 0.9318681318681319
+        }
+      },
+      "trend-expansion": {
+        "samples": 571,
+        "medianAbsLogError": 0.12484490087284683,
+        "approximateMultiplicativeError": 0.13297271635947805,
+        "meanAbsLogError": 0.1603408697367269,
+        "biasLogError": 0.056780700242659056,
+        "nll": -0.1814507569620362,
+        "pinballLoss": {
+          "q05": 0.018022013749981438,
+          "q10": 0.03377174352601693,
+          "q50": 0.08685225668987936,
+          "q90": 0.04367977494457789,
+          "q95": 0.027210773013816796
+        },
+        "coverage": {
+          "interval80": 0.8021015761821366,
+          "interval90": 0.9124343257443083,
+          "interval95": 0.9527145359019265
+        }
+      },
+      "sideways-chop": {
+        "samples": 184,
+        "medianAbsLogError": 0.11554855843141705,
+        "approximateMultiplicativeError": 0.12248901953100155,
+        "meanAbsLogError": 0.14529990331444614,
+        "biasLogError": 0.08037081436107518,
+        "nll": -0.16766432442106574,
+        "pinballLoss": {
+          "q05": 0.021468272974839483,
+          "q10": 0.03934373091700055,
+          "q50": 0.07935402453465168,
+          "q90": 0.040329570677065635,
+          "q95": 0.025241975333734065
+        },
+        "coverage": {
+          "interval80": 0.7554347826086957,
+          "interval90": 0.8043478260869565,
+          "interval95": 0.8913043478260869
+        }
+      },
+      "accumulation-value": {
+        "samples": 233,
+        "medianAbsLogError": 0.2759253567611819,
+        "approximateMultiplicativeError": 0.31774949926564067,
+        "meanAbsLogError": 0.2441409415225729,
+        "biasLogError": -0.12099363418353325,
+        "nll": 0.13712514946116375,
+        "pinballLoss": {
+          "q05": 0.02063073178699446,
+          "q10": 0.03524300490448333,
+          "q50": 0.11202132840831874,
+          "q90": 0.0445155045021307,
+          "q95": 0.022507394551312728
+        },
+        "coverage": {
+          "interval80": 0.721030042918455,
+          "interval90": 0.9613733905579399,
+          "interval95": 1
+        }
+      }
+    },
+    "365": {
+      "deleveraging-bear": {
+        "samples": 430,
+        "medianAbsLogError": 0.11791084546342409,
+        "approximateMultiplicativeError": 0.12514379522194474,
+        "meanAbsLogError": 0.13428706285397518,
+        "biasLogError": 0.01015176684899693,
+        "nll": -0.39660472626540516,
+        "pinballLoss": {
+          "q05": 0.01432904590655788,
+          "q10": 0.027722684912890257,
+          "q50": 0.06887552716135599,
+          "q90": 0.026237309631304523,
+          "q95": 0.016769334431714404
+        },
+        "coverage": {
+          "interval80": 0.7697674418604651,
+          "interval90": 0.9,
+          "interval95": 0.9627906976744186
+        }
+      },
+      "trend-expansion": {
+        "samples": 491,
+        "medianAbsLogError": 0.12233657029196114,
+        "approximateMultiplicativeError": 0.1301344074444033,
+        "meanAbsLogError": 0.13459394287286752,
+        "biasLogError": 0.006112237274870683,
+        "nll": -0.41146911473231984,
+        "pinballLoss": {
+          "q05": 0.013420465034295068,
+          "q10": 0.024961947358263566,
+          "q50": 0.0680446940749471,
+          "q90": 0.02901952883193053,
+          "q95": 0.017576491859747672
+        },
+        "coverage": {
+          "interval80": 0.7922606924643585,
+          "interval90": 0.9409368635437881,
+          "interval95": 0.9714867617107943
+        }
+      },
+      "sideways-chop": {
+        "samples": 104,
+        "medianAbsLogError": 0.11446497189146425,
+        "approximateMultiplicativeError": 0.12127336429096847,
+        "meanAbsLogError": 0.11603356540967195,
+        "biasLogError": 0.012486059747480212,
+        "nll": -0.4933975312211954,
+        "pinballLoss": {
+          "q05": 0.015577462263311954,
+          "q10": 0.02888045487703372,
+          "q50": 0.06017923185245155,
+          "q90": 0.02577646067483613,
+          "q95": 0.01658715872632501
+        },
+        "coverage": {
+          "interval80": 0.8557692307692307,
+          "interval90": 0.8846153846153846,
+          "interval95": 0.9615384615384616
+        }
+      },
+      "accumulation-value": {
+        "samples": 233,
+        "medianAbsLogError": 0.16432416833599015,
+        "approximateMultiplicativeError": 0.17859631677976595,
+        "meanAbsLogError": 0.16349025953289312,
+        "biasLogError": -0.15255581434911822,
+        "nll": -0.21030549257668427,
+        "pinballLoss": {
+          "q05": 0.0188505232554637,
+          "q10": 0.03302899664529802,
+          "q50": 0.07326862240309107,
+          "q90": 0.022337832462138815,
+          "q95": 0.014072929282185717
+        },
+        "coverage": {
+          "interval80": 0.8197424892703863,
+          "interval90": 0.9399141630901288,
+          "interval95": 0.9656652360515021
+        }
+      }
+    }
+  },
+  "ablation": {
+    "modes": [
+      {
+        "id": "baseline-only",
+        "enabled": true,
+        "status": "baseline",
+        "reason": "Calibrated power-law remains the default forecast baseline.",
+        "metrics": {
+          "7": {
+            "samples": 1616,
+            "medianAbsLogError": 0.035889655088447624,
+            "approximateMultiplicativeError": 0.036541463104160954,
+            "meanAbsLogError": 0.05002728730772695,
+            "biasLogError": 0.0019507388920533652,
+            "nll": -1.2506607184165721,
+            "pinballLoss": {
+              "q05": 0.008139866497979178,
+              "q10": 0.012761152306750321,
+              "q50": 0.025193007136055712,
+              "q90": 0.013187589763767086,
+              "q95": 0.008274960223263324
+            },
+            "coverage": {
+              "interval80": 0.8514851485148515,
+              "interval90": 0.9096534653465347,
+              "interval95": 0.9399752475247525
+            }
+          },
+          "14": {
+            "samples": 1609,
+            "medianAbsLogError": 0.05295976255101852,
+            "approximateMultiplicativeError": 0.05438721841388272,
+            "meanAbsLogError": 0.07137907340772458,
+            "biasLogError": 0.0032240237654814334,
+            "nll": -0.922757943094714,
+            "pinballLoss": {
+              "q05": 0.010621357751064656,
+              "q10": 0.017421246675317734,
+              "q50": 0.03602488876166867,
+              "q90": 0.018976298392664126,
+              "q95": 0.01186606029806607
+            },
+            "coverage": {
+              "interval80": 0.839030453697949,
+              "interval90": 0.8968303293971411,
+              "interval95": 0.9322560596643878
+            }
+          },
+          "30": {
+            "samples": 1593,
+            "medianAbsLogError": 0.08298569588394204,
+            "approximateMultiplicativeError": 0.08652626663926366,
+            "meanAbsLogError": 0.10393667833306314,
+            "biasLogError": 0.004481249055724076,
+            "nll": -0.5891516060327263,
+            "pinballLoss": {
+              "q05": 0.01245947064826464,
+              "q10": 0.021944414756645575,
+              "q50": 0.05251660290127724,
+              "q90": 0.02695871431037965,
+              "q95": 0.016466568024580873
+            },
+            "coverage": {
+              "interval80": 0.7978656622724419,
+              "interval90": 0.8976773383553045,
+              "interval95": 0.9453860640301318
+            }
+          },
+          "60": {
+            "samples": 1563,
+            "medianAbsLogError": 0.139283603438968,
+            "approximateMultiplicativeError": 0.14945004176708498,
+            "meanAbsLogError": 0.14663369413618096,
+            "biasLogError": 0.008461078368957068,
+            "nll": -0.32347254916990054,
+            "pinballLoss": {
+              "q05": 0.014328739902738427,
+              "q10": 0.025479599533045228,
+              "q50": 0.07465822257311114,
+              "q90": 0.03499987138108138,
+              "q95": 0.020836605911329662
+            },
+            "coverage": {
+              "interval80": 0.7907869481765835,
+              "interval90": 0.9296225207933462,
+              "interval95": 0.9788867562380038
+            }
+          },
+          "90": {
+            "samples": 1533,
+            "medianAbsLogError": 0.15546004332117405,
+            "approximateMultiplicativeError": 0.16819525793197942,
+            "meanAbsLogError": 0.16577611905792894,
+            "biasLogError": 0.015399298981768146,
+            "nll": -0.2246994039540447,
+            "pinballLoss": {
+              "q05": 0.015621145466527013,
+              "q10": 0.02924520495217353,
+              "q50": 0.08527787156225813,
+              "q90": 0.03839215900592801,
+              "q95": 0.02302521904139175
+            },
+            "coverage": {
+              "interval80": 0.7645140247879973,
+              "interval90": 0.9015003261578604,
+              "interval95": 0.9575994781474233
+            }
+          },
+          "180": {
+            "samples": 1443,
+            "medianAbsLogError": 0.138216971997637,
+            "approximateMultiplicativeError": 0.1482246558460496,
+            "meanAbsLogError": 0.17289621112609221,
+            "biasLogError": 0.01995729167493309,
+            "nll": -0.12335787412973402,
+            "pinballLoss": {
+              "q05": 0.017582421356160016,
+              "q10": 0.031470581934084495,
+              "q50": 0.08926496642602193,
+              "q90": 0.04610754957730385,
+              "q95": 0.028046028138364248
+            },
+            "coverage": {
+              "interval80": 0.7997227997227997,
+              "interval90": 0.9009009009009009,
+              "interval95": 0.9459459459459459
+            }
+          },
+          "365": {
+            "samples": 1258,
+            "medianAbsLogError": 0.12731010733599069,
+            "approximateMultiplicativeError": 0.1357691735283273,
+            "meanAbsLogError": 0.1383066647468657,
+            "biasLogError": -0.021367715645927158,
+            "nll": -0.37590293374011513,
+            "pinballLoss": {
+              "q05": 0.014915076363725181,
+              "q10": 0.0277236837766424,
+              "q50": 0.06864598617071338,
+              "q90": 0.026562876527663058,
+              "q95": 0.016569895341065486
+            },
+            "coverage": {
+              "interval80": 0.794912559618442,
+              "interval90": 0.9220985691573926,
+              "interval95": 0.9666136724960255
+            }
+          }
+        }
+      },
+      {
+        "id": "plus-mvrv",
+        "enabled": false,
+        "status": "context-only",
+        "reason": "mvrv signals are loaded for context but not enabled until ablation beats baseline."
+      },
+      {
+        "id": "plus-onchain",
+        "enabled": false,
+        "status": "context-only",
+        "reason": "onchain signals are loaded for context but not enabled until ablation beats baseline."
+      },
+      {
+        "id": "plus-volatility",
+        "enabled": false,
+        "status": "context-only",
+        "reason": "volatility signals are loaded for context but not enabled until ablation beats baseline."
+      },
+      {
+        "id": "plus-macro",
+        "enabled": false,
+        "status": "context-only",
+        "reason": "macro signals are loaded for context but not enabled until ablation beats baseline."
+      },
+      {
+        "id": "plus-derivatives",
+        "enabled": false,
+        "status": "context-only",
+        "reason": "derivatives signals are loaded for context but not enabled until ablation beats baseline."
+      },
+      {
+        "id": "plus-etf-flow",
+        "enabled": false,
+        "status": "context-only",
+        "reason": "etf-flow signals are loaded for context but not enabled until ablation beats baseline."
+      },
+      {
+        "id": "full-regime-ensemble",
+        "enabled": false,
+        "status": "disabled",
+        "reason": "Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample."
+      }
+    ],
+    "enablementGate": {
+      "defaultEnsembleEnabled": false,
+      "reason": "Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample."
+    }
+  }
+}

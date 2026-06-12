@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import btcHistory from '../src/data/btc-history.json';
 import mvrvHistory from '../src/data/mvrv-history.json';
 import onchainHistory from '../src/data/onchain-history.json';
+import derivativesHistory from '../src/data/derivatives-history.json';
 import type { OHLCVData, MVRVPoint } from '../src/lib/api';
 import { basePowerLawPrice, daysSinceGenesis } from '../src/lib/powerLaw';
 
@@ -20,9 +21,11 @@ function main(): void {
   const btcRows = btcHistory as OHLCVData[];
   const mvrvRows = mvrvHistory as MVRVPoint[];
   const onchainRows = onchainHistory as any[];
+  const derivativesRows = (derivativesHistory as any).rows ?? [];
   const btcByDate = new Map(btcRows.map(row => [row.date, row]));
   const mvrvByDate = new Map(mvrvRows.map(row => [row.date, row]));
   const onchainByDate = new Map(onchainRows.map(row => [row.date, row]));
+  const derivativesByDate = new Map(derivativesRows.map((row: any) => [row.date, row]));
   const rows: FeatureRow[] = [];
   const runningMvrvValues: number[] = [];
 
@@ -36,6 +39,7 @@ function main(): void {
     if (mvrv?.mvrv) runningMvrvValues.push(mvrv.mvrv);
 
     const onchain = onchainByDate.get(sourceDate);
+    const derivatives = derivativesByDate.get(sourceDate) as any;
     const features: Record<string, number> = {};
     const sourceDates: Record<string, string> = {};
     const missingFeatureReasons: Record<string, string> = {};
@@ -78,6 +82,17 @@ function main(): void {
 
     setFeature('volatilityRegime30d', realizedVolatility(btcRows, index - 1, 30), sourceDate, 'insufficient volatility lookback');
     setFeature('drawdownFromCycleHigh', drawdownFromHigh(btcRows, index - 1), sourceDate, 'missing BTC history');
+    if (isDerivativeRowAvailable(derivatives, rowDate)) {
+      setFeature('futuresFundingRateDailyAvg', derivatives.metrics.fundingRateDailyAvg, sourceDate, 'missing derivatives funding');
+      setFeature('futuresFundingRateDailySum', derivatives.metrics.fundingRateDailySum, sourceDate, 'missing derivatives funding');
+      setFeature('futuresOpenInterestUSD', derivatives.metrics.openInterestUSD, sourceDate, 'missing derivatives open interest');
+      setFeature(
+        'futuresOpenInterestToMarketCap',
+        derivatives.metrics.openInterestUSD && mvrv?.marketCap ? derivatives.metrics.openInterestUSD / mvrv.marketCap : null,
+        sourceDate,
+        'missing derivatives open interest or market cap'
+      );
+    }
 
     rows.push({ date: rowDate, features, sourceDates, missingFeatureReasons });
   }
@@ -129,6 +144,12 @@ function addUtcDays(date: string, days: number): string {
   const next = new Date(`${date}T00:00:00Z`);
   next.setUTCDate(next.getUTCDate() + days);
   return next.toISOString().split('T')[0];
+}
+
+function isDerivativeRowAvailable(row: any, forecastDate: string): boolean {
+  if (!row?.metrics) return false;
+  if (!row.availableAfter) return true;
+  return Date.parse(row.availableAfter) <= Date.parse(`${forecastDate}T00:00:00Z`);
 }
 
 main();

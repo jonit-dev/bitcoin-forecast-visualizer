@@ -1,15 +1,974 @@
 {
   "metadata": {
-    "source": "not configured",
-    "status": "unavailable",
-    "fetchedAt": "2026-06-05T06:13:24.789Z",
+    "source": "Binance USD-M Futures public REST",
+    "status": "available",
+    "fetchedAt": "2026-06-12T23:10:31.030Z",
+    "symbol": "BTCUSDT",
     "fields": [
-      "openInterestUSD",
-      "fundingRate"
+      "fundingRateDailyAvg",
+      "fundingRateDailySum",
+      "fundingObservationCount",
+      "openInterestBTC",
+      "openInterestUSD"
     ],
     "cadence": "daily",
     "credentialRequired": false,
-    "note": "No stable free historical derivatives source is enabled for baseline v2. This cache is optional and must stay context-only until a source is selected and validated."
+    "limitations": [
+      "Binance openInterestHist only exposes recent open-interest history, currently documented as latest 1 month.",
+      "Funding is sampled every 8 hours for BTCUSDT perpetual futures and is aggregated by UTC date.",
+      "Rows include raw Binance event timestamps and a conservative next-UTC-day availableAfter timestamp for point-in-time checks.",
+      "This cache is context-only until enough history exists for walk-forward forecast validation."
+    ],
+    "docs": {
+      "fundingRate": "https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Get-Funding-Rate-History",
+      "openInterest": "https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Open-Interest-Statistics"
+    }
   },
-  "rows": []
+  "rows": [
+    {
+      "date": "2026-05-08",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-08",
+      "availableAfter": "2026-05-09T00:00:00.000Z",
+      "daysLag": 34,
+      "metrics": {
+        "fundingRateDailyAvg": -0.000021776666666666668,
+        "fundingRateDailySum": -0.00006533,
+        "fundingObservationCount": 3
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-08T00:00:00.003Z",
+          "2026-05-08T08:00:00.002Z",
+          "2026-05-08T16:00:00.003Z"
+        ],
+        "openInterestTimestamp": null,
+        "conservativeAvailableAfter": "2026-05-09T00:00:00.000Z"
+      },
+      "missingMetrics": [
+        "openInterestBTC",
+        "openInterestUSD"
+      ]
+    },
+    {
+      "date": "2026-05-09",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-09",
+      "availableAfter": "2026-05-10T00:00:00.000Z",
+      "daysLag": 33,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000005646666666666665,
+        "fundingRateDailySum": 0.000016939999999999997,
+        "fundingObservationCount": 3
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-09T00:00:00.000Z",
+          "2026-05-09T08:00:00.001Z",
+          "2026-05-09T16:00:00.002Z"
+        ],
+        "openInterestTimestamp": null,
+        "conservativeAvailableAfter": "2026-05-10T00:00:00.000Z"
+      },
+      "missingMetrics": [
+        "openInterestBTC",
+        "openInterestUSD"
+      ]
+    },
+    {
+      "date": "2026-05-10",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-10",
+      "availableAfter": "2026-05-11T00:00:00.000Z",
+      "daysLag": 32,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00003493333333333333,
+        "fundingRateDailySum": 0.0001048,
+        "fundingObservationCount": 3
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-10T00:00:00.003Z",
+          "2026-05-10T08:00:00.000Z",
+          "2026-05-10T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": null,
+        "conservativeAvailableAfter": "2026-05-11T00:00:00.000Z"
+      },
+      "missingMetrics": [
+        "openInterestBTC",
+        "openInterestUSD"
+      ]
+    },
+    {
+      "date": "2026-05-11",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-11",
+      "availableAfter": "2026-05-12T00:00:00.000Z",
+      "daysLag": 31,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00004315,
+        "fundingRateDailySum": 0.00012945,
+        "fundingObservationCount": 3
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-11T00:00:00.000Z",
+          "2026-05-11T08:00:00.000Z",
+          "2026-05-11T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": null,
+        "conservativeAvailableAfter": "2026-05-12T00:00:00.000Z"
+      },
+      "missingMetrics": [
+        "openInterestBTC",
+        "openInterestUSD"
+      ]
+    },
+    {
+      "date": "2026-05-12",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-12",
+      "availableAfter": "2026-05-13T00:00:00.000Z",
+      "daysLag": 30,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00003194666666666667,
+        "fundingRateDailySum": 0.00009584,
+        "fundingObservationCount": 3
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-12T00:00:00.002Z",
+          "2026-05-12T08:00:00.008Z",
+          "2026-05-12T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": null,
+        "conservativeAvailableAfter": "2026-05-13T00:00:00.000Z"
+      },
+      "missingMetrics": [
+        "openInterestBTC",
+        "openInterestUSD"
+      ]
+    },
+    {
+      "date": "2026-05-13",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-13",
+      "availableAfter": "2026-05-14T00:00:00.000Z",
+      "daysLag": 29,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00004184333333333333,
+        "fundingRateDailySum": 0.00012553,
+        "fundingObservationCount": 3
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-13T00:00:00.010Z",
+          "2026-05-13T08:00:00.003Z",
+          "2026-05-13T16:00:00.001Z"
+        ],
+        "openInterestTimestamp": null,
+        "conservativeAvailableAfter": "2026-05-14T00:00:00.000Z"
+      },
+      "missingMetrics": [
+        "openInterestBTC",
+        "openInterestUSD"
+      ]
+    },
+    {
+      "date": "2026-05-14",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-14",
+      "availableAfter": "2026-05-15T00:00:00.000Z",
+      "daysLag": 28,
+      "metrics": {
+        "fundingRateDailyAvg": 0.0000365,
+        "fundingRateDailySum": 0.00010949999999999999,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 104290.446,
+        "openInterestUSD": 8269001740.5372,
+        "circulatingSupply": 20028553
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-14T00:00:00.005Z",
+          "2026-05-14T08:00:00.000Z",
+          "2026-05-14T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-05-14T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-15T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-15",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-15",
+      "availableAfter": "2026-05-16T00:00:00.000Z",
+      "daysLag": 27,
+      "metrics": {
+        "fundingRateDailyAvg": -0.00001528,
+        "fundingRateDailySum": -0.00004584,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 110454.092,
+        "openInterestUSD": 8952198019.656994,
+        "circulatingSupply": 20028981
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-15T00:00:00.000Z",
+          "2026-05-15T08:00:00.016Z",
+          "2026-05-15T16:00:00.012Z"
+        ],
+        "openInterestTimestamp": "2026-05-15T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-16T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-16",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-16",
+      "availableAfter": "2026-05-17T00:00:00.000Z",
+      "daysLag": 26,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000028943333333333335,
+        "fundingRateDailySum": 0.00008683000000000001,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 101877.653,
+        "openInterestUSD": 8055883721.0873,
+        "circulatingSupply": 20029465
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-16T00:00:00.005Z",
+          "2026-05-16T08:00:00.000Z",
+          "2026-05-16T16:00:00.005Z"
+        ],
+        "openInterestTimestamp": "2026-05-16T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-17T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-17",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-17",
+      "availableAfter": "2026-05-18T00:00:00.000Z",
+      "daysLag": 25,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000017536666666666668,
+        "fundingRateDailySum": 0.000052610000000000006,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 101884.143,
+        "openInterestUSD": 7958085954.343924,
+        "circulatingSupply": 20029921
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-17T00:00:00.000Z",
+          "2026-05-17T08:00:00.010Z",
+          "2026-05-17T16:00:00.009Z"
+        ],
+        "openInterestTimestamp": "2026-05-17T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-18T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-18",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-18",
+      "availableAfter": "2026-05-19T00:00:00.000Z",
+      "daysLag": 24,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000039416666666666665,
+        "fundingRateDailySum": 0.00011825,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 100861.484,
+        "openInterestUSD": 7810057721.314,
+        "circulatingSupply": 20030353
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-18T00:00:00.007Z",
+          "2026-05-18T08:00:00.002Z",
+          "2026-05-18T16:00:00.007Z"
+        ],
+        "openInterestTimestamp": "2026-05-18T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-19T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-19",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-19",
+      "availableAfter": "2026-05-20T00:00:00.000Z",
+      "daysLag": 23,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00005178666666666667,
+        "fundingRateDailySum": 0.00015536,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 104459.024,
+        "openInterestUSD": 8039490310.0144,
+        "circulatingSupply": 20030493
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-19T00:00:00.001Z",
+          "2026-05-19T08:00:00.001Z",
+          "2026-05-19T16:00:00.009Z"
+        ],
+        "openInterestTimestamp": "2026-05-19T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-20T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-20",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-20",
+      "availableAfter": "2026-05-21T00:00:00.000Z",
+      "daysLag": 22,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00006031666666666666,
+        "fundingRateDailySum": 0.00018094999999999998,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 103836.691,
+        "openInterestUSD": 7974657868.8,
+        "circulatingSupply": 20031265
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-20T00:00:00.001Z",
+          "2026-05-20T08:00:00.006Z",
+          "2026-05-20T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-05-20T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-21T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-21",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-21",
+      "availableAfter": "2026-05-22T00:00:00.000Z",
+      "daysLag": 21,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000040193333333333334,
+        "fundingRateDailySum": 0.00012058,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 101591.306,
+        "openInterestUSD": 7874378647.925912,
+        "circulatingSupply": 20031690
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-21T00:00:00.001Z",
+          "2026-05-21T08:00:00.000Z",
+          "2026-05-21T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-05-21T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-22T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-22",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-22",
+      "availableAfter": "2026-05-23T00:00:00.000Z",
+      "daysLag": 20,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000018783333333333334,
+        "fundingRateDailySum": 0.00005635,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 100697.616,
+        "openInterestUSD": 7812745374.4992,
+        "circulatingSupply": 20032175
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-22T00:00:00.000Z",
+          "2026-05-22T08:00:00.004Z",
+          "2026-05-22T16:00:00.001Z"
+        ],
+        "openInterestTimestamp": "2026-05-22T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-23T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-23",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-23",
+      "availableAfter": "2026-05-24T00:00:00.000Z",
+      "daysLag": 19,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00003416333333333333,
+        "fundingRateDailySum": 0.00010249,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 104881.213,
+        "openInterestUSD": 7919307702.4762,
+        "circulatingSupply": 20032571
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-23T00:00:00.009Z",
+          "2026-05-23T08:00:00.001Z",
+          "2026-05-23T16:00:00.003Z"
+        ],
+        "openInterestTimestamp": "2026-05-23T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-24T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-24",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-24",
+      "availableAfter": "2026-05-25T00:00:00.000Z",
+      "daysLag": 18,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00007199666666666666,
+        "fundingRateDailySum": 0.00021599,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 102944.406,
+        "openInterestUSD": 7897513726.637323,
+        "circulatingSupply": 20033068
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-24T00:00:00.011Z",
+          "2026-05-24T08:00:00.008Z",
+          "2026-05-24T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-05-24T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-25T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-25",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-25",
+      "availableAfter": "2026-05-26T00:00:00.000Z",
+      "daysLag": 17,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00003834,
+        "fundingRateDailySum": 0.00011502,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 99129.24,
+        "openInterestUSD": 7635290930.064,
+        "circulatingSupply": 20033565
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-25T00:00:00.001Z",
+          "2026-05-25T08:00:00.001Z",
+          "2026-05-25T16:00:00.001Z"
+        ],
+        "openInterestTimestamp": "2026-05-25T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-26T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-26",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-26",
+      "availableAfter": "2026-05-27T00:00:00.000Z",
+      "daysLag": 16,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00005895333333333333,
+        "fundingRateDailySum": 0.00017685999999999998,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 99831.465,
+        "openInterestUSD": 7715266074.123639,
+        "circulatingSupply": 20033975
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-26T00:00:00.000Z",
+          "2026-05-26T08:00:00.003Z",
+          "2026-05-26T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-05-26T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-27T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-27",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-27",
+      "availableAfter": "2026-05-28T00:00:00.000Z",
+      "daysLag": 15,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00009620666666666668,
+        "fundingRateDailySum": 0.00028862,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 99129.766,
+        "openInterestUSD": 7524053401.941594,
+        "circulatingSupply": 20034500
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-27T00:00:00.000Z",
+          "2026-05-27T08:00:00.004Z",
+          "2026-05-27T16:00:00.009Z"
+        ],
+        "openInterestTimestamp": "2026-05-27T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-28T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-28",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-28",
+      "availableAfter": "2026-05-29T00:00:00.000Z",
+      "daysLag": 14,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00008337,
+        "fundingRateDailySum": 0.00025011,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 101125.283,
+        "openInterestUSD": 7525541310.294,
+        "circulatingSupply": 20034928
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-28T00:00:00.001Z",
+          "2026-05-28T08:00:00.000Z",
+          "2026-05-28T16:00:00.001Z"
+        ],
+        "openInterestTimestamp": "2026-05-28T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-29T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-29",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-29",
+      "availableAfter": "2026-05-30T00:00:00.000Z",
+      "daysLag": 13,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00007364333333333333,
+        "fundingRateDailySum": 0.00022093,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 106587.989,
+        "openInterestUSD": 7844000019.410804,
+        "circulatingSupply": 20035365
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-29T00:00:00.000Z",
+          "2026-05-29T08:00:00.001Z",
+          "2026-05-29T16:00:00.008Z"
+        ],
+        "openInterestTimestamp": "2026-05-29T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-30T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-30",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-30",
+      "availableAfter": "2026-05-31T00:00:00.000Z",
+      "daysLag": 12,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00004803333333333333,
+        "fundingRateDailySum": 0.0001441,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 104364.064,
+        "openInterestUSD": 7663275800.6112,
+        "circulatingSupply": 20035871
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-30T00:00:00.000Z",
+          "2026-05-30T08:00:00.001Z",
+          "2026-05-30T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-05-30T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-05-31T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-05-31",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-05-31",
+      "availableAfter": "2026-06-01T00:00:00.000Z",
+      "daysLag": 11,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00005361,
+        "fundingRateDailySum": 0.00016083,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 103974.85,
+        "openInterestUSD": 7678916981.96,
+        "circulatingSupply": 20036315
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-05-31T00:00:00.000Z",
+          "2026-05-31T08:00:00.000Z",
+          "2026-05-31T16:00:00.004Z"
+        ],
+        "openInterestTimestamp": "2026-05-31T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-01T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-01",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-01",
+      "availableAfter": "2026-06-02T00:00:00.000Z",
+      "daysLag": 10,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00006713666666666667,
+        "fundingRateDailySum": 0.00020141,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 105050.102,
+        "openInterestUSD": 7737315532.158862,
+        "circulatingSupply": 20036643
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-01T00:00:00.001Z",
+          "2026-06-01T08:00:00.001Z",
+          "2026-06-01T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-06-01T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-02T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-02",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-02",
+      "availableAfter": "2026-06-03T00:00:00.000Z",
+      "daysLag": 9,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00008111666666666667,
+        "fundingRateDailySum": 0.00024335,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 105358.559,
+        "openInterestUSD": 7521284130.6125,
+        "circulatingSupply": 20036643
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-02T00:00:00.000Z",
+          "2026-06-02T08:00:00.000Z",
+          "2026-06-02T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-06-02T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-03T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-03",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-03",
+      "availableAfter": "2026-06-04T00:00:00.000Z",
+      "daysLag": 8,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00007464666666666667,
+        "fundingRateDailySum": 0.00022394,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 107552.946,
+        "openInterestUSD": 7177092405.751463,
+        "circulatingSupply": 20037628
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-03T00:00:00.013Z",
+          "2026-06-03T08:00:00.000Z",
+          "2026-06-03T16:00:00.001Z"
+        ],
+        "openInterestTimestamp": "2026-06-03T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-04T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-04",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-04",
+      "availableAfter": "2026-06-05T00:00:00.000Z",
+      "daysLag": 7,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000010490000000000001,
+        "fundingRateDailySum": 0.00003147,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 104752.196,
+        "openInterestUSD": 6716459402.2496,
+        "circulatingSupply": 20037981
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-04T00:00:00.009Z",
+          "2026-06-04T08:00:00.000Z",
+          "2026-06-04T16:00:00.003Z"
+        ],
+        "openInterestTimestamp": "2026-06-04T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-05T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-05",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-05",
+      "availableAfter": "2026-06-06T00:00:00.000Z",
+      "daysLag": 6,
+      "metrics": {
+        "fundingRateDailyAvg": -0.0000032633333333333336,
+        "fundingRateDailySum": -0.000009790000000000001,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 98688.417,
+        "openInterestUSD": 6301849095.461699,
+        "circulatingSupply": 20038312
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-05T00:00:00.000Z",
+          "2026-06-05T08:00:00.004Z",
+          "2026-06-05T16:00:00.009Z"
+        ],
+        "openInterestTimestamp": "2026-06-05T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-06T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-06",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-06",
+      "availableAfter": "2026-06-07T00:00:00.000Z",
+      "daysLag": 5,
+      "metrics": {
+        "fundingRateDailyAvg": 0.0000030999999999999995,
+        "fundingRateDailySum": 0.000009299999999999999,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 101597.505,
+        "openInterestUSD": 6201023262.678916,
+        "circulatingSupply": 20038762
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-06T00:00:00.000Z",
+          "2026-06-06T08:00:00.000Z",
+          "2026-06-06T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-06-06T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-07T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-07",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-07",
+      "availableAfter": "2026-06-08T00:00:00.000Z",
+      "daysLag": 4,
+      "metrics": {
+        "fundingRateDailyAvg": 0.0000010699999999999993,
+        "fundingRateDailySum": 0.000003209999999999998,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 101776.77,
+        "openInterestUSD": 6193343236.743557,
+        "circulatingSupply": 20039087
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-07T00:00:00.001Z",
+          "2026-06-07T08:00:00.000Z",
+          "2026-06-07T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-06-07T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-08T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-08",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-08",
+      "availableAfter": "2026-06-09T00:00:00.000Z",
+      "daysLag": 3,
+      "metrics": {
+        "fundingRateDailyAvg": 0.00002369666666666667,
+        "fundingRateDailySum": 0.00007109000000000001,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 98914.161,
+        "openInterestUSD": 6261698694.923523,
+        "circulatingSupply": 20039087
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-08T00:00:00.000Z",
+          "2026-06-08T08:00:00.005Z",
+          "2026-06-08T16:00:00.004Z"
+        ],
+        "openInterestTimestamp": "2026-06-08T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-09T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-09",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-09",
+      "availableAfter": "2026-06-10T00:00:00.000Z",
+      "daysLag": 2,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000006939999999999999,
+        "fundingRateDailySum": 0.000020819999999999997,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 98493.635,
+        "openInterestUSD": 6211028321.827,
+        "circulatingSupply": 20039087
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-09T00:00:00.000Z",
+          "2026-06-09T08:00:00.000Z",
+          "2026-06-09T16:00:00.001Z"
+        ],
+        "openInterestTimestamp": "2026-06-09T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-10T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-10",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-10",
+      "availableAfter": "2026-06-11T00:00:00.000Z",
+      "daysLag": 1,
+      "metrics": {
+        "fundingRateDailyAvg": -0.0000015933333333333339,
+        "fundingRateDailySum": -0.000004780000000000002,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 99232.019,
+        "openInterestUSD": 6122146791.613028,
+        "circulatingSupply": 20039087
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-10T00:00:00.001Z",
+          "2026-06-10T08:00:00.011Z",
+          "2026-06-10T16:00:00.009Z"
+        ],
+        "openInterestTimestamp": "2026-06-10T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-11T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-11",
+      "source": "Binance USD-M Futures public REST",
+      "symbol": "BTCUSDT",
+      "fetchedAt": "2026-06-12T23:10:31.030Z",
+      "latestSourceDate": "2026-06-11",
+      "availableAfter": "2026-06-12T00:00:00.000Z",
+      "daysLag": 0,
+      "metrics": {
+        "fundingRateDailyAvg": 0.000014833333333333332,
+        "fundingRateDailySum": 0.0000445,
+        "fundingObservationCount": 3,
+        "openInterestBTC": 99363.017,
+        "openInterestUSD": 6109780512.248925,
+        "circulatingSupply": 20039087
+      },
+      "timing": {
+        "fundingEventTimes": [
+          "2026-06-11T00:00:00.000Z",
+          "2026-06-11T08:00:00.004Z",
+          "2026-06-11T16:00:00.000Z"
+        ],
+        "openInterestTimestamp": "2026-06-11T00:00:00.000Z",
+        "conservativeAvailableAfter": "2026-06-12T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    }
+  ]
 }

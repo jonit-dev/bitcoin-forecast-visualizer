@@ -60,11 +60,76 @@ function main(): void {
     featureDate: latestFeatureRow?.date ?? null,
     regime: classifyRegime(latestFeatureRow),
     tailRisk: computeTailRisk(latestFeatureRow),
+    derivativesContext: latestFeatureRow ? buildDerivativesContext(latestFeatureRow) : null,
   }, null, 2)}\n`);
 
   console.log(`[Runtime summaries] reliability=${RELIABILITY_OUT}`);
   console.log(`[Runtime summaries] freshness=${FRESHNESS_OUT}`);
   console.log(`[Runtime summaries] regime=${REGIME_OUT}`);
+}
+
+function buildDerivativesContext(row: any) {
+  const features = row.features || {};
+  const sourceDates = row.sourceDates || {};
+  if (!Number.isFinite(features.futuresOpenInterestToMarketCap) && !Number.isFinite(features.futuresFundingRateDailySum)) {
+    return null;
+  }
+  const openInterestToMarketCap = finiteOrNull(features.futuresOpenInterestToMarketCap);
+  const fundingRateDailySum = finiteOrNull(features.futuresFundingRateDailySum);
+  const leverageState = classifyLeverageState(openInterestToMarketCap);
+  const fundingState = classifyFundingState(fundingRateDailySum);
+  return {
+    source: 'Binance USD-M Futures public REST',
+    sourceDate: sourceDates.futuresOpenInterestToMarketCap || sourceDates.futuresFundingRateDailySum || null,
+    openInterestUSD: finiteOrNull(features.futuresOpenInterestUSD),
+    openInterestToMarketCap,
+    fundingRateDailySum,
+    fundingRateDailyAvg: finiteOrNull(features.futuresFundingRateDailyAvg),
+    leverageState,
+    fundingState,
+    insight: derivativesInsight(leverageState, fundingState),
+    status: 'context-only',
+  };
+}
+
+function finiteOrNull(value: unknown): number | null {
+  return Number.isFinite(value) ? Number(value) : null;
+}
+
+function classifyLeverageState(value: number | null): 'unknown' | 'light' | 'normal' | 'crowded' {
+  if (value === null) return 'unknown';
+  if (value >= 0.005) return 'crowded';
+  if (value <= 0.0035) return 'light';
+  return 'normal';
+}
+
+function classifyFundingState(value: number | null): 'unknown' | 'short-stress' | 'neutral' | 'long-crowded' {
+  if (value === null) return 'unknown';
+  if (value >= 0.0002) return 'long-crowded';
+  if (value <= -0.00005) return 'short-stress';
+  return 'neutral';
+}
+
+function derivativesInsight(
+  leverageState: ReturnType<typeof classifyLeverageState>,
+  fundingState: ReturnType<typeof classifyFundingState>
+): string {
+  if (leverageState === 'crowded' && fundingState === 'long-crowded') {
+    return 'Leveraged longs are crowded; treat upside breakouts as liquidation-sensitive.';
+  }
+  if (leverageState === 'crowded' && fundingState === 'short-stress') {
+    return 'High open interest with negative funding raises two-sided squeeze risk.';
+  }
+  if (leverageState === 'crowded') {
+    return 'Open interest is elevated, but funding is not chasing price right now.';
+  }
+  if (fundingState === 'long-crowded') {
+    return 'Funding is stretched positive, so long positioning may be crowded.';
+  }
+  if (fundingState === 'short-stress') {
+    return 'Funding is negative, which can support squeeze-prone rebounds.';
+  }
+  return 'Funding is neutral, so derivatives are not confirming a crowded directional trade.';
 }
 
 function loadLatestBacktest(): any {

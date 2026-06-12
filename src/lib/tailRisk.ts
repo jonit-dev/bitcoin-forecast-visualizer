@@ -4,6 +4,7 @@ export interface TailRiskFlag {
   riskFlag: 'none' | 'downside' | 'upside' | 'two-sided';
   direction: 'neutral' | 'down' | 'up' | 'both';
   drivers: string[];
+  // Context-only risk weight. Do not apply to forecast intervals without a backtested calibration gate.
   intervalMultiplierAdjustment: number;
 }
 
@@ -31,6 +32,11 @@ export function computeTailRisk(row: FeatureRow | null | undefined): TailRiskFla
     upside += 0.5;
     downside += 0.5;
     drivers.push('large-cycle-drawdown');
+  }
+  if ((f.futuresOpenInterestToMarketCap ?? 0) > 0.0035 && Math.abs(f.futuresFundingRateDailySum ?? 0) > 0.0002) {
+    downside += 0.5;
+    upside += 0.25;
+    drivers.push('futures-leverage-crowding');
   }
 
   const riskFlag = downside > 0 && upside > 0 ? 'two-sided' : downside > 0 ? 'downside' : upside > 0 ? 'upside' : 'none';

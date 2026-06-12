@@ -33,6 +33,18 @@ export interface CurrentRegimeSummary {
     drivers: string[];
     intervalMultiplierAdjustment: number;
   };
+  derivativesContext?: {
+    source: string;
+    sourceDate: string | null;
+    openInterestUSD: number | null;
+    openInterestToMarketCap: number | null;
+    fundingRateDailySum: number | null;
+    fundingRateDailyAvg: number | null;
+    leverageState: 'unknown' | 'light' | 'normal' | 'crowded';
+    fundingState: 'unknown' | 'short-stress' | 'neutral' | 'long-crowded';
+    insight: string;
+    status: 'context-only';
+  } | null;
 }
 
 export interface PowerLawStabilitySummary {

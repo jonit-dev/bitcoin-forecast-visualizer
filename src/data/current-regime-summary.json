@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T22:55:53.981Z",
+  "generatedAt": "2026-06-12T23:10:42.810Z",
   "featureDate": "2026-06-11",
   "regime": {
     "probabilities": {
@@ -24,5 +24,17 @@
       "large-cycle-drawdown"
     ],
     "intervalMultiplierAdjustment": 1.08
+  },
+  "derivativesContext": {
+    "source": "Binance USD-M Futures public REST",
+    "sourceDate": "2026-06-10",
+    "openInterestUSD": 6122146791.613028,
+    "openInterestToMarketCap": 0.004972443764615036,
+    "fundingRateDailySum": -0.000004780000000000002,
+    "fundingRateDailyAvg": -0.0000015933333333333339,
+    "leverageState": "normal",
+    "fundingState": "neutral",
+    "insight": "Funding is neutral, so derivatives are not confirming a crowded directional trade.",
+    "status": "context-only"
   }
 }

@@ -50,6 +50,15 @@ export function classifyRegime(row: FeatureRow | null | undefined): RegimeClassi
     scores['deleveraging-bear']! += 1.2;
     reasons.push('drawdown-or-negative-momentum');
   }
+  if ((f.futuresOpenInterestToMarketCap ?? 0) > 0.0035 && (f.futuresFundingRateDailySum ?? 0) > 0.00025) {
+    scores['late-cycle-overheating']! += 0.5;
+    scores['deleveraging-bear']! += 0.3;
+    reasons.push('elevated-futures-leverage');
+  }
+  if ((f.futuresFundingRateDailySum ?? 0) < -0.00015) {
+    scores['accumulation-value']! += 0.25;
+    reasons.push('negative-perp-funding');
+  }
   if (Math.abs(f.residualMomentum30d ?? 0) < 0.04 && (f.volatilityRegime30d ?? 1) < 0.65) {
     scores['sideways-chop']! += 0.9;
     reasons.push('low-momentum-low-volatility');

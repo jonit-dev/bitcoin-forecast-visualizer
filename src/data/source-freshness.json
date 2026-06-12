@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T22:55:53.981Z",
+  "generatedAt": "2026-06-12T23:10:42.809Z",
   "sources": {
     "btc": {
       "status": "fresh",
@@ -26,9 +26,9 @@
       "required": true
     },
     "derivatives": {
-      "status": "unavailable",
-      "latestDate": null,
-      "lagDays": null,
+      "status": "available",
+      "latestDate": "2026-06-11",
+      "lagDays": 1,
       "required": false
     },
     "etf": {
