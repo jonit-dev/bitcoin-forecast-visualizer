@@ -12,7 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '../src/data/btc-history.json');
 const MVRV_DATA_PATH = join(__dirname, '../src/data/mvrv-history.json');
 const MS_PER_DAY = 86400000;
-const BTC_REPAIR_LOOKBACK_DAYS = 180;
+const BTC_REPAIR_LOOKBACK_DAYS = 365;
 const BTC_HOURLY_CHUNK_DAYS = 90;
 
 function parseUtcDate(date) {
@@ -105,10 +105,17 @@ async function fetchRecentDailyCandles(fromDateInclusive, toDateInclusive) {
       candle.close = price;
     }
 
-    for (const [ts, volume] of chart.total_volumes || []) {
+    // CoinGecko market_chart total_volumes are 24h volume snapshots. Use
+    // the daily 00:00 UTC series for daily candles instead of aggregating
+    // hourly rolling-24h snapshots.
+    const dailyChart = await fetchJson(
+      `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${fromTs}&to=${toTs}&interval=daily`
+    );
+
+    for (const [ts, volume] of dailyChart.total_volumes || []) {
       const date = toUtcDateString(ts);
       if (date < fromDateInclusive || date > toDateInclusive) continue;
-      volumeByDate.set(date, Math.max(volumeByDate.get(date) || 0, Math.round(volume || 0)));
+      volumeByDate.set(date, Math.round(volume || 0));
     }
   }
 
@@ -154,7 +161,7 @@ async function updateBTCData() {
     const repairedDays = rebuiltTail.length;
     const latest = updated[updated.length - 1].date;
     console.log(
-      `[BTC data] Rebuilt ${repairedDays} day(s) from market_chart hourly data. Latest: ${latest}. Missing-days delta vs previous tail: ${daysSince}`
+      `[BTC data] Rebuilt ${repairedDays} day(s) from market_chart hourly prices and daily volume. Latest: ${latest}. Missing-days delta vs previous tail: ${daysSince}`
     );
   } catch (err) {
     console.warn('[BTC data] Update skipped (continuing with cached data):', err.message);

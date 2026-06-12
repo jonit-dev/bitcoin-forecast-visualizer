@@ -1,26 +1,26 @@
 {
-  "generatedAt": "2026-06-12T22:42:39.016Z",
-  "reportPath": "docs/reports/results/backtest-2026-06-12T22-42-22-260Z.json",
+  "generatedAt": "2026-06-12T22:55:53.980Z",
+  "reportPath": "docs/reports/results/backtest-2026-06-12T22-55-52-431Z.json",
   "qualityGateStatus": "PASS",
   "reliabilityScore": 98,
   "horizonConfidence": {
     "14d": {
-      "powerlawError": 0.053012917440583784,
-      "naiveError": 0.05478665273327779,
+      "powerlawError": 0.05295976255101852,
+      "naiveError": 0.05416838433249539,
       "status": "beats-naive"
     },
     "30d": {
       "powerlawError": 0.08298569588394204,
-      "naiveError": 0.08669731140138434,
+      "naiveError": 0.08705149379219239,
       "status": "beats-naive"
     },
     "60d": {
-      "powerlawError": 0.13965334679762115,
+      "powerlawError": 0.139283603438968,
       "naiveError": 0.14222123729788122,
       "status": "beats-naive"
     },
     "90d": {
-      "powerlawError": 0.15554570130543682,
+      "powerlawError": 0.15546004332117405,
       "naiveError": 0.18897599783635985,
       "status": "beats-naive"
     }
