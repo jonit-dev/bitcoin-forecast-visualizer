@@ -12,6 +12,7 @@
     "analyze:phase-signal": "tsx scripts/analyze-phase-signal.ts",
     "analyze:cross-market": "tsx scripts/analyze-cross-market-context.ts",
     "analyze:heatmap-model": "tsx scripts/analyze-heatmap-model.ts",
+    "research:btc-candidates": "tsx scripts/research-btc-candidates.ts",
     "backtest": "tsx scripts/backtest-forecast.ts",
     "backtest:report-only": "tsx scripts/backtest-forecast.ts --report-only",
     "refit:powerlaw": "tsx scripts/refit-power-law.ts",

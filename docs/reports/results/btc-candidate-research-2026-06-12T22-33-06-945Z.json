@@ -1,0 +1,417 @@
+{
+  "generatedAt": "2026-06-12T22:33:06.945Z",
+  "data": {
+    "btcRows": 5809,
+    "btcFirstDate": "2010-07-17",
+    "btcLastDate": "2026-06-11",
+    "featureRows": 5801,
+    "featureFirstDate": "2010-07-18",
+    "featureLastDate": "2026-06-04"
+  },
+  "preRegistration": {
+    "target": "BTC daily close endpoint price",
+    "validationPeriod": "2022-01-01 through 2024-12-31",
+    "finalHoldoutPeriod": "2025-01-01 through latest available target",
+    "horizons": [
+      7,
+      14,
+      30,
+      60,
+      90,
+      180,
+      365
+    ],
+    "primaryMetric": "median absolute log error",
+    "secondaryMetrics": [
+      "mean absolute log error",
+      "paired mean absolute log error improvement vs current",
+      "block bootstrap lower 95% mean improvement"
+    ],
+    "splitPolicy": "Candidates are selected only by 2022-2024 validation average across 14/30/60/90d horizons; 2025+ is final holdout.",
+    "leakagePolicy": "Feature adjustments use feature-table rows keyed by origin date; feature sources are one day lagged by build-feature-table.ts."
+  },
+  "baseline": {
+    "id": "powerlaw-current",
+    "tauDays": 210,
+    "validationAverageMedianAbsLogError": 0.1146075731163119,
+    "holdout": {
+      "7": {
+        "samples": 520,
+        "medianAbsLogError": 0.033798815352132895,
+        "meanAbsLogError": 0.04208017119055531,
+        "meanImprovementVsCurrent": 0,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "14": {
+        "samples": 513,
+        "medianAbsLogError": 0.048593178738928045,
+        "meanAbsLogError": 0.06027221733311024,
+        "meanImprovementVsCurrent": 0,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "30": {
+        "samples": 497,
+        "medianAbsLogError": 0.065879589948896,
+        "meanAbsLogError": 0.08681611811213184,
+        "meanImprovementVsCurrent": 0,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "60": {
+        "samples": 467,
+        "medianAbsLogError": 0.1256088998764149,
+        "meanAbsLogError": 0.12439552861858105,
+        "meanImprovementVsCurrent": 0,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "90": {
+        "samples": 437,
+        "medianAbsLogError": 0.13406412942325457,
+        "meanAbsLogError": 0.13263869671093248,
+        "meanImprovementVsCurrent": 0,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "180": {
+        "samples": 347,
+        "medianAbsLogError": 0.12204469701342784,
+        "meanAbsLogError": 0.14842634385624454,
+        "meanImprovementVsCurrent": 0,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "365": {
+        "samples": 162,
+        "medianAbsLogError": 0.13321701167254366,
+        "meanAbsLogError": 0.15436701193889676,
+        "meanImprovementVsCurrent": 0,
+        "bootstrapLower95MeanImprovement": null
+      }
+    }
+  },
+  "tauValidationGrid": [
+    {
+      "tauDays": 60,
+      "validationAverageMedianAbsLogError": 0.11289039368725692
+    },
+    {
+      "tauDays": 90,
+      "validationAverageMedianAbsLogError": 0.11152629854195992
+    },
+    {
+      "tauDays": 120,
+      "validationAverageMedianAbsLogError": 0.111918155138229
+    },
+    {
+      "tauDays": 150,
+      "validationAverageMedianAbsLogError": 0.112402050077243
+    },
+    {
+      "tauDays": 180,
+      "validationAverageMedianAbsLogError": 0.11350891943020995
+    },
+    {
+      "tauDays": 210,
+      "validationAverageMedianAbsLogError": 0.1146075731163119
+    },
+    {
+      "tauDays": 240,
+      "validationAverageMedianAbsLogError": 0.11580397480628929
+    },
+    {
+      "tauDays": 270,
+      "validationAverageMedianAbsLogError": 0.11650365915207381
+    },
+    {
+      "tauDays": 300,
+      "validationAverageMedianAbsLogError": 0.11709606543839418
+    },
+    {
+      "tauDays": 365,
+      "validationAverageMedianAbsLogError": 0.11812003559650278
+    },
+    {
+      "tauDays": 450,
+      "validationAverageMedianAbsLogError": 0.11901731815229559
+    }
+  ],
+  "candidates": [
+    {
+      "id": "tau-90",
+      "description": "Power-law residual mean-reversion tau selected on validation grid; current default is 210 days.",
+      "validationAverageMedianAbsLogError": 0.11152629854195992,
+      "holdout": {
+        "7": {
+          "samples": 520,
+          "medianAbsLogError": 0.03311175142770451,
+          "meanAbsLogError": 0.04174469790575202,
+          "meanImprovementVsCurrent": 0.00033547328480335243,
+          "bootstrapLower95MeanImprovement": -0.00033500505855947274
+        },
+        "14": {
+          "samples": 513,
+          "medianAbsLogError": 0.04898928734317073,
+          "meanAbsLogError": 0.05938660669017504,
+          "meanImprovementVsCurrent": 0.0008856106429351998,
+          "bootstrapLower95MeanImprovement": -0.0005846477511659993
+        },
+        "30": {
+          "samples": 497,
+          "medianAbsLogError": 0.06457831407546571,
+          "meanAbsLogError": 0.08256900660928265,
+          "meanImprovementVsCurrent": 0.00424711150284918,
+          "bootstrapLower95MeanImprovement": 0.0001932686099763984
+        },
+        "60": {
+          "samples": 467,
+          "medianAbsLogError": 0.10813550799556775,
+          "meanAbsLogError": 0.11418684346904168,
+          "meanImprovementVsCurrent": 0.010208685149539296,
+          "bootstrapLower95MeanImprovement": -0.001039692638156182
+        },
+        "90": {
+          "samples": 437,
+          "medianAbsLogError": 0.10892924490497992,
+          "meanAbsLogError": 0.12091027787356394,
+          "meanImprovementVsCurrent": 0.011728418837368592,
+          "bootstrapLower95MeanImprovement": -0.0010498140672571402
+        },
+        "180": {
+          "samples": 347,
+          "medianAbsLogError": 0.10992012616099031,
+          "meanAbsLogError": 0.1328760938686002,
+          "meanImprovementVsCurrent": 0.015550249987644501,
+          "bootstrapLower95MeanImprovement": 0.01708873583426271
+        },
+        "365": {
+          "samples": 162,
+          "medianAbsLogError": 0.1621819318041991,
+          "meanAbsLogError": 0.16002427626709168,
+          "meanImprovementVsCurrent": -0.005657264328194829,
+          "bootstrapLower95MeanImprovement": null
+        }
+      }
+    },
+    {
+      "id": "momentumTiny",
+      "description": "Small continuation adjustment from one-day-lagged 30d residual momentum, capped at +/-0.08 log points.",
+      "validationAverageMedianAbsLogError": 0.11554012248426526,
+      "holdout": {
+        "7": {
+          "samples": 520,
+          "medianAbsLogError": 0.03480431840242783,
+          "meanAbsLogError": 0.04192657938775466,
+          "meanImprovementVsCurrent": 0.0001535918028006541,
+          "bootstrapLower95MeanImprovement": -0.0003154358510970798
+        },
+        "14": {
+          "samples": 513,
+          "medianAbsLogError": 0.04878858166692818,
+          "meanAbsLogError": 0.060274142005466005,
+          "meanImprovementVsCurrent": -0.0000019246723557374482,
+          "bootstrapLower95MeanImprovement": -0.0012214223000855287
+        },
+        "30": {
+          "samples": 497,
+          "medianAbsLogError": 0.06879075348398168,
+          "meanAbsLogError": 0.08825102624868823,
+          "meanImprovementVsCurrent": -0.0014349081365563204,
+          "bootstrapLower95MeanImprovement": -0.004367390995042262
+        },
+        "60": {
+          "samples": 467,
+          "medianAbsLogError": 0.12787742604517013,
+          "meanAbsLogError": 0.12568302097069017,
+          "meanImprovementVsCurrent": -0.0012874923521090744,
+          "bootstrapLower95MeanImprovement": -0.006651014991651771
+        },
+        "90": {
+          "samples": 437,
+          "medianAbsLogError": 0.14073278097131742,
+          "meanAbsLogError": 0.13379606172159883,
+          "meanImprovementVsCurrent": -0.0011573650106663255,
+          "bootstrapLower95MeanImprovement": -0.004056744135942997
+        },
+        "180": {
+          "samples": 347,
+          "medianAbsLogError": 0.12906783942869254,
+          "meanAbsLogError": 0.1528854620688589,
+          "meanImprovementVsCurrent": -0.004459118212614239,
+          "bootstrapLower95MeanImprovement": -0.00934618430561622
+        },
+        "365": {
+          "samples": 162,
+          "medianAbsLogError": 0.12824235589664362,
+          "meanAbsLogError": 0.15269325895441122,
+          "meanImprovementVsCurrent": 0.0016737529844856763,
+          "bootstrapLower95MeanImprovement": null
+        }
+      }
+    },
+    {
+      "id": "valueRevert",
+      "description": "Small mean-reversion adjustment from one-day-lagged power-law residual, capped at +/-0.10 log points.",
+      "validationAverageMedianAbsLogError": 0.11318163615793957,
+      "holdout": {
+        "7": {
+          "samples": 520,
+          "medianAbsLogError": 0.033711922327245,
+          "meanAbsLogError": 0.04197871818248962,
+          "meanImprovementVsCurrent": 0.0001014530080656513,
+          "bootstrapLower95MeanImprovement": -0.00003715793465468864
+        },
+        "14": {
+          "samples": 513,
+          "medianAbsLogError": 0.048211558298280735,
+          "meanAbsLogError": 0.059978050795178275,
+          "meanImprovementVsCurrent": 0.00029416653793200976,
+          "bootstrapLower95MeanImprovement": -0.000007150799513946451
+        },
+        "30": {
+          "samples": 497,
+          "medianAbsLogError": 0.06550929731785517,
+          "meanAbsLogError": 0.08562341228444095,
+          "meanImprovementVsCurrent": 0.0011927058276909183,
+          "bootstrapLower95MeanImprovement": 0.00046334208004959054
+        },
+        "60": {
+          "samples": 467,
+          "medianAbsLogError": 0.11850360251527746,
+          "meanAbsLogError": 0.12103253866005648,
+          "meanImprovementVsCurrent": 0.0033629899585245235,
+          "bootstrapLower95MeanImprovement": -0.00008103127414883077
+        },
+        "90": {
+          "samples": 437,
+          "medianAbsLogError": 0.12480547871406157,
+          "meanAbsLogError": 0.12825524183858125,
+          "meanImprovementVsCurrent": 0.0043834548723512825,
+          "bootstrapLower95MeanImprovement": -0.00014439270973856942
+        },
+        "180": {
+          "samples": 347,
+          "medianAbsLogError": 0.11654769380174985,
+          "meanAbsLogError": 0.14292927908384517,
+          "meanImprovementVsCurrent": 0.005497064772399464,
+          "bootstrapLower95MeanImprovement": 0.0059882652893434585
+        },
+        "365": {
+          "samples": 162,
+          "medianAbsLogError": 0.150579884452148,
+          "meanAbsLogError": 0.15792250454508333,
+          "meanImprovementVsCurrent": -0.003555492606186482,
+          "bootstrapLower95MeanImprovement": null
+        }
+      }
+    },
+    {
+      "id": "mvrvValue",
+      "description": "Contrarian MVRV percentile adjustment: +0.04 below 25th percentile, -0.04 above 85th percentile.",
+      "validationAverageMedianAbsLogError": 0.11603542186666935,
+      "holdout": {
+        "7": {
+          "samples": 520,
+          "medianAbsLogError": 0.03385943575564465,
+          "meanAbsLogError": 0.04203113825883419,
+          "meanImprovementVsCurrent": 0.00004903293172111433,
+          "bootstrapLower95MeanImprovement": -0.00005982905982906222
+        },
+        "14": {
+          "samples": 513,
+          "medianAbsLogError": 0.048439973956075404,
+          "meanAbsLogError": 0.0600410860989835,
+          "meanImprovementVsCurrent": 0.00023113123412672913,
+          "bootstrapLower95MeanImprovement": -0.000012314344984303771
+        },
+        "30": {
+          "samples": 497,
+          "medianAbsLogError": 0.06488369524662779,
+          "meanAbsLogError": 0.08619105169493324,
+          "meanImprovementVsCurrent": 0.0006250664171985734,
+          "bootstrapLower95MeanImprovement": 0.00008851376796986768
+        },
+        "60": {
+          "samples": 467,
+          "medianAbsLogError": 0.1201154367419903,
+          "meanAbsLogError": 0.12227889213870535,
+          "meanImprovementVsCurrent": 0.0021166364798756057,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "90": {
+          "samples": 437,
+          "medianAbsLogError": 0.12679349714010152,
+          "meanAbsLogError": 0.13080803309537187,
+          "meanImprovementVsCurrent": 0.001830663615560641,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "180": {
+          "samples": 347,
+          "medianAbsLogError": 0.12204469701342784,
+          "meanAbsLogError": 0.14842634385624454,
+          "meanImprovementVsCurrent": 0,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "365": {
+          "samples": 162,
+          "medianAbsLogError": 0.13321701167254366,
+          "meanAbsLogError": 0.15436701193889676,
+          "meanImprovementVsCurrent": 0,
+          "bootstrapLower95MeanImprovement": null
+        }
+      }
+    },
+    {
+      "id": "bearPenalty",
+      "description": "Bear-regime penalty when drawdown is below -35% and 30d residual momentum is negative.",
+      "validationAverageMedianAbsLogError": 0.11667016356863409,
+      "holdout": {
+        "7": {
+          "samples": 520,
+          "medianAbsLogError": 0.03367978951409942,
+          "meanAbsLogError": 0.042043456133428726,
+          "meanImprovementVsCurrent": 0.00003671505712657645,
+          "bootstrapLower95MeanImprovement": -0.00009790032748880835
+        },
+        "14": {
+          "samples": 513,
+          "medianAbsLogError": 0.04817072433634097,
+          "meanAbsLogError": 0.06038137912648255,
+          "meanImprovementVsCurrent": -0.00010916179337232116,
+          "bootstrapLower95MeanImprovement": -0.00043664717348928015
+        },
+        "30": {
+          "samples": 497,
+          "medianAbsLogError": 0.06640903721591634,
+          "meanAbsLogError": 0.08735660807074087,
+          "meanImprovementVsCurrent": -0.0005404899586089752,
+          "bootstrapLower95MeanImprovement": -0.0015489660727047994
+        },
+        "60": {
+          "samples": 467,
+          "medianAbsLogError": 0.12922826757446512,
+          "meanAbsLogError": 0.12677058417004491,
+          "meanImprovementVsCurrent": -0.0023750555514638395,
+          "bootstrapLower95MeanImprovement": -0.006252676659528907
+        },
+        "90": {
+          "samples": 437,
+          "medianAbsLogError": 0.13714417023650716,
+          "meanAbsLogError": 0.13506156938757077,
+          "meanImprovementVsCurrent": -0.0024228726766382346,
+          "bootstrapLower95MeanImprovement": -0.002837528604118994
+        },
+        "180": {
+          "samples": 347,
+          "medianAbsLogError": 0.12204469701342784,
+          "meanAbsLogError": 0.14842634385624454,
+          "meanImprovementVsCurrent": 0,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "365": {
+          "samples": 162,
+          "medianAbsLogError": 0.13321701167254366,
+          "meanAbsLogError": 0.15436701193889676,
+          "meanImprovementVsCurrent": 0,
+          "bootstrapLower95MeanImprovement": null
+        }
+      }
+    }
+  ]
+}
