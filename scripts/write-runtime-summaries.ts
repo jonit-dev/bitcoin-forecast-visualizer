@@ -61,6 +61,7 @@ function main(): void {
     regime: classifyRegime(latestFeatureRow),
     tailRisk: computeTailRisk(latestFeatureRow),
     derivativesContext: latestFeatureRow ? buildDerivativesContext(latestFeatureRow) : null,
+    networkContext: latestFeatureRow ? buildNetworkContext(latestFeatureRow, featureTable as any[]) : null,
   }, null, 2)}\n`);
 
   console.log(`[Runtime summaries] reliability=${RELIABILITY_OUT}`);
@@ -94,6 +95,57 @@ function buildDerivativesContext(row: any) {
 
 function finiteOrNull(value: unknown): number | null {
   return Number.isFinite(value) ? Number(value) : null;
+}
+
+function buildNetworkContext(row: any, rows: any[]) {
+  const features = row.features || {};
+  const sourceDates = row.sourceDates || {};
+  const transferCount = finiteOrNull(features.transferCount);
+  const addressBalanceCount = finiteOrNull(features.addressBalanceCount);
+  if (transferCount === null && addressBalanceCount === null) return null;
+  const transferActivityPercentile = transferCount === null
+    ? null
+    : percentileRank(rows.map(item => item.features?.transferCount).filter(Number.isFinite), transferCount);
+  const activeAddressShare = finiteOrNull(features.activeAddressShare);
+  const transfersPerTransaction = finiteOrNull(features.transfersPerTransaction);
+  const networkState = classifyNetworkState(transferActivityPercentile, activeAddressShare);
+  return {
+    source: 'CoinMetrics Community API',
+    sourceDate: sourceDates.transferCount || sourceDates.addressBalanceCount || null,
+    transferCount,
+    addressBalanceCount,
+    activeAddressShare,
+    transfersPerTransaction,
+    transferActivityPercentile,
+    networkState,
+    insight: networkInsight(networkState),
+    status: 'context-only',
+  };
+}
+
+function percentileRank(values: number[], value: number): number | null {
+  if (values.length < 30) return null;
+  const belowOrEqual = values.filter(item => item <= value).length;
+  return belowOrEqual / values.length;
+}
+
+function classifyNetworkState(
+  transferActivityPercentile: number | null,
+  activeAddressShare: number | null
+): 'unknown' | 'quiet' | 'normal' | 'busy' | 'speculative-congestion' {
+  if (transferActivityPercentile === null && activeAddressShare === null) return 'unknown';
+  if ((transferActivityPercentile ?? 0) >= 0.85 && (activeAddressShare ?? 1) < 0.015) return 'speculative-congestion';
+  if ((transferActivityPercentile ?? 0) >= 0.75) return 'busy';
+  if ((transferActivityPercentile ?? 1) <= 0.25) return 'quiet';
+  return 'normal';
+}
+
+function networkInsight(state: ReturnType<typeof classifyNetworkState>): string {
+  if (state === 'busy') return 'Transfer activity is high versus history, so network usage confirms above-normal activity.';
+  if (state === 'speculative-congestion') return 'Transfers are high while active address share is low, which can indicate churn rather than broad demand.';
+  if (state === 'quiet') return 'Transfer activity is subdued versus history, so network usage is not confirming a strong demand impulse.';
+  if (state === 'normal') return 'Network usage is near its historical middle range.';
+  return 'Network usage context is unavailable.';
 }
 
 function classifyLeverageState(value: number | null): 'unknown' | 'light' | 'normal' | 'crowded' {

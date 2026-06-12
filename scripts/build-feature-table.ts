@@ -72,6 +72,20 @@ function main(): void {
     setFeature('realizedPriceDistance', realizedPrice ? btc.close / realizedPrice - 1 : null, sourceDate, 'missing realized price');
     setFeature('activeAddresses', onchain?.metrics?.activeAddresses, sourceDate, 'missing active addresses');
     setFeature('transactionCount', onchain?.metrics?.transactionCount, sourceDate, 'missing transaction count');
+    setFeature('transferCount', onchain?.metrics?.transferCount, sourceDate, 'missing transfer count');
+    setFeature('addressBalanceCount', onchain?.metrics?.addressBalanceCount, sourceDate, 'missing funded address count');
+    setFeature(
+      'transfersPerTransaction',
+      onchain?.metrics?.transferCount && onchain?.metrics?.transactionCount ? onchain.metrics.transferCount / onchain.metrics.transactionCount : null,
+      sourceDate,
+      'missing transfer or transaction count'
+    );
+    setFeature(
+      'activeAddressShare',
+      onchain?.metrics?.activeAddresses && onchain?.metrics?.addressBalanceCount ? onchain.metrics.activeAddresses / onchain.metrics.addressBalanceCount : null,
+      sourceDate,
+      'missing active or funded address count'
+    );
     setFeature('hashRate', onchain?.metrics?.hashRate, sourceDate, 'missing hash rate');
     setFeature(
       'minerStressProxy',

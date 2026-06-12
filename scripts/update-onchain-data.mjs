@@ -17,6 +17,8 @@ const SOURCE_METRICS = [
   'FeeTotNtv',
   'IssTotNtv',
   'BlkCnt',
+  'TxTfrCnt',
+  'AdrBalCnt',
 ];
 
 const DESIRED_FIELDS = [
@@ -26,6 +28,8 @@ const DESIRED_FIELDS = [
   'marketCapUSD',
   'activeAddresses',
   'transactionCount',
+  'transferCount',
+  'addressBalanceCount',
   'transferValueUSD',
   'feesUSD',
   'hashRate',
@@ -87,6 +91,8 @@ function normalizeRow(row, fetchedAt, latestSourceDate) {
     marketCapUSD,
     activeAddresses: numberValue(row.AdrActCnt),
     transactionCount: numberValue(row.TxCnt),
+    transferCount: numberValue(row.TxTfrCnt),
+    addressBalanceCount: numberValue(row.AdrBalCnt),
     transferValueUSD: null,
     feesUSD: feesNative && priceUSD ? feesNative * priceUSD : null,
     hashRate: numberValue(row.HashRate),

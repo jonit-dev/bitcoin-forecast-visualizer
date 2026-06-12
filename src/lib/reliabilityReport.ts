@@ -45,6 +45,18 @@ export interface CurrentRegimeSummary {
     insight: string;
     status: 'context-only';
   } | null;
+  networkContext?: {
+    source: string;
+    sourceDate: string | null;
+    transferCount: number | null;
+    addressBalanceCount: number | null;
+    activeAddressShare: number | null;
+    transfersPerTransaction: number | null;
+    transferActivityPercentile: number | null;
+    networkState: 'unknown' | 'quiet' | 'normal' | 'busy' | 'speculative-congestion';
+    insight: string;
+    status: 'context-only';
+  } | null;
 }
 
 export interface PowerLawStabilitySummary {

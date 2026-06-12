@@ -78,6 +78,13 @@ function formatMarketCap(n: number) {
   return `$${(n / 1e6).toFixed(0)}M`;
 }
 
+function formatCompactCount(n: number): string {
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+  return n.toLocaleString();
+}
+
 export default function App() {
   const [activeAssetId, setActiveAssetId] = useState<MarketAssetId>('btc');
   const [marketDataByAsset] = useState<Record<MarketAssetId, MarketData>>(() => ({
@@ -93,6 +100,7 @@ export default function App() {
   const regimeContext = currentRegimeSummary.regime;
   const tailRisk = currentRegimeSummary.tailRisk;
   const derivativesContext = currentRegimeSummary.derivativesContext;
+  const networkContext = currentRegimeSummary.networkContext;
   const halvingInfo = useMemo(() => getHalvingInfo(), []);
   const [horizon, setHorizon] = useState(180);
   const [confidenceLevel, setConfidenceLevel] = useState<keyof typeof CONFIDENCE_Z_SCORES>(0.95);
@@ -719,6 +727,39 @@ export default function App() {
                   <p className="text-[10px] leading-relaxed text-zinc-600">
                     Binance derivatives context only; not applied to forecast price or bands.
                   </p>
+                </div>
+              )}
+              {networkContext && (
+                <div className="space-y-2 border-t border-white/5 pt-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <p className="text-[10px] text-zinc-500">Transfers</p>
+                      <p className="text-xs font-mono text-zinc-200">
+                        {networkContext.transferCount === null ? 'n/a' : formatCompactCount(networkContext.transferCount)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-zinc-500">Activity Rank</p>
+                      <p className="text-xs font-mono text-zinc-200">
+                        {networkContext.transferActivityPercentile === null
+                          ? networkContext.networkState
+                          : formatUnsignedPercent(networkContext.transferActivityPercentile, 0) + ' · ' + networkContext.networkState}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-zinc-500">Active Share</p>
+                      <p className="text-xs font-mono text-zinc-200">
+                        {networkContext.activeAddressShare === null ? 'n/a' : formatUnsignedPercent(networkContext.activeAddressShare, 2)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-zinc-500">Transfers / Tx</p>
+                      <p className="text-xs font-mono text-zinc-200">
+                        {networkContext.transfersPerTransaction === null ? 'n/a' : networkContext.transfersPerTransaction.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] leading-relaxed text-zinc-500">{networkContext.insight}</p>
                 </div>
               )}
             </CardContent>

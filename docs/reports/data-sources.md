@@ -6,7 +6,7 @@
 | --- | --- | --- | --- | --- | --- |
 | `src/data/btc-history.json` | CoinGecko hourly market chart | OHLCV | Daily UTC | Usually 0-1 day | None |
 | `src/data/mvrv-history.json` | CoinMetrics Community API | `CapMVRVCur`, `CapMrktCurUSD` | Daily UTC | Usually 0-2 days | None |
-| `src/data/onchain-history.json` | CoinMetrics Community API | MVRV, market cap, realized cap/price derived from MVRV, active addresses, transaction count, hash rate, fees, issuance/miner revenue proxy | Daily UTC | Usually 0-2 days | None |
+| `src/data/onchain-history.json` | CoinMetrics Community API | MVRV, market cap, realized cap/price derived from MVRV, active addresses, transaction count, transfer count, funded address count, hash rate, fees, issuance/miner revenue proxy | Daily UTC | Usually 0-2 days | None |
 | `src/data/voo-history.json` | Yahoo Finance chart endpoint | VOO adjusted OHLCV | Trading days | Usually 0-1 trading day | None |
 
 `transferValueUSD` and `difficulty` are preserved as missing metrics when unavailable through the community API.

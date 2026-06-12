@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T23:10:42.810Z",
+  "generatedAt": "2026-06-12T23:23:59.183Z",
   "featureDate": "2026-06-11",
   "regime": {
     "probabilities": {
@@ -35,6 +35,18 @@
     "leverageState": "normal",
     "fundingState": "neutral",
     "insight": "Funding is neutral, so derivatives are not confirming a crowded directional trade.",
+    "status": "context-only"
+  },
+  "networkContext": {
+    "source": "CoinMetrics Community API",
+    "sourceDate": "2026-06-10",
+    "transferCount": 889630,
+    "addressBalanceCount": 57013546,
+    "activeAddressShare": 0.010852192915697613,
+    "transfersPerTransaction": 1.5714790411757433,
+    "transferActivityPercentile": 0.8303771310487343,
+    "networkState": "busy",
+    "insight": "Transfer activity is high versus history, so network usage confirms above-normal activity.",
     "status": "context-only"
   }
 }
