@@ -965,8 +965,8 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.stochasticTraces.forEach((series, index) => {
       series.applyOptions({ visible: index === 0 ? showModelLine || showScenarios : showScenarios });
     });
-    seriesRefs.current.floorLine?.applyOptions({ visible: showBitcoinOverlays && showFloorLine });
-    seriesRefs.current.peakLine?.applyOptions({ visible: showBitcoinOverlays && showPeakLine });
+    seriesRefs.current.floorLine?.applyOptions({ visible: showFloorLine });
+    seriesRefs.current.peakLine?.applyOptions({ visible: showPeakLine });
   }, [showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showBitcoinOverlays, showCoreModelLine]);
 
   // Update probability heatmap

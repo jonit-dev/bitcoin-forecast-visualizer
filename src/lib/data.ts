@@ -61,7 +61,7 @@ export function coefficientStabilityTrustCopy(
 ): string {
   if (horizonDays < 180) return 'Amber path = median path. Dotted bands show calibrated risk range. Scenario sketches stay hidden unless enabled.';
   if (stabilityVerdict === 'stable') return 'Long-horizon output is a scenario range backed by the latest coefficient stability check.';
-  if (stabilityVerdict === 'unstable') return 'Coefficient stability is unstable, so 180+ day output is directional only rather than exact-confidence guidance.';
+  if (stabilityVerdict === 'unstable') return 'Long-horizon coefficient refits are unstable, so 180+ day output is directional only rather than exact-confidence guidance.';
   return 'Fixed structural coefficients are under review at 180-365 day horizons; treat the output as a scenario range.';
 }
 
@@ -107,6 +107,21 @@ function mulberry32(seed: number) {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+function hashStringSeed(value: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function normalFromRng(rng: () => number): number {
+  const u1 = Math.max(rng(), 1e-12);
+  const u2 = rng();
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 }
 
 function addUtcDays(date: Date, days: number): Date {
@@ -251,6 +266,8 @@ export function processRealData(
   confidenceZ: number = CONFIDENCE_Z_SCORES[0.95]
 ): any[] {
   const stochasticTracesByDate = generatePowerLawStochasticTraces(ohlcv, horizon);
+  const lastReal = ohlcv[ohlcv.length - 1];
+  const rng = mulberry32(hashStringSeed(`btc-forecast-candles:${lastReal?.date ?? 'unknown'}:${horizon}`));
 
   // Add SMAs to historical data
   const data: any[] = ohlcv.map((d, i) => {
@@ -283,7 +300,6 @@ export function processRealData(
   const dailyVol = Math.sqrt(variance);
 
   // Anchor forecast to last real candle
-  const lastReal = ohlcv[ohlcv.length - 1];
   let forecastPrice = lastReal.close;
 
   data[data.length - 1].forecast = forecastPrice;
@@ -300,8 +316,8 @@ export function processRealData(
     const open = i === 1 ? lastReal.close : channelGuardedPowerLawForecast(prevDate, lastReal.close, lastDate);
     const close = channelGuardedPowerLawForecast(date, lastReal.close, lastDate);
 
-    const high = Math.max(open, close) * (1 + Math.random() * dailyVol * 0.3);
-    const low = Math.min(open, close) * (1 - Math.random() * dailyVol * 0.3);
+    const high = Math.max(open, close) * (1 + rng() * dailyVol * 0.3);
+    const low = Math.min(open, close) * (1 - rng() * dailyVol * 0.3);
 
     // Forecast interval: the power-law path uses residual-process variance plus
     // a fat-tail stress multiplier. No visual cap — long-horizon bands should
@@ -345,6 +361,7 @@ export function generateHeatmapData(
   const lastPrice = ohlcv[ohlcv.length - 1].close;
   const lastDateMs = new Date(ohlcv[ohlcv.length - 1].date + 'T00:00:00Z').getTime();
   const lastDate = new Date(lastDateMs);
+  const rng = mulberry32(hashStringSeed(`btc-forecast-heatmap:${ohlcv[ohlcv.length - 1].date}:${horizon}:${numSimulations}:${numPriceBands}`));
   const dailyVol = blendedPowerLawHeatmapVol(ohlcv);
 
   const futureBasePrices = new Float64Array(horizon + 1);
@@ -364,17 +381,10 @@ export function generateHeatmapData(
   const sampledSet = new Set(sampledDays);
   const sampledCount = sampledDays.length;
 
-  // Pre-generate all random normals (use both Box-Muller outputs)
+  // Pre-generate deterministic random normals so identical inputs produce identical forecasts.
   const totalRands = numSimulations * horizon;
   const normals = new Float64Array(totalRands);
-  for (let i = 0; i < totalRands; i += 2) {
-    const u1 = Math.random();
-    const u2 = Math.random();
-    const r = Math.sqrt(-2 * Math.log(u1));
-    const theta = 6.283185307179586 * u2; // 2*PI
-    normals[i] = r * Math.cos(theta);
-    if (i + 1 < totalRands) normals[i + 1] = r * Math.sin(theta);
-  }
+  for (let i = 0; i < totalRands; i++) normals[i] = normalFromRng(rng);
 
   // Run Monte Carlo — store only sampled days in flat typed array
   const results = new Float64Array(numSimulations * sampledCount);

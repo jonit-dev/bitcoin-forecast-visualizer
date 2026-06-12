@@ -222,7 +222,7 @@ Expected benefit: useful as a contrarian/context feature, but weaker than on-cha
 
 Priority 6: improve market data quality.
 
-Current price candles are reconstructed from CoinGecko hourly range data and CryptoCompare daily volume. That is fine for visualization, but for modeling it would be better to store:
+Current price candles are reconstructed from CoinGecko hourly range data, including reported total volume. That is fine for visualization, but for modeling it would be better to store:
 
 - Exchange-specific OHLCV from a high-liquidity venue such as Coinbase, Kraken, or Binance where legally/operationally appropriate.
 - Aggregate spot volume from a consistent vendor.

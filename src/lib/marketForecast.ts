@@ -45,7 +45,7 @@ export const MARKET_ASSETS: MarketAssetConfig[] = [
     quote: 'USD',
     chartTitle: 'BTC/USD Forward View',
     subtitle: 'Bitcoin forecast workspace',
-    dataSourceLabel: 'CoinGecko + CryptoCompare',
+    dataSourceLabel: 'CoinGecko market chart',
     instrumentLabel: 'BTC spot proxy',
     capabilities: {
       bitcoinOverlays: true,
@@ -133,6 +133,72 @@ function computeLogReturns(ohlcv: OHLCVData[]): number[] {
 const GENERIC_STOCHASTIC_TRACE_COUNT = 12;
 const GENERIC_RETURN_BOOTSTRAP_LOOKBACK_DAYS = 504;
 const GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS = 10;
+export const SP500_CHANNEL_CONFIG = {
+  trendWindowDays: 126,
+  residualLookbackDays: 1260,
+  lowerResidualQuantile: 0.025,
+  upperResidualQuantile: 0.99,
+  minResidualSamples: 756,
+} as const;
+
+function quantileInterpolated(values: number[], q: number): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = (sorted.length - 1) * Math.min(1, Math.max(0, q));
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) return sorted[lower];
+  return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
+}
+
+function rollingMeanAt(ohlcv: OHLCVData[], index: number, windowDays: number): number | null {
+  if (index < windowDays - 1) return null;
+  let total = 0;
+  for (let i = index - windowDays + 1; i <= index; i++) total += ohlcv[i].close;
+  return total / windowDays;
+}
+
+export interface SP500ChannelPoint {
+  trend: number | null;
+  lower: number | null;
+  upper: number | null;
+  lowerResidual: number | null;
+  upperResidual: number | null;
+}
+
+export function computeSP500ChannelBounds(ohlcv: OHLCVData[]): SP500ChannelPoint[] {
+  const config = SP500_CHANNEL_CONFIG;
+  const trends = ohlcv.map((_, index) => rollingMeanAt(ohlcv, index, config.trendWindowDays));
+  const residuals = ohlcv.map((row, index) => {
+    const trend = trends[index];
+    return trend && trend > 0 && row.close > 0 ? Math.log(row.close / trend) : null;
+  });
+
+  return ohlcv.map((_, index) => {
+    const trend = trends[index];
+    if (!trend || trend <= 0) {
+      return { trend, lower: null, upper: null, lowerResidual: null, upperResidual: null };
+    }
+
+    const start = Math.max(0, index - config.residualLookbackDays);
+    const history = residuals
+      .slice(start, index)
+      .filter((value): value is number => value !== null && Number.isFinite(value));
+    if (history.length < config.minResidualSamples) {
+      return { trend, lower: null, upper: null, lowerResidual: null, upperResidual: null };
+    }
+
+    const lowerResidual = quantileInterpolated(history, config.lowerResidualQuantile);
+    const upperResidual = quantileInterpolated(history, config.upperResidualQuantile);
+    return {
+      trend,
+      lower: trend * Math.exp(lowerResidual),
+      upper: trend * Math.exp(upperResidual),
+      lowerResidual,
+      upperResidual,
+    };
+  });
+}
 
 function buildScaledEmpiricalInnovations(returns: number[], dailyVol: number): number[] {
   const recent = returns
@@ -163,12 +229,6 @@ export function computeSP500ModelInputs(ohlcv: OHLCVData[]) {
   const dailyVol = Math.max(0.0001, 0.65 * vol90 + 0.35 * vol252);
 
   return { returns, drift, dailyVol, expandingEquityPremium };
-}
-
-function rollingTrend(ohlcv: OHLCVData[], index: number): number | null {
-  if (index < 199) return null;
-  const window = ohlcv.slice(index - 199, index + 1);
-  return window.reduce((sum, row) => sum + row.close, 0) / window.length;
 }
 
 function generateGenericStochasticTraces(
@@ -219,17 +279,22 @@ function generateGenericStochasticTraces(
 function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: number): any[] {
   const { returns, drift, dailyVol } = computeSP500ModelInputs(ohlcv);
   const tracesByDate = generateGenericStochasticTraces(ohlcv, horizon, drift, dailyVol, returns);
+  const channelBounds = computeSP500ChannelBounds(ohlcv);
+  const latestChannel = [...channelBounds].reverse().find((point) =>
+    point.lowerResidual !== null && point.upperResidual !== null
+  );
   const data: any[] = ohlcv.map((row, index) => {
     const sma20 = index >= 19 ? mean(ohlcv.slice(index - 19, index + 1).map((d) => d.close)) : null;
     const sma50 = index >= 49 ? mean(ohlcv.slice(index - 49, index + 1).map((d) => d.close)) : null;
+    const channel = channelBounds[index];
     return {
       ...row,
       sma20,
       sma50,
       isForecast: false,
-      powerLawModel: rollingTrend(ohlcv, index),
-      floorPriceModel: null,
-      peakPriceModel: null,
+      powerLawModel: channel.trend,
+      floorPriceModel: channel.lower,
+      peakPriceModel: channel.upper,
       stochasticTraces: tracesByDate.get(row.date),
     };
   });
@@ -253,6 +318,15 @@ function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: nu
     const rangeLow = median * Math.exp(-confidenceZ * sigma);
     const rangeHigh = median * Math.exp(confidenceZ * sigma);
     const candleSpread = Math.max(0.001, dailyVol * 0.25);
+    const channelTrend = latestChannel?.trend
+      ? latestChannel.trend * Math.exp(drift * day)
+      : null;
+    const lowerBound = channelTrend && latestChannel?.lowerResidual !== null && latestChannel?.lowerResidual !== undefined
+      ? channelTrend * Math.exp(latestChannel.lowerResidual)
+      : null;
+    const upperBound = channelTrend && latestChannel?.upperResidual !== null && latestChannel?.upperResidual !== undefined
+      ? channelTrend * Math.exp(latestChannel.upperResidual)
+      : null;
 
     data.push({
       date,
@@ -266,9 +340,9 @@ function processGenericData(ohlcv: OHLCVData[], horizon: number, confidenceZ: nu
       forecastLower: rangeLow,
       forecastRange: [rangeLow, rangeHigh],
       isForecast: true,
-      powerLawModel: median,
-      floorPriceModel: null,
-      peakPriceModel: null,
+      powerLawModel: channelTrend ?? median,
+      floorPriceModel: lowerBound,
+      peakPriceModel: upperBound,
       stochasticTraces: tracesByDate.get(date),
       sma20: null,
       sma50: null,

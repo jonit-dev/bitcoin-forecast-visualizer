@@ -39,4 +39,13 @@ median_h = close * exp(drift * h)
 interval_h = median_h * exp(+/- z * volatility * sqrt(h))
 ```
 
-`npm run backtest:market` is the reproducible statistical gate for the S&P 500 model. On the current VOO cache through 2026-06-05, the walk-forward test passes at 30, 90, and 180 trading-day horizons with statistically significant median-error improvement versus a no-change baseline and directional relevance against a 50% null.
+The S&P 500 lower/top lines reuse the same chart fields as BTC floor/peak lines, but use a VOO-specific statistical channel instead of Bitcoin power-law curves:
+
+```text
+trend = 126-session SMA
+residual = log(close / trend)
+lower = trend * exp(2.5th percentile residual over prior 1,260 sessions)
+top = trend * exp(99th percentile residual over prior 1,260 sessions)
+```
+
+`npm run backtest:market` is the reproducible statistical gate for the S&P 500 model. On the current VOO cache through 2026-06-05, the walk-forward channel test covers 96.3% of sampled closes with 2.4% below-channel breaks and 1.4% above-channel breaks. The median forecast also passes at 30, 90, and 180 trading-day horizons with statistically significant median-error improvement versus a no-change baseline and directional relevance against a 50% null.

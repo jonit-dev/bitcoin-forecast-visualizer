@@ -1,6 +1,10 @@
 import vooHistory from '../src/data/voo-history.json';
 import type { OHLCVData } from '../src/lib/api';
-import { computeSP500ModelInputs } from '../src/lib/marketForecast';
+import {
+  computeSP500ChannelBounds,
+  computeSP500ModelInputs,
+  SP500_CHANNEL_CONFIG,
+} from '../src/lib/marketForecast';
 
 const HORIZONS = [30, 90, 180];
 const MIN_TRAINING_ROWS = 1000;
@@ -18,6 +22,15 @@ interface HorizonResult {
   pairedT: number;
   pairedPValue: number;
   coverage90: number;
+  pass: boolean;
+}
+
+interface ChannelResult {
+  samples: number;
+  coverage: number;
+  belowRate: number;
+  aboveRate: number;
+  meanLogWidth: number;
   pass: boolean;
 }
 
@@ -119,16 +132,70 @@ function backtestHorizon(rows: OHLCVData[], horizon: number): HorizonResult {
   };
 }
 
+function backtestChannel(rows: OHLCVData[]): ChannelResult {
+  const bounds = computeSP500ChannelBounds(rows);
+  let samples = 0;
+  let inBand = 0;
+  let below = 0;
+  let above = 0;
+  let logWidth = 0;
+
+  for (let index = MIN_TRAINING_ROWS; index < rows.length; index += STEP_ROWS) {
+    const channel = bounds[index];
+    if (!channel.lower || !channel.upper || channel.lower <= 0 || channel.upper <= channel.lower) continue;
+
+    const close = rows[index].close;
+    if (close >= channel.lower && close <= channel.upper) inBand++;
+    else if (close < channel.lower) below++;
+    else above++;
+    logWidth += Math.log(channel.upper / channel.lower);
+    samples++;
+  }
+
+  const coverage = inBand / samples;
+  const belowRate = below / samples;
+  const aboveRate = above / samples;
+
+  return {
+    samples,
+    coverage,
+    belowRate,
+    aboveRate,
+    meanLogWidth: logWidth / samples,
+    pass: (
+      coverage >= 0.94 &&
+      coverage <= 0.98 &&
+      belowRate >= 0.015 &&
+      belowRate <= 0.04 &&
+      aboveRate <= 0.03
+    ),
+  };
+}
+
+function formatPct(value: number): string {
+  return `${(value * 100).toFixed(1)}%`;
+}
+
 function main(): void {
   const rows = vooHistory as OHLCVData[];
   const results = HORIZONS.map((horizon) => backtestHorizon(rows, horizon));
+  const channel = backtestChannel(rows);
   const latest = rows.at(-1)?.date ?? 'unknown';
 
   console.log(`[S&P 500 backtest] VOO rows=${rows.length} latest=${latest}`);
+  console.log(
+    `[S&P 500 channel] trend=${SP500_CHANNEL_CONFIG.trendWindowDays}d residuals=${SP500_CHANNEL_CONFIG.residualLookbackDays}d q=${SP500_CHANNEL_CONFIG.lowerResidualQuantile}-${SP500_CHANNEL_CONFIG.upperResidualQuantile} samples=${channel.samples} coverage=${formatPct(channel.coverage)} below=${formatPct(channel.belowRate)} above=${formatPct(channel.aboveRate)} meanWidth=${formatPct(Math.exp(channel.meanLogWidth) - 1)} ${channel.pass ? 'PASS' : 'FAIL'}`
+  );
   for (const result of results) {
     console.log(
       `[S&P 500 backtest] h=${result.horizon}d samples=${result.samples} hit=${(result.hitRate * 100).toFixed(1)}% p_dir=${result.directionPValue.toExponential(3)} mae=${result.meanAbsoluteLogError.toFixed(5)} baseline=${result.baselineMeanAbsoluteLogError.toFixed(5)} improvement=${result.maeImprovementPct.toFixed(2)}% t=${result.pairedT.toFixed(2)} p_mae=${result.pairedPValue.toExponential(3)} cov90=${(result.coverage90 * 100).toFixed(1)}% ${result.pass ? 'PASS' : 'FAIL'}`
     );
+  }
+
+  if (!channel.pass) {
+    console.error('[S&P 500 backtest] FAIL: statistical channel did not satisfy the walk-forward coverage gate.');
+    process.exitCode = 1;
+    return;
   }
 
   if (results.some((result) => !result.pass)) {

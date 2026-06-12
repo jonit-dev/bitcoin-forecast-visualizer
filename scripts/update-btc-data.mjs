@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Patches src/data/btc-history.json with recent OHLC from CoinGecko and volume from CryptoCompare.
+ * Patches src/data/btc-history.json with recent OHLC and volume from CoinGecko.
  * Patches src/data/mvrv-history.json with missing days from CoinMetrics.
  * Runs automatically as a predev hook before `yarn dev`.
  */
@@ -73,46 +73,16 @@ async function fetchJson(url, retries = 3) {
   }
 }
 
-async function fetchCryptoCompareDailyVolumes(fromDateInclusive, toDateInclusive) {
-  const volumeByDate = new Map();
-  let cursorTo = toDateInclusive;
-
-  while (cursorTo >= fromDateInclusive) {
-    const spanDays = diffUtcDays(fromDateInclusive, cursorTo);
-    const limit = Math.min(2000, Math.max(0, spanDays));
-    const toTs = Math.floor(parseUtcDate(cursorTo).getTime() / 1000);
-    const json = await fetchJson(
-      `https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=${limit}&toTs=${toTs}`
-    );
-
-    if (json.Response !== 'Success') {
-      throw new Error(`CryptoCompare request failed: ${json.Message || 'unknown error'}`);
-    }
-
-    const rows = json.Data?.Data || [];
-    if (rows.length === 0) break;
-
-    for (const row of rows) {
-      const date = toUtcDateString(row.time * 1000);
-      if (date < fromDateInclusive || date > toDateInclusive) continue;
-      volumeByDate.set(date, Math.round(row.volumeto || 0));
-    }
-
-    const firstDate = toUtcDateString(rows[0].time * 1000);
-    if (firstDate <= fromDateInclusive) break;
-    cursorTo = addUtcDays(firstDate, -1);
-  }
-
-  return volumeByDate;
-}
-
 async function fetchRecentDailyCandles(fromDateInclusive, toDateInclusive) {
   const toDateExclusive = addUtcDays(toDateInclusive, 1);
   const priceByDate = new Map();
+  const volumeByDate = new Map();
 
   for (const { from, to } of buildRangeChunks(fromDateInclusive, toDateExclusive, BTC_HOURLY_CHUNK_DAYS)) {
+    const fromTs = Math.floor(parseUtcDate(from).getTime() / 1000);
+    const toTs = Math.floor(parseUtcDate(to).getTime() / 1000);
     const chart = await fetchJson(
-      `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}&interval=hourly`
+      `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${fromTs}&to=${toTs}&interval=hourly`
     );
 
     for (const [ts, price] of chart.prices || []) {
@@ -134,9 +104,13 @@ async function fetchRecentDailyCandles(fromDateInclusive, toDateInclusive) {
       candle.low = Math.min(candle.low, price);
       candle.close = price;
     }
-  }
 
-  const volumeByDate = await fetchCryptoCompareDailyVolumes(fromDateInclusive, toDateInclusive);
+    for (const [ts, volume] of chart.total_volumes || []) {
+      const date = toUtcDateString(ts);
+      if (date < fromDateInclusive || date > toDateInclusive) continue;
+      volumeByDate.set(date, Math.max(volumeByDate.get(date) || 0, Math.round(volume || 0)));
+    }
+  }
 
   const candles = [];
   for (let date = fromDateInclusive; date <= toDateInclusive; date = addUtcDays(date, 1)) {

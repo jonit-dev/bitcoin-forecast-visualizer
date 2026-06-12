@@ -51,6 +51,11 @@ interface BacktestReport {
       reason: string;
     }[];
   };
+  robustness: {
+    status: 'PASS' | 'FAIL';
+    blockBootstrapIterations: number;
+    checks: RobustnessCheck[];
+  };
   regimeSummary?: Record<string, Partial<Record<RegimeState, BacktestMetricRow>>>;
   ablation: {
     modes: {
@@ -84,7 +89,32 @@ interface BacktestReport {
   };
 }
 
+interface RobustnessCheck {
+  horizonDays: number;
+  benchmarkModelId: BacktestModelId;
+  samples: number;
+  blockLength: number;
+  medianAbsLogErrorImprovement: number | null;
+  meanAbsLogErrorImprovement: number | null;
+  bootstrapLower95MeanImprovement: number | null;
+  passed: boolean;
+  reason: string;
+}
+
 const REPORT_DIR = join(process.cwd(), 'docs', 'reports', 'results');
+const ROBUSTNESS_BOOTSTRAP_ITERATIONS = 400;
+
+function mean(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+}
 
 function main(): void {
   const ohlcv = btcHistory as OHLCVData[];
@@ -166,6 +196,7 @@ function main(): void {
     models: models.map(({ id, description, config }) => ({ id, description, config })),
     metrics,
     qualityGate: evaluateQualityGate(metrics),
+    robustness: evaluateRobustness(ohlcv, models),
     regimeSummary: renderRegimeSummary(regimeInputs),
     ablation: buildAblationSummary(metrics),
     candidateComparison: candidate ? evaluateCandidateComparison(metrics, candidate.source) : undefined,
@@ -176,6 +207,130 @@ function main(): void {
   if (report.qualityGate.status === 'FAIL' && !process.argv.includes('--report-only')) {
     process.exitCode = 1;
   }
+}
+
+function evaluateRobustness(ohlcv: OHLCVData[], models: ReturnType<typeof getBacktestModels>): BacktestReport['robustness'] {
+  const checks: RobustnessCheck[] = [];
+  const powerlaw = models.find(model => model.id === 'powerlaw-current');
+  const benchmarks = models.filter(model =>
+    model.id !== 'powerlaw-current' &&
+    model.id !== 'powerlaw-refit-candidate'
+  );
+  if (!powerlaw) {
+    return {
+      status: 'FAIL',
+      blockBootstrapIterations: ROBUSTNESS_BOOTSTRAP_ITERATIONS,
+      checks: [{
+        horizonDays: 0,
+        benchmarkModelId: 'naive-current-price',
+        samples: 0,
+        blockLength: 0,
+        medianAbsLogErrorImprovement: null,
+        meanAbsLogErrorImprovement: null,
+        bootstrapLower95MeanImprovement: null,
+        passed: false,
+        reason: 'powerlaw-current model was unavailable',
+      }],
+    };
+  }
+
+  for (const horizon of BACKTEST_CONFIG.requiredGateHorizons) {
+    for (const benchmark of benchmarks) {
+      const paired = pairedErrorImprovements(ohlcv, horizon, powerlaw, benchmark);
+      const medianImprovement = median(paired);
+      const meanImprovement = mean(paired);
+      const blockLength = Math.max(7, Math.min(horizon, 90));
+      const lower95 = paired.length > blockLength * 3
+        ? blockBootstrapLowerBound(paired, blockLength, ROBUSTNESS_BOOTSTRAP_ITERATIONS, 0xB17C000 + horizon * 997 + benchmark.id.length)
+        : null;
+      const passed = (
+        paired.length > blockLength * 3 &&
+        medianImprovement !== null &&
+        meanImprovement !== null &&
+        lower95 !== null &&
+        medianImprovement > 0 &&
+        meanImprovement > 0 &&
+        lower95 > 0
+      );
+      checks.push({
+        horizonDays: horizon,
+        benchmarkModelId: benchmark.id,
+        samples: paired.length,
+        blockLength,
+        medianAbsLogErrorImprovement: medianImprovement,
+        meanAbsLogErrorImprovement: meanImprovement,
+        bootstrapLower95MeanImprovement: lower95,
+        passed,
+        reason: passed
+          ? `powerlaw-current beat ${benchmark.id} after block-bootstrap overlap adjustment`
+          : `powerlaw-current did not clear the block-bootstrap robustness threshold against ${benchmark.id}`,
+      });
+    }
+  }
+
+  return {
+    status: checks.every(check => check.passed) ? 'PASS' : 'FAIL',
+    blockBootstrapIterations: ROBUSTNESS_BOOTSTRAP_ITERATIONS,
+    checks,
+  };
+}
+
+function pairedErrorImprovements(
+  ohlcv: OHLCVData[],
+  horizon: number,
+  powerlaw: ReturnType<typeof getBacktestModels>[number],
+  benchmark: ReturnType<typeof getBacktestModels>[number]
+): number[] {
+  const improvements: number[] = [];
+  for (
+    let originIndex = BACKTEST_CONFIG.minimumLookbackDays;
+    originIndex + horizon < ohlcv.length;
+    originIndex += BACKTEST_CONFIG.rollingOriginSpacingDays
+  ) {
+    const origin = ohlcv[originIndex];
+    if (origin.date < BACKTEST_CONFIG.holdoutStartDate) continue;
+    if (!isContiguous(ohlcv, originIndex, horizon)) continue;
+
+    const target = ohlcv[originIndex + horizon];
+    const powerlawForecast = powerlaw.forecast(ohlcv, originIndex, horizon);
+    const benchmarkForecast = benchmark.forecast(ohlcv, originIndex, horizon);
+    if (!powerlawForecast?.median || !benchmarkForecast?.median) continue;
+
+    const powerlawError = Math.abs(Math.log(powerlawForecast.median / target.close));
+    const benchmarkError = Math.abs(Math.log(benchmarkForecast.median / target.close));
+    if (Number.isFinite(powerlawError) && Number.isFinite(benchmarkError)) {
+      improvements.push(benchmarkError - powerlawError);
+    }
+  }
+  return improvements;
+}
+
+function blockBootstrapLowerBound(values: number[], blockLength: number, iterations: number, seed: number): number | null {
+  if (values.length === 0) return null;
+  const rng = mulberry32(seed);
+  const means: number[] = [];
+  for (let iteration = 0; iteration < iterations; iteration++) {
+    let sum = 0;
+    let count = 0;
+    while (count < values.length) {
+      const start = Math.floor(rng() * Math.max(1, values.length - blockLength + 1));
+      for (let offset = 0; offset < blockLength && count < values.length; offset++, count++) {
+        sum += values[start + offset];
+      }
+    }
+    means.push(sum / values.length);
+  }
+  means.sort((a, b) => a - b);
+  return means[Math.floor(iterations * 0.05)] ?? null;
+}
+
+function mulberry32(seed: number) {
+  return () => {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 function loadFeatureTableMetadata(): BacktestReport['metadata']['featureTable'] {
@@ -333,6 +488,12 @@ function writeReports(report: BacktestReport): void {
   for (const check of report.qualityGate.checks) {
     console.log(`${check.passed ? 'PASS' : 'FAIL'} ${check.horizonDays}d: ${check.reason}`);
   }
+  console.log(`Backtest robustness audit: ${report.robustness.status}`);
+  for (const check of report.robustness.checks) {
+    console.log(
+      `${check.passed ? 'PASS' : 'FAIL'} ${check.horizonDays}d vs ${check.benchmarkModelId}: mean improvement ${formatMetric(check.meanAbsLogErrorImprovement)}, bootstrap lower95 ${formatMetric(check.bootstrapLower95MeanImprovement)}`
+    );
+  }
   console.log(`JSON report: ${jsonPath}`);
   console.log(`Markdown report: ${markdownPath}`);
 }
@@ -354,6 +515,26 @@ function renderMarkdown(report: BacktestReport): string {
     '| Horizon | Result | Reason |',
     '| --- | --- | --- |',
     ...report.qualityGate.checks.map(check => `| ${check.horizonDays}d | ${check.passed ? 'PASS' : 'FAIL'} | ${check.reason} |`),
+    '',
+    `## Robustness Audit: ${report.robustness.status}`,
+    '',
+    `Block bootstrap iterations: ${report.robustness.blockBootstrapIterations}`,
+    '',
+    '| Horizon | Benchmark | Samples | Block length | Median improvement | Mean improvement | 5% bootstrap mean improvement | Result |',
+    '| ---: | --- | ---: | ---: | ---: | ---: | ---: | --- |',
+    ...report.robustness.checks.map(check => [
+      `| ${check.horizonDays}d`,
+      `\`${check.benchmarkModelId}\``,
+      check.samples,
+      check.blockLength,
+      formatMetric(check.medianAbsLogErrorImprovement),
+      formatMetric(check.meanAbsLogErrorImprovement),
+      formatMetric(check.bootstrapLower95MeanImprovement),
+      check.passed ? 'PASS' : 'FAIL',
+      '|',
+    ].join(' | ')),
+    '',
+    'Positive values mean `powerlaw-current` had lower absolute log error than the benchmark. The bootstrap samples contiguous blocks so overlapping rolling-origin windows are not treated as independent daily observations.',
     '',
     '## Metrics',
     '',

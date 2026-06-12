@@ -389,32 +389,28 @@ export default function App() {
                   >
                     Scenarios
                   </button>
-                  {canShowBitcoinOverlays && (
-                    <>
-                      <button
-                        onClick={() => setShowFloorLine(!showFloorLine)}
-                        className={cn(
-                          "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
-                          showFloorLine
-                            ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                            : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
-                        )}
-                      >
-                        Floor
-                      </button>
-                      <button
-                        onClick={() => setShowPeakLine(!showPeakLine)}
-                        className={cn(
-                          "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
-                          showPeakLine
-                            ? "bg-red-500/10 text-red-400 border-red-500/20"
-                            : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
-                        )}
-                      >
-                        Peak
-                      </button>
-                    </>
-                  )}
+                  <button
+                    onClick={() => setShowFloorLine(!showFloorLine)}
+                    className={cn(
+                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                      showFloorLine
+                        ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                    )}
+                  >
+                    {canShowBitcoinOverlays ? 'Floor' : 'Lower'}
+                  </button>
+                  <button
+                    onClick={() => setShowPeakLine(!showPeakLine)}
+                    className={cn(
+                      "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                      showPeakLine
+                        ? "bg-red-500/10 text-red-400 border-red-500/20"
+                        : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                    )}
+                  >
+                    {canShowBitcoinOverlays ? 'Peak' : 'Top'}
+                  </button>
                   <button
                     onClick={() => setShowHeatmap(!showHeatmap)}
                     className={cn(
@@ -618,23 +614,23 @@ export default function App() {
             </CardHeader>
             <CardContent className="p-4 pt-0 md:p-6 md:pt-0 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-xs md:text-sm text-zinc-400">Backtest Gate</span>
+                <span className="text-xs md:text-sm text-zinc-400">14-90d Backtest</span>
                 <span className={cn("text-xs md:text-sm font-mono", reliabilitySummary.qualityGateStatus === 'PASS' ? "text-emerald-400" : "text-red-400")}>
                   {reliabilitySummary.qualityGateStatus}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs md:text-sm text-zinc-400">Reliability Score</span>
+                <span className="text-xs md:text-sm text-zinc-400">14-90d Score</span>
                 <span className="text-xs md:text-sm font-mono text-zinc-200">{reliabilitySummary.reliabilityScore}/100</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs md:text-sm text-zinc-400">Default Model</span>
+                <span className="text-xs md:text-sm text-zinc-400">Active Model</span>
                 <span className="text-xs md:text-sm font-medium text-amber-200">
                   {reliabilitySummary.ensembleEnabled ? 'Regime ensemble' : 'Power-law'}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs md:text-sm text-zinc-400">Coefficient Stability</span>
+                <span className="text-xs md:text-sm text-zinc-400">180d+ Stability</span>
                 <span className={cn(
                   "text-xs md:text-sm font-mono",
                   powerLawStabilitySummary.verdict === 'stable' ? "text-emerald-400" : powerLawStabilitySummary.verdict === 'unstable' ? "text-red-400" : "text-amber-300"
@@ -645,6 +641,11 @@ export default function App() {
               {horizon >= 180 && (
                 <p className="text-[10px] leading-relaxed text-zinc-500">
                   {coefficientStabilityTrustCopy(horizon, powerLawStabilitySummary.verdict)}
+                </p>
+              )}
+              {horizon < 180 && powerLawStabilitySummary.verdict === 'unstable' && (
+                <p className="text-[10px] leading-relaxed text-zinc-500">
+                  Short-horizon backtests passed, but the long-horizon coefficient refit is unstable.
                 </p>
               )}
             </CardContent>
