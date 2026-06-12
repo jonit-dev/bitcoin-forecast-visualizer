@@ -1,27 +1,27 @@
 {
-  "generatedAt": "2026-06-05T06:13:29.263Z",
+  "generatedAt": "2026-06-12T22:42:39.017Z",
   "sources": {
     "btc": {
       "status": "fresh",
-      "latestDate": "2026-06-04",
+      "latestDate": "2026-06-11",
       "lagDays": 1,
       "required": true
     },
     "mvrv": {
       "status": "fresh",
-      "latestDate": "2026-06-04",
+      "latestDate": "2026-06-11",
       "lagDays": 1,
       "required": true
     },
     "onchain": {
       "status": "fresh",
-      "latestDate": "2026-06-04",
+      "latestDate": "2026-06-11",
       "lagDays": 1,
       "required": true
     },
     "features": {
       "status": "fresh",
-      "latestDate": "2026-06-04",
+      "latestDate": "2026-06-11",
       "lagDays": 1,
       "required": true
     },

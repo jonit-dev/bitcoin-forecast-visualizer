@@ -4,6 +4,7 @@ import btcHistory from '../src/data/btc-history.json';
 import featureTable from '../src/data/feature-table.json';
 import type { OHLCVData } from '../src/lib/api';
 import type { FeatureRow } from '../src/lib/features';
+import { computePowerLawInterval, normalQuantile } from '../src/lib/forecastInterval';
 import { POWER_LAW_CONFIG } from '../src/lib/modelConfig';
 
 type AdjustmentRule = (features: FeatureRow['features'] | null, horizonDays: number) => number;
@@ -14,6 +15,33 @@ interface MetricSummary {
   meanAbsLogError: number;
   meanImprovementVsCurrent: number;
   bootstrapLower95MeanImprovement: number | null;
+}
+
+interface IntervalMetricSummary {
+  samples: number;
+  nll: number;
+  pinballLoss: {
+    q05: number;
+    q10: number;
+    q50: number;
+    q90: number;
+    q95: number;
+  };
+  coverage: {
+    interval80: number;
+    interval90: number;
+    interval95: number;
+  };
+  meanNllImprovementVsCurrent: number;
+  bootstrapLower95NllImprovement: number | null;
+}
+
+interface IntervalCandidateResult {
+  id: string;
+  description: string;
+  selectedScales: Record<string, number>;
+  validation: Record<string, IntervalMetricSummary>;
+  holdout: Record<string, IntervalMetricSummary>;
 }
 
 interface CandidateResult {
@@ -51,6 +79,12 @@ interface ResearchReport {
   };
   tauValidationGrid: { tauDays: number; validationAverageMedianAbsLogError: number }[];
   candidates: CandidateResult[];
+  intervalBaseline: {
+    id: 'current-intervals';
+    validation: Record<string, IntervalMetricSummary>;
+    holdout: Record<string, IntervalMetricSummary>;
+  };
+  intervalCandidates: IntervalCandidateResult[];
 }
 
 const REPORT_DIR = join(process.cwd(), 'docs', 'reports', 'results');
@@ -65,6 +99,7 @@ const VALIDATION_END = '2024-12-31';
 const FINAL_HOLDOUT_START = '2025-01-01';
 const CURRENT_TAU_DAYS = POWER_LAW_CONFIG.meanReversionTauDays;
 const BOOTSTRAP_ITERATIONS = 400;
+const INTERVAL_SCALE_CANDIDATES = [0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00, 1.05, 1.10, 1.15, 1.20, 1.30];
 
 const RULES: Record<string, { description: string; adjust: AdjustmentRule }> = {
   momentumTiny: {
@@ -117,6 +152,7 @@ function main(): void {
       holdout: evaluateCandidate(CURRENT_TAU_DAYS, rule.adjust),
     })),
   ];
+  const intervalScales = selectIntervalScales();
 
   const report: ResearchReport = {
     generatedAt: new Date().toISOString(),
@@ -146,6 +182,20 @@ function main(): void {
     },
     tauValidationGrid: tauResults,
     candidates,
+    intervalBaseline: {
+      id: 'current-intervals',
+      validation: evaluateIntervalSet(VALIDATION_START, VALIDATION_END, {}),
+      holdout: evaluateIntervalSet(FINAL_HOLDOUT_START, null, {}),
+    },
+    intervalCandidates: [
+      {
+        id: 'validation-nll-scaled-intervals',
+        description: 'Per-horizon sigma scale selected on 2022-2024 validation NLL with minimum 88% validation coverage for nominal 90% intervals.',
+        selectedScales: intervalScales,
+        validation: evaluateIntervalSet(VALIDATION_START, VALIDATION_END, intervalScales),
+        holdout: evaluateIntervalSet(FINAL_HOLDOUT_START, null, intervalScales),
+      },
+    ],
   };
 
   mkdirSync(REPORT_DIR, { recursive: true });
@@ -157,6 +207,121 @@ function main(): void {
 
   console.log(`BTC candidate research report: ${jsonPath}`);
   console.log(`BTC candidate research markdown: ${markdownPath}`);
+}
+
+function selectIntervalScales(): Record<string, number> {
+  return Object.fromEntries(
+    ALL_HORIZONS.map(horizonDays => {
+      const candidates = INTERVAL_SCALE_CANDIDATES
+        .map(scale => ({
+          scale,
+          metric: evaluateIntervalMetric(horizonDays, VALIDATION_START, VALIDATION_END, scale),
+        }))
+        .filter(candidate => candidate.metric.coverage.interval90 >= 0.88);
+      const best = (candidates.length > 0 ? candidates : INTERVAL_SCALE_CANDIDATES.map(scale => ({
+        scale,
+        metric: evaluateIntervalMetric(horizonDays, VALIDATION_START, VALIDATION_END, scale),
+      }))).sort((a, b) => a.metric.nll - b.metric.nll)[0];
+      return [String(horizonDays), best.scale];
+    })
+  );
+}
+
+function evaluateIntervalSet(startDate: string, endDate: string | null, scales: Record<string, number>): Record<string, IntervalMetricSummary> {
+  return Object.fromEntries(
+    ALL_HORIZONS.map(horizonDays => [
+      String(horizonDays),
+      evaluateIntervalMetric(horizonDays, startDate, endDate, scales[String(horizonDays)] ?? 1),
+    ])
+  );
+}
+
+function evaluateIntervalMetric(
+  horizonDays: number,
+  startDate: string,
+  endDate: string | null,
+  scale: number
+): IntervalMetricSummary {
+  const nlls: number[] = [];
+  const currentNlls: number[] = [];
+  const nllImprovements: number[] = [];
+  const pinballValues = {
+    q05: [] as number[],
+    q10: [] as number[],
+    q50: [] as number[],
+    q90: [] as number[],
+    q95: [] as number[],
+  };
+  const coverageCounts = {
+    interval80: { covered: 0, samples: 0 },
+    interval90: { covered: 0, samples: 0 },
+    interval95: { covered: 0, samples: 0 },
+  };
+
+  for (let originIndex = 365; originIndex + horizonDays < BTC_ROWS.length; originIndex++) {
+    const origin = BTC_ROWS[originIndex];
+    if (origin.date < startDate || (endDate && origin.date > endDate)) continue;
+    if (!isContiguous(originIndex, horizonDays)) continue;
+
+    const actual = BTC_ROWS[originIndex + horizonDays].close;
+    const medianForecast = forecastWithTau(originIndex, horizonDays, CURRENT_TAU_DAYS, 0);
+    const interval = computePowerLawInterval({
+      ohlcv: BTC_ROWS.slice(0, originIndex + 1),
+      horizonDays,
+      median: medianForecast,
+      currentPrice: origin.close,
+    });
+    if (!interval) continue;
+
+    const sigma = interval.sigma * scale;
+    const candidateNll = normalNll(Math.log(actual), Math.log(medianForecast), sigma);
+    const currentNll = normalNll(Math.log(actual), Math.log(medianForecast), interval.sigma);
+    if (candidateNll === null || currentNll === null) continue;
+
+    nlls.push(candidateNll);
+    currentNlls.push(currentNll);
+    nllImprovements.push(currentNll - candidateNll);
+
+    const q05 = medianForecast * Math.exp(sigma * normalQuantile(0.05));
+    const q10 = medianForecast * Math.exp(sigma * normalQuantile(0.10));
+    const q50 = medianForecast;
+    const q90 = medianForecast * Math.exp(sigma * normalQuantile(0.90));
+    const q95 = medianForecast * Math.exp(sigma * normalQuantile(0.95));
+    const q025 = medianForecast * Math.exp(sigma * normalQuantile(0.025));
+    const q975 = medianForecast * Math.exp(sigma * normalQuantile(0.975));
+
+    pinballValues.q05.push(pinballLoss(actual, q05, 0.05) / actual);
+    pinballValues.q10.push(pinballLoss(actual, q10, 0.10) / actual);
+    pinballValues.q50.push(pinballLoss(actual, q50, 0.50) / actual);
+    pinballValues.q90.push(pinballLoss(actual, q90, 0.90) / actual);
+    pinballValues.q95.push(pinballLoss(actual, q95, 0.95) / actual);
+
+    addCoverage(coverageCounts.interval80, actual >= q10 && actual <= q90);
+    addCoverage(coverageCounts.interval90, actual >= q05 && actual <= q95);
+    addCoverage(coverageCounts.interval95, actual >= q025 && actual <= q975);
+  }
+
+  const blockLength = Math.max(7, Math.min(horizonDays, 90));
+  return {
+    samples: nlls.length,
+    nll: mean(nlls),
+    pinballLoss: {
+      q05: mean(pinballValues.q05),
+      q10: mean(pinballValues.q10),
+      q50: mean(pinballValues.q50),
+      q90: mean(pinballValues.q90),
+      q95: mean(pinballValues.q95),
+    },
+    coverage: {
+      interval80: coverageCounts.interval80.covered / coverageCounts.interval80.samples,
+      interval90: coverageCounts.interval90.covered / coverageCounts.interval90.samples,
+      interval95: coverageCounts.interval95.covered / coverageCounts.interval95.samples,
+    },
+    meanNllImprovementVsCurrent: mean(nllImprovements),
+    bootstrapLower95NllImprovement: nllImprovements.length > blockLength * 3
+      ? blockBootstrapLowerBound(nllImprovements, blockLength, BOOTSTRAP_ITERATIONS, 0xFACE00 + horizonDays * 313 + Math.round(scale * 100))
+      : null,
+  };
 }
 
 function evaluateCandidate(tauDays: number, adjust: AdjustmentRule | null): Record<string, MetricSummary> {
@@ -270,6 +435,22 @@ function blockBootstrapLowerBound(values: number[], blockLength: number, iterati
   return means[Math.floor(iterations * 0.05)];
 }
 
+function normalNll(actualLogPrice: number, medianLogPrice: number, sigma: number): number | null {
+  if (!Number.isFinite(sigma) || sigma <= 0) return null;
+  const variance = sigma * sigma;
+  return 0.5 * Math.log(2 * Math.PI * variance) + ((actualLogPrice - medianLogPrice) ** 2) / (2 * variance);
+}
+
+function pinballLoss(actual: number, predicted: number, quantile: number): number {
+  const error = actual - predicted;
+  return Math.max(quantile * error, (quantile - 1) * error);
+}
+
+function addCoverage(counter: { covered: number; samples: number }, covered: boolean): void {
+  counter.samples++;
+  if (covered) counter.covered++;
+}
+
 function mulberry32(seed: number): () => number {
   return () => {
     let t = seed += 0x6D2B79F5;
@@ -328,6 +509,22 @@ function renderMarkdown(report: ResearchReport): string {
   lines.push('## Decision');
   lines.push('');
   lines.push('All candidate changes are research-only unless their paired mean improvement has a positive lower 95% block-bootstrap bound across the required horizons and they do not degrade median error on the final holdout.');
+  lines.push('');
+  lines.push('## Interval Candidates');
+  lines.push('');
+  lines.push(renderIntervalResultTable('Baseline: current intervals, validation', report.intervalBaseline.validation));
+  lines.push('');
+  lines.push(renderIntervalResultTable('Baseline: current intervals, 2025+ final holdout', report.intervalBaseline.holdout));
+  for (const candidate of report.intervalCandidates) {
+    lines.push('');
+    lines.push(`### ${candidate.id}`);
+    lines.push(candidate.description);
+    lines.push(`Selected scales: ${Object.entries(candidate.selectedScales).map(([horizon, scale]) => `${horizon}d=${scale}`).join(', ')}`);
+    lines.push('');
+    lines.push(renderIntervalResultTable('Validation', candidate.validation));
+    lines.push('');
+    lines.push(renderIntervalResultTable('2025+ final holdout', candidate.holdout));
+  }
   return `${lines.join('\n')}\n`;
 }
 
@@ -349,8 +546,37 @@ function renderResultTable(title: string, holdout: Record<string, MetricSummary>
   ].join('\n');
 }
 
+function renderIntervalResultTable(title: string, metrics: Record<string, IntervalMetricSummary>): string {
+  return [
+    `#### ${title}`,
+    '',
+    '| Horizon | Samples | NLL | NLL improvement vs current | Bootstrap lower 95% | Pinball q05/q10/q50/q90/q95 | 80% / 90% / 95% coverage |',
+    '| ---: | ---: | ---: | ---: | ---: | --- | --- |',
+    ...Object.entries(metrics).map(([horizon, row]) => [
+      `| ${horizon}d`,
+      row.samples,
+      format(row.nll),
+      format(row.meanNllImprovementVsCurrent),
+      format(row.bootstrapLower95NllImprovement),
+      [
+        format(row.pinballLoss.q05),
+        format(row.pinballLoss.q10),
+        format(row.pinballLoss.q50),
+        format(row.pinballLoss.q90),
+        format(row.pinballLoss.q95),
+      ].join(' / '),
+      `${formatPercent(row.coverage.interval80)} / ${formatPercent(row.coverage.interval90)} / ${formatPercent(row.coverage.interval95)}`,
+      '|',
+    ].join(' | ')),
+  ].join('\n');
+}
+
 function format(value: number | null): string {
   return value === null || !Number.isFinite(value) ? 'n/a' : value.toFixed(6);
+}
+
+function formatPercent(value: number | null): string {
+  return value === null || !Number.isFinite(value) ? 'n/a' : `${(value * 100).toFixed(1)}%`;
 }
 
 main();

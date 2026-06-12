@@ -24,6 +24,11 @@ function main(): void {
       if (typeof sourceDate !== 'string' || sourceDate > allowedLatestSourceDate) {
         throw new Error(`lookahead feature ${feature} on ${row.date}: sourceDate=${sourceDate}`);
       }
+      if (/^residualMomentum\d+d$/.test(feature) && sourceDate !== allowedLatestSourceDate) {
+        throw new Error(
+          `stale momentum sourceDate ${feature} on ${row.date}: sourceDate=${sourceDate} expected=${allowedLatestSourceDate}`
+        );
+      }
       if (sourceDate > maxSourceDate) maxSourceDate = sourceDate;
     }
     for (const [feature, value] of Object.entries(row.features)) {

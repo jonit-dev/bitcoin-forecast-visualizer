@@ -57,7 +57,7 @@ function main(): void {
         continue;
       }
       const priorT = daysSinceGenesis(new Date(`${prior.date}T00:00:00Z`));
-      setFeature(`residualMomentum${lookback}d`, Math.log(btc.close / basePowerLawPrice(t)) - Math.log(prior.close / basePowerLawPrice(priorT)), prior.date);
+      setFeature(`residualMomentum${lookback}d`, Math.log(btc.close / basePowerLawPrice(t)) - Math.log(prior.close / basePowerLawPrice(priorT)));
     }
 
     setFeature('mvrvLevel', mvrv?.mvrv, sourceDate, 'missing MVRV row');
