@@ -3,6 +3,7 @@ import { createChart, ColorType, CrosshairMode, ISeriesApi, CandlestickSeries, H
 import type { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { cn } from '../lib/utils';
 import { CYCLE_PIVOTS, PHASE_ZONES, type PhaseLabel } from '../lib/cycle';
+import type { BuyZoneSpan } from '../lib/buyZone';
 
 // Bitcoin halving dates — known + dynamically projected every ~4 years
 const KNOWN_HALVINGS = ['2012-11-28', '2016-07-09', '2020-05-11', '2024-04-20'];
@@ -207,6 +208,117 @@ class HalvingCyclePrimitive {
   detached() {
     this._chart = null;
     this._paneViews = [];
+  }
+}
+
+// ---- Buy-zone primitive: leakage-safe heavy-buy shading from backtested flow score ----
+
+class BuyZoneRenderer {
+  private _chart: any;
+  private _zones: BuyZoneSpan[];
+
+  constructor(chart: any, zones: BuyZoneSpan[]) {
+    this._chart = chart;
+    this._zones = zones;
+  }
+
+  update(chart: any, zones: BuyZoneSpan[]) {
+    this._chart = chart;
+    this._zones = zones;
+  }
+
+  draw(target: CanvasRenderingTarget2D): void {
+    if (!this._chart || this._zones.length === 0) return;
+    target.useMediaCoordinateSpace(({ context, mediaSize }) => {
+      const timeScale = this._chart.timeScale();
+      const w = mediaSize.width;
+      const h = mediaSize.height;
+
+      for (const zone of this._zones) {
+        const x0 = timeScale.timeToCoordinate(zone.startDate as any);
+        const x1 = timeScale.timeToCoordinate(zone.endDate as any);
+        if (x0 === null || x1 === null) continue;
+        const left = Math.max(0, Math.floor(Math.min(x0, x1)) - 1);
+        const right = Math.min(w, Math.ceil(Math.max(x0, x1)) + 1);
+        if (right <= 0 || left >= w) continue;
+
+        const intensity = Math.min(1, Math.max(0, (zone.maxScore - 0.70) / 0.12));
+        const alpha = zone.maxConviction ? 0.18 : 0.10 + intensity * 0.06;
+        context.fillStyle = `rgba(34, 197, 94, ${alpha})`;
+        context.fillRect(left, 0, right - left, h);
+
+        context.strokeStyle = zone.maxConviction ? 'rgba(74, 222, 128, 0.48)' : 'rgba(34, 197, 94, 0.30)';
+        context.lineWidth = zone.maxConviction ? 1.5 : 1;
+        context.setLineDash(zone.maxConviction ? [] : [3, 3]);
+        context.beginPath();
+        context.moveTo(left + 0.5, 0);
+        context.lineTo(left + 0.5, h);
+        context.moveTo(right - 0.5, 0);
+        context.lineTo(right - 0.5, h);
+        context.stroke();
+        context.setLineDash([]);
+
+        const label = zone.maxConviction ? 'MAX BUY' : 'HEAVY BUY';
+        context.font = 'bold 10px sans-serif';
+        const tm = context.measureText(label);
+        if (right - left > tm.width + 16) {
+          const cx = left + (right - left) / 2;
+          const ly = Math.max(46, Math.min(h - 20, h * 0.18));
+          context.fillStyle = zone.maxConviction ? 'rgba(22, 101, 52, 0.70)' : 'rgba(20, 83, 45, 0.55)';
+          context.beginPath();
+          context.roundRect(cx - tm.width / 2 - 6, ly - 11, tm.width + 12, 16, 4);
+          context.fill();
+          context.fillStyle = zone.maxConviction ? 'rgba(187, 247, 208, 0.95)' : 'rgba(134, 239, 172, 0.86)';
+          context.textAlign = 'center';
+          context.fillText(label, cx, ly);
+          context.textAlign = 'left';
+        }
+      }
+    });
+  }
+}
+
+class BuyZonePaneView {
+  private _renderer: BuyZoneRenderer;
+
+  constructor(renderer: BuyZoneRenderer) {
+    this._renderer = renderer;
+  }
+
+  zOrder() { return 'bottom' as const; }
+
+  renderer() { return this._renderer; }
+}
+
+class BuyZonePrimitive {
+  private _chart: any = null;
+  private _zones: BuyZoneSpan[] = [];
+  private _renderer = new BuyZoneRenderer(null, []);
+  private _paneViews: BuyZonePaneView[] = [new BuyZonePaneView(this._renderer)];
+  private _requestUpdate?: () => void;
+
+  setZones(zones: BuyZoneSpan[]) {
+    this._zones = zones;
+    this._renderer.update(this._chart, zones);
+    this._requestUpdate?.();
+  }
+
+  updateAllViews() {
+    this._renderer.update(this._chart, this._zones);
+    this._paneViews = [new BuyZonePaneView(this._renderer)];
+  }
+
+  paneViews() { return this._paneViews; }
+
+  attached(param: any) {
+    this._chart = param.chart;
+    this._requestUpdate = param.requestUpdate;
+    this.updateAllViews();
+  }
+
+  detached() {
+    this._chart = null;
+    this._requestUpdate = undefined;
   }
 }
 
@@ -484,6 +596,8 @@ interface ForecastChartProps {
   showPeakLine: boolean;
   showHeatmap: boolean;
   heatmapData: HeatmapCell[];
+  showBuyZones?: boolean;
+  buyZones?: BuyZoneSpan[];
   timeRange: string;
   playbackIndex: number | null;
   mvrvData: { date: string; zScore: number; mvrv: number }[];
@@ -500,7 +614,7 @@ interface ForecastChartProps {
   } | null;
 }
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, buyZones = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<{
@@ -520,6 +634,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
   const markersRef = useRef<any>(null);
   const forecastMarkersRef = useRef<any>(null);
   const heatmapPrimRef = useRef<HeatmapPrimitive | null>(null);
+  const buyZonePrimRef = useRef<BuyZonePrimitive | null>(null);
   const mvrvChartContainerRef = useRef<HTMLDivElement>(null);
   const mvrvChartRef = useRef<any>(null);
   const mvrvSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
@@ -574,6 +689,11 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     const heatmapPrimitive = new HeatmapPrimitive();
     candlestickSeries.attachPrimitive(heatmapPrimitive as any);
     heatmapPrimRef.current = heatmapPrimitive;
+
+    // Attach statistically backtested BTC buy-zone primitive
+    const buyZonePrimitive = new BuyZonePrimitive();
+    candlestickSeries.attachPrimitive(buyZonePrimitive as any);
+    buyZonePrimRef.current = buyZonePrimitive;
 
     // Volume Series
     const volumeSeries = chart.addSeries(HistogramSeries, {
@@ -736,6 +856,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       mvrvChartRef.current = null;
       mvrvSeriesRef.current = null;
       heatmapPrimRef.current = null;
+      buyZonePrimRef.current = null;
       markersRef.current = null;
       forecastMarkersRef.current = null;
       seriesRefs.current = { stochasticTraces: [] };
@@ -975,6 +1096,13 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     const visible = showHeatmap && playbackIndex === null;
     heatmapPrimRef.current.setCells(visible ? heatmapData : []);
   }, [heatmapData, showHeatmap, playbackIndex]);
+
+  // Update statistically backtested buy-zone overlay
+  useEffect(() => {
+    if (!buyZonePrimRef.current) return;
+    const visible = showBitcoinOverlays && showBuyZones && playbackIndex === null;
+    buyZonePrimRef.current.setZones(visible ? buyZones : []);
+  }, [buyZones, showBuyZones, playbackIndex, showBitcoinOverlays]);
 
   // Handle time range — only reacts to explicit timeRange button clicks, not data changes
   const prevTimeRange = useRef(timeRange);

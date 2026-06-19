@@ -15,6 +15,8 @@ import { cn } from './lib/utils';
 import { loadCurrentRegimeSummary, loadPowerLawStabilitySummary, loadReliabilitySummary, loadSourceFreshness } from './lib/reliabilityReport';
 import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from './lib/marketForecast';
 import { computeCrossMarketContext } from './lib/crossMarket';
+import buyZoneSummaryData from './data/buy-zone-summary.json';
+import type { BuyZoneSummary } from './lib/buyZone';
 
 function formatHorizonLabel(days: number): string {
   if (days < 30) return `${days}d`;
@@ -60,6 +62,8 @@ function getHalvingInfo() {
 
 const CIRCULATING_SUPPLY = 19_850_000;
 const MAX_SUPPLY = 21_000_000;
+const BUY_ZONE_SUMMARY = buyZoneSummaryData as unknown as BuyZoneSummary;
+const PRIMARY_BUY_ZONE_BACKTEST = BUY_ZONE_SUMMARY.backtests.find((result) => result.id === 'heavy-buy-zone') ?? BUY_ZONE_SUMMARY.backtests[0];
 const HORIZON_OPTIONS = [
   { value: 7, label: '7D' },
   { value: 14, label: '14D' },
@@ -121,6 +125,7 @@ export default function App() {
   const [showFloorLine, setShowFloorLine] = useState(true);
   const [showPeakLine, setShowPeakLine] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(true);
+  const [showBuyZones, setShowBuyZones] = useState(true);
   const [showMVRV, setShowMVRV] = useState(false);
   const [lastRunAt, setLastRunAt] = useState(() => new Date());
   const activeAsset = getMarketAssetConfig(activeAssetId);
@@ -163,6 +168,9 @@ export default function App() {
 
   const activeDisplayData = forecastResult.displayData;
   const heatmapData = forecastResult.heatmapData;
+  const buyZoneSummary = canShowBitcoinOverlays ? BUY_ZONE_SUMMARY : null;
+  const latestBuyZone = buyZoneSummary?.latest ?? null;
+  const primaryBuyZoneBacktest = canShowBitcoinOverlays ? PRIMARY_BUY_ZONE_BACKTEST : null;
   const drawdownStats = forecastResult.drawdownStats;
   const probabilityForecast = forecastResult.probabilityForecast;
   const adjustedProbabilityForecast = useMemo(() => {
@@ -436,6 +444,19 @@ export default function App() {
                   >
                     Heatmap
                   </button>
+                  {canShowBitcoinOverlays && (
+                    <button
+                      onClick={() => setShowBuyZones(!showBuyZones)}
+                      className={cn(
+                        "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
+                        showBuyZones
+                          ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
+                          : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
+                      )}
+                    >
+                      Buy Zones
+                    </button>
+                  )}
                   {canShowBitcoinOverlays && mvrvZScoreData.length > 0 && (
                     <button
                       onClick={() => setShowMVRV(!showMVRV)}
@@ -469,6 +490,8 @@ export default function App() {
                   showPeakLine={showPeakLine}
                   showHeatmap={showHeatmap}
                   heatmapData={heatmapData}
+                  showBuyZones={showBuyZones}
+                  buyZones={buyZoneSummary?.zones ?? []}
                   timeRange={timeRange}
                   playbackIndex={playbackIndex}
                   mvrvData={mvrvZScoreData}
@@ -481,7 +504,7 @@ export default function App() {
           </Card>
 
           {/* Metrics Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-3 shrink-0">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5 md:gap-3 shrink-0">
             <Card className="rounded-lg border-white/10 bg-[#11140f]">
               <CardContent className="p-3 md:p-4">
                 <div className="mb-2 flex items-center gap-2 text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">
@@ -498,6 +521,30 @@ export default function App() {
                 )}
               </CardContent>
             </Card>
+            {latestBuyZone && primaryBuyZoneBacktest && (
+              <Card className={cn(
+                "rounded-lg",
+                latestBuyZone.isHeavyBuy
+                  ? "border-emerald-400/30 bg-emerald-400/[0.08]"
+                  : "border-white/10 bg-[#11140f]"
+              )}>
+                <CardContent className="p-3 md:p-4">
+                  <div className="mb-2 flex items-center gap-2 text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                    <TrendingDown className="h-3.5 w-3.5 text-emerald-400" />
+                    Buy Zone
+                  </div>
+                  <p className={cn(
+                    "text-lg md:text-2xl font-semibold font-mono",
+                    latestBuyZone.isMaxConviction ? "text-emerald-200" : latestBuyZone.isHeavyBuy ? "text-emerald-300" : "text-zinc-100"
+                  )}>
+                    {(latestBuyZone.bottomScore * 100).toFixed(0)}
+                  </p>
+                  <p className="mt-0.5 text-[10px] leading-snug text-zinc-500">
+                    {latestBuyZone.isMaxConviction ? 'Max conviction' : latestBuyZone.isHeavyBuy ? 'Heavy buy active' : 'Not active'} · 1Y med {formatUnsignedPercent(primaryBuyZoneBacktest.medianReturn1y ?? 0, 0)}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
             <Card className="rounded-lg border-amber-400/20 bg-amber-400/[0.06]">
               <CardContent className="p-3 md:p-4">
                 <div className="mb-2 flex items-center gap-2 text-[10px] md:text-xs font-medium text-amber-200/80 uppercase tracking-wider">
@@ -616,6 +663,46 @@ export default function App() {
               </Button>
             </CardContent>
           </Card>
+
+          {latestBuyZone && primaryBuyZoneBacktest && (
+            <Card className="rounded-lg border-emerald-400/20 bg-[#0b120d]">
+              <CardHeader className="p-4 md:p-5">
+                <CardTitle className="flex items-center justify-between gap-2 text-sm">
+                  <span className="flex items-center gap-2">
+                    <TrendingDown className="w-4 h-4 text-emerald-300" />
+                    Heavy Buy Lab
+                  </span>
+                  <span className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                    latestBuyZone.isHeavyBuy ? "bg-emerald-400/15 text-emerald-200" : "bg-zinc-800 text-zinc-400"
+                  )}>
+                    {latestBuyZone.isHeavyBuy ? 'ACTIVE' : 'INACTIVE'}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 pt-0 md:p-5 md:pt-0 space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs md:text-sm text-zinc-400">Bottom score</span>
+                  <span className="text-xs md:text-sm font-mono text-emerald-200">{(latestBuyZone.bottomScore * 100).toFixed(1)} / 70</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs md:text-sm text-zinc-400">MVRV / realized dist pct</span>
+                  <span className="text-xs md:text-sm font-mono text-zinc-200">
+                    {formatUnsignedPercent(latestBuyZone.mvrvPercentile ?? 0, 0)} / {formatUnsignedPercent(latestBuyZone.realizedPctPast ?? 0, 0)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs md:text-sm text-zinc-400">Backtest 1Y / 2Y median</span>
+                  <span className="text-xs md:text-sm font-mono text-emerald-300">
+                    {formatSignedPercent(primaryBuyZoneBacktest.medianReturn1y ?? 0, 0)} / {formatSignedPercent(primaryBuyZoneBacktest.medianReturn2y ?? 0, 0)}
+                  </span>
+                </div>
+                <p className="text-[10px] leading-relaxed text-zinc-500">
+                  Overlay is leakage-safe: power-law residual, MVRV, realized-price distance, and drawdown pain are ranked only against prior history. Historically strong, but still allowed roughly {formatSignedPercent(primaryBuyZoneBacktest.medianWorstDrawdown180d ?? 0, 0)} median next-180d drawdown.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {activeAsset.capabilities.modelTrust && (
           <Card>
