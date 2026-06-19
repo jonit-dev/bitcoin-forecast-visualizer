@@ -1,19 +1,18 @@
 {
-  "generatedAt": "2026-06-12T23:27:35.840Z",
-  "featureDate": "2026-06-11",
+  "generatedAt": "2026-06-19T23:08:06.960Z",
+  "featureDate": "2026-06-18",
   "regime": {
     "probabilities": {
-      "accumulation-value": 0.3516483516483516,
-      "trend-expansion": 0.12087912087912087,
-      "late-cycle-overheating": 0.0879120879120879,
-      "deleveraging-bear": 0.3516483516483516,
-      "sideways-chop": 0.0879120879120879
+      "accumulation-value": 0.36363636363636365,
+      "trend-expansion": 0.09090909090909091,
+      "late-cycle-overheating": 0.09090909090909091,
+      "deleveraging-bear": 0.36363636363636365,
+      "sideways-chop": 0.09090909090909091
     },
     "topState": "accumulation-value",
     "reasonCodes": [
       "value-discount",
-      "drawdown-or-negative-momentum",
-      "hashrate-available"
+      "drawdown-or-negative-momentum"
     ],
     "contextOnly": true
   },
@@ -25,28 +24,6 @@
     ],
     "intervalMultiplierAdjustment": 1.08
   },
-  "derivativesContext": {
-    "source": "Binance USD-M Futures public REST",
-    "sourceDate": "2026-06-10",
-    "openInterestUSD": 6122146791.613028,
-    "openInterestToMarketCap": 0.004972443764615036,
-    "fundingRateDailySum": -0.000004780000000000002,
-    "fundingRateDailyAvg": -0.0000015933333333333339,
-    "leverageState": "normal",
-    "fundingState": "neutral",
-    "insight": "Funding is neutral, so derivatives are not confirming a crowded directional trade.",
-    "status": "context-only"
-  },
-  "networkContext": {
-    "source": "CoinMetrics Community API",
-    "sourceDate": "2026-06-10",
-    "transferCount": 889630,
-    "addressBalanceCount": 57013546,
-    "activeAddressShare": 0.010852192915697613,
-    "transfersPerTransaction": 1.5714790411757433,
-    "transferActivityPercentile": 0.8303771310487343,
-    "networkState": "busy",
-    "insight": "Transfer activity is high versus history, so network usage confirms above-normal activity.",
-    "status": "context-only"
-  }
+  "derivativesContext": null,
+  "networkContext": null
 }

@@ -1,34 +1,34 @@
 {
-  "generatedAt": "2026-06-12T23:27:35.840Z",
+  "generatedAt": "2026-06-19T23:08:06.960Z",
   "sources": {
     "btc": {
       "status": "fresh",
-      "latestDate": "2026-06-11",
+      "latestDate": "2026-06-18",
       "lagDays": 1,
       "required": true
     },
     "mvrv": {
       "status": "fresh",
-      "latestDate": "2026-06-11",
+      "latestDate": "2026-06-18",
       "lagDays": 1,
       "required": true
     },
     "onchain": {
-      "status": "fresh",
+      "status": "stale",
       "latestDate": "2026-06-11",
-      "lagDays": 1,
+      "lagDays": 8,
       "required": true
     },
     "features": {
       "status": "fresh",
-      "latestDate": "2026-06-11",
+      "latestDate": "2026-06-18",
       "lagDays": 1,
       "required": true
     },
     "derivatives": {
       "status": "available",
       "latestDate": "2026-06-11",
-      "lagDays": 1,
+      "lagDays": 8,
       "required": false
     },
     "etf": {

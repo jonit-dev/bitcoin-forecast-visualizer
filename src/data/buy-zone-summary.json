@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-19T22:43:03.678Z",
+  "generatedAt": "2026-06-19T23:08:06.368Z",
   "data": {
-    "btcRows": 5809,
+    "btcRows": 5816,
     "btcFirstDate": "2010-07-17",
-    "btcLastDate": "2026-06-11",
-    "featureRows": 5808,
+    "btcLastDate": "2026-06-18",
+    "featureRows": 5815,
     "featureFirstDate": "2010-07-18",
-    "featureLastDate": "2026-06-11"
+    "featureLastDate": "2026-06-18"
   },
   "config": {
     "heavyThreshold": 0.7,
@@ -21,13 +21,13 @@
     ]
   },
   "latest": {
-    "date": "2026-06-11",
-    "close": 63477.66,
-    "bottomScore": 0.6435257618749296,
-    "residualPctPast": 0.5834337868090236,
-    "mvrvPercentile": 0.18271052178405373,
-    "realizedPctPast": 0.1836031691353772,
-    "drawdownPainPctPast": 0.5238505252281729,
+    "date": "2026-06-18",
+    "close": 62822.61,
+    "bottomScore": 0.5586515307877536,
+    "residualPctPast": 0.6166150670794633,
+    "mvrvPercentile": 0.20072239422084623,
+    "realizedPctPast": null,
+    "drawdownPainPctPast": 0.49329205366357065,
     "isHeavyBuy": false,
     "isMaxConviction": false
   },
