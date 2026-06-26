@@ -36,6 +36,7 @@ function validateCache(name, relativePath, optional) {
     if (name === 'derivatives') validateDerivativesRow(row);
     if (name === 'sentiment') validateSentimentRow(row);
     if (name === 'cot') validateCotRow(row);
+    if (name === 'macro') validateMacroRow(row);
   }
   if (duplicateCount > 0) throw new Error(`${name} duplicate dates: ${duplicateCount}`);
 
@@ -50,6 +51,19 @@ function validateCache(name, relativePath, optional) {
       `credentialRequired=${metadata.credentialRequired ?? false}`,
     ].join('  ')
   );
+}
+
+function validateMacroRow(row) {
+  if (!row.metrics || typeof row.metrics !== 'object') throw new Error(`macro missing metrics on ${row.date}`);
+  if (!row.availableAfter || Number.isNaN(Date.parse(row.availableAfter))) {
+    throw new Error(`macro missing availableAfter on ${row.date}`);
+  }
+  if (Date.parse(row.availableAfter) <= Date.parse(`${row.date}T00:00:00Z`)) {
+    throw new Error(`macro availableAfter must be after source date on ${row.date}`);
+  }
+  for (const key of Object.keys(row.metrics)) {
+    if (!Number.isFinite(row.metrics[key])) throw new Error(`macro non-finite ${key} on ${row.date}`);
+  }
 }
 
 function validateCotRow(row) {

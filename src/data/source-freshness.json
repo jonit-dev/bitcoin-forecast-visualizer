@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-26T05:17:49.802Z",
+  "generatedAt": "2026-06-26T05:24:25.719Z",
   "sources": {
     "btc": {
       "status": "fresh",
@@ -38,9 +38,9 @@
       "required": false
     },
     "macro": {
-      "status": "missing-credential",
-      "latestDate": null,
-      "lagDays": null,
+      "status": "available",
+      "latestDate": "2026-06-24",
+      "lagDays": 2,
       "required": false
     },
     "sentiment": {

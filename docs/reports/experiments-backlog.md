@@ -524,3 +524,75 @@ Rerun if:
 ### Next better experiment
 
 If COT fails, keep it as context-only institutional positioning. Do not combine it with Binance derivatives unless a separate pre-registered richer positioning experiment is defined.
+
+---
+
+## 2026-06-26 — Point-in-time macro liquidity regime
+
+Status: `completed — rejected`
+
+### Hypothesis
+
+Bitcoin forecast errors and interval miscalibration are regime-dependent on liquidity and macro stress. A lag-safe macro regime score may improve 30/60/90/180d NLL, pinball loss, or regime-conditioned error without directly overfitting price residuals.
+
+### Data/source changes
+
+Use official FRED CSV endpoints, no API key required:
+
+- `WALCL`: Fed balance sheet.
+- `FEDFUNDS`: effective federal funds rate.
+- `DGS10`: 10-year Treasury yield.
+- `BAMLH0A0HYM2`: high-yield spread.
+- `M2SL`: M2 money supply.
+
+Output: `src/data/macro-history.json`.
+Result: 1095 daily aligned rows, `2023-06-26 → 2026-06-24`.
+
+Limitations:
+
+- This is latest-observation FRED data, not ALFRED vintages.
+- Rows use a conservative 30-day `availableAfter` lag for feature-table joins to reduce publication/revision lookahead risk.
+- Macro fields remain context-only unless out-of-sample evidence is strong and the revision limitation is accepted.
+
+### Validation setup
+
+Script: `scripts/backtest-macro-liquidity.ts`
+
+- Baseline: current `powerlaw-current` median and sigma.
+- Candidate A: macro regime event stats for stress, liquidity easing, tightening, and credit stress.
+- Candidate B: median unchanged; sigma widened or narrowed from transparent macro regimes with scale selected on validation only.
+- Validation: `2022-01-01 → 2024-12-31`.
+- Final holdout: `2025-01-01 → latest available target`.
+- Horizons: `30/60/90/180d`.
+- Metrics: NLL improvement, q05/q95 pinball, 90% coverage, median absolute log error guardrail, event counts, and paired block-bootstrap lower95.
+- Promotion gate: NLL or tail pinball improves on final holdout at 30/60/90d with positive lower95, 90% coverage remains sane, median absolute log error does not materially degrade, and `npm run validate:features` passes.
+
+### Report artifacts
+
+- `docs/reports/results/btc-macro-liquidity-2026-06-26T05-23-29-014Z.md`
+- `docs/reports/results/btc-macro-liquidity-2026-06-26T05-23-29-014Z.json`
+
+### Result / verdict
+
+Verdict: `reject` for forecast influence; keep macro fields context-only.
+
+The latest-observation FRED implementation was too sample-starved after conservative lagging and the available high-yield spread history:
+
+- `macro-stress`: 3 holdout samples at 30d, 1 at 60/90/180d; selected scale `0` except no improvement.
+- `credit-stress`: 3 holdout samples at 30d, 1 at 60/90/180d; selected scale `0`.
+- `liquidity-easing`: 2 holdout samples at 30d, 1 at 60d, 0 at 90/180d; selected scale `0`.
+- `tightening-pressure`: 1 holdout sample at each horizon; 60d selected scale `0.5` but worsened NLL by `-0.3057`.
+
+No regime met the minimum sample count or positive lower95 requirement. Latest FRED observations are also not vintage-safe, so macro remains context-only until ALFRED/vintage-safe data or a longer usable source history is available.
+
+### Rerun criteria
+
+Rerun if:
+
+1. ALFRED vintage-safe data is added.
+2. Macro publication lag handling changes materially.
+3. The baseline interval model changes.
+
+### Next better experiment
+
+If latest-observation FRED macro fails, do not tune macro score weights on the same holdout. Use ALFRED vintages or a different macro hypothesis before revisiting.

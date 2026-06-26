@@ -7,6 +7,7 @@ import derivativesHistory from '../src/data/derivatives-history.json';
 import stablecoinHistory from '../src/data/stablecoin-history.json';
 import sentimentHistory from '../src/data/sentiment-history.json';
 import cotHistory from '../src/data/cot-history.json';
+import macroHistory from '../src/data/macro-history.json';
 import type { OHLCVData, MVRVPoint } from '../src/lib/api';
 import { basePowerLawPrice, daysSinceGenesis } from '../src/lib/powerLaw';
 
@@ -28,6 +29,7 @@ function main(): void {
   const stablecoinRows = (stablecoinHistory as any).rows ?? [];
   const sentimentRows = (sentimentHistory as any).rows ?? [];
   const cotRows = (cotHistory as any).rows ?? [];
+  const macroRows = (macroHistory as any).rows ?? [];
   const btcByDate = new Map(btcRows.map(row => [row.date, row]));
   const mvrvByDate = new Map(mvrvRows.map(row => [row.date, row]));
   const onchainByDate = new Map(onchainRows.map(row => [row.date, row]));
@@ -51,6 +53,7 @@ function main(): void {
     const stablecoin = stablecoinByDate.get(sourceDate) as any;
     const sentiment = sentimentByDate.get(sourceDate) as any;
     const cot = latestTimedRow(cotRows, sourceDate, rowDate) as any;
+    const macro = latestTimedRow(macroRows, sourceDate, rowDate) as any;
     const features: Record<string, number> = {};
     const sourceDates: Record<string, string> = {};
     const missingFeatureReasons: Record<string, string> = {};
@@ -168,6 +171,21 @@ function main(): void {
       setFeature('cmeCotDealerNetPctRank', cot.metrics.dealerNetPctRank, cot.date, 'missing COT dealer percentile');
       setFeature('cmeCotOpenInterestChange4w', cot.metrics.openInterestChange4w, cot.date, 'missing COT OI change');
       setFeature('cmeCotOpenInterestPctRank', cot.metrics.openInterestPctRank, cot.date, 'missing COT OI percentile');
+    }
+
+    if (macro?.metrics) {
+      setFeature('macroFedBalanceSheetChange13w', macro.metrics.fedBalanceSheetChange13w, macro.date, 'missing macro Fed balance sheet 13w change');
+      setFeature('macroFedBalanceSheetChange26w', macro.metrics.fedBalanceSheetChange26w, macro.date, 'missing macro Fed balance sheet 26w change');
+      setFeature('macroFedFundsRate', macro.metrics.fedFundsRate, macro.date, 'missing macro Fed funds');
+      setFeature('macroFedFundsChange13w', macro.metrics.fedFundsChange13w, macro.date, 'missing macro Fed funds change');
+      setFeature('macroTreasury10yYield', macro.metrics.treasury10yYield, macro.date, 'missing macro 10y yield');
+      setFeature('macroTreasury10yChange30d', macro.metrics.treasury10yChange30d, macro.date, 'missing macro 10y 30d change');
+      setFeature('macroTreasury10yChange90d', macro.metrics.treasury10yChange90d, macro.date, 'missing macro 10y 90d change');
+      setFeature('macroHighYieldSpread', macro.metrics.highYieldSpread, macro.date, 'missing macro high-yield spread');
+      setFeature('macroHighYieldSpreadZ252d', macro.metrics.highYieldSpreadZ252d, macro.date, 'missing macro high-yield spread z-score');
+      setFeature('macroM2Change26w', macro.metrics.m2Change26w, macro.date, 'missing macro M2 change');
+      setFeature('macroLiquidityImpulseZ252d', macro.metrics.liquidityImpulseZ252d, macro.date, 'missing macro liquidity impulse');
+      setFeature('macroRiskScore', macro.metrics.macroRiskScore, macro.date, 'missing macro risk score');
     }
 
     rows.push({ date: rowDate, features, sourceDates, missingFeatureReasons });

@@ -25,6 +25,7 @@
     "audit:market-data-quality": "tsx scripts/audit-market-data-quality.ts",
     "backtest:sentiment-extremes": "tsx scripts/backtest-sentiment-extremes.ts",
     "backtest:cme-cot": "tsx scripts/backtest-cme-cot.ts",
+    "backtest:macro-liquidity": "tsx scripts/backtest-macro-liquidity.ts",
     "calibrate:intervals": "tsx scripts/calibrate-intervals.ts",
     "update:onchain": "node scripts/update-onchain-data.mjs",
     "validate:onchain": "node scripts/validate-onchain-data.mjs",
