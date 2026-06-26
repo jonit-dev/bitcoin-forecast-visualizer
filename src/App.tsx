@@ -748,7 +748,7 @@ export default function App() {
                     Trading System
                   </span>
                   <span className="rounded-full bg-lime-400/10 px-2 py-0.5 text-[10px] font-medium text-lime-200">
-                    ROBUST
+                    NO LEVERAGE
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -802,24 +802,24 @@ export default function App() {
                 </div>
                 <div className="space-y-1.5 border-t border-white/5 pt-3 text-[10px] leading-relaxed">
                   <div className="flex justify-between gap-3">
-                    <span className="text-zinc-500">Entry</span>
-                    <span className="text-right text-zinc-300">Bottom score 75-85 scales BTC target from 0% to 125%.</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-zinc-500">Hold</span>
-                    <span className="text-right text-zinc-300">Keeps the latest target until a scheduled Trim window.</span>
+                    <span className="text-zinc-500">Buy</span>
+                    <span className="text-right text-zinc-300">Target 100% BTC after confirmed uptrend or high-probability bottom zone.</span>
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-zinc-500">Trim</span>
-                    <span className="text-right text-zinc-300">Caps BTC at 50%; never increases exposure into Trim.</span>
+                    <span className="text-right text-zinc-300">Target 50% BTC / 50% reserve after 14 hot-valuation days.</span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="text-zinc-500">Raise</span>
+                    <span className="text-right text-zinc-300">Return to 100% BTC only after 45 cool-valuation days.</span>
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-zinc-500">Exit</span>
-                    <span className="text-right text-zinc-300">After Trim ends, target resets to 0% reserve.</span>
+                    <span className="text-right text-zinc-300">Move to 100% reserve after 10 confirmed trend-break days.</span>
                   </div>
                 </div>
                 <p className="text-[10px] leading-relaxed text-zinc-500">
-                  Chart markers are target changes after rebalance, not cumulative buy amounts.
+                  Chart markers are full portfolio targets after rebalance, not cumulative buys or sells.
                 </p>
               </CardContent>
             </Card>

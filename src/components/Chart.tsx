@@ -992,18 +992,29 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       });
     }
 
+    const minSystemLabelSpacingDays = timeRange === 'ALL' ? 300 : timeRange === '1Y' ? 45 : 20;
+    const minSystemLabelTime = timeRange === 'ALL' && lastHist
+      ? Date.parse(`${lastHist.date}T00:00:00Z`) - 5 * 365 * 86400000
+      : -Infinity;
+    let lastSystemLabelTime = -Infinity;
     const systemMarkerRows = showBitcoinOverlays && showTradingSystem && !isInPlayback
       ? tradingSystemMarkers.map(marker => {
         const exposurePct = Math.round(marker.exposure * 100);
-        const fromPct = Math.round(marker.fromExposure * 100);
         const reservePct = Math.max(0, 100 - Math.min(100, exposurePct));
-        const exposureLabel = marker.action === 'reset'
-          ? 'EXIT TO RESERVE: 0% BTC TARGET'
-          : marker.action === 'trim'
-            ? `TARGET CHANGE: ${fromPct}% -> ${exposurePct}% BTC / ${reservePct}% RESERVE`
+        const markerTime = Date.parse(`${marker.date}T00:00:00Z`);
+        const canPrintLabel = Number.isFinite(markerTime)
+          && markerTime >= minSystemLabelTime
+          && markerTime - lastSystemLabelTime >= minSystemLabelSpacingDays * 86400000;
+        if (canPrintLabel) lastSystemLabelTime = markerTime;
+        const exposureLabel = !canPrintLabel
+          ? undefined
           : marker.exposure > 1
-            ? `TARGET CHANGE: ${fromPct}% -> ${exposurePct}% BTC (${exposurePct - 100}% BORROWED)`
-            : `TARGET CHANGE: ${fromPct}% -> ${exposurePct}% BTC`;
+            ? `TARGET: ${exposurePct}% BTC / ${exposurePct - 100}% BORROW`
+          : marker.action === 'trim'
+            ? `TRIM: ${exposurePct}% BTC / ${reservePct}% CASH`
+            : marker.action === 'reset'
+              ? `EXIT: ${reservePct}% CASH`
+              : `TARGET: ${exposurePct}% BTC`;
         return {
           time: marker.date,
           position: marker.action === 'trim' || marker.action === 'reset' ? 'aboveBar' : 'belowBar',
