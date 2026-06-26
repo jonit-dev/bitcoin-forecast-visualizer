@@ -807,7 +807,7 @@ export default function App() {
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-zinc-500">Trim</span>
-                    <span className="text-right text-zinc-300">Target 50% BTC / 50% reserve after 14 hot-valuation days.</span>
+                    <span className="text-right text-zinc-300">Target 35% BTC / 65% reserve after 14 hot-valuation days.</span>
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-zinc-500">Raise</span>

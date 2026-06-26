@@ -13,6 +13,7 @@ const HOT_CONFIRM_DAYS = 14;
 const COOL_CONFIRM_DAYS = 45;
 const BREAK_CONFIRM_DAYS = 10;
 const REENTRY_COOLDOWN_DAYS = 30;
+const TRIM_TARGET = 0.35;
 
 export interface TradingSystemPoint {
   date: string;
@@ -114,8 +115,8 @@ function targetExposure(
     return target;
   }
 
-  if (hotDays >= HOT_CONFIRM_DAYS && target > 0.5) target = 0.5;
-  if (target === 0.5 && coolDays >= COOL_CONFIRM_DAYS && riskOn) target = 1;
+  if (hotDays >= HOT_CONFIRM_DAYS && target > TRIM_TARGET) target = TRIM_TARGET;
+  if (target === TRIM_TARGET && coolDays >= COOL_CONFIRM_DAYS && riskOn) target = 1;
   if (breakDays >= BREAK_CONFIRM_DAYS) target = 0;
   return target;
 }
@@ -242,8 +243,8 @@ export function computeTradingSystemSummary(): TradingSystemSummary {
   const years = yearsBetween(testRows[0].date, testRows.at(-1)?.date ?? testRows[0].date);
 
   return {
-    name: 'Confirmed Trend/Value System',
-    description: 'No-leverage trend/value system: target 100% BTC on confirmed trend or deep value, trim to 50% only after 14 hot-valuation days, raise back after 45 cool days, and exit after 10 confirmed trend-break days.',
+    name: 'Confirmed Trend/Value Risk System',
+    description: 'No-leverage trend/value system: target 100% BTC on confirmed trend or deep value, trim to 35% after 14 hot-valuation days, raise back after 45 cool days, and exit after 10 confirmed trend-break days.',
     initialCapital: INITIAL_CAPITAL,
     finalValue,
     totalReturn: finalValue / INITIAL_CAPITAL - 1,
