@@ -1,0 +1,228 @@
+{
+  "generatedAt": "2026-06-26T04:17:23.130Z",
+  "data": {
+    "btcRows": 5816,
+    "btcFirstDate": "2010-07-17",
+    "btcLastDate": "2026-06-18",
+    "featureRows": 5815,
+    "featureFirstDate": "2010-07-18",
+    "featureLastDate": "2026-06-18"
+  },
+  "preRegistration": {
+    "purpose": "Test Binance funding/premium as short-horizon bounce-risk and interval/tail-risk signals after median-adjustment ablation failed.",
+    "validationPeriod": "2022-01-01 through 2024-12-31",
+    "finalHoldoutPeriod": "2025-01-01 through latest available target",
+    "horizons": [
+      7,
+      14,
+      30,
+      60
+    ],
+    "baseline": "powerlaw-current median and sigma",
+    "eventHypotheses": [
+      "Negative funding after drawdown should increase 7/14/30d bounce probability.",
+      "Positive funding/premium after rally should increase downside/crowded-long risk."
+    ],
+    "intervalModel": "median unchanged; sigma scaled by 1 + selectedScale * max(0, abs(fundingZ) + abs(premiumZ) - 1)",
+    "leakagePolicy": "uses one-day-lagged feature table only; interval scale selected on 2022-2024 validation, then reported on 2025+ holdout.",
+    "overlapPolicy": "interval validation uses thinned origins spaced by horizon days."
+  },
+  "eventResults": {
+    "7": {
+      "negativeFundingAfterDrawdown": {
+        "samples": 5,
+        "medianReturn": -0.01647694807419494,
+        "meanReturn": -0.006635806795529689,
+        "upRate": 0.4,
+        "baselineSamples": 75,
+        "baselineMedianReturn": -0.004746959059479909,
+        "baselineUpRate": 0.4666666666666667,
+        "excessUpRate": -0.06666666666666665
+      },
+      "positiveCrowdingAfterRally": {
+        "samples": 6,
+        "medianReturn": -0.023461549672671646,
+        "meanReturn": -0.03553573491781534,
+        "upRate": 0.3333333333333333,
+        "baselineSamples": 75,
+        "baselineMedianReturn": -0.004746959059479909,
+        "baselineUpRate": 0.4666666666666667,
+        "excessUpRate": -0.13333333333333336
+      }
+    },
+    "14": {
+      "negativeFundingAfterDrawdown": {
+        "samples": 3,
+        "medianReturn": -0.048418005790459524,
+        "meanReturn": -0.058137687587221265,
+        "upRate": 0,
+        "baselineSamples": 37,
+        "baselineMedianReturn": -0.0040368784390856635,
+        "baselineUpRate": 0.43243243243243246,
+        "excessUpRate": -0.43243243243243246
+      },
+      "positiveCrowdingAfterRally": {
+        "samples": 3,
+        "medianReturn": -0.0040368784390856635,
+        "meanReturn": -0.03980140715570878,
+        "upRate": 0.3333333333333333,
+        "baselineSamples": 37,
+        "baselineMedianReturn": -0.0040368784390856635,
+        "baselineUpRate": 0.43243243243243246,
+        "excessUpRate": -0.09909909909909914
+      }
+    },
+    "30": {
+      "negativeFundingAfterDrawdown": {
+        "samples": 2,
+        "medianReturn": -0.019007576952200702,
+        "meanReturn": -0.019007576952200702,
+        "upRate": 0,
+        "baselineSamples": 17,
+        "baselineMedianReturn": -0.031271547574930565,
+        "baselineUpRate": 0.4117647058823529,
+        "excessUpRate": -0.4117647058823529
+      },
+      "positiveCrowdingAfterRally": {
+        "samples": 0,
+        "medianReturn": null,
+        "meanReturn": null,
+        "upRate": null,
+        "baselineSamples": 17,
+        "baselineMedianReturn": -0.031271547574930565,
+        "baselineUpRate": 0.4117647058823529,
+        "excessUpRate": null
+      }
+    },
+    "60": {
+      "negativeFundingAfterDrawdown": {
+        "samples": 1,
+        "medianReturn": 0.12205168748866108,
+        "meanReturn": 0.12205168748866108,
+        "upRate": 1,
+        "baselineSamples": 8,
+        "baselineMedianReturn": -0.0007734183516739006,
+        "baselineUpRate": 0.5,
+        "excessUpRate": 0.5
+      },
+      "positiveCrowdingAfterRally": {
+        "samples": 0,
+        "medianReturn": null,
+        "meanReturn": null,
+        "upRate": null,
+        "baselineSamples": 8,
+        "baselineMedianReturn": -0.0007734183516739006,
+        "baselineUpRate": 0.5,
+        "excessUpRate": null
+      }
+    }
+  },
+  "intervalCandidate": {
+    "selectedIntervalScales": {
+      "7": 0,
+      "14": 0.1,
+      "30": 0,
+      "60": 0
+    },
+    "validationThinned": {
+      "7": {
+        "samples": 157,
+        "nll": -1.2081365525569179,
+        "baselineNll": -1.2081365525569179,
+        "meanNllImprovement": 0,
+        "coverage80": 0.8598726114649682,
+        "coverage90": 0.910828025477707,
+        "coverage95": 0.9299363057324841,
+        "meanInterval90WidthLog": 0.25181494797018567,
+        "baselineCoverage90": 0.910828025477707,
+        "baselineInterval90WidthLog": 0.25181494797018567
+      },
+      "14": {
+        "samples": 79,
+        "nll": -0.835873968891698,
+        "baselineNll": -0.8342715789785036,
+        "meanNllImprovement": 0.0016023899131945454,
+        "coverage80": 0.8354430379746836,
+        "coverage90": 0.8734177215189873,
+        "coverage95": 0.8987341772151899,
+        "meanInterval90WidthLog": 0.3559771698264976,
+        "baselineCoverage90": 0.8734177215189873,
+        "baselineInterval90WidthLog": 0.35040682065567275
+      },
+      "30": {
+        "samples": 36,
+        "nll": -0.47374226187037904,
+        "baselineNll": -0.47374226187037904,
+        "meanNllImprovement": 0,
+        "coverage80": 0.75,
+        "coverage90": 0.8333333333333334,
+        "coverage95": 0.9166666666666666,
+        "meanInterval90WidthLog": 0.47980150336215566,
+        "baselineCoverage90": 0.8333333333333334,
+        "baselineInterval90WidthLog": 0.47980150336215566
+      },
+      "60": {
+        "samples": 18,
+        "nll": -0.2753585076869518,
+        "baselineNll": -0.2753585076869518,
+        "meanNllImprovement": 0,
+        "coverage80": 0.8333333333333334,
+        "coverage90": 1,
+        "coverage95": 1,
+        "meanInterval90WidthLog": 0.6502898928828821,
+        "baselineCoverage90": 1,
+        "baselineInterval90WidthLog": 0.6502898928828821
+      }
+    },
+    "holdoutThinned": {
+      "7": {
+        "samples": 75,
+        "nll": -1.4645695306514666,
+        "baselineNll": -1.4645695306514666,
+        "meanNllImprovement": 0,
+        "coverage80": 0.88,
+        "coverage90": 0.92,
+        "coverage95": 0.96,
+        "meanInterval90WidthLog": 0.20699152957636008,
+        "baselineCoverage90": 0.92,
+        "baselineInterval90WidthLog": 0.20699152957636008
+      },
+      "14": {
+        "samples": 37,
+        "nll": -1.1333389257928215,
+        "baselineNll": -1.1443386833891356,
+        "meanNllImprovement": -0.010999757596313877,
+        "coverage80": 0.8648648648648649,
+        "coverage90": 0.918918918918919,
+        "coverage95": 0.9459459459459459,
+        "meanInterval90WidthLog": 0.2917505245125168,
+        "baselineCoverage90": 0.918918918918919,
+        "baselineInterval90WidthLog": 0.28709086178677823
+      },
+      "30": {
+        "samples": 17,
+        "nll": -0.885211434683435,
+        "baselineNll": -0.885211434683435,
+        "meanNllImprovement": 0,
+        "coverage80": 0.8823529411764706,
+        "coverage90": 0.9411764705882353,
+        "coverage95": 1,
+        "meanInterval90WidthLog": 0.39829467458971013,
+        "baselineCoverage90": 0.9411764705882353,
+        "baselineInterval90WidthLog": 0.39829467458971013
+      },
+      "60": {
+        "samples": 8,
+        "nll": -0.5768886118783378,
+        "baselineNll": -0.5768886118783378,
+        "meanNllImprovement": 0,
+        "coverage80": 0.875,
+        "coverage90": 1,
+        "coverage95": 1,
+        "meanInterval90WidthLog": 0.5337808679836967,
+        "baselineCoverage90": 1,
+        "baselineInterval90WidthLog": 0.5337808679836967
+      }
+    }
+  }
+}

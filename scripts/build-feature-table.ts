@@ -4,6 +4,7 @@ import btcHistory from '../src/data/btc-history.json';
 import mvrvHistory from '../src/data/mvrv-history.json';
 import onchainHistory from '../src/data/onchain-history.json';
 import derivativesHistory from '../src/data/derivatives-history.json';
+import stablecoinHistory from '../src/data/stablecoin-history.json';
 import type { OHLCVData, MVRVPoint } from '../src/lib/api';
 import { basePowerLawPrice, daysSinceGenesis } from '../src/lib/powerLaw';
 
@@ -22,10 +23,12 @@ function main(): void {
   const mvrvRows = mvrvHistory as MVRVPoint[];
   const onchainRows = onchainHistory as any[];
   const derivativesRows = (derivativesHistory as any).rows ?? [];
+  const stablecoinRows = (stablecoinHistory as any).rows ?? [];
   const btcByDate = new Map(btcRows.map(row => [row.date, row]));
   const mvrvByDate = new Map(mvrvRows.map(row => [row.date, row]));
   const onchainByDate = new Map(onchainRows.map(row => [row.date, row]));
   const derivativesByDate = new Map(derivativesRows.map((row: any) => [row.date, row]));
+  const stablecoinByDate = new Map(stablecoinRows.map((row: any) => [row.date, row]));
   const rows: FeatureRow[] = [];
   const runningMvrvValues: number[] = [];
 
@@ -40,6 +43,7 @@ function main(): void {
 
     const onchain = onchainByDate.get(sourceDate);
     const derivatives = derivativesByDate.get(sourceDate) as any;
+    const stablecoin = stablecoinByDate.get(sourceDate) as any;
     const features: Record<string, number> = {};
     const sourceDates: Record<string, string> = {};
     const missingFeatureReasons: Record<string, string> = {};
@@ -99,12 +103,35 @@ function main(): void {
     if (isDerivativeRowAvailable(derivatives, rowDate)) {
       setFeature('futuresFundingRateDailyAvg', derivatives.metrics.fundingRateDailyAvg, sourceDate, 'missing derivatives funding');
       setFeature('futuresFundingRateDailySum', derivatives.metrics.fundingRateDailySum, sourceDate, 'missing derivatives funding');
+      setFeature('futuresFundingRateSum7d', derivatives.metrics.fundingRateSum7d, sourceDate, 'missing derivatives funding lookback');
+      setFeature('futuresFundingRateSum30d', derivatives.metrics.fundingRateSum30d, sourceDate, 'missing derivatives funding lookback');
+      setFeature('futuresFundingRateSumZ90d', derivatives.metrics.fundingRateSumZ90d, sourceDate, 'missing derivatives funding z-score');
+      setFeature('futuresFundingRateAvgZ90d', derivatives.metrics.fundingRateAvgZ90d, sourceDate, 'missing derivatives funding z-score');
+      setFeature('futuresPremiumClose', derivatives.metrics.premiumClose, sourceDate, 'missing derivatives premium');
+      setFeature('futuresPremiumCloseZ90d', derivatives.metrics.premiumCloseZ90d, sourceDate, 'missing derivatives premium z-score');
+      setFeature('futuresPremiumRange', derivatives.metrics.premiumRange, sourceDate, 'missing derivatives premium range');
       setFeature('futuresOpenInterestUSD', derivatives.metrics.openInterestUSD, sourceDate, 'missing derivatives open interest');
       setFeature(
         'futuresOpenInterestToMarketCap',
         derivatives.metrics.openInterestUSD && mvrv?.marketCap ? derivatives.metrics.openInterestUSD / mvrv.marketCap : null,
         sourceDate,
         'missing derivatives open interest or market cap'
+      );
+    }
+
+    if (isTimedRowAvailable(stablecoin, rowDate)) {
+      setFeature('stablecoinSupplyUSD', stablecoin.metrics.totalSupplyUSD, sourceDate, 'missing stablecoin supply');
+      setFeature('stablecoinSupplyChange7d', stablecoin.metrics.totalSupplyChange7d, sourceDate, 'missing stablecoin 7d change');
+      setFeature('stablecoinSupplyChange30d', stablecoin.metrics.totalSupplyChange30d, sourceDate, 'missing stablecoin 30d change');
+      setFeature('stablecoinSupplyChange90d', stablecoin.metrics.totalSupplyChange90d, sourceDate, 'missing stablecoin 90d change');
+      setFeature('stablecoinSupplyChange365d', stablecoin.metrics.totalSupplyChange365d, sourceDate, 'missing stablecoin 365d change');
+      setFeature('stablecoinSupplyZ365d', stablecoin.metrics.totalSupplyZ365d, sourceDate, 'missing stablecoin z-score');
+      setFeature('stablecoinLiquidityImpulse30dVsAnnual', stablecoin.metrics.liquidityImpulse30dVsAnnual, sourceDate, 'missing stablecoin liquidity impulse');
+      setFeature(
+        'stablecoinSupplyToBtcMarketCap',
+        stablecoin.metrics.totalSupplyUSD && mvrv?.marketCap ? stablecoin.metrics.totalSupplyUSD / mvrv.marketCap : null,
+        sourceDate,
+        'missing stablecoin supply or BTC market cap'
       );
     }
 
@@ -161,6 +188,10 @@ function addUtcDays(date: string, days: number): string {
 }
 
 function isDerivativeRowAvailable(row: any, forecastDate: string): boolean {
+  return isTimedRowAvailable(row, forecastDate);
+}
+
+function isTimedRowAvailable(row: any, forecastDate: string): boolean {
   if (!row?.metrics) return false;
   if (!row.availableAfter) return true;
   return Date.parse(row.availableAfter) <= Date.parse(`${forecastDate}T00:00:00Z`);

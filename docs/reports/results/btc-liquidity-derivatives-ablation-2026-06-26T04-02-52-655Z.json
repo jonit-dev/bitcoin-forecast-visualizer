@@ -1,0 +1,2660 @@
+{
+  "generatedAt": "2026-06-26T04:02:52.655Z",
+  "data": {
+    "btcRows": 5816,
+    "btcFirstDate": "2010-07-17",
+    "btcLastDate": "2026-06-18",
+    "featureRows": 5815,
+    "featureFirstDate": "2010-07-18",
+    "featureLastDate": "2026-06-18"
+  },
+  "preRegistration": {
+    "purpose": "Research-only ablation of public stablecoin liquidity and Binance derivatives crowding features against current power-law BTC forecast.",
+    "validationPeriod": "2022-01-01 through 2024-12-31",
+    "finalHoldoutPeriod": "2025-01-01 through latest available target",
+    "horizons": [
+      7,
+      14,
+      30,
+      60,
+      90,
+      180,
+      365
+    ],
+    "baseline": "powerlaw-current median forecast",
+    "modelForm": "candidate median = baseline median * exp(coefficient * featureComposite); coefficient selected on validation grid only",
+    "leakagePolicy": "feature-table sources are one-day lagged; this script additionally uses expanding-z normalization from prior feature rows only.",
+    "caution": "Daily labels overlap; thinned metrics use origin spacing equal to horizon days and are the promotion gate."
+  },
+  "baseline": {
+    "validationDaily": {
+      "7": {
+        "samples": 1096,
+        "medianAbsLogError": 0.03746175460566814,
+        "meanAbsLogError": 0.053798741296780514,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.5748175182481752,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "14": {
+        "samples": 1096,
+        "medianAbsLogError": 0.0555890172492397,
+        "meanAbsLogError": 0.0765443975471184,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.5866788321167883,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "30": {
+        "samples": 1096,
+        "medianAbsLogError": 0.09019507412474148,
+        "meanAbsLogError": 0.11171159583941465,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.6414233576642335,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "60": {
+        "samples": 1096,
+        "medianAbsLogError": 0.14686001824556616,
+        "meanAbsLogError": 0.15610369087331186,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.7025547445255474,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "90": {
+        "samples": 1096,
+        "medianAbsLogError": 0.165786182845701,
+        "meanAbsLogError": 0.17898183254272812,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.7436131386861314,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "180": {
+        "samples": 1096,
+        "medianAbsLogError": 0.14777515681601727,
+        "meanAbsLogError": 0.18062985870730203,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.8567518248175182,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "365": {
+        "samples": 1096,
+        "medianAbsLogError": 0.12711780287405627,
+        "meanAbsLogError": 0.1359327813115473,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.9625912408759124,
+        "bootstrapLower95MeanImprovement": 0
+      }
+    },
+    "holdoutDaily": {
+      "7": {
+        "samples": 527,
+        "medianAbsLogError": 0.034749013966084874,
+        "meanAbsLogError": 0.042111379315031575,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.5616698292220114,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "14": {
+        "samples": 520,
+        "medianAbsLogError": 0.04845168731168226,
+        "meanAbsLogError": 0.06032944500574365,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.5884615384615385,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "30": {
+        "samples": 504,
+        "medianAbsLogError": 0.06724929827848314,
+        "meanAbsLogError": 0.08767029556761345,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.6309523809523809,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "60": {
+        "samples": 474,
+        "medianAbsLogError": 0.12388395415357945,
+        "meanAbsLogError": 0.12385018814514369,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.6708860759493671,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "90": {
+        "samples": 444,
+        "medianAbsLogError": 0.13292503330206973,
+        "meanAbsLogError": 0.1312725639760119,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.759009009009009,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "180": {
+        "samples": 354,
+        "medianAbsLogError": 0.12385999600751063,
+        "meanAbsLogError": 0.1481548191341691,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.9915254237288136,
+        "bootstrapLower95MeanImprovement": 0
+      },
+      "365": {
+        "samples": 169,
+        "medianAbsLogError": 0.14844027299487017,
+        "meanAbsLogError": 0.15573027863401348,
+        "meanImprovementVsBaseline": 0,
+        "directionHitRate": 0.727810650887574,
+        "bootstrapLower95MeanImprovement": 0
+      }
+    }
+  },
+  "candidates": [
+    {
+      "id": "stablecoin-supply-z365",
+      "family": "stablecoin",
+      "description": "Aggregate stablecoin supply z-score versus trailing 365d history.",
+      "featureNames": [
+        "stablecoinSupplyZ365d"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0,
+        "14": 0,
+        "30": 0,
+        "60": -0.08,
+        "90": -0.04,
+        "180": -0.08,
+        "365": 0.08
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.03746175460566814,
+          "meanAbsLogError": 0.053798741296780514,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5748175182481752,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.0555890172492397,
+          "meanAbsLogError": 0.0765443975471184,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5866788321167883,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09019507412474148,
+          "meanAbsLogError": 0.11171159583941465,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6414233576642335,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14014759107175312,
+          "meanAbsLogError": 0.1630954001857643,
+          "meanImprovementVsBaseline": -0.006991709312452588,
+          "directionHitRate": 0.7171532846715328,
+          "bootstrapLower95MeanImprovement": -0.03994636078659683
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.1429201559984703,
+          "meanAbsLogError": 0.16332038580155556,
+          "meanImprovementVsBaseline": 0.015661446741172057,
+          "directionHitRate": 0.8412408759124088,
+          "bootstrapLower95MeanImprovement": 0.0003809377503401194
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14473861454909542,
+          "meanAbsLogError": 0.15536219855747682,
+          "meanImprovementVsBaseline": 0.025267660149825164,
+          "directionHitRate": 0.8832116788321168,
+          "bootstrapLower95MeanImprovement": -0.01865884130172756
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14161597018281924,
+          "meanAbsLogError": 0.16914964396372784,
+          "meanImprovementVsBaseline": -0.03321686265218067,
+          "directionHitRate": 0.9571167883211679,
+          "bootstrapLower95MeanImprovement": -0.05210470071789379
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03585497178815977,
+          "meanAbsLogError": 0.051763628563995016,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5605095541401274,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.054206853825684576,
+          "meanAbsLogError": 0.07910921371396999,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5569620253164557,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.08748874438433951,
+          "meanAbsLogError": 0.11535819441166043,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.10626148883229813,
+          "meanAbsLogError": 0.13585689023988806,
+          "meanImprovementVsBaseline": 0.026224691996239596,
+          "directionHitRate": 0.7777777777777778,
+          "bootstrapLower95MeanImprovement": 0.026224691996239596
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.11370733522281196,
+          "meanAbsLogError": 0.12703876230009273,
+          "meanImprovementVsBaseline": 0.006627469373194324,
+          "directionHitRate": 0.9166666666666666,
+          "bootstrapLower95MeanImprovement": 0.006627469373194324
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.0993087663551222,
+          "meanAbsLogError": 0.12726621755563508,
+          "meanImprovementVsBaseline": 0.04035251799058326,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.029926444294709142,
+          "meanAbsLogError": 0.11372151496197407,
+          "meanImprovementVsBaseline": 0.08349620301770717,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.034749013966084874,
+          "meanAbsLogError": 0.042111379315031575,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5616698292220114,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.04845168731168226,
+          "meanAbsLogError": 0.06032944500574365,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5884615384615385,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.06724929827848314,
+          "meanAbsLogError": 0.08767029556761345,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6309523809523809,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.14233892727595077,
+          "meanAbsLogError": 0.14596880098978646,
+          "meanImprovementVsBaseline": -0.022118612844642883,
+          "directionHitRate": 0.540084388185654,
+          "bootstrapLower95MeanImprovement": -0.0823953113047137
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.12476798896018693,
+          "meanAbsLogError": 0.1294767711359471,
+          "meanImprovementVsBaseline": 0.0017957928400650388,
+          "directionHitRate": 0.6936936936936937,
+          "bootstrapLower95MeanImprovement": -0.03148396624911289
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.15051702014189594,
+          "meanAbsLogError": 0.16045333730023234,
+          "meanImprovementVsBaseline": -0.012298518166063355,
+          "directionHitRate": 0.6468926553672316,
+          "bootstrapLower95MeanImprovement": -0.11053464818705373
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.3080058865643682,
+          "meanAbsLogError": 0.3178553271025821,
+          "meanImprovementVsBaseline": -0.1621250484685685,
+          "directionHitRate": 0.28994082840236685,
+          "bootstrapLower95MeanImprovement": -0.1621250484685685
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03783395041117821,
+          "meanAbsLogError": 0.041801537349364634,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5405405405405406,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.04139632544690919,
+          "meanAbsLogError": 0.07076318958027147,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6470588235294118,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.13668522135923045,
+          "meanAbsLogError": 0.13982844176976106,
+          "meanImprovementVsBaseline": -0.037363688237581405,
+          "directionHitRate": 0.5,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.08474015202434337,
+          "meanAbsLogError": 0.08560535285752593,
+          "meanImprovementVsBaseline": 0.006403143707817094,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.1382102475594662,
+          "meanAbsLogError": 0.1382102475594662,
+          "meanImprovementVsBaseline": -0.01916507738998874,
+          "directionHitRate": 0.5,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "context-only",
+      "verdictReason": "Some target-horizon improvement exists, but it is not stable enough across thinned horizons to promote."
+    },
+    {
+      "id": "stablecoin-30d-impulse",
+      "family": "stablecoin",
+      "description": "Aggregate stablecoin supply 30d growth, expanding-z normalized.",
+      "featureNames": [
+        "stablecoinSupplyChange30d"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0.04,
+        "14": 0.08,
+        "30": -0.12,
+        "60": -0.3,
+        "90": 0.04,
+        "180": -0.24,
+        "365": -0.3
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.037144379144451456,
+          "meanAbsLogError": 0.05378288203071308,
+          "meanImprovementVsBaseline": 0.00001585926606743214,
+          "directionHitRate": 0.5602189781021898,
+          "bootstrapLower95MeanImprovement": -0.0004509225052284677
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.05455051625882135,
+          "meanAbsLogError": 0.0763519087901661,
+          "meanImprovementVsBaseline": 0.0001924887569522073,
+          "directionHitRate": 0.5684306569343066,
+          "bootstrapLower95MeanImprovement": -0.0010162120950138874
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09198839720048024,
+          "meanAbsLogError": 0.11267453826417068,
+          "meanImprovementVsBaseline": -0.0009629424247560975,
+          "directionHitRate": 0.6551094890510949,
+          "bootstrapLower95MeanImprovement": -0.0037994197785105837
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.1601555682275313,
+          "meanAbsLogError": 0.15946453453946166,
+          "meanImprovementVsBaseline": -0.00336084366614985,
+          "directionHitRate": 0.6870437956204379,
+          "bootstrapLower95MeanImprovement": -0.013842732154414011
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.16660829752051232,
+          "meanAbsLogError": 0.1786627858463329,
+          "meanImprovementVsBaseline": 0.00031904669639500576,
+          "directionHitRate": 0.7381386861313869,
+          "bootstrapLower95MeanImprovement": -0.0011298583508360987
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14523071715747626,
+          "meanAbsLogError": 0.18294966284439937,
+          "meanImprovementVsBaseline": -0.002319804137097248,
+          "directionHitRate": 0.8886861313868614,
+          "bootstrapLower95MeanImprovement": -0.014812296265306796
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.11253999321221997,
+          "meanAbsLogError": 0.1272481586369331,
+          "meanImprovementVsBaseline": 0.008684622674614492,
+          "directionHitRate": 0.9625912408759124,
+          "bootstrapLower95MeanImprovement": 0.0016992078408832084
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03471347159152138,
+          "meanAbsLogError": 0.051528385960999776,
+          "meanImprovementVsBaseline": 0.00023524260299524077,
+          "directionHitRate": 0.554140127388535,
+          "bootstrapLower95MeanImprovement": -0.0003457441016879704
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.05538349329142278,
+          "meanAbsLogError": 0.07887027716862152,
+          "meanImprovementVsBaseline": 0.00023893654534846864,
+          "directionHitRate": 0.5569620253164557,
+          "bootstrapLower95MeanImprovement": -0.0014121533044983334
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.1021657730142751,
+          "meanAbsLogError": 0.11526186416828822,
+          "meanImprovementVsBaseline": 0.00009633024337220143,
+          "directionHitRate": 0.7222222222222222,
+          "bootstrapLower95MeanImprovement": 0.00009633024337220143
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.17775026157515583,
+          "meanAbsLogError": 0.1585362479608314,
+          "meanImprovementVsBaseline": 0.0035453342752962413,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": 0.0035453342752962413
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.1272558539638977,
+          "meanAbsLogError": 0.1335340189044638,
+          "meanImprovementVsBaseline": 0.00013221276882324773,
+          "directionHitRate": 0.9166666666666666,
+          "bootstrapLower95MeanImprovement": 0.00013221276882324773
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.1484536694123717,
+          "meanAbsLogError": 0.16589741971736474,
+          "meanImprovementVsBaseline": 0.001721315828853598,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.18445358014882807,
+          "meanAbsLogError": 0.18489501511581055,
+          "meanImprovementVsBaseline": 0.01232270286387068,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.03546162222148119,
+          "meanAbsLogError": 0.04217484347377869,
+          "meanImprovementVsBaseline": -0.00006346415874710128,
+          "directionHitRate": 0.5351043643263758,
+          "bootstrapLower95MeanImprovement": -0.0005803818330695245
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.049300841775106186,
+          "meanAbsLogError": 0.06067053418208146,
+          "meanImprovementVsBaseline": -0.0003410891763377875,
+          "directionHitRate": 0.5346153846153846,
+          "bootstrapLower95MeanImprovement": -0.0020280749612869254
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.06829009063758118,
+          "meanAbsLogError": 0.08889440545305526,
+          "meanImprovementVsBaseline": -0.0012241098854418896,
+          "directionHitRate": 0.6765873015873016,
+          "bootstrapLower95MeanImprovement": -0.004481345445185014
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.10749714133479582,
+          "meanAbsLogError": 0.1252645749566739,
+          "meanImprovementVsBaseline": -0.0014143868115300377,
+          "directionHitRate": 0.7827004219409283,
+          "bootstrapLower95MeanImprovement": -0.014202169348558126
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.13330725154732903,
+          "meanAbsLogError": 0.1309236505439781,
+          "meanImprovementVsBaseline": 0.0003489134320339319,
+          "directionHitRate": 0.7387387387387387,
+          "bootstrapLower95MeanImprovement": -0.0017695067866903163
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.13313898773659094,
+          "meanAbsLogError": 0.1541809314238269,
+          "meanImprovementVsBaseline": -0.006026112289657821,
+          "directionHitRate": 0.980225988700565,
+          "bootstrapLower95MeanImprovement": -0.02328591709566694
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.17961632601794975,
+          "meanAbsLogError": 0.1868744353095273,
+          "meanImprovementVsBaseline": -0.031144156675513804,
+          "directionHitRate": 0.5798816568047337,
+          "bootstrapLower95MeanImprovement": -0.031144156675513804
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.035636878860772825,
+          "meanAbsLogError": 0.04154815753837265,
+          "meanImprovementVsBaseline": 0.00025337981099198714,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": -0.0007598327275340467
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.04167805245279155,
+          "meanAbsLogError": 0.05588282417277898,
+          "meanImprovementVsBaseline": -0.00028207775634646814,
+          "directionHitRate": 0.5945945945945946,
+          "bootstrapLower95MeanImprovement": -0.0012456541627209297
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.05339706804478617,
+          "meanAbsLogError": 0.07336305906150349,
+          "meanImprovementVsBaseline": -0.0025998694812320246,
+          "directionHitRate": 0.7647058823529411,
+          "bootstrapLower95MeanImprovement": -0.0025998694812320246
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.08990944999282036,
+          "meanAbsLogError": 0.10974236636175339,
+          "meanImprovementVsBaseline": -0.007277612829573732,
+          "directionHitRate": 0.625,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.11700610348215967,
+          "meanAbsLogError": 0.09121640183537708,
+          "meanImprovementVsBaseline": 0.000792094729965953,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.11863129595243116,
+          "meanAbsLogError": 0.11863129595243116,
+          "meanImprovementVsBaseline": 0.0004138742170463061,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "context-only",
+      "verdictReason": "Some target-horizon improvement exists, but it is not stable enough across thinned horizons to promote."
+    },
+    {
+      "id": "stablecoin-90d-impulse",
+      "family": "stablecoin",
+      "description": "Aggregate stablecoin supply 90d growth, expanding-z normalized.",
+      "featureNames": [
+        "stablecoinSupplyChange90d"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0.04,
+        "14": 0.04,
+        "30": -0.08,
+        "60": -0.3,
+        "90": 0.04,
+        "180": -0.18,
+        "365": -0.3
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.037218190170901444,
+          "meanAbsLogError": 0.05385609005264951,
+          "meanImprovementVsBaseline": -0.00005734875586902395,
+          "directionHitRate": 0.5647810218978102,
+          "bootstrapLower95MeanImprovement": -0.0006931922385977958
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.05479408411341691,
+          "meanAbsLogError": 0.07629171432391946,
+          "meanImprovementVsBaseline": 0.00025268322319882733,
+          "directionHitRate": 0.5611313868613139,
+          "bootstrapLower95MeanImprovement": -0.0005936449118872208
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09112256466007729,
+          "meanAbsLogError": 0.11251316244831767,
+          "meanImprovementVsBaseline": -0.000801566608903008,
+          "directionHitRate": 0.6478102189781022,
+          "bootstrapLower95MeanImprovement": -0.003384451874341478
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.163895520706121,
+          "meanAbsLogError": 0.16204068939608737,
+          "meanImprovementVsBaseline": -0.0059369985227756,
+          "directionHitRate": 0.6605839416058394,
+          "bootstrapLower95MeanImprovement": -0.020189796267768442
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.16766516669571097,
+          "meanAbsLogError": 0.17857467357870488,
+          "meanImprovementVsBaseline": 0.0004071589640231135,
+          "directionHitRate": 0.7363138686131386,
+          "bootstrapLower95MeanImprovement": -0.0015484616588449086
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14517921649879106,
+          "meanAbsLogError": 0.18298158963617273,
+          "meanImprovementVsBaseline": -0.002351730928870615,
+          "directionHitRate": 0.8886861313868614,
+          "bootstrapLower95MeanImprovement": -0.015054025528543756
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.10768472233308479,
+          "meanAbsLogError": 0.12563985917605053,
+          "meanImprovementVsBaseline": 0.010292922135496776,
+          "directionHitRate": 0.9625912408759124,
+          "bootstrapLower95MeanImprovement": 0.0008306602079387968
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03562707760354478,
+          "meanAbsLogError": 0.05156978601937317,
+          "meanImprovementVsBaseline": 0.00019384254462184513,
+          "directionHitRate": 0.5414012738853503,
+          "bootstrapLower95MeanImprovement": -0.0005980798545040844
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.05748727077427418,
+          "meanAbsLogError": 0.0788528567948887,
+          "meanImprovementVsBaseline": 0.0002563569190813031,
+          "directionHitRate": 0.5443037974683544,
+          "bootstrapLower95MeanImprovement": -0.000881326241705383
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.10077493007069638,
+          "meanAbsLogError": 0.11524980778637689,
+          "meanImprovementVsBaseline": 0.00010838662528353836,
+          "directionHitRate": 0.6944444444444444,
+          "bootstrapLower95MeanImprovement": 0.00010838662528353836
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.16528562195018814,
+          "meanAbsLogError": 0.1572715036952309,
+          "meanImprovementVsBaseline": 0.00481007854089673,
+          "directionHitRate": 0.6111111111111112,
+          "bootstrapLower95MeanImprovement": 0.00481007854089673
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.1253182933225041,
+          "meanAbsLogError": 0.13349059980951594,
+          "meanImprovementVsBaseline": 0.0001756318637711196,
+          "directionHitRate": 0.9166666666666666,
+          "bootstrapLower95MeanImprovement": 0.0001756318637711196
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.14828938036626127,
+          "meanAbsLogError": 0.16573325867688027,
+          "meanImprovementVsBaseline": 0.0018854768693380801,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.19727392768294827,
+          "meanAbsLogError": 0.18042464534617983,
+          "meanImprovementVsBaseline": 0.01679307263350142,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.034962502736117784,
+          "meanAbsLogError": 0.042260020978755974,
+          "meanImprovementVsBaseline": -0.00014864166372436017,
+          "directionHitRate": 0.5332068311195446,
+          "bootstrapLower95MeanImprovement": -0.0008572834791341074
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.050555284036758685,
+          "meanAbsLogError": 0.060479856950078036,
+          "meanImprovementVsBaseline": -0.00015041194433430464,
+          "directionHitRate": 0.5346153846153846,
+          "bootstrapLower95MeanImprovement": -0.0012654743908397288
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.06849895213180623,
+          "meanAbsLogError": 0.08868632350894813,
+          "meanImprovementVsBaseline": -0.001016027941334665,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": -0.003922048217466935
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.10635493887720138,
+          "meanAbsLogError": 0.12696529837539594,
+          "meanImprovementVsBaseline": -0.0031151102302521202,
+          "directionHitRate": 0.7257383966244726,
+          "bootstrapLower95MeanImprovement": -0.02029297811384847
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.13299088475172827,
+          "meanAbsLogError": 0.1308157442525866,
+          "meanImprovementVsBaseline": 0.00045681972342550837,
+          "directionHitRate": 0.7364864864864865,
+          "bootstrapLower95MeanImprovement": -0.0023849439418823443
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.13313914901269364,
+          "meanAbsLogError": 0.1542611752276128,
+          "meanImprovementVsBaseline": -0.006106356093443676,
+          "directionHitRate": 0.980225988700565,
+          "bootstrapLower95MeanImprovement": -0.023422357627421758
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.19018377989448787,
+          "meanAbsLogError": 0.19744468152275332,
+          "meanImprovementVsBaseline": -0.04171440288873993,
+          "directionHitRate": 0.5088757396449705,
+          "bootstrapLower95MeanImprovement": -0.04171440288873993
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03457611458271437,
+          "meanAbsLogError": 0.041575293422086476,
+          "meanImprovementVsBaseline": 0.00022624392727815728,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": -0.0011392382296040657
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.04058192099468094,
+          "meanAbsLogError": 0.055751424260094495,
+          "meanImprovementVsBaseline": -0.00015067784366197957,
+          "directionHitRate": 0.5945945945945946,
+          "bootstrapLower95MeanImprovement": -0.0007463690685173904
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.052102855786477775,
+          "meanAbsLogError": 0.07297674587204896,
+          "meanImprovementVsBaseline": -0.0022135562917774865,
+          "directionHitRate": 0.7647058823529411,
+          "bootstrapLower95MeanImprovement": -0.0022135562917774865
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.07949027100170714,
+          "meanAbsLogError": 0.1123519276105378,
+          "meanImprovementVsBaseline": -0.009887174078358152,
+          "directionHitRate": 0.75,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.11562376911606087,
+          "meanAbsLogError": 0.09096295353301506,
+          "meanImprovementVsBaseline": 0.0010455430323279558,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.11856598806214524,
+          "meanAbsLogError": 0.11856598806214524,
+          "meanImprovementVsBaseline": 0.0004791821073322211,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "context-only",
+      "verdictReason": "Some target-horizon improvement exists, but it is not stable enough across thinned horizons to promote."
+    },
+    {
+      "id": "stablecoin-liquidity-impulse",
+      "family": "stablecoin",
+      "description": "30d stablecoin liquidity impulse relative to annualized 365d trend, expanding-z normalized.",
+      "featureNames": [
+        "stablecoinLiquidityImpulse30dVsAnnual"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": -0.04,
+        "14": -0.04,
+        "30": 0.08,
+        "60": 0.3,
+        "90": -0.04,
+        "180": 0.18,
+        "365": 0.3
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.037369156971342576,
+          "meanAbsLogError": 0.05388672615790982,
+          "meanImprovementVsBaseline": -0.00008798486112935192,
+          "directionHitRate": 0.5638686131386861,
+          "bootstrapLower95MeanImprovement": -0.0007686571877081036
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.05468374078114824,
+          "meanAbsLogError": 0.07629334695370321,
+          "meanImprovementVsBaseline": 0.0002510505934151844,
+          "directionHitRate": 0.5638686131386861,
+          "bootstrapLower95MeanImprovement": -0.0006469457825572094
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09165048155260092,
+          "meanAbsLogError": 0.1126120494387972,
+          "meanImprovementVsBaseline": -0.0009004535993823873,
+          "directionHitRate": 0.6541970802919708,
+          "bootstrapLower95MeanImprovement": -0.0036543688457613215
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.16434799858037952,
+          "meanAbsLogError": 0.16292272944933273,
+          "meanImprovementVsBaseline": -0.00681903857602105,
+          "directionHitRate": 0.656934306569343,
+          "bootstrapLower95MeanImprovement": -0.02209872738171578
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.16794103253872095,
+          "meanAbsLogError": 0.1785358038935699,
+          "meanImprovementVsBaseline": 0.0004460286491585977,
+          "directionHitRate": 0.7354014598540146,
+          "bootstrapLower95MeanImprovement": -0.0016525156447436823
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14602986822617492,
+          "meanAbsLogError": 0.18336819814146293,
+          "meanImprovementVsBaseline": -0.0027383394341607458,
+          "directionHitRate": 0.8905109489051095,
+          "bootstrapLower95MeanImprovement": -0.01645627215114909
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.10560723378192982,
+          "meanAbsLogError": 0.1254508780133242,
+          "meanImprovementVsBaseline": 0.010481903298223101,
+          "directionHitRate": 0.9607664233576643,
+          "bootstrapLower95MeanImprovement": 0.00030708271081664065
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.034981845689669555,
+          "meanAbsLogError": 0.05159794129359459,
+          "meanImprovementVsBaseline": 0.00016568727040043064,
+          "directionHitRate": 0.5414012738853503,
+          "bootstrapLower95MeanImprovement": -0.0006794413867811871
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.05677489016008508,
+          "meanAbsLogError": 0.07884923215469058,
+          "meanImprovementVsBaseline": 0.00025998155927941516,
+          "directionHitRate": 0.5443037974683544,
+          "bootstrapLower95MeanImprovement": -0.0009738195975950581
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.10169795128191428,
+          "meanAbsLogError": 0.11523202788685143,
+          "meanImprovementVsBaseline": 0.00012616652480900036,
+          "directionHitRate": 0.75,
+          "bootstrapLower95MeanImprovement": 0.00012616652480900036
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.16308814862228793,
+          "meanAbsLogError": 0.15701354026820014,
+          "meanImprovementVsBaseline": 0.005068041967927527,
+          "directionHitRate": 0.6111111111111112,
+          "bootstrapLower95MeanImprovement": 0.005068041967927527
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.12470051686725103,
+          "meanAbsLogError": 0.13345209846204073,
+          "meanImprovementVsBaseline": 0.00021413321124634047,
+          "directionHitRate": 0.9166666666666666,
+          "bootstrapLower95MeanImprovement": 0.00021413321124634047
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.1483435939899982,
+          "meanAbsLogError": 0.1657371056290152,
+          "meanImprovementVsBaseline": 0.001881629917203161,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.20045580942139907,
+          "meanAbsLogError": 0.17937672416468212,
+          "meanImprovementVsBaseline": 0.017840993814999113,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.03487126807540086,
+          "meanAbsLogError": 0.04227348644013762,
+          "meanImprovementVsBaseline": -0.00016210712510599914,
+          "directionHitRate": 0.5294117647058824,
+          "bootstrapLower95MeanImprovement": -0.0009023615192651473
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.05048595638599451,
+          "meanAbsLogError": 0.060489535929498156,
+          "meanImprovementVsBaseline": -0.00016009092375450783,
+          "directionHitRate": 0.5326923076923077,
+          "bootstrapLower95MeanImprovement": -0.0013266128387801673
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.06842424333720665,
+          "meanAbsLogError": 0.08878733004506605,
+          "meanImprovementVsBaseline": -0.0011170344774526066,
+          "directionHitRate": 0.6686507936507936,
+          "bootstrapLower95MeanImprovement": -0.004193908666830284
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.10520437924853798,
+          "meanAbsLogError": 0.1274715471443087,
+          "meanImprovementVsBaseline": -0.003621358999164841,
+          "directionHitRate": 0.7067510548523207,
+          "bootstrapLower95MeanImprovement": -0.02162961623691267
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.13279387106648866,
+          "meanAbsLogError": 0.1307960892396252,
+          "meanImprovementVsBaseline": 0.0004764747363869434,
+          "directionHitRate": 0.7342342342342343,
+          "bootstrapLower95MeanImprovement": -0.002506846330667947
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.13400022332568984,
+          "meanAbsLogError": 0.15454443095958584,
+          "meanImprovementVsBaseline": -0.0063896118254167964,
+          "directionHitRate": 0.980225988700565,
+          "bootstrapLower95MeanImprovement": -0.024621074478242168
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.19244341681723043,
+          "meanAbsLogError": 0.1998826141894769,
+          "meanImprovementVsBaseline": -0.04415233555546355,
+          "directionHitRate": 0.5029585798816568,
+          "bootstrapLower95MeanImprovement": -0.04415233555546355
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03429316245106584,
+          "meanAbsLogError": 0.04158518468252929,
+          "meanImprovementVsBaseline": 0.00021635266683534365,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": -0.0012002453637536567
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.04077721860388728,
+          "meanAbsLogError": 0.055759543036835314,
+          "meanImprovementVsBaseline": -0.0001587966204027968,
+          "directionHitRate": 0.5945945945945946,
+          "bootstrapLower95MeanImprovement": -0.0007644973433630503
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.052716757081523014,
+          "meanAbsLogError": 0.07312655582691573,
+          "meanImprovementVsBaseline": -0.0023633662466442515,
+          "directionHitRate": 0.7647058823529411,
+          "bootstrapLower95MeanImprovement": -0.0023633662466442515
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.07777676242383436,
+          "meanAbsLogError": 0.11297141722182702,
+          "meanImprovementVsBaseline": -0.010506663689647366,
+          "directionHitRate": 0.625,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.11520908220205328,
+          "meanAbsLogError": 0.09090681301273165,
+          "meanImprovementVsBaseline": 0.0011016835526113766,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.11852620714217199,
+          "meanAbsLogError": 0.11852620714217199,
+          "meanImprovementVsBaseline": 0.0005189630273054746,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "context-only",
+      "verdictReason": "Some target-horizon improvement exists, but it is not stable enough across thinned horizons to promote."
+    },
+    {
+      "id": "stablecoin-dry-powder-ratio",
+      "family": "stablecoin",
+      "description": "Stablecoin supply divided by BTC market cap, expanding-z normalized.",
+      "featureNames": [
+        "stablecoinSupplyToBtcMarketCap"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0,
+        "14": 0,
+        "30": 0,
+        "60": 0,
+        "90": -0.04,
+        "180": 0.04,
+        "365": 0.08
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.03746175460566814,
+          "meanAbsLogError": 0.053798741296780514,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5748175182481752,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.0555890172492397,
+          "meanAbsLogError": 0.0765443975471184,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5866788321167883,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09019507412474148,
+          "meanAbsLogError": 0.11171159583941465,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6414233576642335,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14686001824556616,
+          "meanAbsLogError": 0.15610369087331186,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.7025547445255474,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.175430899874792,
+          "meanAbsLogError": 0.1846388947326416,
+          "meanImprovementVsBaseline": -0.005657062189913767,
+          "directionHitRate": 0.6459854014598541,
+          "bootstrapLower95MeanImprovement": -0.02446273550332896
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.13077285727074894,
+          "meanAbsLogError": 0.1844529829207869,
+          "meanImprovementVsBaseline": -0.0038231242134847687,
+          "directionHitRate": 0.8832116788321168,
+          "bootstrapLower95MeanImprovement": -0.0434679704798102
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09927631580228624,
+          "meanAbsLogError": 0.12224108439462783,
+          "meanImprovementVsBaseline": 0.01369169691691967,
+          "directionHitRate": 0.9708029197080292,
+          "bootstrapLower95MeanImprovement": 0.005836812901040413
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03585497178815977,
+          "meanAbsLogError": 0.051763628563995016,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5605095541401274,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.054206853825684576,
+          "meanAbsLogError": 0.07910921371396999,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5569620253164557,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.08748874438433951,
+          "meanAbsLogError": 0.11535819441166043,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.16959945509429541,
+          "meanAbsLogError": 0.16208158223612765,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6111111111111112,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.06874033824480019,
+          "meanAbsLogError": 0.1270934369337232,
+          "meanImprovementVsBaseline": 0.006572794739563885,
+          "directionHitRate": 0.75,
+          "bootstrapLower95MeanImprovement": 0.006572794739563885
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.14297193879193504,
+          "meanAbsLogError": 0.16090671180493774,
+          "meanImprovementVsBaseline": 0.006712023741280622,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.14002899327205576,
+          "meanAbsLogError": 0.11610128971964369,
+          "meanImprovementVsBaseline": 0.08111642826003755,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.034749013966084874,
+          "meanAbsLogError": 0.042111379315031575,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5616698292220114,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.04845168731168226,
+          "meanAbsLogError": 0.06032944500574365,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5884615384615385,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.06724929827848314,
+          "meanAbsLogError": 0.08767029556761345,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6309523809523809,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.12388395415357945,
+          "meanAbsLogError": 0.12385018814514369,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6708860759493671,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.1350948151030673,
+          "meanAbsLogError": 0.12992589630013807,
+          "meanImprovementVsBaseline": 0.0013466676758741236,
+          "directionHitRate": 0.7657657657657657,
+          "bootstrapLower95MeanImprovement": -0.0014247087514617
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.12300162632392286,
+          "meanAbsLogError": 0.14920102708027927,
+          "meanImprovementVsBaseline": -0.0010462079461102491,
+          "directionHitRate": 0.9915254237288136,
+          "bootstrapLower95MeanImprovement": -0.0027748460443983826
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.16421260048795538,
+          "meanAbsLogError": 0.1542856177370978,
+          "meanImprovementVsBaseline": 0.0014446608969155843,
+          "directionHitRate": 0.7100591715976331,
+          "bootstrapLower95MeanImprovement": 0.0014446608969155843
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03783395041117821,
+          "meanAbsLogError": 0.041801537349364634,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5405405405405406,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.04139632544690919,
+          "meanAbsLogError": 0.07076318958027147,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6470588235294118,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.119076009949171,
+          "meanAbsLogError": 0.10246475353217965,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.625,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.12527570884061312,
+          "meanAbsLogError": 0.0878867518792763,
+          "meanImprovementVsBaseline": 0.004121744686066719,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.12181148256733998,
+          "meanAbsLogError": 0.12181148256733998,
+          "meanImprovementVsBaseline": -0.0027663123978625137,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "context-only",
+      "verdictReason": "Some target-horizon improvement exists, but it is not stable enough across thinned horizons to promote."
+    },
+    {
+      "id": "derivatives-funding-z90",
+      "family": "derivatives",
+      "description": "Binance BTCUSDT daily funding sum z-score versus trailing 90d funding history.",
+      "featureNames": [
+        "futuresFundingRateSumZ90d"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0,
+        "14": 0,
+        "30": 0.04,
+        "60": 0.04,
+        "90": 0.04,
+        "180": 0,
+        "365": -0.12
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.03746175460566814,
+          "meanAbsLogError": 0.053798741296780514,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5748175182481752,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.0555890172492397,
+          "meanAbsLogError": 0.0765443975471184,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5866788321167883,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09951758630891927,
+          "meanAbsLogError": 0.11630777136597605,
+          "meanImprovementVsBaseline": -0.004596175526561222,
+          "directionHitRate": 0.6496350364963503,
+          "bootstrapLower95MeanImprovement": -0.009880261682200362
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14858336688012663,
+          "meanAbsLogError": 0.16213571316779474,
+          "meanImprovementVsBaseline": -0.006032022294483288,
+          "directionHitRate": 0.6806569343065694,
+          "bootstrapLower95MeanImprovement": -0.012279202106457719
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.17065482875946625,
+          "meanAbsLogError": 0.18481774590187408,
+          "meanImprovementVsBaseline": -0.0058359133591462786,
+          "directionHitRate": 0.7299270072992701,
+          "bootstrapLower95MeanImprovement": -0.01179412622430137
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14777515681601727,
+          "meanAbsLogError": 0.18062985870730203,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.8567518248175182,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.146664152895287,
+          "meanAbsLogError": 0.16784771459988673,
+          "meanImprovementVsBaseline": -0.031914933288339324,
+          "directionHitRate": 0.9534671532846716,
+          "bootstrapLower95MeanImprovement": -0.037857265130065286
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03585497178815977,
+          "meanAbsLogError": 0.051763628563995016,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5605095541401274,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.054206853825684576,
+          "meanAbsLogError": 0.07910921371396999,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5569620253164557,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.07661318741158762,
+          "meanAbsLogError": 0.10836798220457498,
+          "meanImprovementVsBaseline": 0.006990212207085437,
+          "directionHitRate": 0.7222222222222222,
+          "bootstrapLower95MeanImprovement": -0.00023268765234855474
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.1615526145889472,
+          "meanAbsLogError": 0.15848783001329922,
+          "meanImprovementVsBaseline": 0.003593752222828428,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": 0.003593752222828428
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.1046930447354697,
+          "meanAbsLogError": 0.13043952873557915,
+          "meanImprovementVsBaseline": 0.0032267029377079184,
+          "directionHitRate": 0.8333333333333334,
+          "bootstrapLower95MeanImprovement": 0.0032267029377079184
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.1490733542442122,
+          "meanAbsLogError": 0.16761873554621834,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.21477907797424756,
+          "meanAbsLogError": 0.1894198990850627,
+          "meanImprovementVsBaseline": 0.00779781889461854,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.034749013966084874,
+          "meanAbsLogError": 0.042111379315031575,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5616698292220114,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.04845168731168226,
+          "meanAbsLogError": 0.06032944500574365,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5884615384615385,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.0844304864498282,
+          "meanAbsLogError": 0.09729487381043866,
+          "meanImprovementVsBaseline": -0.009624578242825194,
+          "directionHitRate": 0.5257936507936508,
+          "bootstrapLower95MeanImprovement": -0.01739344663051197
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.12951729498105724,
+          "meanAbsLogError": 0.1281167060092052,
+          "meanImprovementVsBaseline": -0.004266517864061547,
+          "directionHitRate": 0.5907172995780591,
+          "bootstrapLower95MeanImprovement": -0.016981143480618407
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.135153496149103,
+          "meanAbsLogError": 0.1396218256359189,
+          "meanImprovementVsBaseline": -0.008349261659906891,
+          "directionHitRate": 0.7319819819819819,
+          "bootstrapLower95MeanImprovement": -0.013382468845296442
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.12385999600751063,
+          "meanAbsLogError": 0.1481548191341691,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.9915254237288136,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.21836000609702566,
+          "meanAbsLogError": 0.23613660979855347,
+          "meanImprovementVsBaseline": -0.0804063311645402,
+          "directionHitRate": 0.41420118343195267,
+          "bootstrapLower95MeanImprovement": -0.0804063311645402
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03783395041117821,
+          "meanAbsLogError": 0.041801537349364634,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5405405405405406,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.0615033031275658,
+          "meanAbsLogError": 0.07257444394798217,
+          "meanImprovementVsBaseline": -0.0018112543677106926,
+          "directionHitRate": 0.7058823529411765,
+          "bootstrapLower95MeanImprovement": -0.0018112543677106926
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.11803777370289126,
+          "meanAbsLogError": 0.12237104749206562,
+          "meanImprovementVsBaseline": -0.019906293959885968,
+          "directionHitRate": 0.375,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.0700389776175836,
+          "meanAbsLogError": 0.0972345079731646,
+          "meanImprovementVsBaseline": -0.005226011407821573,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.11904517016947747,
+          "meanAbsLogError": 0.11904517016947747,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "Did not show stable thinned holdout improvement over current power-law baseline."
+    },
+    {
+      "id": "derivatives-funding-30d",
+      "family": "derivatives",
+      "description": "Binance BTCUSDT trailing 30d funding sum, expanding-z normalized.",
+      "featureNames": [
+        "futuresFundingRateSum30d"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0,
+        "14": 0,
+        "30": -0.04,
+        "60": -0.08,
+        "90": 0.04,
+        "180": -0.04,
+        "365": -0.3
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.03746175460566814,
+          "meanAbsLogError": 0.053798741296780514,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5748175182481752,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.0555890172492397,
+          "meanAbsLogError": 0.0765443975471184,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5866788321167883,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.08805122848474412,
+          "meanAbsLogError": 0.11226282398876954,
+          "meanImprovementVsBaseline": -0.0005512281493546144,
+          "directionHitRate": 0.6450729927007299,
+          "bootstrapLower95MeanImprovement": -0.004499302396739323
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.15385297168630174,
+          "meanAbsLogError": 0.15534495020651087,
+          "meanImprovementVsBaseline": 0.0007587406668006385,
+          "directionHitRate": 0.6596715328467153,
+          "bootstrapLower95MeanImprovement": -0.011720748435853466
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.17238278562862508,
+          "meanAbsLogError": 0.18024567395236993,
+          "meanImprovementVsBaseline": -0.0012638414096418095,
+          "directionHitRate": 0.6970802919708029,
+          "bootstrapLower95MeanImprovement": -0.00759157298872572
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14844127510255944,
+          "meanAbsLogError": 0.1785010335607742,
+          "meanImprovementVsBaseline": 0.0021288251465280397,
+          "directionHitRate": 0.8832116788321168,
+          "bootstrapLower95MeanImprovement": -0.008458524746768432
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09706599932929016,
+          "meanAbsLogError": 0.12565565760790315,
+          "meanImprovementVsBaseline": 0.010277123703644152,
+          "directionHitRate": 0.9799270072992701,
+          "bootstrapLower95MeanImprovement": -0.013062764077751877
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03585497178815977,
+          "meanAbsLogError": 0.051763628563995016,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5605095541401274,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.054206853825684576,
+          "meanAbsLogError": 0.07910921371396999,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5569620253164557,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.10501835416338157,
+          "meanAbsLogError": 0.11235971885402746,
+          "meanImprovementVsBaseline": 0.002998475557632959,
+          "directionHitRate": 0.6388888888888888,
+          "bootstrapLower95MeanImprovement": 0.0013051897696633298
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.15568934313184535,
+          "meanAbsLogError": 0.15675951795637635,
+          "meanImprovementVsBaseline": 0.005322064279751299,
+          "directionHitRate": 0.6111111111111112,
+          "bootstrapLower95MeanImprovement": 0.005322064279751299
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.10105794765293652,
+          "meanAbsLogError": 0.1320579375778562,
+          "meanImprovementVsBaseline": 0.001608294095430877,
+          "directionHitRate": 0.75,
+          "bootstrapLower95MeanImprovement": 0.001608294095430877
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.15027282892629756,
+          "meanAbsLogError": 0.16483348075747065,
+          "meanImprovementVsBaseline": 0.002785254788747693,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.07475508842648892,
+          "meanAbsLogError": 0.1358159100382057,
+          "meanImprovementVsBaseline": 0.06140180794147554,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.034749013966084874,
+          "meanAbsLogError": 0.042111379315031575,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5616698292220114,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.04845168731168226,
+          "meanAbsLogError": 0.06032944500574365,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5884615384615385,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.06401671357966432,
+          "meanAbsLogError": 0.08859478570670541,
+          "meanImprovementVsBaseline": -0.0009244901390919506,
+          "directionHitRate": 0.7103174603174603,
+          "bootstrapLower95MeanImprovement": -0.006599575310436888
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.09255847962984376,
+          "meanAbsLogError": 0.121605856283037,
+          "meanImprovementVsBaseline": 0.0022443318621068148,
+          "directionHitRate": 0.7067510548523207,
+          "bootstrapLower95MeanImprovement": -0.013972914281883204
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.1361946552240303,
+          "meanAbsLogError": 0.13231027562466627,
+          "meanImprovementVsBaseline": -0.0010377116486541007,
+          "directionHitRate": 0.7027027027027027,
+          "bootstrapLower95MeanImprovement": -0.012185960475754138
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.1300766172198049,
+          "meanAbsLogError": 0.1525126043321896,
+          "meanImprovementVsBaseline": -0.004357785198020485,
+          "directionHitRate": 0.980225988700565,
+          "bootstrapLower95MeanImprovement": -0.017494931793393554
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.3181720156722836,
+          "meanAbsLogError": 0.30872191454485803,
+          "meanImprovementVsBaseline": -0.15299163591084458,
+          "directionHitRate": 0.2603550295857988,
+          "bootstrapLower95MeanImprovement": -0.15299163591084458
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03783395041117821,
+          "meanAbsLogError": 0.041801537349364634,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5405405405405406,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.049777545853281424,
+          "meanAbsLogError": 0.0744254876737821,
+          "meanImprovementVsBaseline": -0.0036622980935106225,
+          "directionHitRate": 0.6470588235294118,
+          "bootstrapLower95MeanImprovement": -0.0036622980935106225
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.0663597002041163,
+          "meanAbsLogError": 0.1067105327393969,
+          "meanImprovementVsBaseline": -0.0042457792072172484,
+          "directionHitRate": 0.625,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.10736812590494615,
+          "meanAbsLogError": 0.0887371458581498,
+          "meanImprovementVsBaseline": 0.003271350707193221,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.116662598735358,
+          "meanAbsLogError": 0.116662598735358,
+          "meanImprovementVsBaseline": 0.0023825714341194626,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "Did not show stable thinned holdout improvement over current power-law baseline."
+    },
+    {
+      "id": "derivatives-premium-z90",
+      "family": "derivatives",
+      "description": "Binance BTCUSDT premium-index close z-score versus trailing 90d premium history.",
+      "featureNames": [
+        "futuresPremiumCloseZ90d"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0,
+        "14": 0,
+        "30": 0,
+        "60": 0.04,
+        "90": 0,
+        "180": 0,
+        "365": -0.18
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.03746175460566814,
+          "meanAbsLogError": 0.053798741296780514,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5748175182481752,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.0555890172492397,
+          "meanAbsLogError": 0.0765443975471184,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5866788321167883,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09019507412474148,
+          "meanAbsLogError": 0.11171159583941465,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6414233576642335,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.1413914269546206,
+          "meanAbsLogError": 0.1586414670112991,
+          "meanImprovementVsBaseline": -0.0025377761379872213,
+          "directionHitRate": 0.6806569343065694,
+          "bootstrapLower95MeanImprovement": -0.008465983796797636
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.165786182845701,
+          "meanAbsLogError": 0.17898183254272812,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.7436131386861314,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14777515681601727,
+          "meanAbsLogError": 0.18062985870730203,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.8567518248175182,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.1592950373035471,
+          "meanAbsLogError": 0.197107700179465,
+          "meanImprovementVsBaseline": -0.06117491886791771,
+          "directionHitRate": 0.947992700729927,
+          "bootstrapLower95MeanImprovement": -0.07483148213993546
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03585497178815977,
+          "meanAbsLogError": 0.051763628563995016,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5605095541401274,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.054206853825684576,
+          "meanAbsLogError": 0.07910921371396999,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5569620253164557,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.08748874438433951,
+          "meanAbsLogError": 0.11535819441166043,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.1647155582831905,
+          "meanAbsLogError": 0.15373459843366868,
+          "meanImprovementVsBaseline": 0.00834698380245897,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": 0.00834698380245897
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.13276565083207625,
+          "meanAbsLogError": 0.13366623167328706,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.9166666666666666,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.1490733542442122,
+          "meanAbsLogError": 0.16761873554621834,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.08799129738365252,
+          "meanAbsLogError": 0.10539707200993871,
+          "meanImprovementVsBaseline": 0.09182064596974253,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.034749013966084874,
+          "meanAbsLogError": 0.042111379315031575,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5616698292220114,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.04845168731168226,
+          "meanAbsLogError": 0.06032944500574365,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5884615384615385,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.06724929827848314,
+          "meanAbsLogError": 0.08767029556761345,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6309523809523809,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.12384558821758684,
+          "meanAbsLogError": 0.12354887984518052,
+          "meanImprovementVsBaseline": 0.00030130829996326416,
+          "directionHitRate": 0.6286919831223629,
+          "bootstrapLower95MeanImprovement": -0.008160580272086871
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.13292503330206973,
+          "meanAbsLogError": 0.1312725639760119,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.759009009009009,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.12385999600751063,
+          "meanAbsLogError": 0.1481548191341691,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.9915254237288136,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.23409643124605672,
+          "meanAbsLogError": 0.2508054801508099,
+          "meanImprovementVsBaseline": -0.09507520151679633,
+          "directionHitRate": 0.44970414201183434,
+          "bootstrapLower95MeanImprovement": -0.09507520151679633
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03783395041117821,
+          "meanAbsLogError": 0.041801537349364634,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5405405405405406,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.04139632544690919,
+          "meanAbsLogError": 0.07076318958027147,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.6470588235294118,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.13042822201035253,
+          "meanAbsLogError": 0.12050026713474082,
+          "meanImprovementVsBaseline": -0.01803551360256117,
+          "directionHitRate": 0.25,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.12118290524618658,
+          "meanAbsLogError": 0.09200849656534302,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.11904517016947747,
+          "meanAbsLogError": 0.11904517016947747,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "Did not show stable thinned holdout improvement over current power-law baseline."
+    },
+    {
+      "id": "derivatives-premium-range",
+      "family": "derivatives",
+      "description": "Daily premium-index range, expanding-z normalized.",
+      "featureNames": [
+        "futuresPremiumRange"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0,
+        "14": 0.04,
+        "30": 0.04,
+        "60": 0.04,
+        "90": -0.04,
+        "180": -0.04,
+        "365": -0.12
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.03746175460566814,
+          "meanAbsLogError": 0.053798741296780514,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5748175182481752,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.05864505232733208,
+          "meanAbsLogError": 0.07921982891747424,
+          "meanImprovementVsBaseline": -0.0026754313703559003,
+          "directionHitRate": 0.5748175182481752,
+          "bootstrapLower95MeanImprovement": -0.004255416542140885
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09359002284978946,
+          "meanAbsLogError": 0.11315879838457266,
+          "meanImprovementVsBaseline": -0.0014472025451579276,
+          "directionHitRate": 0.625,
+          "bootstrapLower95MeanImprovement": -0.0035872832812698465
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.1446880277312399,
+          "meanAbsLogError": 0.15733014004425735,
+          "meanImprovementVsBaseline": -0.0012264491709457852,
+          "directionHitRate": 0.6934306569343066,
+          "bootstrapLower95MeanImprovement": -0.0036599327553958924
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.16565591460455042,
+          "meanAbsLogError": 0.17983207136257975,
+          "meanImprovementVsBaseline": -0.0008502388198519182,
+          "directionHitRate": 0.7299270072992701,
+          "bootstrapLower95MeanImprovement": -0.0032967293528291517
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14485407116860216,
+          "meanAbsLogError": 0.18140035544446215,
+          "meanImprovementVsBaseline": -0.0007704967371596866,
+          "directionHitRate": 0.8594890510948905,
+          "bootstrapLower95MeanImprovement": -0.0024966011224095155
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.1279514866650997,
+          "meanAbsLogError": 0.14966611916779193,
+          "meanImprovementVsBaseline": -0.013733337856244749,
+          "directionHitRate": 0.9461678832116789,
+          "bootstrapLower95MeanImprovement": -0.019511227595979664
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03585497178815977,
+          "meanAbsLogError": 0.051763628563995016,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5605095541401274,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.05501667392664977,
+          "meanAbsLogError": 0.07816993096877191,
+          "meanImprovementVsBaseline": 0.0009392827451980936,
+          "directionHitRate": 0.569620253164557,
+          "bootstrapLower95MeanImprovement": -0.001924377627174206
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.09683434294505933,
+          "meanAbsLogError": 0.11477248299176779,
+          "meanImprovementVsBaseline": 0.0005857114198926342,
+          "directionHitRate": 0.7222222222222222,
+          "bootstrapLower95MeanImprovement": 0.0004756690673035635
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.14590094954456845,
+          "meanAbsLogError": 0.1542340437663059,
+          "meanImprovementVsBaseline": 0.007847538469821756,
+          "directionHitRate": 0.7222222222222222,
+          "bootstrapLower95MeanImprovement": 0.007847538469821756
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.1336386279969588,
+          "meanAbsLogError": 0.13155752780817634,
+          "meanImprovementVsBaseline": 0.0021087038651107135,
+          "directionHitRate": 0.9166666666666666,
+          "bootstrapLower95MeanImprovement": 0.0021087038651107135
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.14904603806673578,
+          "meanAbsLogError": 0.16719643717077007,
+          "meanImprovementVsBaseline": 0.0004222983754482712,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.10540861425453407,
+          "meanAbsLogError": 0.17931353598412988,
+          "meanImprovementVsBaseline": 0.017904181995551365,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.034749013966084874,
+          "meanAbsLogError": 0.042111379315031575,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5616698292220114,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.052651043110479634,
+          "meanAbsLogError": 0.06197278178825022,
+          "meanImprovementVsBaseline": -0.0016433367825065318,
+          "directionHitRate": 0.5403846153846154,
+          "bootstrapLower95MeanImprovement": -0.004490825947334737
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.07513209206222449,
+          "meanAbsLogError": 0.08912891297005314,
+          "meanImprovementVsBaseline": -0.0014586174024395911,
+          "directionHitRate": 0.5496031746031746,
+          "bootstrapLower95MeanImprovement": -0.004890011504283823
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.13021971318226377,
+          "meanAbsLogError": 0.12497255111929512,
+          "meanImprovementVsBaseline": -0.0011223629741514106,
+          "directionHitRate": 0.5970464135021097,
+          "bootstrapLower95MeanImprovement": -0.0069400581161959095
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.13572758573436783,
+          "meanAbsLogError": 0.13284287937585484,
+          "meanImprovementVsBaseline": -0.0015703153998428148,
+          "directionHitRate": 0.8355855855855856,
+          "bootstrapLower95MeanImprovement": -0.007506705582044001
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.129165234498271,
+          "meanAbsLogError": 0.1523217688514644,
+          "meanImprovementVsBaseline": -0.004166949717295221,
+          "directionHitRate": 0.9830508474576272,
+          "bootstrapLower95MeanImprovement": -0.013547099706224615
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.18039557593721334,
+          "meanAbsLogError": 0.1973940301769671,
+          "meanImprovementVsBaseline": -0.04166375154295371,
+          "directionHitRate": 0.4970414201183432,
+          "bootstrapLower95MeanImprovement": -0.04166375154295371
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03783395041117821,
+          "meanAbsLogError": 0.041801537349364634,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.04367848316154799,
+          "meanAbsLogError": 0.056813665302869854,
+          "meanImprovementVsBaseline": -0.0012129188864373392,
+          "directionHitRate": 0.6486486486486487,
+          "bootstrapLower95MeanImprovement": -0.0051999249564808085
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.05383483926294019,
+          "meanAbsLogError": 0.07203221750651005,
+          "meanImprovementVsBaseline": -0.0012690279262385802,
+          "directionHitRate": 0.6470588235294118,
+          "bootstrapLower95MeanImprovement": -0.0012690279262385802
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.11954483163258356,
+          "meanAbsLogError": 0.10486539117343097,
+          "meanImprovementVsBaseline": -0.002400637641251313,
+          "directionHitRate": 0.625,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.10889207851491278,
+          "meanAbsLogError": 0.0924699559424333,
+          "meanImprovementVsBaseline": -0.0004614593770902786,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.11601750933555088,
+          "meanAbsLogError": 0.11601750933555088,
+          "meanImprovementVsBaseline": 0.003027660833926582,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "Did not show stable thinned holdout improvement over current power-law baseline."
+    },
+    {
+      "id": "derivatives-crowding-composite",
+      "family": "derivatives",
+      "description": "Equal-weight funding and premium crowding composite.",
+      "featureNames": [
+        "futuresFundingRateSumZ90d",
+        "futuresPremiumCloseZ90d"
+      ],
+      "selectedCoefficientByHorizon": {
+        "7": 0,
+        "14": 0,
+        "30": 0.04,
+        "60": 0.04,
+        "90": 0,
+        "180": 0,
+        "365": -0.24
+      },
+      "validationDaily": {
+        "7": {
+          "samples": 1096,
+          "medianAbsLogError": 0.03746175460566814,
+          "meanAbsLogError": 0.053798741296780514,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5748175182481752,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 1096,
+          "medianAbsLogError": 0.0555890172492397,
+          "meanAbsLogError": 0.0765443975471184,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5866788321167883,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 1096,
+          "medianAbsLogError": 0.09767234648571588,
+          "meanAbsLogError": 0.11507210404851222,
+          "meanImprovementVsBaseline": -0.003360508209097477,
+          "directionHitRate": 0.6450729927007299,
+          "bootstrapLower95MeanImprovement": -0.008456046803236915
+        },
+        "60": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14390859570531234,
+          "meanAbsLogError": 0.15950877981211584,
+          "meanImprovementVsBaseline": -0.003405088938804143,
+          "directionHitRate": 0.6852189781021898,
+          "bootstrapLower95MeanImprovement": -0.009121408643711073
+        },
+        "90": {
+          "samples": 1096,
+          "medianAbsLogError": 0.165786182845701,
+          "meanAbsLogError": 0.17898183254272812,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.7436131386861314,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "180": {
+          "samples": 1096,
+          "medianAbsLogError": 0.14777515681601727,
+          "meanAbsLogError": 0.18062985870730203,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.8567518248175182,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "365": {
+          "samples": 1096,
+          "medianAbsLogError": 0.1919337027390151,
+          "meanAbsLogError": 0.22454313978969873,
+          "meanImprovementVsBaseline": -0.08861035847815135,
+          "directionHitRate": 0.9297445255474452,
+          "bootstrapLower95MeanImprovement": -0.10444887650764144
+        }
+      },
+      "validationThinned": {
+        "7": {
+          "samples": 157,
+          "medianAbsLogError": 0.03585497178815977,
+          "meanAbsLogError": 0.051763628563995016,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5605095541401274,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 79,
+          "medianAbsLogError": 0.054206853825684576,
+          "meanAbsLogError": 0.07910921371396999,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5569620253164557,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 36,
+          "medianAbsLogError": 0.09434880864543604,
+          "meanAbsLogError": 0.11487076488952017,
+          "meanImprovementVsBaseline": 0.00048742952214025296,
+          "directionHitRate": 0.6944444444444444,
+          "bootstrapLower95MeanImprovement": -0.004109938144363519
+        },
+        "60": {
+          "samples": 18,
+          "medianAbsLogError": 0.1714235767914074,
+          "meanAbsLogError": 0.15472211934808427,
+          "meanImprovementVsBaseline": 0.007359462888043369,
+          "directionHitRate": 0.6666666666666666,
+          "bootstrapLower95MeanImprovement": 0.007359462888043369
+        },
+        "90": {
+          "samples": 12,
+          "medianAbsLogError": 0.13276565083207625,
+          "meanAbsLogError": 0.13366623167328706,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.9166666666666666,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "180": {
+          "samples": 6,
+          "medianAbsLogError": 0.1490733542442122,
+          "meanAbsLogError": 0.16761873554621834,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 3,
+          "medianAbsLogError": 0.01279139268475582,
+          "meanAbsLogError": 0.13156969339474855,
+          "meanImprovementVsBaseline": 0.06564802458493268,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "holdoutDaily": {
+        "7": {
+          "samples": 527,
+          "medianAbsLogError": 0.034749013966084874,
+          "meanAbsLogError": 0.042111379315031575,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5616698292220114,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 520,
+          "medianAbsLogError": 0.04845168731168226,
+          "meanAbsLogError": 0.06032944500574365,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5884615384615385,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 504,
+          "medianAbsLogError": 0.0774584571927468,
+          "meanAbsLogError": 0.09250488171942192,
+          "meanImprovementVsBaseline": -0.004834586151808489,
+          "directionHitRate": 0.5972222222222222,
+          "bootstrapLower95MeanImprovement": -0.01064122953176245
+        },
+        "60": {
+          "samples": 474,
+          "medianAbsLogError": 0.12631032041861978,
+          "meanAbsLogError": 0.1244960014403355,
+          "meanImprovementVsBaseline": -0.000645813295191674,
+          "directionHitRate": 0.6223628691983122,
+          "bootstrapLower95MeanImprovement": -0.009603036478187967
+        },
+        "90": {
+          "samples": 444,
+          "medianAbsLogError": 0.13292503330206973,
+          "meanAbsLogError": 0.1312725639760119,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.759009009009009,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "180": {
+          "samples": 354,
+          "medianAbsLogError": 0.12385999600751063,
+          "meanAbsLogError": 0.1481548191341691,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.9915254237288136,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "365": {
+          "samples": 169,
+          "medianAbsLogError": 0.2875536448658611,
+          "meanAbsLogError": 0.2935701459121559,
+          "meanImprovementVsBaseline": -0.1378398672781425,
+          "directionHitRate": 0.35502958579881655,
+          "bootstrapLower95MeanImprovement": -0.1378398672781425
+        }
+      },
+      "holdoutThinned": {
+        "7": {
+          "samples": 75,
+          "medianAbsLogError": 0.03783395041117821,
+          "meanAbsLogError": 0.041801537349364634,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.56,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "14": {
+          "samples": 37,
+          "medianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.5405405405405406,
+          "bootstrapLower95MeanImprovement": 0
+        },
+        "30": {
+          "samples": 17,
+          "medianAbsLogError": 0.05831622323260888,
+          "meanAbsLogError": 0.07238296490071108,
+          "meanImprovementVsBaseline": -0.0016197753204396125,
+          "directionHitRate": 0.7058823529411765,
+          "bootstrapLower95MeanImprovement": -0.0016197753204396125
+        },
+        "60": {
+          "samples": 8,
+          "medianAbsLogError": 0.12426113726697441,
+          "meanAbsLogError": 0.1184706353997882,
+          "meanImprovementVsBaseline": -0.01600588186760854,
+          "directionHitRate": 0.25,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "90": {
+          "samples": 5,
+          "medianAbsLogError": 0.12118290524618658,
+          "meanAbsLogError": 0.09200849656534302,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 0.8,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "180": {
+          "samples": 2,
+          "medianAbsLogError": 0.11904517016947747,
+          "meanAbsLogError": 0.11904517016947747,
+          "meanImprovementVsBaseline": 0,
+          "directionHitRate": 1,
+          "bootstrapLower95MeanImprovement": null
+        },
+        "365": {
+          "samples": 0,
+          "medianAbsLogError": null,
+          "meanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "directionHitRate": null,
+          "bootstrapLower95MeanImprovement": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "Did not show stable thinned holdout improvement over current power-law baseline."
+    }
+  ]
+}
