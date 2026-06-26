@@ -14,6 +14,7 @@ const MVRV_DATA_PATH = join(__dirname, '../src/data/mvrv-history.json');
 const MS_PER_DAY = 86400000;
 const BTC_REPAIR_LOOKBACK_DAYS = 365;
 const BTC_HOURLY_CHUNK_DAYS = 90;
+const DEV_PREFLIGHT = process.argv.includes('--dev-preflight') || process.env.DEV_PREFLIGHT === '1';
 
 function parseUtcDate(date) {
   return new Date(`${date}T00:00:00Z`);
@@ -143,7 +144,16 @@ async function updateBTCData() {
   const todayUtc = toUtcDateString(Date.now());
   const lastCompletedUtcDate = addUtcDays(todayUtc, -1);
   const daysSince = Math.max(0, diffUtcDays(lastDate, lastCompletedUtcDate));
-  const repairStart = maxDate(existing[0].date, addUtcDays(lastCompletedUtcDate, -(BTC_REPAIR_LOOKBACK_DAYS - 1)));
+  const repairStart = DEV_PREFLIGHT && daysSince <= 0
+    ? null
+    : DEV_PREFLIGHT
+      ? addUtcDays(lastDate, 1)
+      : maxDate(existing[0].date, addUtcDays(lastCompletedUtcDate, -(BTC_REPAIR_LOOKBACK_DAYS - 1)));
+
+  if (!repairStart) {
+    console.log(`[BTC data] Up to date (${lastDate}); skipping CoinGecko repair during dev preflight.`);
+    return;
+  }
 
   console.log(`[BTC data] Rebuilding daily candles from ${repairStart} to ${lastCompletedUtcDate} (last saved ${lastDate})`);
 
