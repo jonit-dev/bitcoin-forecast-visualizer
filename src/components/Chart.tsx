@@ -4,6 +4,7 @@ import type { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { cn } from '../lib/utils';
 import { CYCLE_PIVOTS, PHASE_ZONES, type PhaseLabel } from '../lib/cycle';
 import type { BuyZoneSpan } from '../lib/buyZone';
+import type { TradingSystemMarker } from '../lib/tradingSystem';
 
 // Bitcoin halving dates — known + dynamically projected every ~4 years
 const KNOWN_HALVINGS = ['2012-11-28', '2016-07-09', '2020-05-11', '2024-04-20'];
@@ -623,6 +624,8 @@ interface ForecastChartProps {
   heatmapData: HeatmapCell[];
   showBuyZones?: boolean;
   buyZones?: BuyZoneSpan[];
+  showTradingSystem?: boolean;
+  tradingSystemMarkers?: TradingSystemMarker[];
   timeRange: string;
   playbackIndex: number | null;
   mvrvData: { date: string; zScore: number; mvrv: number }[];
@@ -639,7 +642,7 @@ interface ForecastChartProps {
   } | null;
 }
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, buyZones = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, buyZones = [], showTradingSystem = false, tradingSystemMarkers = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<{
@@ -989,6 +992,28 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       });
     }
 
+    const systemMarkerRows = showBitcoinOverlays && showTradingSystem && !isInPlayback
+      ? tradingSystemMarkers.map(marker => {
+        const exposurePct = Math.round(marker.exposure * 100);
+        const fromPct = Math.round(marker.fromExposure * 100);
+        const reservePct = Math.max(0, 100 - Math.min(100, exposurePct));
+        const exposureLabel = marker.action === 'reset'
+          ? 'EXIT TO RESERVE: 0% BTC TARGET'
+          : marker.action === 'trim'
+            ? `TARGET CHANGE: ${fromPct}% -> ${exposurePct}% BTC / ${reservePct}% RESERVE`
+          : marker.exposure > 1
+            ? `TARGET CHANGE: ${fromPct}% -> ${exposurePct}% BTC (${exposurePct - 100}% BORROWED)`
+            : `TARGET CHANGE: ${fromPct}% -> ${exposurePct}% BTC`;
+        return {
+          time: marker.date,
+          position: marker.action === 'trim' || marker.action === 'reset' ? 'aboveBar' : 'belowBar',
+          color: marker.action === 'trim' || marker.action === 'reset' ? '#f59e0b' : '#22c55e',
+          shape: marker.action === 'trim' || marker.action === 'reset' ? 'arrowDown' : 'arrowUp',
+          text: exposureLabel,
+        };
+      })
+      : [];
+
     // Marker: only show when not in playback
     if (!isInPlayback && lastHist && seriesRefs.current.candlestick) {
       if (!markersRef.current) {
@@ -1000,7 +1025,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
         color: '#10b981',
         shape: 'arrowDown',
         text: 'Forecast Starts',
-      }]);
+      }, ...systemMarkerRows]);
     } else if (isInPlayback && markersRef.current) {
       markersRef.current.setMarkers([]);
     }
@@ -1024,7 +1049,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     } else if (forecastMarkersRef.current) {
       forecastMarkersRef.current.setMarkers([]);
     }
-  }, [data, playbackIndex, probabilityForecast, showScenarios]);
+  }, [data, playbackIndex, probabilityForecast, showScenarios, showBitcoinOverlays, showTradingSystem, tradingSystemMarkers]);
 
   // Crosshair subscription (only re-subscribes when data changes, not every playback tick)
   useEffect(() => {
