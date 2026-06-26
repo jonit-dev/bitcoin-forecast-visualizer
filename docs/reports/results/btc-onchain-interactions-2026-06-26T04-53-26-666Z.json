@@ -1,0 +1,650 @@
+{
+  "generatedAt": "2026-06-26T04:53:26.666Z",
+  "data": {
+    "btcRows": 5816,
+    "btcFirstDate": "2010-07-17",
+    "btcLastDate": "2026-06-18",
+    "featureRows": 5815,
+    "featureFirstDate": "2010-07-18",
+    "featureLastDate": "2026-06-18"
+  },
+  "preRegistration": {
+    "purpose": "Research-only on-chain interaction regime experiment; do not test simple single-feature MVRV/activity median tweaks.",
+    "validationPeriod": "2022-01-01 through 2024-12-31",
+    "finalHoldoutPeriod": "2025-01-01 through latest available target",
+    "horizons": [
+      30,
+      60,
+      90,
+      180
+    ],
+    "baseline": "powerlaw-current median forecast",
+    "modelForm": "state-specific candidate median = baseline median * exp(validation-selected coefficient); only active-state origins are evaluated.",
+    "states": [
+      {
+        "id": "cheap-and-active",
+        "description": "Cheap valuation with rising active-address or transaction activity."
+      },
+      {
+        "id": "cheap-and-dead",
+        "description": "Cheap valuation with falling active-address and transaction activity."
+      },
+      {
+        "id": "miner-stress",
+        "description": "Low miner revenue proxy versus prior year plus large drawdown."
+      },
+      {
+        "id": "network-expansion",
+        "description": "Rising activity trend with positive 30d residual momentum."
+      },
+      {
+        "id": "valuation-activity-divergence",
+        "description": "Cheap valuation paired with weak or negative activity trend."
+      }
+    ],
+    "leakagePolicy": "feature rows are keyed by forecast origin and source dates are validated one-day lagged; activity/miner trends use only prior feature rows.",
+    "promotionGate": "at least 5 thinned holdout samples at claimed horizon, positive validation improvement, positive holdout improvement with positive lower95 bound, no material adjacent-horizon degradation, and interpretable state definition."
+  },
+  "states": [
+    {
+      "id": "cheap-and-active",
+      "description": "Cheap valuation with rising active-address or transaction activity.",
+      "selectedCoefficientByHorizon": {
+        "30": 0,
+        "60": 0.18,
+        "90": 0.25,
+        "180": 0.35
+      },
+      "validationThinned": {
+        "30": {
+          "samples": 1,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.005280038047539293,
+          "baselineMedianAbsLogError": 0.005280038047539293,
+          "meanAbsLogError": 0.005280038047539293,
+          "baselineMeanAbsLogError": 0.005280038047539293,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": 0.0006239024488637607
+        },
+        "60": {
+          "samples": 1,
+          "selectedCoefficient": 0.18,
+          "medianAbsLogError": 0.03230292261441292,
+          "baselineMedianAbsLogError": 0.2123029226144144,
+          "meanAbsLogError": 0.03230292261441292,
+          "baselineMeanAbsLogError": 0.2123029226144144,
+          "meanImprovementVsBaseline": 0.1800000000000015,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": 0.22644790299167109
+        },
+        "90": {
+          "samples": 1,
+          "selectedCoefficient": 0.25,
+          "medianAbsLogError": 0.010138674426382721,
+          "baselineMedianAbsLogError": 0.2601386744263827,
+          "meanAbsLogError": 0.010138674426382721,
+          "baselineMeanAbsLogError": 0.2601386744263827,
+          "meanImprovementVsBaseline": 0.25,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": 0.28818470769421045
+        },
+        "180": {
+          "samples": 1,
+          "selectedCoefficient": 0.35,
+          "medianAbsLogError": 0.010570278705058556,
+          "baselineMedianAbsLogError": 0.3605702787050582,
+          "meanAbsLogError": 0.010570278705058556,
+          "baselineMeanAbsLogError": 0.3605702787050582,
+          "meanImprovementVsBaseline": 0.34999999999999964,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": 0.49005107359531197
+        }
+      },
+      "holdoutThinned": {
+        "30": {
+          "samples": 1,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.007652297723906187,
+          "baselineMedianAbsLogError": 0.007652297723906187,
+          "meanAbsLogError": 0.007652297723906187,
+          "baselineMeanAbsLogError": 0.007652297723906187,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0,
+          "baselineDirectionHitRate": 0,
+          "medianForwardReturn": -0.00674360632947084
+        },
+        "60": {
+          "samples": 1,
+          "selectedCoefficient": 0.18,
+          "medianAbsLogError": 0.049922074735167854,
+          "baselineMedianAbsLogError": 0.13007792526483186,
+          "meanAbsLogError": 0.049922074735167854,
+          "baselineMeanAbsLogError": 0.13007792526483186,
+          "meanImprovementVsBaseline": 0.08015585052966401,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 0,
+          "medianForwardReturn": 0.12205168748866108
+        },
+        "90": {
+          "samples": 0,
+          "selectedCoefficient": 0.25,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "180": {
+          "samples": 0,
+          "selectedCoefficient": 0.35,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible interaction state passed the thinned holdout improvement gate."
+    },
+    {
+      "id": "cheap-and-dead",
+      "description": "Cheap valuation with falling active-address and transaction activity.",
+      "selectedCoefficientByHorizon": {
+        "30": -0.12,
+        "60": 0,
+        "90": 0,
+        "180": 0
+      },
+      "validationThinned": {
+        "30": {
+          "samples": 1,
+          "selectedCoefficient": -0.12,
+          "medianAbsLogError": 0.025400832125621164,
+          "baselineMedianAbsLogError": 0.14540083212562038,
+          "meanAbsLogError": 0.025400832125621164,
+          "baselineMeanAbsLogError": 0.14540083212562038,
+          "meanImprovementVsBaseline": 0.11999999999999922,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": -0.16070725760530793
+        },
+        "60": {
+          "samples": 0,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "90": {
+          "samples": 0,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "180": {
+          "samples": 0,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        }
+      },
+      "holdoutThinned": {
+        "30": {
+          "samples": 0,
+          "selectedCoefficient": -0.12,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "60": {
+          "samples": 0,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "90": {
+          "samples": 0,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "180": {
+          "samples": 0,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible interaction state passed the thinned holdout improvement gate."
+    },
+    {
+      "id": "miner-stress",
+      "description": "Low miner revenue proxy versus prior year plus large drawdown.",
+      "selectedCoefficientByHorizon": {
+        "30": -0.08,
+        "60": -0.12,
+        "90": -0.12,
+        "180": -0.35
+      },
+      "validationThinned": {
+        "30": {
+          "samples": 5,
+          "selectedCoefficient": -0.08,
+          "medianAbsLogError": 0.06749459413446068,
+          "baselineMedianAbsLogError": 0.06977139116613706,
+          "meanAbsLogError": 0.08787616589306424,
+          "baselineMeanAbsLogError": 0.1047868847057348,
+          "meanImprovementVsBaseline": 0.016910718812670568,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 0.8,
+          "medianForwardReturn": -0.035215634219442425
+        },
+        "60": {
+          "samples": 4,
+          "selectedCoefficient": -0.12,
+          "medianAbsLogError": 0.029690290488749937,
+          "baselineMedianAbsLogError": 0.14969029048874916,
+          "meanAbsLogError": 0.05095256310891472,
+          "baselineMeanAbsLogError": 0.16054406241370112,
+          "meanImprovementVsBaseline": 0.1095914993047864,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 0.75,
+          "medianForwardReturn": -0.1747878319065766
+        },
+        "90": {
+          "samples": 2,
+          "selectedCoefficient": -0.12,
+          "medianAbsLogError": 0.06622641589980027,
+          "baselineMedianAbsLogError": 0.17471099379172017,
+          "meanAbsLogError": 0.06622641589980027,
+          "baselineMeanAbsLogError": 0.17471099379172017,
+          "meanImprovementVsBaseline": 0.1084845778919199,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": -0.28035784890112714
+        },
+        "180": {
+          "samples": 1,
+          "selectedCoefficient": -0.35,
+          "medianAbsLogError": 0.03839149912991502,
+          "baselineMedianAbsLogError": 0.3116085008700864,
+          "meanAbsLogError": 0.03839149912991502,
+          "baselineMeanAbsLogError": 0.3116085008700864,
+          "meanImprovementVsBaseline": 0.2732170017401714,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": -0.5607156978022544
+        }
+      },
+      "holdoutThinned": {
+        "30": {
+          "samples": 0,
+          "selectedCoefficient": -0.08,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "60": {
+          "samples": 0,
+          "selectedCoefficient": -0.12,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "90": {
+          "samples": 0,
+          "selectedCoefficient": -0.12,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "180": {
+          "samples": 0,
+          "selectedCoefficient": -0.35,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible interaction state passed the thinned holdout improvement gate."
+    },
+    {
+      "id": "network-expansion",
+      "description": "Rising activity trend with positive 30d residual momentum.",
+      "selectedCoefficientByHorizon": {
+        "30": 0,
+        "60": 0.08,
+        "90": 0,
+        "180": 0.08
+      },
+      "validationThinned": {
+        "30": {
+          "samples": 5,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.03448199561769272,
+          "baselineMedianAbsLogError": 0.03448199561769272,
+          "meanAbsLogError": 0.11208933647881061,
+          "baselineMeanAbsLogError": 0.11208933647881061,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.8,
+          "baselineDirectionHitRate": 0.8,
+          "medianForwardReturn": 0.011879945018038938
+        },
+        "60": {
+          "samples": 3,
+          "selectedCoefficient": 0.08,
+          "medianAbsLogError": 0.011519512373434182,
+          "baselineMedianAbsLogError": 0.09151951237343425,
+          "meanAbsLogError": 0.0870429022372304,
+          "baselineMeanAbsLogError": 0.11069171654268277,
+          "meanImprovementVsBaseline": 0.023648814305452365,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.6666666666666666,
+          "baselineDirectionHitRate": 0.3333333333333333,
+          "medianForwardReturn": 0.08147712496520214
+        },
+        "90": {
+          "samples": 1,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.006751147645038813,
+          "baselineMedianAbsLogError": 0.006751147645038813,
+          "meanAbsLogError": 0.006751147645038813,
+          "baselineMeanAbsLogError": 0.006751147645038813,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": 0.23866939076824886
+        },
+        "180": {
+          "samples": 1,
+          "selectedCoefficient": 0.08,
+          "medianAbsLogError": 0.012843195970093646,
+          "baselineMedianAbsLogError": 0.06715680402990643,
+          "meanAbsLogError": 0.012843195970093646,
+          "baselineMeanAbsLogError": 0.06715680402990643,
+          "meanImprovementVsBaseline": 0.05431360805981278,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": 0.5296047279922667
+        }
+      },
+      "holdoutThinned": {
+        "30": {
+          "samples": 1,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.04139632544690919,
+          "baselineMedianAbsLogError": 0.04139632544690919,
+          "meanAbsLogError": 0.04139632544690919,
+          "baselineMeanAbsLogError": 0.04139632544690919,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": -0.07317797517708442
+        },
+        "60": {
+          "samples": 0,
+          "selectedCoefficient": 0.08,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "90": {
+          "samples": 0,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "180": {
+          "samples": 0,
+          "selectedCoefficient": 0.08,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible interaction state passed the thinned holdout improvement gate."
+    },
+    {
+      "id": "valuation-activity-divergence",
+      "description": "Cheap valuation paired with weak or negative activity trend.",
+      "selectedCoefficientByHorizon": {
+        "30": 0.08,
+        "60": -0.12,
+        "90": 0.04,
+        "180": -0.35
+      },
+      "validationThinned": {
+        "30": {
+          "samples": 6,
+          "selectedCoefficient": 0.08,
+          "medianAbsLogError": 0.10064026802972581,
+          "baselineMedianAbsLogError": 0.13896075044256495,
+          "meanAbsLogError": 0.15350887450189324,
+          "baselineMeanAbsLogError": 0.1587087194512978,
+          "meanImprovementVsBaseline": 0.005199844949404546,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.5,
+          "baselineDirectionHitRate": 0.8333333333333334,
+          "medianForwardReturn": 0.055937213747315764
+        },
+        "60": {
+          "samples": 2,
+          "selectedCoefficient": -0.12,
+          "medianAbsLogError": 0.021978045135031543,
+          "baselineMedianAbsLogError": 0.12116104374460512,
+          "meanAbsLogError": 0.021978045135031543,
+          "baselineMeanAbsLogError": 0.12116104374460512,
+          "meanImprovementVsBaseline": 0.09918299860957358,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": -0.18568822816821445
+        },
+        "90": {
+          "samples": 2,
+          "selectedCoefficient": 0.04,
+          "medianAbsLogError": 0.14979518185063778,
+          "baselineMedianAbsLogError": 0.14979518185063867,
+          "meanAbsLogError": 0.14979518185063778,
+          "baselineMeanAbsLogError": 0.14979518185063867,
+          "meanImprovementVsBaseline": 8.881784197001252e-16,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": -0.013462530795299077
+        },
+        "180": {
+          "samples": 1,
+          "selectedCoefficient": -0.35,
+          "medianAbsLogError": 0.03839149912991502,
+          "baselineMedianAbsLogError": 0.3116085008700864,
+          "meanAbsLogError": 0.03839149912991502,
+          "baselineMeanAbsLogError": 0.3116085008700864,
+          "meanImprovementVsBaseline": 0.2732170017401714,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "medianForwardReturn": -0.5607156978022544
+        }
+      },
+      "holdoutThinned": {
+        "30": {
+          "samples": 0,
+          "selectedCoefficient": 0.08,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "60": {
+          "samples": 0,
+          "selectedCoefficient": -0.12,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "90": {
+          "samples": 0,
+          "selectedCoefficient": 0.04,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        },
+        "180": {
+          "samples": 0,
+          "selectedCoefficient": -0.35,
+          "medianAbsLogError": null,
+          "baselineMedianAbsLogError": null,
+          "meanAbsLogError": null,
+          "baselineMeanAbsLogError": null,
+          "meanImprovementVsBaseline": null,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": null,
+          "baselineDirectionHitRate": null,
+          "medianForwardReturn": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible interaction state passed the thinned holdout improvement gate."
+    }
+  ]
+}

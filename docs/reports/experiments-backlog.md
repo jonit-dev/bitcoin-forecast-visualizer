@@ -246,3 +246,69 @@ Rerun if:
 ### Next better experiment
 
 If dynamic volatility fails, keep current interval logic and move to point-in-time macro liquidity or on-chain interaction regimes rather than over-tuning volatility on the same holdout.
+
+---
+
+## 2026-06-26 — On-chain interaction regimes
+
+Status: `completed — rejected`
+
+### Hypothesis
+
+Single on-chain valuation signals were weak as direct median adjustments, but interaction states may identify regimes where the current power-law median is biased. Specifically, valuation must interact with activity, miner stress, drawdown, or residual momentum to create a testable state.
+
+### Data/source changes
+
+No new external data source. Use existing lag-safe `src/data/feature-table.json` and its source dates.
+
+Pre-registered interaction states:
+
+- `cheap-and-active`: low `mvrvPercentile` or low `realizedPriceDistance`, plus rising active-address/activity trend.
+- `cheap-and-dead`: low valuation plus falling active-address/activity trend.
+- `miner-stress`: low miner revenue proxy plus large drawdown.
+- `network-expansion`: rising activity trend with positive residual momentum.
+- `valuation-activity-divergence`: valuation cheapness paired with weak/negative activity trend.
+
+### Validation setup
+
+Script: `scripts/backtest-onchain-interactions.ts`
+
+- Baseline: current `powerlaw-current` median forecast.
+- Candidate form: state-specific median adjustment `baseline median * exp(coefficient)` with coefficient selected on validation only.
+- Validation: `2022-01-01 → 2024-12-31`.
+- Final holdout: `2025-01-01 → latest available target`.
+- Horizons: `30/60/90/180d`.
+- Metrics: thinned mean absolute log-error improvement, median absolute log error, direction hit rate, event counts, and paired bootstrap lower 95% bound.
+- Leakage policy: use feature-table rows keyed by forecast origin; all feature sources must remain one-day lagged per `npm run validate:features`.
+- Promotion gate: a state must have at least 5 thinned holdout samples at a claimed horizon, positive validation improvement, positive holdout improvement with positive lower95 bound, no material degradation on adjacent horizons, and an interpretable reason code.
+
+### Report artifacts
+
+- `docs/reports/results/btc-onchain-interactions-2026-06-26T04-53-26-666Z.md`
+- `docs/reports/results/btc-onchain-interactions-2026-06-26T04-53-26-666Z.json`
+
+### Result / verdict
+
+Verdict: `reject` — no production forecast/product changes.
+
+The final holdout is too sample-starved for these pre-registered states:
+
+- `cheap-and-active`: 1 thinned holdout sample at 30d, 1 at 60d, 0 at 90/180d.
+- `cheap-and-dead`: 0 thinned holdout samples across 30/60/90/180d.
+- `miner-stress`: 0 thinned holdout samples across 30/60/90/180d.
+- `network-expansion`: 1 thinned holdout sample at 30d, 0 at 60/90/180d.
+- `valuation-activity-divergence`: 0 thinned holdout samples across 30/60/90/180d.
+
+The only positive-looking pocket was `cheap-and-active` at 60d (`+8.02%` mean absolute log-error improvement), but it had only one holdout sample and no lower95 estimate. This stays as a research note only.
+
+### Rerun criteria
+
+Rerun only if:
+
+1. New lag-safe on-chain fields are added.
+2. A materially different interaction definition is pre-registered before checking holdout.
+3. The baseline power-law median changes.
+
+### Next better experiment
+
+If these interactions fail, do not keep mining MVRV/activity combinations on the same holdout. Move to macro liquidity, ETF demand pressure, or market-data quality instead.
