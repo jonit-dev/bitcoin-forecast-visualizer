@@ -181,4 +181,68 @@ Do not rerun this exact Binance funding/premium tail-risk experiment. Revisit on
 
 Do not move to implementation. The next research candidate should use a different data family or materially richer derivatives data, e.g. OKX OI/positioning or spot order-book/liquidity imbalance, and still must pass the hard positive-signal gate before product work.
 
+---
 
+## 2026-06-26 — Dynamic volatility interval model
+
+Status: `completed — rejected`
+
+### Hypothesis
+
+The current power-law interval model may improve short-horizon probability calibration if volatility is forecast explicitly from recent BTC realized volatility dynamics instead of relying only on the current blended 90/365-day volatility and fitted horizon multipliers.
+
+### Data/source changes
+
+No new external data source. Use existing `src/data/btc-history.json` only.
+
+Candidate sigma models:
+
+- EWMA daily realized volatility with validation-selected decay and multiplier.
+- HAR-style 7/30/90-day realized-volatility blend with validation-selected weights and multiplier.
+- Volatility-of-volatility widening when recent volatility instability is elevated.
+- Asymmetric widening after large downside moves.
+
+### Validation setup
+
+Script: `scripts/backtest-dynamic-volatility.ts`
+
+- Baseline: current `powerlaw-current` median and current interval sigma.
+- Candidate median remains unchanged.
+- Parameters selected on thinned validation period only: `2022-01-01 → 2024-12-31`.
+- Final holdout: `2025-01-01 → latest available target`.
+- Horizons: `7/14/30/60d`.
+- Metrics: NLL, 80/90/95% coverage, q05/q10/q90/q95 pinball loss, 90% interval width.
+- Leakage policy: all volatility inputs use BTC rows at or before the forecast origin.
+- Promotion gate: NLL improves on final holdout at `7/14/30d`, lower 95% block-bootstrap improvement is positive at promoted horizons, 90% coverage remains roughly `85-95%`, and tail pinball does not worsen on both tails.
+
+### Report artifacts
+
+- `docs/reports/results/btc-dynamic-volatility-2026-06-26T04-50-09-423Z.md`
+- `docs/reports/results/btc-dynamic-volatility-2026-06-26T04-50-09-423Z.json`
+
+### Result / verdict
+
+Verdict: `reject` — no production interval/model changes.
+
+Validation-selected candidates were all downside-widening variants, and none passed the final holdout gate:
+
+- Best selected candidate: `downside-lb7-t0.16-s0.2`
+  - 7d holdout NLL improvement `-0.0013`, lower95 `-0.0038`, coverage90 `92.0%`
+  - 14d/30d NLL improvement `0.0000`, lower95 `0.0000`
+- Other selected downside variants widened intervals without improving holdout NLL:
+  - `downside-lb30-t0.16-s0.2`: 7d/14d/30d NLL improvements `-0.0180`, `-0.0172`, `-0.0211`
+  - `downside-lb7-t0.12-s0.2`: 7d/14d NLL improvements `-0.0036`, `-0.0042`
+
+The current interval baseline already has acceptable short-horizon 90% holdout coverage (`92.0%`, `91.9%`, `94.1%` at 7/14/30d), so simple volatility widening mostly adds width without improving likelihood.
+
+### Rerun criteria
+
+Rerun if:
+
+1. The baseline interval model or fitted horizon multipliers change.
+2. BTC history is materially revised.
+3. A materially different volatility model family is proposed before seeing holdout results.
+
+### Next better experiment
+
+If dynamic volatility fails, keep current interval logic and move to point-in-time macro liquidity or on-chain interaction regimes rather than over-tuning volatility on the same holdout.

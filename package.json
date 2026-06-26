@@ -20,6 +20,7 @@
     "backtest:buy-zones": "tsx scripts/backtest-buy-zones.ts",
     "backtest:liquidity-derivatives": "tsx scripts/backtest-liquidity-derivatives.ts",
     "backtest:derivatives-tail-risk": "tsx scripts/backtest-derivatives-tail-risk.ts",
+    "backtest:dynamic-volatility": "tsx scripts/backtest-dynamic-volatility.ts",
     "calibrate:intervals": "tsx scripts/calibrate-intervals.ts",
     "update:onchain": "node scripts/update-onchain-data.mjs",
     "validate:onchain": "node scripts/validate-onchain-data.mjs",
