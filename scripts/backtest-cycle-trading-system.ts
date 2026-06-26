@@ -7,6 +7,8 @@ import type { OHLCVData } from '../src/lib/api';
 
 const INITIAL_CAPITAL = 1000;
 const FEE_RATE = 0.001;
+const BORROW_APR = 0.08;
+const MAINTENANCE_MARGIN = 0.15;
 const REPORT_DIR = join(process.cwd(), 'docs', 'reports', 'results');
 
 type ZoneMode = 'visible-oracle' | 'scheduled';
@@ -20,6 +22,7 @@ interface StrategySpec {
   maxThreshold: number;
   trimTarget: number;
   baseTarget: number;
+  maxLeverage: number;
   rebalanceThreshold: number;
 }
 
@@ -42,6 +45,8 @@ interface BacktestResult {
   trades: number;
   turnover: number;
   feesPaid: number;
+  borrowCost: number;
+  liquidated: boolean;
   bestTradeReturn: number | null;
   worstTradeReturn: number | null;
   avgTradeReturn: number | null;
@@ -95,13 +100,13 @@ function entryTarget(spec: StrategySpec, state: DailyState): number {
   if (spec.kind === 'all-in') return 1;
   if (spec.kind === 'base-hold') return Math.max(spec.baseTarget, score >= spec.buyThreshold ? 0.65 : spec.baseTarget);
   if (spec.kind === 'ladder' || spec.kind === 'stateful-ladder') {
-    if (score >= spec.maxThreshold) return 1;
-    if (score >= spec.buyThreshold + 0.05) return 0.75;
+    if (score >= spec.maxThreshold) return spec.maxLeverage;
+    if (score >= spec.buyThreshold + 0.05) return Math.min(spec.maxLeverage, spec.maxLeverage >= 1.25 ? 1.25 : 0.75);
     return 0.5;
   }
 
   const scaled = (score - spec.buyThreshold) / Math.max(0.01, spec.maxThreshold - spec.buyThreshold);
-  return Math.max(spec.baseTarget, Math.min(1, scaled));
+  return Math.max(spec.baseTarget, Math.min(spec.maxLeverage, scaled * spec.maxLeverage));
 }
 
 function targetAllocation(spec: StrategySpec, state: DailyState, previousTarget: number): number {
@@ -129,29 +134,12 @@ function seededTarget(spec: StrategySpec): number {
 }
 
 function assertFiniteTarget(target: number): number {
-  return Math.max(0, Math.min(1, Number.isFinite(target) ? target : 0));
+  return Math.max(0, Number.isFinite(target) ? target : 0);
 }
 
 function targetFromSignal(spec: StrategySpec, previousState: DailyState | null, state: DailyState, previousTarget: number): number {
   if (previousState && resetsAfterTrim(spec, previousState, state)) return resetTarget(spec);
-  return assertFiniteTarget(targetAllocation(spec, state, previousTarget));
-}
-
-function unusedLegacyTargetAllocation(spec: StrategySpec, state: DailyState): number {
-  if (state.isTrim) return spec.trimTarget;
-  const score = state.bottomScore;
-  if (score === null || score < spec.buyThreshold) return spec.baseTarget;
-
-  if (spec.kind === 'all-in') return 1;
-  if (spec.kind === 'base-hold') return Math.max(spec.baseTarget, score >= spec.buyThreshold ? 0.65 : spec.baseTarget);
-  if (spec.kind === 'ladder') {
-    if (score >= spec.maxThreshold) return 1;
-    if (score >= spec.buyThreshold + 0.05) return 0.75;
-    return 0.5;
-  }
-
-  const scaled = (score - spec.buyThreshold) / Math.max(0.01, spec.maxThreshold - spec.buyThreshold);
-  return Math.max(spec.baseTarget, Math.min(1, scaled));
+  return Math.min(spec.maxLeverage, assertFiniteTarget(targetAllocation(spec, state, previousTarget)));
 }
 
 function yearsBetween(startDate: string, endDate: string): number {
@@ -175,11 +163,11 @@ function tradeToTarget(cash: number, btc: number, price: number, target: number)
   if (Math.abs(delta) < 1e-9) return { cash, btc, fee: 0, turnover: 0, traded: false };
 
   if (delta > 0) {
-    const spend = Math.min(cash, value * delta);
+    const spend = Math.max(0, value * delta);
     const fee = spend * FEE_RATE;
     return {
-      cash: cash - spend,
-      btc: btc + (spend - fee) / price,
+      cash: cash - spend - fee,
+      btc: btc + spend / price,
       fee,
       turnover: spend,
       traded: spend > 0,
@@ -214,6 +202,8 @@ function runBacktest(spec: StrategySpec): BacktestResult {
   let trades = 0;
   let feesPaid = 0;
   let turnover = 0;
+  let borrowCost = 0;
+  let liquidated = false;
   const values: number[] = [];
   const exposures: number[] = [];
   const tradeEntries: number[] = [];
@@ -224,8 +214,34 @@ function runBacktest(spec: StrategySpec): BacktestResult {
     const signal = states[i - 1];
     const previousSignal = i >= 2 ? states[i - 2] : null;
     const row = testRows[i];
+
+    if (cash < 0) {
+      const dailyBorrow = -cash * BORROW_APR / 365;
+      cash -= dailyBorrow;
+      borrowCost += dailyBorrow;
+    }
+
     const price = row.open > 0 ? row.open : row.close;
     const beforeValue = cash + btc * price;
+    if (beforeValue <= 0) {
+      cash = 0;
+      btc = 0;
+      liquidated = true;
+      values.push(0);
+      exposures.push(0);
+      break;
+    }
+
+    const marginRatio = btc > 0 ? beforeValue / (btc * price) : Infinity;
+    if (marginRatio < MAINTENANCE_MARGIN) {
+      cash = 0;
+      btc = 0;
+      liquidated = true;
+      values.push(0);
+      exposures.push(0);
+      break;
+    }
+
     const target = targetFromSignal(spec, previousSignal, signal, previousTarget);
     const currentTarget = beforeValue > 0 ? (btc * price) / beforeValue : 0;
 
@@ -270,6 +286,8 @@ function runBacktest(spec: StrategySpec): BacktestResult {
     trades,
     turnover,
     feesPaid,
+    borrowCost,
+    liquidated,
     bestTradeReturn: tradeReturns.length ? Math.max(...tradeReturns) : null,
     worstTradeReturn: tradeReturns.length ? Math.min(...tradeReturns) : null,
     avgTradeReturn: tradeReturns.length ? tradeReturns.reduce((sum, value) => sum + value, 0) / tradeReturns.length : null,
@@ -284,21 +302,25 @@ function runBacktest(spec: StrategySpec): BacktestResult {
 function specs(): StrategySpec[] {
   const output: StrategySpec[] = [];
   for (const zoneMode of ['scheduled', 'visible-oracle'] as ZoneMode[]) {
-    for (const kind of ['all-in', 'ladder', 'risk-scaled', 'base-hold'] as StrategyKind[]) {
+    for (const kind of ['all-in', 'ladder', 'risk-scaled', 'base-hold', 'stateful-ladder', 'stateful-risk'] as StrategyKind[]) {
       for (const buyThreshold of [0.65, 0.70, 0.75]) {
         for (const trimTarget of [0, 0.15, 0.3, 0.5]) {
+          for (const maxLeverage of [1, 1.25, 1.5, 2]) {
+            if (maxLeverage > 1 && (kind === 'base-hold' || kind === 'all-in')) continue;
           const baseTargets = kind === 'base-hold' ? [0.2, 0.35] : [0];
           for (const baseTarget of baseTargets) {
             output.push({
-              id: `${zoneMode}-${kind}-buy${buyThreshold}-trim${trimTarget}-base${baseTarget}`,
+              id: `${zoneMode}-${kind}-buy${buyThreshold}-trim${trimTarget}-base${baseTarget}-L${maxLeverage}`,
               zoneMode,
               kind,
               buyThreshold,
               maxThreshold: Math.max(0.8, buyThreshold + 0.1),
               trimTarget,
               baseTarget,
+              maxLeverage,
               rebalanceThreshold: 0.1,
             });
+          }
           }
         }
       }
@@ -320,28 +342,39 @@ function renderMarkdown(results: BacktestResult[], generatedAt: string): string 
   const sorted = [...results].sort((a, b) => b.finalValue - a.finalValue);
   const causal = sorted.filter(result => result.spec.zoneMode === 'scheduled');
   const oracle = sorted.filter(result => result.spec.zoneMode === 'visible-oracle');
+  const riskAdjusted = [...results]
+    .filter(result => result.spec.zoneMode === 'scheduled' && !result.liquidated && result.maxDrawdown < 0)
+    .sort((a, b) => (b.cagr / Math.abs(b.maxDrawdown)) - (a.cagr / Math.abs(a.maxDrawdown)));
   const baseline = sorted[0];
   const topRows = (items: BacktestResult[]) => items.slice(0, 12).map(result =>
-    `| \`${result.spec.id}\` | ${fmtUsd(result.finalValue)} | ${fmtPct(result.totalReturn, 0)} | ${fmtPct(result.cagr)} | ${fmtPct(result.maxDrawdown)} | ${result.trades} | ${fmtPct(result.winRate)} | ${fmtUsd(result.feesPaid)} |`
+    `| \`${result.spec.id}\` | ${fmtUsd(result.finalValue)} | ${fmtPct(result.totalReturn, 0)} | ${fmtPct(result.cagr)} | ${fmtPct(result.maxDrawdown)} | ${fmtPct(result.exposure)} | ${result.trades} | ${result.liquidated ? 'yes' : 'no'} | ${fmtUsd(result.borrowCost)} |`
+  ).join('\n');
+  const riskRows = riskAdjusted.slice(0, 12).map(result =>
+    `| \`${result.spec.id}\` | ${fmtUsd(result.finalValue)} | ${fmtPct(result.cagr)} | ${fmtPct(result.maxDrawdown)} | ${(result.cagr / Math.abs(result.maxDrawdown)).toFixed(2)} | ${fmtPct(result.exposure)} | ${fmtUsd(result.borrowCost)} |`
   ).join('\n');
 
   return `# BTC cycle-zone trading-system sweep\n\n` +
     `Generated: ${generatedAt}\n\n` +
-    `Initial capital: ${fmtUsd(INITIAL_CAPITAL)}. Fee assumption: ${(FEE_RATE * 100).toFixed(2)}% per trade. Trades execute on next-day open after a prior-day signal.\n\n` +
+    `Initial capital: ${fmtUsd(INITIAL_CAPITAL)}. Fee assumption: ${(FEE_RATE * 100).toFixed(2)}% per trade. Borrow APR for leveraged variants: ${(BORROW_APR * 100).toFixed(1)}%. Maintenance margin tripwire: ${(MAINTENANCE_MARGIN * 100).toFixed(0)}%. Trades execute on next-day open after a prior-day signal.\n\n` +
     `## Important leakage note\n\n` +
     `The visible chart's orange Trim zone is the 30 days before an ATH marker. Historical known ATH/ATL markers are not tradable if they were identified after the fact, so \`visible-oracle\` is reported only as an upper-bound/reference. The \`scheduled\` variant uses the fixed 1064d ATL→ATH and 364d ATH→ATL cadence seeded from the 2015-01-14 ATL.\n\n` +
     `Buy signal uses the existing leakage-safe heavy-buy score. Trim signal uses the main-chart Trim band.\n\n` +
     `Buy-and-hold from ${baseline.startDate} to ${baseline.endDate}: ${fmtUsd(baseline.buyHoldFinalValue)} (${fmtPct(baseline.buyHoldReturn, 0)} total, ${fmtPct(baseline.buyHoldCagr)} CAGR, ${fmtPct(baseline.buyHoldMaxDrawdown)} max DD).\n\n` +
     `## Best causal scheduled systems\n\n` +
-    `| strategy | final | return | CAGR | max DD | trades | win | fees |\n` +
-    `| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
+    `| strategy | final | return | CAGR | max DD | avg exposure | trades | liquidated | borrow cost |\n` +
+    `| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
     `${topRows(causal)}\n\n` +
+    `## Best Risk-Adjusted Causal Systems\n\n` +
+    `Score is CAGR divided by absolute max drawdown; this favors systems that survive cleanly.\n\n` +
+    `| strategy | final | CAGR | max DD | score | avg exposure | borrow cost |\n` +
+    `| --- | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
+    `${riskRows}\n\n` +
     `## Visible/oracle reference\n\n` +
-    `| strategy | final | return | CAGR | max DD | trades | win | fees |\n` +
-    `| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
+    `| strategy | final | return | CAGR | max DD | avg exposure | trades | liquidated | borrow cost |\n` +
+    `| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
     `${topRows(oracle)}\n\n` +
     `## Proposed robust rule\n\n` +
-    `Prefer scheduled, ladder/risk-scaled systems over all-in systems unless the goal is pure upside. A robust live rule should accumulate in steps when bottomScore crosses 0.70/0.75, keep some cash reserve, and trim to 15-30% BTC exposure in scheduled Trim windows instead of going fully flat.\n`;
+    `Prefer scheduled, stateful ladder/risk-scaled systems over all-in systems unless the goal is pure upside. A robust live rule should accumulate in steps when bottomScore crosses 0.70/0.75, use no more than modest leverage unless fresh walk-forward tests justify it, and trim to 15-30% BTC exposure in scheduled Trim windows instead of going fully flat.\n`;
 }
 
 function main(): void {
