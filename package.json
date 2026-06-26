@@ -19,6 +19,7 @@
     "backtest:market": "tsx scripts/backtest-market-forecast.ts",
     "backtest:buy-zones": "tsx scripts/backtest-buy-zones.ts",
     "backtest:cycle-system": "tsx scripts/backtest-cycle-trading-system.ts",
+    "research:trading-variants": "tsx scripts/research-trading-variants.ts",
     "backtest:liquidity-derivatives": "tsx scripts/backtest-liquidity-derivatives.ts",
     "backtest:derivatives-tail-risk": "tsx scripts/backtest-derivatives-tail-risk.ts",
     "backtest:dynamic-volatility": "tsx scripts/backtest-dynamic-volatility.ts",
