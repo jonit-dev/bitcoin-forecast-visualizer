@@ -18,6 +18,7 @@
     "refit:powerlaw": "tsx scripts/refit-power-law.ts",
     "backtest:market": "tsx scripts/backtest-market-forecast.ts",
     "backtest:buy-zones": "tsx scripts/backtest-buy-zones.ts",
+    "backtest:cycle-system": "tsx scripts/backtest-cycle-trading-system.ts",
     "backtest:liquidity-derivatives": "tsx scripts/backtest-liquidity-derivatives.ts",
     "backtest:derivatives-tail-risk": "tsx scripts/backtest-derivatives-tail-risk.ts",
     "backtest:dynamic-volatility": "tsx scripts/backtest-dynamic-volatility.ts",
