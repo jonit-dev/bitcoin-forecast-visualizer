@@ -50,7 +50,7 @@ function main(): void {
       derivatives: optionalCacheStatus('src/data/derivatives-history.json'),
       etf: optionalCacheStatus('src/data/etf-flow-history.json'),
       macro: optionalCacheStatus('src/data/macro-history.json'),
-      sentiment: { status: 'deferred', latestDate: null, lagDays: null, required: false },
+      sentiment: optionalCacheStatus('src/data/sentiment-history.json'),
     },
   }, null, 2)}\n`);
 

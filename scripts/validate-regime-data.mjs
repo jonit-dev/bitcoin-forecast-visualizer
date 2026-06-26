@@ -8,6 +8,7 @@ const FILES = [
   ['derivatives', '../src/data/derivatives-history.json', true],
   ['etf-flow', '../src/data/etf-flow-history.json', true],
   ['macro', '../src/data/macro-history.json', true],
+  ['sentiment', '../src/data/sentiment-history.json', true],
 ];
 
 function validateCache(name, relativePath, optional) {
@@ -32,6 +33,7 @@ function validateCache(name, relativePath, optional) {
     if (seen.has(row.date)) duplicateCount++;
     seen.add(row.date);
     if (name === 'derivatives') validateDerivativesRow(row);
+    if (name === 'sentiment') validateSentimentRow(row);
   }
   if (duplicateCount > 0) throw new Error(`${name} duplicate dates: ${duplicateCount}`);
 
@@ -46,6 +48,18 @@ function validateCache(name, relativePath, optional) {
       `credentialRequired=${metadata.credentialRequired ?? false}`,
     ].join('  ')
   );
+}
+
+function validateSentimentRow(row) {
+  if (!row.metrics || typeof row.metrics !== 'object') throw new Error(`sentiment missing metrics on ${row.date}`);
+  const value = row.metrics.fearGreedIndex;
+  if (!Number.isFinite(value) || value < 0 || value > 100) throw new Error(`sentiment bad fearGreedIndex on ${row.date}`);
+  if (!row.availableAfter || Number.isNaN(Date.parse(row.availableAfter))) {
+    throw new Error(`sentiment missing availableAfter on ${row.date}`);
+  }
+  if (Date.parse(row.availableAfter) <= Date.parse(`${row.date}T00:00:00Z`)) {
+    throw new Error(`sentiment availableAfter must be after source date on ${row.date}`);
+  }
 }
 
 function validateDerivativesRow(row) {

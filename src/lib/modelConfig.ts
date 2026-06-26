@@ -67,5 +67,5 @@ export const ENSEMBLE_CONFIG = {
     powerlaw: 1,
     regimeAdjustment: 0,
   },
-  featureFamilies: ['mvrv', 'onchain', 'volatility', 'macro', 'derivatives', 'etf-flow'],
+  featureFamilies: ['mvrv', 'onchain', 'volatility', 'macro', 'derivatives', 'etf-flow', 'sentiment'],
 } as const;

@@ -379,3 +379,75 @@ Rerun if:
 ### Next better experiment
 
 If source deltas are small and reproducible, volume-feature research may be pre-registered separately. If deltas are large or source coverage is unstable, keep volume out of forecast modeling and document the limitation.
+
+---
+
+## 2026-06-26 — Sentiment extremes event study
+
+Status: `completed — rejected`
+
+### Hypothesis
+
+Alternative.me Fear & Greed extremes may classify capitulation or euphoria events, but are likely redundant with price, volatility, and drawdown. Sentiment should start as optional context and only influence forecasts if extreme-event behavior improves out-of-sample versus both unconditional and price-context baselines.
+
+### Data/source changes
+
+Add optional public sentiment cache:
+
+- Source: `https://api.alternative.me/fng/?limit=0&format=json`
+- Output: `src/data/sentiment-history.json`
+- Result: 3064 daily rows, `2018-02-01 → 2026-06-26`
+- Fields: Fear & Greed index value, source classification, 7d/30d changes, extreme fear/greed flags.
+- Availability: each source date is treated as available after the next UTC day before joining into `src/data/feature-table.json`.
+
+### Validation setup
+
+Script: `scripts/backtest-sentiment-extremes.ts`
+
+- Baseline: current `powerlaw-current` median forecast.
+- Candidate form: event-specific median adjustment `baseline median * exp(coefficient)` with coefficient selected on validation only.
+- Event states:
+  - `extreme-fear`
+  - `extreme-greed`
+  - `fear-after-drawdown`
+  - `greed-after-rally`
+  - `sentiment-price-divergence`
+- Validation: `2022-01-01 → 2024-12-31`.
+- Final holdout: `2025-01-01 → latest available target`.
+- Horizons: `7/14/30/60d`.
+- Metrics: event counts, mean absolute log-error improvement, lower95 paired block bootstrap, direction hit rate, median forward return, and comparison to price-context event baselines.
+- Promotion gate: at least 10 thinned holdout samples for a claimed state/horizon, positive validation improvement, positive holdout improvement with positive lower95 bound, and improvement over the matching price-only event baseline.
+
+### Report artifacts
+
+- `docs/reports/results/btc-sentiment-extremes-2026-06-26T05-08-19-361Z.md`
+- `docs/reports/results/btc-sentiment-extremes-2026-06-26T05-08-19-361Z.json`
+
+### Result / verdict
+
+Verdict: `reject` for forecast influence; keep sentiment as optional context/freshness only.
+
+No sentiment event passed the thinned holdout promotion gate:
+
+- `extreme-fear`
+  - 7d: n=25, selected coefficient `0`, improvement `0.00%`, lower95 `0.00%`
+  - 14d: n=12, selected coefficient `0.03`, improvement `-1.16%`, lower95 `-1.16%`
+- `fear-after-drawdown`
+  - 7d: n=22, selected coefficient `0`, improvement `0.00%`, lower95 `0.00%`
+  - 14d: n=11, selected coefficient `0.03`, improvement `-1.32%`, lower95 `-1.32%`
+- `extreme-greed` and `greed-after-rally` were sample-starved in 2025+ holdout: 3 samples at 7d, 2 at 14d, 0 at 30/60d.
+- `sentiment-price-divergence` was sample-starved: 5 samples at 7d, 2 at 14d, 1 at 30/60d.
+
+Sentiment is now available as lag-safe optional context fields in the feature table, but forecast median/interval logic remains unchanged.
+
+### Rerun criteria
+
+Rerun if:
+
+1. Alternative.me source history materially changes or becomes unavailable.
+2. A new non-price sentiment source is added.
+3. The event definitions are materially changed before checking holdout.
+
+### Next better experiment
+
+If sentiment fails, keep it as optional context/freshness only and do not add Google Trends until a reproducible source workflow is selected.

@@ -18,6 +18,7 @@
 | `src/data/derivatives-history.json` | Optional available | Binance USD-M Futures public REST for BTCUSDT funding and open-interest snapshots. Funding is aggregated by UTC date; open-interest history is limited by Binance to recent history, so the features stay context-only until enough walk-forward history accumulates. | None |
 | `src/data/etf-flow-history.json` | Optional unavailable by default | ETF flow vendors differ in methodology and machine-readable availability. The baseline cache records explicit unavailable metadata. | None configured |
 | `src/data/macro-history.json` | Optional credentialed | FRED series `WALCL`, `FEDFUNDS`, `DGS10`, `BAMLH0A0HYM2`, and `M2SL`, aligned by last-known observation date. | `FRED_API_KEY` |
+| `src/data/sentiment-history.json` | Optional available | Alternative.me Fear & Greed Index API. Rows are conservatively joined into features only after the next UTC day. Sentiment-extreme event study rejected forecast influence, so these fields are context-only. | None |
 
 Optional sources are context-only until validators show coverage and a later ablation proves forecast value. The current derivatives context is shown in the Regime Context panel, but it does not alter the median forecast or interval calibration.
 

@@ -5,6 +5,7 @@ import mvrvHistory from '../src/data/mvrv-history.json';
 import onchainHistory from '../src/data/onchain-history.json';
 import derivativesHistory from '../src/data/derivatives-history.json';
 import stablecoinHistory from '../src/data/stablecoin-history.json';
+import sentimentHistory from '../src/data/sentiment-history.json';
 import type { OHLCVData, MVRVPoint } from '../src/lib/api';
 import { basePowerLawPrice, daysSinceGenesis } from '../src/lib/powerLaw';
 
@@ -24,11 +25,13 @@ function main(): void {
   const onchainRows = onchainHistory as any[];
   const derivativesRows = (derivativesHistory as any).rows ?? [];
   const stablecoinRows = (stablecoinHistory as any).rows ?? [];
+  const sentimentRows = (sentimentHistory as any).rows ?? [];
   const btcByDate = new Map(btcRows.map(row => [row.date, row]));
   const mvrvByDate = new Map(mvrvRows.map(row => [row.date, row]));
   const onchainByDate = new Map(onchainRows.map(row => [row.date, row]));
   const derivativesByDate = new Map(derivativesRows.map((row: any) => [row.date, row]));
   const stablecoinByDate = new Map(stablecoinRows.map((row: any) => [row.date, row]));
+  const sentimentByDate = new Map(sentimentRows.map((row: any) => [row.date, row]));
   const rows: FeatureRow[] = [];
   const runningMvrvValues: number[] = [];
 
@@ -44,6 +47,7 @@ function main(): void {
     const onchain = onchainByDate.get(sourceDate);
     const derivatives = derivativesByDate.get(sourceDate) as any;
     const stablecoin = stablecoinByDate.get(sourceDate) as any;
+    const sentiment = sentimentByDate.get(sourceDate) as any;
     const features: Record<string, number> = {};
     const sourceDates: Record<string, string> = {};
     const missingFeatureReasons: Record<string, string> = {};
@@ -132,6 +136,22 @@ function main(): void {
         stablecoin.metrics.totalSupplyUSD && mvrv?.marketCap ? stablecoin.metrics.totalSupplyUSD / mvrv.marketCap : null,
         sourceDate,
         'missing stablecoin supply or BTC market cap'
+      );
+    }
+
+    if (isTimedRowAvailable(sentiment, rowDate)) {
+      setFeature('fearGreedIndex', sentiment.metrics.fearGreedIndex, sourceDate, 'missing sentiment index');
+      setFeature('fearGreedChange7d', sentiment.metrics.fearGreedChange7d, sourceDate, 'missing sentiment 7d change');
+      setFeature('fearGreedChange30d', sentiment.metrics.fearGreedChange30d, sourceDate, 'missing sentiment 30d change');
+      setFeature('extremeFearEvent', sentiment.metrics.extremeFear, sourceDate, 'missing sentiment extreme fear flag');
+      setFeature('extremeGreedEvent', sentiment.metrics.extremeGreed, sourceDate, 'missing sentiment extreme greed flag');
+      setFeature(
+        'fearGreedResidualDivergence',
+        Number.isFinite(sentiment.metrics.fearGreedIndex) && Number.isFinite(features.priceResidualLog)
+          ? ((sentiment.metrics.fearGreedIndex - 50) / 50) - features.priceResidualLog
+          : null,
+        sourceDate,
+        'missing sentiment index or price residual'
       );
     }
 
