@@ -21,6 +21,22 @@
 
 Optional sources are context-only until validators show coverage and a later ablation proves forecast value. The current derivatives context is shown in the Regime Context panel, but it does not alter the median forecast or interval calibration.
 
+## BTC Market Data Quality Audit
+
+`npm run audit:market-data-quality` compares the canonical BTC cache against recent public exchange candles from Binance BTCUSDT, Coinbase BTC-USD, and Kraken XBT/USD.
+
+Current audit artifact:
+
+- `docs/reports/results/btc-market-data-quality-2026-06-26T04-57-51-659Z.md`
+
+Latest finding over `2025-06-19` through `2026-06-18`:
+
+- Exchange daily closes are close enough to the canonical cache for drift monitoring: median close differences were `0.16-0.18%`, with p95 below `0.82%`.
+- Exchange volumes are venue-specific and much smaller than CoinGecko aggregate market volume. Correlations versus canonical volume were only `0.41-0.51`.
+- No production source replacement or volume forecast feature is enabled from this audit alone.
+
+Use this audit as a reproducibility check before any separate pre-registered volume-feature ablation. Do not treat a single exchange's volume as aggregate market volume.
+
 ## S&P 500 Proxy And Model
 
 The S&P 500 tab uses VOO, labeled as `S&P 500` in the UI with `VOO ETF, adjusted daily OHLCV` shown as instrument metadata. VOO is used first because it is an investable S&P 500 proxy with real daily OHLCV and volume. VTI is intentionally deferred because it represents the broader U.S. market, not the S&P 500 index.

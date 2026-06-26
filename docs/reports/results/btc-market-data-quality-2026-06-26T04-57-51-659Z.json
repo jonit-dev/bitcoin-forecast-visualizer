@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-06-26T04:57:51.659Z",
+  "data": {
+    "canonicalSource": "src/data/btc-history.json",
+    "canonicalMethodology": "CoinGecko hourly market_chart prices for OHLC and daily total_volumes snapshots for volume",
+    "canonicalRows": 5816,
+    "canonicalFirstDate": "2010-07-17",
+    "canonicalLatestDate": "2026-06-18",
+    "auditStartDate": "2025-06-19",
+    "auditEndDate": "2026-06-18",
+    "auditLookbackDays": 365
+  },
+  "preRegistration": {
+    "purpose": "Data-quality audit before any exchange-volume forecast experiment.",
+    "checks": [
+      "UTC daily close difference versus canonical cache",
+      "OHLC consistency violations",
+      "overlap/missing-day behavior",
+      "volume correlation and volume ratio versus canonical volume"
+    ],
+    "promotionPolicy": "This audit cannot promote a forecast feature. It can only document whether exchange candles are stable enough to support a separate pre-registered volume-feature ablation."
+  },
+  "sources": [
+    {
+      "id": "binance-btcusdt",
+      "label": "Binance spot BTCUSDT 1d klines",
+      "status": "available",
+      "sourceUrl": "https://api.binance.com/api/v3/klines",
+      "rows": 365,
+      "firstDate": "2025-06-19",
+      "latestDate": "2026-06-18",
+      "overlapDays": 365,
+      "missingOverlapDays": 0,
+      "ohlcViolations": 0,
+      "closeDiffPct": {
+        "median": 0.0017606687198848947,
+        "p95": 0.008093605009325433,
+        "max": 0.019548951762256572,
+        "countAbove1Pct": 12,
+        "countAbove5Pct": 0
+      },
+      "volumeCorrelation": 0.510099992606473,
+      "volumeRatio": {
+        "median": 0.03476401532532142,
+        "p95": 0.07652645301325868
+      },
+      "notes": [
+        "BTCUSDT is a USDT quote market, not BTC/USD spot; close agreement is useful but not a canonical USD replacement by itself.",
+        "Volume is quote volume in USDT and is not directly comparable to CoinGecko aggregate USD volume."
+      ]
+    },
+    {
+      "id": "coinbase-btc-usd",
+      "label": "Coinbase Exchange BTC-USD 1d candles",
+      "status": "available",
+      "sourceUrl": "https://api.exchange.coinbase.com/products/BTC-USD/candles",
+      "rows": 366,
+      "firstDate": "2025-06-19",
+      "latestDate": "2026-06-19",
+      "overlapDays": 365,
+      "missingOverlapDays": 0,
+      "ohlcViolations": 0,
+      "closeDiffPct": {
+        "median": 0.0015813222843596986,
+        "p95": 0.007898332047474033,
+        "max": 0.01963573229826432,
+        "countAbove1Pct": 13,
+        "countAbove5Pct": 0
+      },
+      "volumeCorrelation": 0.4478003290347292,
+      "volumeRatio": {
+        "median": 0.014841739397600251,
+        "p95": 0.034971649375404215
+      },
+      "notes": [
+        "Coinbase is BTC/USD spot with exchange-specific base BTC volume converted to approximate USD using daily close; it is useful for source-methodology drift checks but not total market volume."
+      ]
+    },
+    {
+      "id": "kraken-xbtusd",
+      "label": "Kraken XBT/USD 1d OHLC",
+      "status": "available",
+      "sourceUrl": "https://api.kraken.com/0/public/OHLC",
+      "rows": 373,
+      "firstDate": "2025-06-19",
+      "latestDate": "2026-06-26",
+      "overlapDays": 365,
+      "missingOverlapDays": 0,
+      "ohlcViolations": 0,
+      "closeDiffPct": {
+        "median": 0.0016226673091011001,
+        "p95": 0.007963661771415831,
+        "max": 0.01969718998933878,
+        "countAbove1Pct": 10,
+        "countAbove5Pct": 0
+      },
+      "volumeCorrelation": 0.41409494510724476,
+      "volumeRatio": {
+        "median": 0.0033575653837129853,
+        "p95": 0.008047303060098614
+      },
+      "notes": [
+        "Kraken is BTC/USD spot with exchange-specific base BTC volume converted to approximate USD using daily close and may return a limited recent history window."
+      ]
+    }
+  ],
+  "verdict": {
+    "status": "needs-review",
+    "summary": "At least one source is available, but close/volume agreement is not strong enough to treat exchange volume as model-ready without manual review."
+  }
+}

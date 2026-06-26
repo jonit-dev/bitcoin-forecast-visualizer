@@ -312,3 +312,70 @@ Rerun only if:
 ### Next better experiment
 
 If these interactions fail, do not keep mining MVRV/activity combinations on the same holdout. Move to macro liquidity, ETF demand pressure, or market-data quality instead.
+
+---
+
+## 2026-06-26 — Market data quality and volume audit
+
+Status: `completed`
+
+### Hypothesis
+
+Before using exchange volume or replacing the canonical BTC candle cache, the app needs an auditable comparison between the current CoinGecko-derived daily candles and public exchange-specific UTC daily candles. Source methodology differences may explain close/volume drift, and any later volume feature should only start from a stable source.
+
+### Data/source changes
+
+No production source change planned for the audit.
+
+Candidate public sources:
+
+- Current canonical cache: `src/data/btc-history.json`, built from CoinGecko hourly market chart prices plus daily volume snapshots.
+- Binance spot `BTCUSDT` 1d klines.
+- Coinbase Exchange `BTC-USD` 1d candles.
+- Kraken `XBT/USD` 1d OHLC.
+
+### Validation setup
+
+Script: `scripts/audit-market-data-quality.ts`
+
+- Compare overlapping UTC dates in the recent one-year window.
+- Metrics: close absolute percentage difference, OHLC consistency violations, missing days, and volume correlation versus canonical volume.
+- Report per-source overlap, latest date, median/p95/max close difference, large-difference day counts, and volume correlation.
+- This is a data-quality audit, not a forecast-alpha claim.
+
+### Report artifacts
+
+- `docs/reports/results/btc-market-data-quality-2026-06-26T04-57-51-659Z.md`
+- `docs/reports/results/btc-market-data-quality-2026-06-26T04-57-51-659Z.json`
+
+### Result / verdict
+
+Verdict: `needs-review` — no production source replacement and no volume forecast feature.
+
+All three public exchange sources were available over the `2025-06-19 → 2026-06-18` audit window with full canonical-date overlap and no OHLC consistency violations.
+
+Close-price agreement versus the canonical CoinGecko-derived cache was tight enough for drift monitoring:
+
+- Binance BTCUSDT: median close difference `0.18%`, p95 `0.81%`, max `1.95%`.
+- Coinbase BTC-USD: median close difference `0.16%`, p95 `0.79%`, max `1.96%`.
+- Kraken XBT/USD: median close difference `0.16%`, p95 `0.80%`, max `1.97%`.
+
+Volume is not model-ready as a direct replacement for canonical aggregate USD volume:
+
+- Binance quote-volume correlation versus canonical volume: `0.5101`, median ratio `0.0348`.
+- Coinbase base BTC volume converted to USD: correlation `0.4478`, median ratio `0.0148`.
+- Kraken base BTC volume converted to USD: correlation `0.4141`, median ratio `0.0034`.
+
+Interpretation: exchange candles can support a source-methodology drift report, but exchange-specific volume is venue-level flow, not aggregate market volume. Any volume feature needs a separate pre-registered ablation and probably multiple-exchange aggregation.
+
+### Rerun criteria
+
+Rerun if:
+
+1. The canonical BTC updater changes source or candle construction.
+2. A candidate exchange API schema changes.
+3. A later volume-feature ablation is proposed.
+
+### Next better experiment
+
+If source deltas are small and reproducible, volume-feature research may be pre-registered separately. If deltas are large or source coverage is unstable, keep volume out of forecast modeling and document the limitation.

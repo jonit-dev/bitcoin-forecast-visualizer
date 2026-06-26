@@ -22,6 +22,7 @@
     "backtest:derivatives-tail-risk": "tsx scripts/backtest-derivatives-tail-risk.ts",
     "backtest:dynamic-volatility": "tsx scripts/backtest-dynamic-volatility.ts",
     "backtest:onchain-interactions": "tsx scripts/backtest-onchain-interactions.ts",
+    "audit:market-data-quality": "tsx scripts/audit-market-data-quality.ts",
     "calibrate:intervals": "tsx scripts/calibrate-intervals.ts",
     "update:onchain": "node scripts/update-onchain-data.mjs",
     "validate:onchain": "node scripts/validate-onchain-data.mjs",
