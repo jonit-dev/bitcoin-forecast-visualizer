@@ -37,6 +37,7 @@ function validateCache(name, relativePath, optional) {
     if (name === 'sentiment') validateSentimentRow(row);
     if (name === 'cot') validateCotRow(row);
     if (name === 'macro') validateMacroRow(row);
+    if (name === 'etf-flow') validateEtfFlowRow(row);
   }
   if (duplicateCount > 0) throw new Error(`${name} duplicate dates: ${duplicateCount}`);
 
@@ -51,6 +52,19 @@ function validateCache(name, relativePath, optional) {
       `credentialRequired=${metadata.credentialRequired ?? false}`,
     ].join('  ')
   );
+}
+
+function validateEtfFlowRow(row) {
+  if (!row.metrics || typeof row.metrics !== 'object') throw new Error(`etf-flow missing metrics on ${row.date}`);
+  if (!row.availableAfter || Number.isNaN(Date.parse(row.availableAfter))) {
+    throw new Error(`etf-flow missing availableAfter on ${row.date}`);
+  }
+  if (Date.parse(row.availableAfter) <= Date.parse(`${row.date}T00:00:00Z`)) {
+    throw new Error(`etf-flow availableAfter must be after source date on ${row.date}`);
+  }
+  for (const key of ['totalFlowUSDm', 'totalFlowUSD', 'cumulativeFlowUSDm', 'cumulativeFlowUSD']) {
+    if (!Number.isFinite(row.metrics[key])) throw new Error(`etf-flow non-finite ${key} on ${row.date}`);
+  }
 }
 
 function validateMacroRow(row) {

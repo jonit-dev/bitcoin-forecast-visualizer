@@ -1,0 +1,756 @@
+{
+  "generatedAt": "2026-06-26T05:31:26.579Z",
+  "data": {
+    "btcRows": 5823,
+    "btcFirstDate": "2010-07-17",
+    "btcLastDate": "2026-06-25",
+    "featureRows": 5822,
+    "featureFirstDate": "2010-07-18",
+    "featureLastDate": "2026-06-25",
+    "etfFeatureRows": 896
+  },
+  "preRegistration": {
+    "purpose": "Research-only spot Bitcoin ETF demand-pressure median experiment; ETF fields stay context-only unless the holdout gate passes.",
+    "validationPeriod": "2024-01-11 through 2024-12-31",
+    "finalHoldoutPeriod": "2025-01-01 through latest available target",
+    "horizons": [
+      14,
+      30,
+      60,
+      90
+    ],
+    "baseline": "powerlaw-current median forecast",
+    "modelForm": "candidate median = baseline median * exp(validation-selected coefficient * feature value); origins are thinned by horizon.",
+    "candidates": [
+      {
+        "id": "etf-flow-5d-marketcap",
+        "description": "Five ETF business-day net flow as a share of BTC market cap.",
+        "featureName": "spotEtfFlow5dToBtcMarketCap",
+        "normalize": "expanding-z"
+      },
+      {
+        "id": "etf-flow-20d-marketcap",
+        "description": "Twenty ETF business-day net flow as a share of BTC market cap.",
+        "featureName": "spotEtfFlow20dToBtcMarketCap",
+        "normalize": "expanding-z"
+      },
+      {
+        "id": "etf-flow-shock",
+        "description": "Daily spot ETF flow shock z-score versus prior 90 ETF rows.",
+        "featureName": "spotEtfFlowShockZ90d",
+        "normalize": "none"
+      },
+      {
+        "id": "etf-cumulative-trend",
+        "description": "Cumulative spot ETF net flow trend, expanding-z normalized.",
+        "featureName": "spotEtfCumulativeFlowUSD",
+        "normalize": "expanding-z"
+      }
+    ],
+    "leakagePolicy": "ETF rows are joined only after next-UTC-day availableAfter timing; expanding-z candidate values use only prior feature rows.",
+    "promotionGate": "enough non-overlapping samples, positive validation and holdout median-error improvement at 14/30/60d, positive lower95, and the effect survives excluding largest single-flow days.",
+    "sourceLimitation": "Farside is a public HTML table rather than a versioned API, so parser/source changes must fail validation rather than silently changing features."
+  },
+  "candidates": [
+    {
+      "id": "etf-flow-5d-marketcap",
+      "description": "Five ETF business-day net flow as a share of BTC market cap.",
+      "featureName": "spotEtfFlow5dToBtcMarketCap",
+      "selectedCoefficientByHorizon": {
+        "14": 0,
+        "30": -0.03,
+        "60": -0.03,
+        "90": 0.03
+      },
+      "validationThinned": {
+        "14": {
+          "samples": 23,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.05793264806777643,
+          "baselineMedianAbsLogError": 0.05793264806777643,
+          "meanAbsLogError": 0.08117483733394476,
+          "baselineMeanAbsLogError": 0.08117483733394476,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.5217391304347826,
+          "baselineDirectionHitRate": 0.5217391304347826,
+          "excludedLargestFlowDays": false
+        },
+        "30": {
+          "samples": 10,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.07636138666907755,
+          "baselineMedianAbsLogError": 0.08336379468637745,
+          "meanAbsLogError": 0.10069872133550373,
+          "baselineMeanAbsLogError": 0.10369695850015219,
+          "meanImprovementVsBaseline": 0.002998237164648465,
+          "bootstrapLower95MeanImprovement": 0.002998237164648465,
+          "directionHitRate": 0.6,
+          "baselineDirectionHitRate": 0.6,
+          "excludedLargestFlowDays": false
+        },
+        "60": {
+          "samples": 5,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.22665387978933715,
+          "baselineMedianAbsLogError": 0.21387440524056167,
+          "meanAbsLogError": 0.16955765985845872,
+          "baselineMeanAbsLogError": 0.1770087720983561,
+          "meanImprovementVsBaseline": 0.007451112239897384,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.4,
+          "baselineDirectionHitRate": 0.4,
+          "excludedLargestFlowDays": false
+        },
+        "90": {
+          "samples": 3,
+          "selectedCoefficient": 0.03,
+          "medianAbsLogError": 0.17305007440793396,
+          "baselineMedianAbsLogError": 0.1921264107449261,
+          "meanAbsLogError": 0.16475081448746623,
+          "baselineMeanAbsLogError": 0.17748757203043772,
+          "meanImprovementVsBaseline": 0.01273675754297147,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.6666666666666666,
+          "baselineDirectionHitRate": 0.6666666666666666,
+          "excludedLargestFlowDays": false
+        }
+      },
+      "holdoutThinned": {
+        "14": {
+          "samples": 37,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.038422454067355005,
+          "baselineMedianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05560074641643251,
+          "baselineMeanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.5405405405405406,
+          "baselineDirectionHitRate": 0.5405405405405406,
+          "excludedLargestFlowDays": false
+        },
+        "30": {
+          "samples": 17,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.05650886742505534,
+          "baselineMedianAbsLogError": 0.04139632544690919,
+          "meanAbsLogError": 0.07852580707867705,
+          "baselineMeanAbsLogError": 0.07076318958027147,
+          "meanImprovementVsBaseline": -0.007762617498405579,
+          "bootstrapLower95MeanImprovement": -0.007762617498405579,
+          "directionHitRate": 0.5882352941176471,
+          "baselineDirectionHitRate": 0.6470588235294118,
+          "excludedLargestFlowDays": false
+        },
+        "60": {
+          "samples": 8,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.1380138368295709,
+          "baselineMedianAbsLogError": 0.119076009949171,
+          "meanAbsLogError": 0.1212198731060008,
+          "baselineMeanAbsLogError": 0.10246475353217965,
+          "meanImprovementVsBaseline": -0.018755119573821144,
+          "bootstrapLower95MeanImprovement": -0.018755119573821144,
+          "directionHitRate": 0.625,
+          "baselineDirectionHitRate": 0.625,
+          "excludedLargestFlowDays": false
+        },
+        "90": {
+          "samples": 5,
+          "selectedCoefficient": 0.03,
+          "medianAbsLogError": 0.10564729681188822,
+          "baselineMedianAbsLogError": 0.12118290524618658,
+          "meanAbsLogError": 0.08203651311798552,
+          "baselineMeanAbsLogError": 0.09200849656534302,
+          "meanImprovementVsBaseline": 0.009971983447357502,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.8,
+          "baselineDirectionHitRate": 0.8,
+          "excludedLargestFlowDays": false
+        }
+      },
+      "holdoutThinnedExLargestFlowDays": {
+        "14": {
+          "samples": 35,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.038422454067355005,
+          "baselineMedianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05536879125927955,
+          "baselineMeanAbsLogError": 0.05536879125927955,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.5428571428571428,
+          "baselineDirectionHitRate": 0.5428571428571428,
+          "excludedLargestFlowDays": true
+        },
+        "30": {
+          "samples": 15,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.06282815186665047,
+          "baselineMedianAbsLogError": 0.07603180340993276,
+          "meanAbsLogError": 0.08466568918199649,
+          "baselineMeanAbsLogError": 0.07800800699463188,
+          "meanImprovementVsBaseline": -0.006657682187364599,
+          "bootstrapLower95MeanImprovement": -0.006657682187364599,
+          "directionHitRate": 0.6,
+          "baselineDirectionHitRate": 0.6,
+          "excludedLargestFlowDays": true
+        },
+        "60": {
+          "samples": 7,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.1330303622264104,
+          "baselineMedianAbsLogError": 0.11032263916778717,
+          "meanAbsLogError": 0.11810881048789643,
+          "baselineMeanAbsLogError": 0.0988412353609832,
+          "meanImprovementVsBaseline": -0.01926757512691322,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.7142857142857143,
+          "baselineDirectionHitRate": 0.7142857142857143,
+          "excludedLargestFlowDays": true
+        },
+        "90": {
+          "samples": 4,
+          "selectedCoefficient": 0.03,
+          "medianAbsLogError": 0.10899266195032808,
+          "baselineMedianAbsLogError": 0.12476896255834902,
+          "meanAbsLogError": 0.08912482600116389,
+          "baselineMeanAbsLogError": 0.10918434656025822,
+          "meanImprovementVsBaseline": 0.020059520559094324,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.75,
+          "baselineDirectionHitRate": 0.75,
+          "excludedLargestFlowDays": true
+        }
+      },
+      "verdict": "context-only",
+      "verdictReason": "Some holdout improvement exists, but the full ETF promotion gate did not pass."
+    },
+    {
+      "id": "etf-flow-20d-marketcap",
+      "description": "Twenty ETF business-day net flow as a share of BTC market cap.",
+      "featureName": "spotEtfFlow20dToBtcMarketCap",
+      "selectedCoefficientByHorizon": {
+        "14": 0.03,
+        "30": 0,
+        "60": 0.16,
+        "90": 0.16
+      },
+      "validationThinned": {
+        "14": {
+          "samples": 22,
+          "selectedCoefficient": 0.03,
+          "medianAbsLogError": 0.05564148017097459,
+          "baselineMedianAbsLogError": 0.0560697509467305,
+          "meanAbsLogError": 0.0714023394696899,
+          "baselineMeanAbsLogError": 0.07324948984133864,
+          "meanImprovementVsBaseline": 0.0018471503716487416,
+          "bootstrapLower95MeanImprovement": -0.001399061043240673,
+          "directionHitRate": 0.5,
+          "baselineDirectionHitRate": 0.5,
+          "excludedLargestFlowDays": false
+        },
+        "30": {
+          "samples": 10,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.08336379468637745,
+          "baselineMedianAbsLogError": 0.08336379468637745,
+          "meanAbsLogError": 0.10369695850015219,
+          "baselineMeanAbsLogError": 0.10369695850015219,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.6,
+          "baselineDirectionHitRate": 0.6,
+          "excludedLargestFlowDays": false
+        },
+        "60": {
+          "samples": 5,
+          "selectedCoefficient": 0.16,
+          "medianAbsLogError": 0.03032263465765972,
+          "baselineMedianAbsLogError": 0.21387440524056167,
+          "meanAbsLogError": 0.12676582720058072,
+          "baselineMeanAbsLogError": 0.1770087720983561,
+          "meanImprovementVsBaseline": 0.050242944897775386,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.8,
+          "baselineDirectionHitRate": 0.4,
+          "excludedLargestFlowDays": false
+        },
+        "90": {
+          "samples": 3,
+          "selectedCoefficient": 0.16,
+          "medianAbsLogError": 0.007556436839800895,
+          "baselineMedianAbsLogError": 0.1921264107449261,
+          "meanAbsLogError": 0.02254786824503145,
+          "baselineMeanAbsLogError": 0.17748757203043772,
+          "meanImprovementVsBaseline": 0.15493970378540625,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 0.6666666666666666,
+          "excludedLargestFlowDays": false
+        }
+      },
+      "holdoutThinned": {
+        "14": {
+          "samples": 37,
+          "selectedCoefficient": 0.03,
+          "medianAbsLogError": 0.03613984156580763,
+          "baselineMedianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05651214533884449,
+          "baselineMeanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": -0.0009113989224119729,
+          "bootstrapLower95MeanImprovement": -0.005564340824713045,
+          "directionHitRate": 0.5945945945945946,
+          "baselineDirectionHitRate": 0.5405405405405406,
+          "excludedLargestFlowDays": false
+        },
+        "30": {
+          "samples": 17,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.04139632544690919,
+          "baselineMedianAbsLogError": 0.04139632544690919,
+          "meanAbsLogError": 0.07076318958027147,
+          "baselineMeanAbsLogError": 0.07076318958027147,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.6470588235294118,
+          "baselineDirectionHitRate": 0.6470588235294118,
+          "excludedLargestFlowDays": false
+        },
+        "60": {
+          "samples": 8,
+          "selectedCoefficient": 0.16,
+          "medianAbsLogError": 0.08551217917433451,
+          "baselineMedianAbsLogError": 0.119076009949171,
+          "meanAbsLogError": 0.14161371292743508,
+          "baselineMeanAbsLogError": 0.10246475353217965,
+          "meanImprovementVsBaseline": -0.03914895939525542,
+          "bootstrapLower95MeanImprovement": -0.03914895939525542,
+          "directionHitRate": 0.5,
+          "baselineDirectionHitRate": 0.625,
+          "excludedLargestFlowDays": false
+        },
+        "90": {
+          "samples": 5,
+          "selectedCoefficient": 0.16,
+          "medianAbsLogError": 0.09758252549780444,
+          "baselineMedianAbsLogError": 0.12118290524618658,
+          "meanAbsLogError": 0.09110014037617482,
+          "baselineMeanAbsLogError": 0.09200849656534302,
+          "meanImprovementVsBaseline": 0.0009083561891682024,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.8,
+          "baselineDirectionHitRate": 0.8,
+          "excludedLargestFlowDays": false
+        }
+      },
+      "holdoutThinnedExLargestFlowDays": {
+        "14": {
+          "samples": 35,
+          "selectedCoefficient": 0.03,
+          "medianAbsLogError": 0.03613984156580763,
+          "baselineMedianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05612966479545933,
+          "baselineMeanAbsLogError": 0.05536879125927955,
+          "meanImprovementVsBaseline": -0.0007608735361797768,
+          "bootstrapLower95MeanImprovement": -0.0061803208382459375,
+          "directionHitRate": 0.5714285714285714,
+          "baselineDirectionHitRate": 0.5428571428571428,
+          "excludedLargestFlowDays": true
+        },
+        "30": {
+          "samples": 15,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.07603180340993276,
+          "baselineMedianAbsLogError": 0.07603180340993276,
+          "meanAbsLogError": 0.07800800699463188,
+          "baselineMeanAbsLogError": 0.07800800699463188,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.6,
+          "baselineDirectionHitRate": 0.6,
+          "excludedLargestFlowDays": true
+        },
+        "60": {
+          "samples": 7,
+          "selectedCoefficient": 0.16,
+          "medianAbsLogError": 0.10684966910042526,
+          "baselineMedianAbsLogError": 0.11032263916778717,
+          "meanAbsLogError": 0.15267643059589098,
+          "baselineMeanAbsLogError": 0.0988412353609832,
+          "meanImprovementVsBaseline": -0.053835195234907776,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.42857142857142855,
+          "baselineDirectionHitRate": 0.7142857142857143,
+          "excludedLargestFlowDays": true
+        },
+        "90": {
+          "samples": 4,
+          "selectedCoefficient": 0.16,
+          "medianAbsLogError": 0.10628556407483103,
+          "baselineMedianAbsLogError": 0.12476896255834902,
+          "meanAbsLogError": 0.11126434422271503,
+          "baselineMeanAbsLogError": 0.10918434656025822,
+          "meanImprovementVsBaseline": -0.0020799976624568117,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.75,
+          "baselineDirectionHitRate": 0.75,
+          "excludedLargestFlowDays": true
+        }
+      },
+      "verdict": "context-only",
+      "verdictReason": "Some holdout improvement exists, but the full ETF promotion gate did not pass."
+    },
+    {
+      "id": "etf-flow-shock",
+      "description": "Daily spot ETF flow shock z-score versus prior 90 ETF rows.",
+      "featureName": "spotEtfFlowShockZ90d",
+      "selectedCoefficientByHorizon": {
+        "14": -0.03,
+        "30": -0.03,
+        "60": -0.06,
+        "90": -0.06
+      },
+      "validationThinned": {
+        "14": {
+          "samples": 17,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.06201314996694407,
+          "baselineMedianAbsLogError": 0.061232958561816986,
+          "meanAbsLogError": 0.07875618508926184,
+          "baselineMeanAbsLogError": 0.08386522645289099,
+          "meanImprovementVsBaseline": 0.005109041363629154,
+          "bootstrapLower95MeanImprovement": -0.008100134022880567,
+          "directionHitRate": 0.5882352941176471,
+          "baselineDirectionHitRate": 0.5294117647058824,
+          "excludedLargestFlowDays": false
+        },
+        "30": {
+          "samples": 7,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.10772950859953312,
+          "baselineMedianAbsLogError": 0.11540671561260574,
+          "meanAbsLogError": 0.104085794131287,
+          "baselineMeanAbsLogError": 0.11937515814025268,
+          "meanImprovementVsBaseline": 0.01528936400896568,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.42857142857142855,
+          "baselineDirectionHitRate": 0.5714285714285714,
+          "excludedLargestFlowDays": false
+        },
+        "60": {
+          "samples": 3,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.0368039634233881,
+          "baselineMedianAbsLogError": 0.21387440524056167,
+          "meanAbsLogError": 0.08913480405836616,
+          "baselineMeanAbsLogError": 0.16373595883002365,
+          "meanImprovementVsBaseline": 0.07460115477165748,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.6666666666666666,
+          "baselineDirectionHitRate": 0.6666666666666666,
+          "excludedLargestFlowDays": false
+        },
+        "90": {
+          "samples": 2,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.05259522474818201,
+          "baselineMedianAbsLogError": 0.10937729385627915,
+          "meanAbsLogError": 0.05259522474818201,
+          "baselineMeanAbsLogError": 0.10937729385627915,
+          "meanImprovementVsBaseline": 0.05678206910809713,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 1,
+          "baselineDirectionHitRate": 1,
+          "excludedLargestFlowDays": false
+        }
+      },
+      "holdoutThinned": {
+        "14": {
+          "samples": 37,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.048275909497016656,
+          "baselineMedianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.06248436429477239,
+          "baselineMeanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": -0.00688361787833987,
+          "bootstrapLower95MeanImprovement": -0.012180209561522996,
+          "directionHitRate": 0.5405405405405406,
+          "baselineDirectionHitRate": 0.5405405405405406,
+          "excludedLargestFlowDays": false
+        },
+        "30": {
+          "samples": 17,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.06344531563135725,
+          "baselineMedianAbsLogError": 0.04139632544690919,
+          "meanAbsLogError": 0.08161526452958752,
+          "baselineMeanAbsLogError": 0.07076318958027147,
+          "meanImprovementVsBaseline": -0.010852074949316053,
+          "bootstrapLower95MeanImprovement": -0.010852074949316053,
+          "directionHitRate": 0.5882352941176471,
+          "baselineDirectionHitRate": 0.6470588235294118,
+          "excludedLargestFlowDays": false
+        },
+        "60": {
+          "samples": 8,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.09886733188340191,
+          "baselineMedianAbsLogError": 0.119076009949171,
+          "meanAbsLogError": 0.12397049485600475,
+          "baselineMeanAbsLogError": 0.10246475353217965,
+          "meanImprovementVsBaseline": -0.0215057413238251,
+          "bootstrapLower95MeanImprovement": -0.0215057413238251,
+          "directionHitRate": 0.625,
+          "baselineDirectionHitRate": 0.625,
+          "excludedLargestFlowDays": false
+        },
+        "90": {
+          "samples": 5,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.16334041330788018,
+          "baselineMedianAbsLogError": 0.12118290524618658,
+          "meanAbsLogError": 0.15910799081448915,
+          "baselineMeanAbsLogError": 0.09200849656534302,
+          "meanImprovementVsBaseline": -0.06709949424914612,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.2,
+          "baselineDirectionHitRate": 0.8,
+          "excludedLargestFlowDays": false
+        }
+      },
+      "holdoutThinnedExLargestFlowDays": {
+        "14": {
+          "samples": 35,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.048275909497016656,
+          "baselineMedianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.062407069555777336,
+          "baselineMeanAbsLogError": 0.05536879125927955,
+          "meanImprovementVsBaseline": -0.007038278296497781,
+          "bootstrapLower95MeanImprovement": -0.013950394500985957,
+          "directionHitRate": 0.5428571428571428,
+          "baselineDirectionHitRate": 0.5428571428571428,
+          "excludedLargestFlowDays": true
+        },
+        "30": {
+          "samples": 15,
+          "selectedCoefficient": -0.03,
+          "medianAbsLogError": 0.06344531563135725,
+          "baselineMedianAbsLogError": 0.07603180340993276,
+          "meanAbsLogError": 0.08036850503655432,
+          "baselineMeanAbsLogError": 0.07800800699463188,
+          "meanImprovementVsBaseline": -0.0023604980419224355,
+          "bootstrapLower95MeanImprovement": -0.0023604980419224355,
+          "directionHitRate": 0.6666666666666666,
+          "baselineDirectionHitRate": 0.6,
+          "excludedLargestFlowDays": true
+        },
+        "60": {
+          "samples": 7,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.13891323326079785,
+          "baselineMedianAbsLogError": 0.11032263916778717,
+          "meanAbsLogError": 0.13934923932042764,
+          "baselineMeanAbsLogError": 0.0988412353609832,
+          "meanImprovementVsBaseline": -0.04050800395944444,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.5714285714285714,
+          "baselineDirectionHitRate": 0.7142857142857143,
+          "excludedLargestFlowDays": true
+        },
+        "90": {
+          "samples": 4,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.17020317870463497,
+          "baselineMedianAbsLogError": 0.12476896255834902,
+          "meanAbsLogError": 0.15804988519114138,
+          "baselineMeanAbsLogError": 0.10918434656025822,
+          "meanImprovementVsBaseline": -0.048865538630883165,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.25,
+          "baselineDirectionHitRate": 0.75,
+          "excludedLargestFlowDays": true
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No ETF demand candidate passed the ETF-era thinned holdout promotion gate."
+    },
+    {
+      "id": "etf-cumulative-trend",
+      "description": "Cumulative spot ETF net flow trend, expanding-z normalized.",
+      "featureName": "spotEtfCumulativeFlowUSD",
+      "selectedCoefficientByHorizon": {
+        "14": 0,
+        "30": 0,
+        "60": -0.06,
+        "90": 0
+      },
+      "validationThinned": {
+        "14": {
+          "samples": 24,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.0560697509467305,
+          "baselineMedianAbsLogError": 0.0560697509467305,
+          "meanAbsLogError": 0.0791735371363221,
+          "baselineMeanAbsLogError": 0.0791735371363221,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.5416666666666666,
+          "baselineDirectionHitRate": 0.5416666666666666,
+          "excludedLargestFlowDays": false
+        },
+        "30": {
+          "samples": 10,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.08336379468637745,
+          "baselineMedianAbsLogError": 0.08336379468637745,
+          "meanAbsLogError": 0.10369695850015219,
+          "baselineMeanAbsLogError": 0.10369695850015219,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.6,
+          "baselineDirectionHitRate": 0.6,
+          "excludedLargestFlowDays": false
+        },
+        "60": {
+          "samples": 5,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.1559751775939855,
+          "baselineMedianAbsLogError": 0.21387440524056167,
+          "meanAbsLogError": 0.16219216700264205,
+          "baselineMeanAbsLogError": 0.1770087720983561,
+          "meanImprovementVsBaseline": 0.014816605095714053,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.6,
+          "baselineDirectionHitRate": 0.4,
+          "excludedLargestFlowDays": false
+        },
+        "90": {
+          "samples": 3,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.1921264107449261,
+          "baselineMedianAbsLogError": 0.1921264107449261,
+          "meanAbsLogError": 0.17748757203043772,
+          "baselineMeanAbsLogError": 0.17748757203043772,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.6666666666666666,
+          "baselineDirectionHitRate": 0.6666666666666666,
+          "excludedLargestFlowDays": false
+        }
+      },
+      "holdoutThinned": {
+        "14": {
+          "samples": 37,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.038422454067355005,
+          "baselineMedianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05560074641643251,
+          "baselineMeanAbsLogError": 0.05560074641643251,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.5405405405405406,
+          "baselineDirectionHitRate": 0.5405405405405406,
+          "excludedLargestFlowDays": false
+        },
+        "30": {
+          "samples": 17,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.04139632544690919,
+          "baselineMedianAbsLogError": 0.04139632544690919,
+          "meanAbsLogError": 0.07076318958027147,
+          "baselineMeanAbsLogError": 0.07076318958027147,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.6470588235294118,
+          "baselineDirectionHitRate": 0.6470588235294118,
+          "excludedLargestFlowDays": false
+        },
+        "60": {
+          "samples": 8,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.1308162737581311,
+          "baselineMedianAbsLogError": 0.119076009949171,
+          "meanAbsLogError": 0.11692309581687388,
+          "baselineMeanAbsLogError": 0.10246475353217965,
+          "meanImprovementVsBaseline": -0.014458342284694226,
+          "bootstrapLower95MeanImprovement": -0.014458342284694226,
+          "directionHitRate": 0.5,
+          "baselineDirectionHitRate": 0.625,
+          "excludedLargestFlowDays": false
+        },
+        "90": {
+          "samples": 5,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.12118290524618658,
+          "baselineMedianAbsLogError": 0.12118290524618658,
+          "meanAbsLogError": 0.09200849656534302,
+          "baselineMeanAbsLogError": 0.09200849656534302,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.8,
+          "baselineDirectionHitRate": 0.8,
+          "excludedLargestFlowDays": false
+        }
+      },
+      "holdoutThinnedExLargestFlowDays": {
+        "14": {
+          "samples": 35,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.038422454067355005,
+          "baselineMedianAbsLogError": 0.038422454067355005,
+          "meanAbsLogError": 0.05536879125927955,
+          "baselineMeanAbsLogError": 0.05536879125927955,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.5428571428571428,
+          "baselineDirectionHitRate": 0.5428571428571428,
+          "excludedLargestFlowDays": true
+        },
+        "30": {
+          "samples": 15,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.07603180340993276,
+          "baselineMedianAbsLogError": 0.07603180340993276,
+          "meanAbsLogError": 0.07800800699463188,
+          "baselineMeanAbsLogError": 0.07800800699463188,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": 0,
+          "directionHitRate": 0.6,
+          "baselineDirectionHitRate": 0.6,
+          "excludedLargestFlowDays": true
+        },
+        "60": {
+          "samples": 7,
+          "selectedCoefficient": -0.06,
+          "medianAbsLogError": 0.14801144720295234,
+          "baselineMedianAbsLogError": 0.11032263916778717,
+          "meanAbsLogError": 0.13281737206143848,
+          "baselineMeanAbsLogError": 0.0988412353609832,
+          "meanImprovementVsBaseline": -0.03397613670045528,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.42857142857142855,
+          "baselineDirectionHitRate": 0.7142857142857143,
+          "excludedLargestFlowDays": true
+        },
+        "90": {
+          "samples": 4,
+          "selectedCoefficient": 0,
+          "medianAbsLogError": 0.12476896255834902,
+          "baselineMedianAbsLogError": 0.12476896255834902,
+          "meanAbsLogError": 0.10918434656025822,
+          "baselineMeanAbsLogError": 0.10918434656025822,
+          "meanImprovementVsBaseline": 0,
+          "bootstrapLower95MeanImprovement": null,
+          "directionHitRate": 0.75,
+          "baselineDirectionHitRate": 0.75,
+          "excludedLargestFlowDays": true
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No ETF demand candidate passed the ETF-era thinned holdout promotion gate."
+    }
+  ]
+}

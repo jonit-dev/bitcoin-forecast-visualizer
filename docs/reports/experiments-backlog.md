@@ -22,6 +22,85 @@ Skills may reference this file as the place to read/write experiment history, bu
 
 ---
 
+## 2026-06-26 — Spot ETF demand pressure
+
+Status: `completed — rejected`
+
+### Hypothesis
+
+Post-2024 spot Bitcoin ETF flows provide a demand channel not captured by older Bitcoin cycle/power-law assumptions. Lag-safe daily ETF flows may improve 14/30/60/90d median forecasts in the ETF era.
+
+### Data/source changes
+
+Add optional public ETF flow cache:
+
+- Source: Farside Investors public Bitcoin ETF Flow - All Data HTML table.
+- Output: `src/data/etf-flow-history.json`.
+- Result: 631 ETF business-day rows, `2024-01-11 → 2026-06-25`.
+- Fields: daily total flow in US$m/USD, cumulative flow in US$m/USD, and per-fund daily flow columns for `IBIT`, `FBTC`, `BITB`, `ARKB`, `BTCO`, `EZBC`, `BRRR`, `HODL`, `BTCW`, `MSBT`, `GBTC`, and `BTC`.
+- Availability: rows are conservatively treated as available after the next UTC day before joining into `src/data/feature-table.json`.
+- Limitation: source is public HTML rather than a versioned API, so parser/source changes must fail validation and ETF fields must remain context-only unless the out-of-sample experiment passes.
+
+Candidate features:
+
+- Daily net ETF flow in USD.
+- 5/20 ETF business-day net flows.
+- 5/20-day flow as a percentage of estimated BTC market cap.
+- Cumulative ETF net flow trend.
+- Daily flow shock z-score using prior ETF-era history only.
+
+### Validation setup
+
+Script: `scripts/backtest-etf-demand.ts`
+
+- Baseline: current `powerlaw-current` median forecast.
+- Candidate form: `baseline median * exp(coefficient * feature value)` with coefficient selected on validation only.
+- Validation: `2024-01-11 → 2024-12-31`.
+- Final holdout: `2025-01-01 → latest available target`.
+- Horizons: `14/30/60/90d`.
+- Metrics: median and mean absolute log-error improvement, direction hit rate, paired block-bootstrap lower95, and robustness excluding the largest single-flow days.
+- Promotion gate: enough non-overlapping samples, positive validation and holdout improvement at `14/30/60d`, positive lower95, and the effect survives excluding the largest single-flow days.
+
+### Report artifacts
+
+- `docs/reports/results/btc-etf-demand-2026-06-26T05-31-26-579Z.md`
+- `docs/reports/results/btc-etf-demand-2026-06-26T05-31-26-579Z.json`
+
+### Result / verdict
+
+Verdict: `reject` for forecast influence; keep ETF flow fields context-only.
+
+No ETF demand candidate passed the ETF-era thinned holdout promotion gate:
+
+- `etf-flow-5d-marketcap`
+  - 14d: n=37, selected coefficient `0`, improvement `0.00%`, lower95 `0.00%`.
+  - 30d: n=17, selected coefficient `-0.03`, improvement `-0.78%`, lower95 `-0.78%`.
+  - 60d: n=8, selected coefficient `-0.03`, improvement `-1.88%`, lower95 `-1.88%`.
+  - 90d showed a `+1.00%` pocket, but only 5 thinned samples and no lower95 support.
+- `etf-flow-20d-marketcap`
+  - 14d: n=37, selected coefficient `0.03`, improvement `-0.09%`, lower95 `-0.56%`.
+  - 30d: n=17, selected coefficient `0`, improvement `0.00%`.
+  - 60d: n=8, selected coefficient `0.16`, improvement `-3.91%`, lower95 `-3.91%`.
+  - 90d showed only `+0.09%` with 5 samples and failed the ex-largest-flow robustness check.
+- `etf-flow-shock` worsened all tested holdout horizons.
+- `etf-cumulative-trend` selected zero at 14/30/90d and worsened 60d.
+
+Interpretation: ETF flow is useful context for the post-2024 demand regime, but the short ETF-era sample does not justify moving the median forecast.
+
+### Rerun criteria
+
+Rerun only if:
+
+1. ETF source methodology changes materially or a better machine-readable source is selected.
+2. More forward ETF-era holdout history accumulates enough to materially increase non-overlapping samples.
+3. A new pre-registered ETF hypothesis targets interval/tail behavior rather than direct median movement.
+
+### Next better experiment
+
+Do not implement forecast changes. A better follow-up would test ETF flow as a context label or liquidity-stress classifier after more ETF-era history accumulates, not tune the current median on the same holdout.
+
+---
+
 ## 2026-06-26 — Stablecoin liquidity + Binance derivatives median-ablation
 
 Status: `completed`

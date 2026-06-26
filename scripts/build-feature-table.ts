@@ -8,6 +8,7 @@ import stablecoinHistory from '../src/data/stablecoin-history.json';
 import sentimentHistory from '../src/data/sentiment-history.json';
 import cotHistory from '../src/data/cot-history.json';
 import macroHistory from '../src/data/macro-history.json';
+import etfFlowHistory from '../src/data/etf-flow-history.json';
 import type { OHLCVData, MVRVPoint } from '../src/lib/api';
 import { basePowerLawPrice, daysSinceGenesis } from '../src/lib/powerLaw';
 
@@ -30,6 +31,7 @@ function main(): void {
   const sentimentRows = (sentimentHistory as any).rows ?? [];
   const cotRows = (cotHistory as any).rows ?? [];
   const macroRows = (macroHistory as any).rows ?? [];
+  const etfRows = (etfFlowHistory as any).rows ?? [];
   const btcByDate = new Map(btcRows.map(row => [row.date, row]));
   const mvrvByDate = new Map(mvrvRows.map(row => [row.date, row]));
   const onchainByDate = new Map(onchainRows.map(row => [row.date, row]));
@@ -54,6 +56,7 @@ function main(): void {
     const sentiment = sentimentByDate.get(sourceDate) as any;
     const cot = latestTimedRow(cotRows, sourceDate, rowDate) as any;
     const macro = latestTimedRow(macroRows, sourceDate, rowDate) as any;
+    const etf = latestTimedRow(etfRows, sourceDate, rowDate) as any;
     const features: Record<string, number> = {};
     const sourceDates: Record<string, string> = {};
     const missingFeatureReasons: Record<string, string> = {};
@@ -188,6 +191,32 @@ function main(): void {
       setFeature('macroRiskScore', macro.metrics.macroRiskScore, macro.date, 'missing macro risk score');
     }
 
+    if (etf?.metrics) {
+      setFeature('spotEtfFlowUSD', etf.metrics.totalFlowUSD, etf.date, 'missing spot ETF daily flow');
+      setFeature('spotEtfFlow5dUSD', trailingMetricSum(etfRows, etf.date, 5, 'totalFlowUSD'), etf.date, 'missing spot ETF 5d flow');
+      setFeature('spotEtfFlow20dUSD', trailingMetricSum(etfRows, etf.date, 20, 'totalFlowUSD'), etf.date, 'missing spot ETF 20d flow');
+      setFeature('spotEtfCumulativeFlowUSD', etf.metrics.cumulativeFlowUSD, etf.date, 'missing spot ETF cumulative flow');
+      setFeature(
+        'spotEtfFlowToBtcMarketCap',
+        Number.isFinite(etf.metrics.totalFlowUSD) && mvrv?.marketCap ? etf.metrics.totalFlowUSD / mvrv.marketCap : null,
+        etf.date,
+        'missing spot ETF daily flow or BTC market cap'
+      );
+      setFeature(
+        'spotEtfFlow20dToBtcMarketCap',
+        mvrv?.marketCap ? (trailingMetricSum(etfRows, etf.date, 20, 'totalFlowUSD') ?? NaN) / mvrv.marketCap : null,
+        etf.date,
+        'missing spot ETF 20d flow or BTC market cap'
+      );
+      setFeature(
+        'spotEtfFlow5dToBtcMarketCap',
+        mvrv?.marketCap ? (trailingMetricSum(etfRows, etf.date, 5, 'totalFlowUSD') ?? NaN) / mvrv.marketCap : null,
+        etf.date,
+        'missing spot ETF 5d flow or BTC market cap'
+      );
+      setFeature('spotEtfFlowShockZ90d', trailingMetricZScore(etfRows, etf.date, 90, 'totalFlowUSD'), etf.date, 'missing spot ETF flow z-score');
+    }
+
     rows.push({ date: rowDate, features, sourceDates, missingFeatureReasons });
   }
 
@@ -257,6 +286,27 @@ function latestTimedRow(rows: any[], sourceDate: string, forecastDate: string): 
     if (isTimedRowAvailable(row, forecastDate)) latest = row;
   }
   return latest;
+}
+
+function trailingMetricSum(rows: any[], date: string, lookback: number, metric: string): number | null {
+  const index = rows.findIndex(row => row.date === date);
+  if (index < lookback - 1) return null;
+  const window = rows.slice(index - lookback + 1, index + 1);
+  if (window.length !== lookback || window.some(row => !Number.isFinite(row.metrics?.[metric]))) return null;
+  return window.reduce((sum, row) => sum + row.metrics[metric], 0);
+}
+
+function trailingMetricZScore(rows: any[], date: string, lookback: number, metric: string): number | null {
+  const index = rows.findIndex(row => row.date === date);
+  if (index < lookback) return null;
+  const prior = rows.slice(index - lookback, index).map(row => row.metrics?.[metric]).filter(Number.isFinite);
+  if (prior.length < lookback) return null;
+  const current = rows[index]?.metrics?.[metric];
+  if (!Number.isFinite(current)) return null;
+  const mean = prior.reduce((sum, value) => sum + value, 0) / prior.length;
+  const variance = prior.reduce((sum, value) => sum + (value - mean) ** 2, 0) / prior.length;
+  const sd = Math.sqrt(variance);
+  return sd > 0 ? (current - mean) / sd : null;
 }
 
 main();
