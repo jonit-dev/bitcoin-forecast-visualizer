@@ -1,0 +1,941 @@
+{
+  "generatedAt": "2026-06-26T05:16:53.701Z",
+  "data": {
+    "btcRows": 5823,
+    "btcFirstDate": "2010-07-17",
+    "btcLastDate": "2026-06-25",
+    "featureRows": 5822,
+    "featureFirstDate": "2010-07-18",
+    "featureLastDate": "2026-06-25",
+    "weeklyOrigins": 428
+  },
+  "preRegistration": {
+    "purpose": "Research-only CME COT weekly positioning event study; median remains unchanged.",
+    "validationPeriod": "2022-01-01 through 2024-12-31",
+    "finalHoldoutPeriod": "2025-01-01 through latest available target",
+    "horizons": [
+      7,
+      14,
+      30,
+      60
+    ],
+    "baseline": "powerlaw-current distribution on weekly origins with lag-safe COT features",
+    "modelForm": "event stats plus event-specific sigma widening; no median adjustment is tested.",
+    "events": [
+      {
+        "id": "leveraged-money-crowded-short",
+        "description": "Leveraged-money net positioning in the bottom historical decile."
+      },
+      {
+        "id": "leveraged-money-crowded-long",
+        "description": "Leveraged-money net positioning in the top historical decile."
+      },
+      {
+        "id": "asset-manager-crowded-long",
+        "description": "Asset-manager net positioning in the top historical decile."
+      },
+      {
+        "id": "dealer-short-pressure",
+        "description": "Dealer net positioning in the bottom historical decile."
+      },
+      {
+        "id": "open-interest-expansion",
+        "description": "Open interest in the top historical decile with positive 4w change."
+      }
+    ],
+    "leakagePolicy": "COT feature source dates are weekly report dates and rows are only used after conservative availableAfter timing through build-feature-table.ts.",
+    "promotionGate": "at least 10 thinned holdout event samples, tail classification better than unconditional weekly baseline, and NLL or q05/q95 pinball improvement with positive lower95 bound."
+  },
+  "events": [
+    {
+      "id": "leveraged-money-crowded-short",
+      "description": "Leveraged-money net positioning in the bottom historical decile.",
+      "eventHoldout": {
+        "7": {
+          "samples": 19,
+          "upRate": 0.42105263157894735,
+          "baselineUpRate": 0.47368421052631576,
+          "excessUpRate": -0.05263157894736842,
+          "largeUpRate": 0,
+          "baselineLargeUpRate": 0.02631578947368421,
+          "largeDownRate": 0.05263157894736842,
+          "baselineLargeDownRate": 0.06578947368421052,
+          "medianReturn": -0.010462217372932403,
+          "baselineMedianReturn": -0.0020902795499805494
+        },
+        "14": {
+          "samples": 19,
+          "upRate": 0.3684210526315789,
+          "baselineUpRate": 0.48,
+          "excessUpRate": -0.11157894736842106,
+          "largeUpRate": 0.05263157894736842,
+          "baselineLargeUpRate": 0.06666666666666667,
+          "largeDownRate": 0.15789473684210525,
+          "baselineLargeDownRate": 0.13333333333333333,
+          "medianReturn": -0.01989027261475624,
+          "baselineMedianReturn": -0.0068310597035327126
+        },
+        "30": {
+          "samples": 19,
+          "upRate": 0.5263157894736842,
+          "baselineUpRate": 0.4931506849315068,
+          "excessUpRate": 0.03316510454217736,
+          "largeUpRate": 0.10526315789473684,
+          "baselineLargeUpRate": 0.1506849315068493,
+          "largeDownRate": 0.2631578947368421,
+          "baselineLargeDownRate": 0.2328767123287671,
+          "medianReturn": 0.0026025922088451954,
+          "baselineMedianReturn": -0.0023871869949560025
+        },
+        "60": {
+          "samples": 19,
+          "upRate": 0.42105263157894735,
+          "baselineUpRate": 0.463768115942029,
+          "excessUpRate": -0.042715484363081646,
+          "largeUpRate": 0.3157894736842105,
+          "baselineLargeUpRate": 0.2608695652173913,
+          "largeDownRate": 0.47368421052631576,
+          "baselineLargeDownRate": 0.391304347826087,
+          "medianReturn": -0.08057220376991274,
+          "baselineMedianReturn": -0.029966349686155642
+        }
+      },
+      "selectedScaleByHorizon": {
+        "7": 0,
+        "14": 0.1,
+        "30": 0,
+        "60": 0
+      },
+      "intervalValidation": {
+        "7": {
+          "samples": 56,
+          "selectedScale": 0,
+          "nll": -1.2664181987191225,
+          "baselineNll": -1.2664181987191225,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9285714285714286,
+          "baselineCoverage90": 0.9285714285714286,
+          "q05Pinball": 0.0071539861002022235,
+          "baselineQ05Pinball": 0.0071539861002022235,
+          "q95Pinball": 0.007425499639311181,
+          "baselineQ95Pinball": 0.007425499639311181
+        },
+        "14": {
+          "samples": 56,
+          "selectedScale": 0.1,
+          "nll": -0.7594892001438038,
+          "baselineNll": -0.7557086306492418,
+          "meanNllImprovement": 0.0037805694945619445,
+          "bootstrapLower95NllImprovement": -0.032371623591654734,
+          "coverage90": 0.9107142857142857,
+          "baselineCoverage90": 0.9107142857142857,
+          "q05Pinball": 0.013283674998073789,
+          "baselineQ05Pinball": 0.013062844754610337,
+          "q95Pinball": 0.013215647119796342,
+          "baselineQ95Pinball": 0.013101866962342376
+        },
+        "30": {
+          "samples": 56,
+          "selectedScale": 0,
+          "nll": -0.5262027470358877,
+          "baselineNll": -0.5262027470358877,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.875,
+          "baselineCoverage90": 0.875,
+          "q05Pinball": 0.013105401429602525,
+          "baselineQ05Pinball": 0.013105401429602525,
+          "q95Pinball": 0.015238536764578117,
+          "baselineQ95Pinball": 0.015238536764578117
+        },
+        "60": {
+          "samples": 56,
+          "selectedScale": 0,
+          "nll": -0.19394354702591224,
+          "baselineNll": -0.19394354702591224,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.8928571428571429,
+          "baselineCoverage90": 0.8928571428571429,
+          "q05Pinball": 0.01643308799412229,
+          "baselineQ05Pinball": 0.01643308799412229,
+          "q95Pinball": 0.018641942339256718,
+          "baselineQ95Pinball": 0.018641942339256718
+        }
+      },
+      "intervalHoldout": {
+        "7": {
+          "samples": 19,
+          "selectedScale": 0,
+          "nll": -1.5139866054410407,
+          "baselineNll": -1.5139866054410407,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9473684210526315,
+          "baselineCoverage90": 0.9473684210526315,
+          "q05Pinball": 0.0057224222131354524,
+          "baselineQ05Pinball": 0.0057224222131354524,
+          "q95Pinball": 0.006252957239072994,
+          "baselineQ95Pinball": 0.006252957239072994
+        },
+        "14": {
+          "samples": 19,
+          "selectedScale": 0.1,
+          "nll": -1.1181458568032312,
+          "baselineNll": -1.1644394492623453,
+          "meanNllImprovement": -0.046293592459114095,
+          "bootstrapLower95NllImprovement": -0.07405593929422884,
+          "coverage90": 1,
+          "baselineCoverage90": 0.9473684210526315,
+          "q05Pinball": 0.007098382096056354,
+          "baselineQ05Pinball": 0.006554984272675807,
+          "q95Pinball": 0.00994213612721474,
+          "baselineQ95Pinball": 0.009167567117066044
+        },
+        "30": {
+          "samples": 19,
+          "selectedScale": 0,
+          "nll": -0.6862147013316974,
+          "baselineNll": -0.6862147013316974,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.8947368421052632,
+          "baselineCoverage90": 0.8947368421052632,
+          "q05Pinball": 0.01081563004785531,
+          "baselineQ05Pinball": 0.01081563004785531,
+          "q95Pinball": 0.013310392644839011,
+          "baselineQ95Pinball": 0.013310392644839011
+        },
+        "60": {
+          "samples": 19,
+          "selectedScale": 0,
+          "nll": -0.3515644177887584,
+          "baselineNll": -0.3515644177887584,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9473684210526315,
+          "baselineCoverage90": 0.9473684210526315,
+          "q05Pinball": 0.011561515303508064,
+          "baselineQ05Pinball": 0.011561515303508064,
+          "q95Pinball": 0.01732910339700385,
+          "baselineQ95Pinball": 0.01732910339700385
+        }
+      },
+      "verdict": "context-only",
+      "verdictReason": "Some tail behavior differs from weekly baseline, but interval/tail metric gates did not pass."
+    },
+    {
+      "id": "leveraged-money-crowded-long",
+      "description": "Leveraged-money net positioning in the top historical decile.",
+      "eventHoldout": {
+        "7": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.47368421052631576,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.02631578947368421,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.06578947368421052,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0020902795499805494
+        },
+        "14": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.48,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.06666666666666667,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.13333333333333333,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0068310597035327126
+        },
+        "30": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.4931506849315068,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.1506849315068493,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.2328767123287671,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0023871869949560025
+        },
+        "60": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.463768115942029,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.2608695652173913,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.391304347826087,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.029966349686155642
+        }
+      },
+      "selectedScaleByHorizon": {
+        "7": 0,
+        "14": 0,
+        "30": 0,
+        "60": 0
+      },
+      "intervalValidation": {
+        "7": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "14": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "30": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "60": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        }
+      },
+      "intervalHoldout": {
+        "7": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "14": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "30": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "60": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible COT event passed the weekly-origin holdout promotion gate."
+    },
+    {
+      "id": "asset-manager-crowded-long",
+      "description": "Asset-manager net positioning in the top historical decile.",
+      "eventHoldout": {
+        "7": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.47368421052631576,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.02631578947368421,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.06578947368421052,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0020902795499805494
+        },
+        "14": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.48,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.06666666666666667,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.13333333333333333,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0068310597035327126
+        },
+        "30": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.4931506849315068,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.1506849315068493,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.2328767123287671,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0023871869949560025
+        },
+        "60": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.463768115942029,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.2608695652173913,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.391304347826087,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.029966349686155642
+        }
+      },
+      "selectedScaleByHorizon": {
+        "7": 0.1,
+        "14": 0,
+        "30": 0,
+        "60": 0
+      },
+      "intervalValidation": {
+        "7": {
+          "samples": 99,
+          "selectedScale": 0.1,
+          "nll": -1.084084642053436,
+          "baselineNll": -1.0777154402612739,
+          "meanNllImprovement": 0.006369201792162394,
+          "bootstrapLower95NllImprovement": -0.028998238607633026,
+          "coverage90": 0.9292929292929293,
+          "baselineCoverage90": 0.9090909090909091,
+          "q05Pinball": 0.01018471629971275,
+          "baselineQ05Pinball": 0.010196339526663033,
+          "q95Pinball": 0.009536750083449175,
+          "baselineQ95Pinball": 0.00921694289897434
+        },
+        "14": {
+          "samples": 99,
+          "selectedScale": 0,
+          "nll": -0.8287585081859045,
+          "baselineNll": -0.8287585081859045,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9090909090909091,
+          "baselineCoverage90": 0.9090909090909091,
+          "q05Pinball": 0.0116852085647215,
+          "baselineQ05Pinball": 0.0116852085647215,
+          "q95Pinball": 0.012520263592300006,
+          "baselineQ95Pinball": 0.012520263592300006
+        },
+        "30": {
+          "samples": 99,
+          "selectedScale": 0,
+          "nll": -0.47728688721064483,
+          "baselineNll": -0.47728688721064483,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.898989898989899,
+          "baselineCoverage90": 0.898989898989899,
+          "q05Pinball": 0.012525060082190611,
+          "baselineQ05Pinball": 0.012525060082190611,
+          "q95Pinball": 0.018108787447607428,
+          "baselineQ95Pinball": 0.018108787447607428
+        },
+        "60": {
+          "samples": 99,
+          "selectedScale": 0,
+          "nll": -0.20389348708712102,
+          "baselineNll": -0.20389348708712102,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9090909090909091,
+          "baselineCoverage90": 0.9090909090909091,
+          "q05Pinball": 0.017685816814922775,
+          "baselineQ05Pinball": 0.017685816814922775,
+          "q95Pinball": 0.020290093200071736,
+          "baselineQ95Pinball": 0.020290093200071736
+        }
+      },
+      "intervalHoldout": {
+        "7": {
+          "samples": 0,
+          "selectedScale": 0.1,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "14": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "30": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "60": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible COT event passed the weekly-origin holdout promotion gate."
+    },
+    {
+      "id": "dealer-short-pressure",
+      "description": "Dealer net positioning in the bottom historical decile.",
+      "eventHoldout": {
+        "7": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.47368421052631576,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.02631578947368421,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.06578947368421052,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0020902795499805494
+        },
+        "14": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.48,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.06666666666666667,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.13333333333333333,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0068310597035327126
+        },
+        "30": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.4931506849315068,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.1506849315068493,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.2328767123287671,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.0023871869949560025
+        },
+        "60": {
+          "samples": 0,
+          "upRate": null,
+          "baselineUpRate": 0.463768115942029,
+          "excessUpRate": null,
+          "largeUpRate": null,
+          "baselineLargeUpRate": 0.2608695652173913,
+          "largeDownRate": null,
+          "baselineLargeDownRate": 0.391304347826087,
+          "medianReturn": null,
+          "baselineMedianReturn": -0.029966349686155642
+        }
+      },
+      "selectedScaleByHorizon": {
+        "7": 0.1,
+        "14": 0,
+        "30": 0,
+        "60": 0
+      },
+      "intervalValidation": {
+        "7": {
+          "samples": 73,
+          "selectedScale": 0.1,
+          "nll": -1.0520127799538355,
+          "baselineNll": -1.0500025287059198,
+          "meanNllImprovement": 0.0020102512479158196,
+          "bootstrapLower95NllImprovement": -0.04453854966101959,
+          "coverage90": 0.9315068493150684,
+          "baselineCoverage90": 0.9178082191780822,
+          "q05Pinball": 0.011895947595338338,
+          "baselineQ05Pinball": 0.011743788094588755,
+          "q95Pinball": 0.01026732308388353,
+          "baselineQ95Pinball": 0.010056060130804874
+        },
+        "14": {
+          "samples": 73,
+          "selectedScale": 0,
+          "nll": -0.8066043202099205,
+          "baselineNll": -0.8066043202099205,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.8767123287671232,
+          "baselineCoverage90": 0.8767123287671232,
+          "q05Pinball": 0.01389129887242981,
+          "baselineQ05Pinball": 0.01389129887242981,
+          "q95Pinball": 0.013731777048269615,
+          "baselineQ95Pinball": 0.013731777048269615
+        },
+        "30": {
+          "samples": 73,
+          "selectedScale": 0,
+          "nll": -0.46063854749704947,
+          "baselineNll": -0.46063854749704947,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.8904109589041096,
+          "baselineCoverage90": 0.8904109589041096,
+          "q05Pinball": 0.01369805967361315,
+          "baselineQ05Pinball": 0.01369805967361315,
+          "q95Pinball": 0.017058583735454918,
+          "baselineQ95Pinball": 0.017058583735454918
+        },
+        "60": {
+          "samples": 73,
+          "selectedScale": 0,
+          "nll": -0.2337039561724207,
+          "baselineNll": -0.2337039561724207,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9452054794520548,
+          "baselineCoverage90": 0.9452054794520548,
+          "q05Pinball": 0.019096891756291538,
+          "baselineQ05Pinball": 0.019096891756291538,
+          "q95Pinball": 0.017779262138128662,
+          "baselineQ95Pinball": 0.017779262138128662
+        }
+      },
+      "intervalHoldout": {
+        "7": {
+          "samples": 0,
+          "selectedScale": 0.1,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "14": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "30": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        },
+        "60": {
+          "samples": 0,
+          "selectedScale": 0,
+          "nll": null,
+          "baselineNll": null,
+          "meanNllImprovement": null,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": null,
+          "baselineCoverage90": null,
+          "q05Pinball": null,
+          "baselineQ05Pinball": null,
+          "q95Pinball": null,
+          "baselineQ95Pinball": null
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible COT event passed the weekly-origin holdout promotion gate."
+    },
+    {
+      "id": "open-interest-expansion",
+      "description": "Open interest in the top historical decile with positive 4w change.",
+      "eventHoldout": {
+        "7": {
+          "samples": 2,
+          "upRate": 0.5,
+          "baselineUpRate": 0.47368421052631576,
+          "excessUpRate": 0.026315789473684237,
+          "largeUpRate": 0,
+          "baselineLargeUpRate": 0.02631578947368421,
+          "largeDownRate": 0,
+          "baselineLargeDownRate": 0.06578947368421052,
+          "medianReturn": -0.010094919548532272,
+          "baselineMedianReturn": -0.0020902795499805494
+        },
+        "14": {
+          "samples": 2,
+          "upRate": 0.5,
+          "baselineUpRate": 0.48,
+          "excessUpRate": 0.020000000000000018,
+          "largeUpRate": 0,
+          "baselineLargeUpRate": 0.06666666666666667,
+          "largeDownRate": 0,
+          "baselineLargeDownRate": 0.13333333333333333,
+          "medianReturn": -0.0065614382184081416,
+          "baselineMedianReturn": -0.0068310597035327126
+        },
+        "30": {
+          "samples": 2,
+          "upRate": 0.5,
+          "baselineUpRate": 0.4931506849315068,
+          "excessUpRate": 0.006849315068493178,
+          "largeUpRate": 0,
+          "baselineLargeUpRate": 0.1506849315068493,
+          "largeDownRate": 0,
+          "baselineLargeDownRate": 0.2328767123287671,
+          "medianReturn": 0.0011415505029204222,
+          "baselineMedianReturn": -0.0023871869949560025
+        },
+        "60": {
+          "samples": 2,
+          "upRate": 1,
+          "baselineUpRate": 0.463768115942029,
+          "excessUpRate": 0.536231884057971,
+          "largeUpRate": 0.5,
+          "baselineLargeUpRate": 0.2608695652173913,
+          "largeDownRate": 0,
+          "baselineLargeDownRate": 0.391304347826087,
+          "medianReturn": 0.10569073801118059,
+          "baselineMedianReturn": -0.029966349686155642
+        }
+      },
+      "selectedScaleByHorizon": {
+        "7": 0,
+        "14": 0,
+        "30": 0,
+        "60": 0
+      },
+      "intervalValidation": {
+        "7": {
+          "samples": 63,
+          "selectedScale": 0,
+          "nll": -1.3017557858937225,
+          "baselineNll": -1.3017557858937225,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9365079365079365,
+          "baselineCoverage90": 0.9365079365079365,
+          "q05Pinball": 0.006766447522383287,
+          "baselineQ05Pinball": 0.006766447522383287,
+          "q95Pinball": 0.007917172666676894,
+          "baselineQ95Pinball": 0.007917172666676894
+        },
+        "14": {
+          "samples": 63,
+          "selectedScale": 0,
+          "nll": -1.0106068280174243,
+          "baselineNll": -1.0106068280174243,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9365079365079365,
+          "baselineCoverage90": 0.9365079365079365,
+          "q05Pinball": 0.009277973537141253,
+          "baselineQ05Pinball": 0.009277973537141253,
+          "q95Pinball": 0.012117142144566126,
+          "baselineQ95Pinball": 0.012117142144566126
+        },
+        "30": {
+          "samples": 63,
+          "selectedScale": 0,
+          "nll": -0.6790362211715764,
+          "baselineNll": -0.6790362211715764,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9206349206349206,
+          "baselineCoverage90": 0.9206349206349206,
+          "q05Pinball": 0.012205307107099514,
+          "baselineQ05Pinball": 0.012205307107099514,
+          "q95Pinball": 0.01372171472269288,
+          "baselineQ95Pinball": 0.01372171472269288
+        },
+        "60": {
+          "samples": 63,
+          "selectedScale": 0,
+          "nll": -0.31626817397532386,
+          "baselineNll": -0.31626817397532386,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": 0,
+          "coverage90": 0.9365079365079365,
+          "baselineCoverage90": 0.9365079365079365,
+          "q05Pinball": 0.01646837205270832,
+          "baselineQ05Pinball": 0.01646837205270832,
+          "q95Pinball": 0.017683460351728554,
+          "baselineQ95Pinball": 0.017683460351728554
+        }
+      },
+      "intervalHoldout": {
+        "7": {
+          "samples": 2,
+          "selectedScale": 0,
+          "nll": -1.6776540708182806,
+          "baselineNll": -1.6776540708182806,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": 1,
+          "baselineCoverage90": 1,
+          "q05Pinball": 0.005267810949860596,
+          "baselineQ05Pinball": 0.005267810949860596,
+          "q95Pinball": 0.006438813079175005,
+          "baselineQ95Pinball": 0.006438813079175005
+        },
+        "14": {
+          "samples": 2,
+          "selectedScale": 0,
+          "nll": -1.3815867795419883,
+          "baselineNll": -1.3815867795419883,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": 1,
+          "baselineCoverage90": 1,
+          "q05Pinball": 0.007666983650649862,
+          "baselineQ05Pinball": 0.007666983650649862,
+          "q95Pinball": 0.008619564298538947,
+          "baselineQ95Pinball": 0.008619564298538947
+        },
+        "30": {
+          "samples": 2,
+          "selectedScale": 0,
+          "nll": -1.0677215683523995,
+          "baselineNll": -1.0677215683523995,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": 1,
+          "baselineCoverage90": 1,
+          "q05Pinball": 0.010953801211363867,
+          "baselineQ05Pinball": 0.010953801211363867,
+          "q95Pinball": 0.011344052929668013,
+          "baselineQ95Pinball": 0.011344052929668013
+        },
+        "60": {
+          "samples": 2,
+          "selectedScale": 0,
+          "nll": -0.6331147607775129,
+          "baselineNll": -0.6331147607775129,
+          "meanNllImprovement": 0,
+          "bootstrapLower95NllImprovement": null,
+          "coverage90": 1,
+          "baselineCoverage90": 1,
+          "q05Pinball": 0.019932941397565386,
+          "baselineQ05Pinball": 0.019932941397565386,
+          "q95Pinball": 0.009877914471729195,
+          "baselineQ95Pinball": 0.009877914471729195
+        }
+      },
+      "verdict": "reject",
+      "verdictReason": "No eligible COT event passed the weekly-origin holdout promotion gate."
+    }
+  ]
+}

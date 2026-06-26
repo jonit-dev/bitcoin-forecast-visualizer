@@ -51,6 +51,7 @@ function main(): void {
       etf: optionalCacheStatus('src/data/etf-flow-history.json'),
       macro: optionalCacheStatus('src/data/macro-history.json'),
       sentiment: optionalCacheStatus('src/data/sentiment-history.json'),
+      cot: optionalCacheStatus('src/data/cot-history.json'),
     },
   }, null, 2)}\n`);
 

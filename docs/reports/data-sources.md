@@ -19,6 +19,7 @@
 | `src/data/etf-flow-history.json` | Optional unavailable by default | ETF flow vendors differ in methodology and machine-readable availability. The baseline cache records explicit unavailable metadata. | None configured |
 | `src/data/macro-history.json` | Optional credentialed | FRED series `WALCL`, `FEDFUNDS`, `DGS10`, `BAMLH0A0HYM2`, and `M2SL`, aligned by last-known observation date. | `FRED_API_KEY` |
 | `src/data/sentiment-history.json` | Optional available | Alternative.me Fear & Greed Index API. Rows are conservatively joined into features only after the next UTC day. Sentiment-extreme event study rejected forecast influence, so these fields are context-only. | None |
+| `src/data/cot-history.json` | Optional available | CFTC TFF Futures Only public reporting for CME Bitcoin (`133741`) and Micro Bitcoin (`133742`) futures, aggregated in BTC-equivalent contract exposure. Report dates are treated as available after Saturday 00:00 UTC. COT event study found context-only positioning labels, not forecast influence. | None |
 
 Optional sources are context-only until validators show coverage and a later ablation proves forecast value. The current derivatives context is shown in the Regime Context panel, but it does not alter the median forecast or interval calibration.
 

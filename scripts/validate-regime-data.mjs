@@ -9,6 +9,7 @@ const FILES = [
   ['etf-flow', '../src/data/etf-flow-history.json', true],
   ['macro', '../src/data/macro-history.json', true],
   ['sentiment', '../src/data/sentiment-history.json', true],
+  ['cot', '../src/data/cot-history.json', true],
 ];
 
 function validateCache(name, relativePath, optional) {
@@ -34,6 +35,7 @@ function validateCache(name, relativePath, optional) {
     seen.add(row.date);
     if (name === 'derivatives') validateDerivativesRow(row);
     if (name === 'sentiment') validateSentimentRow(row);
+    if (name === 'cot') validateCotRow(row);
   }
   if (duplicateCount > 0) throw new Error(`${name} duplicate dates: ${duplicateCount}`);
 
@@ -48,6 +50,19 @@ function validateCache(name, relativePath, optional) {
       `credentialRequired=${metadata.credentialRequired ?? false}`,
     ].join('  ')
   );
+}
+
+function validateCotRow(row) {
+  if (!row.metrics || typeof row.metrics !== 'object') throw new Error(`cot missing metrics on ${row.date}`);
+  if (!Number.isFinite(row.metrics.openInterestBtc) || row.metrics.openInterestBtc <= 0) {
+    throw new Error(`cot bad openInterestBtc on ${row.date}`);
+  }
+  if (!row.availableAfter || Number.isNaN(Date.parse(row.availableAfter))) {
+    throw new Error(`cot missing availableAfter on ${row.date}`);
+  }
+  if (Date.parse(row.availableAfter) <= Date.parse(`${row.date}T00:00:00Z`)) {
+    throw new Error(`cot availableAfter must be after report date on ${row.date}`);
+  }
 }
 
 function validateSentimentRow(row) {

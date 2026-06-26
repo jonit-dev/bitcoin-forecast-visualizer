@@ -6,6 +6,7 @@ import onchainHistory from '../src/data/onchain-history.json';
 import derivativesHistory from '../src/data/derivatives-history.json';
 import stablecoinHistory from '../src/data/stablecoin-history.json';
 import sentimentHistory from '../src/data/sentiment-history.json';
+import cotHistory from '../src/data/cot-history.json';
 import type { OHLCVData, MVRVPoint } from '../src/lib/api';
 import { basePowerLawPrice, daysSinceGenesis } from '../src/lib/powerLaw';
 
@@ -26,6 +27,7 @@ function main(): void {
   const derivativesRows = (derivativesHistory as any).rows ?? [];
   const stablecoinRows = (stablecoinHistory as any).rows ?? [];
   const sentimentRows = (sentimentHistory as any).rows ?? [];
+  const cotRows = (cotHistory as any).rows ?? [];
   const btcByDate = new Map(btcRows.map(row => [row.date, row]));
   const mvrvByDate = new Map(mvrvRows.map(row => [row.date, row]));
   const onchainByDate = new Map(onchainRows.map(row => [row.date, row]));
@@ -48,6 +50,7 @@ function main(): void {
     const derivatives = derivativesByDate.get(sourceDate) as any;
     const stablecoin = stablecoinByDate.get(sourceDate) as any;
     const sentiment = sentimentByDate.get(sourceDate) as any;
+    const cot = latestTimedRow(cotRows, sourceDate, rowDate) as any;
     const features: Record<string, number> = {};
     const sourceDates: Record<string, string> = {};
     const missingFeatureReasons: Record<string, string> = {};
@@ -155,6 +158,18 @@ function main(): void {
       );
     }
 
+    if (cot?.metrics) {
+      setFeature('cmeCotOpenInterestBtc', cot.metrics.openInterestBtc, cot.date, 'missing COT open interest');
+      setFeature('cmeCotLeveragedMoneyNetPctOi', cot.metrics.leveragedMoneyNetPctOi, cot.date, 'missing COT leveraged-money net');
+      setFeature('cmeCotLeveragedMoneyNetPctRank', cot.metrics.leveragedMoneyNetPctRank, cot.date, 'missing COT leveraged-money percentile');
+      setFeature('cmeCotAssetManagerNetPctOi', cot.metrics.assetManagerNetPctOi, cot.date, 'missing COT asset-manager net');
+      setFeature('cmeCotAssetManagerNetPctRank', cot.metrics.assetManagerNetPctRank, cot.date, 'missing COT asset-manager percentile');
+      setFeature('cmeCotDealerNetPctOi', cot.metrics.dealerNetPctOi, cot.date, 'missing COT dealer net');
+      setFeature('cmeCotDealerNetPctRank', cot.metrics.dealerNetPctRank, cot.date, 'missing COT dealer percentile');
+      setFeature('cmeCotOpenInterestChange4w', cot.metrics.openInterestChange4w, cot.date, 'missing COT OI change');
+      setFeature('cmeCotOpenInterestPctRank', cot.metrics.openInterestPctRank, cot.date, 'missing COT OI percentile');
+    }
+
     rows.push({ date: rowDate, features, sourceDates, missingFeatureReasons });
   }
 
@@ -215,6 +230,15 @@ function isTimedRowAvailable(row: any, forecastDate: string): boolean {
   if (!row?.metrics) return false;
   if (!row.availableAfter) return true;
   return Date.parse(row.availableAfter) <= Date.parse(`${forecastDate}T00:00:00Z`);
+}
+
+function latestTimedRow(rows: any[], sourceDate: string, forecastDate: string): any | null {
+  let latest: any | null = null;
+  for (const row of rows) {
+    if (row.date > sourceDate) break;
+    if (isTimedRowAvailable(row, forecastDate)) latest = row;
+  }
+  return latest;
 }
 
 main();

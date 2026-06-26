@@ -451,3 +451,76 @@ Rerun if:
 ### Next better experiment
 
 If sentiment fails, keep it as optional context/freshness only and do not add Google Trends until a reproducible source workflow is selected.
+
+---
+
+## 2026-06-26 — CME COT positioning event study
+
+Status: `completed`
+
+### Hypothesis
+
+CME Bitcoin futures positioning may provide a cleaner institutional leverage signal than Binance funding/premium. Weekly CFTC TFF positioning may help classify 7/14/30/60d tail risk or interval calibration, but it should not be tested first as a generic daily median adjustment.
+
+### Data/source changes
+
+Add optional public COT cache:
+
+- Source: CFTC Public Reporting Socrata dataset `gpe5-46if`, TFF Futures Only.
+- Contracts:
+  - Bitcoin CME futures code `133741`, contract size 5 BTC.
+  - Micro Bitcoin CME futures code `133742`, contract size 0.1 BTC.
+- Output: `src/data/cot-history.json`.
+- Result: 428 weekly rows, `2018-04-10 → 2026-06-16`.
+- Fields: aggregate BTC-equivalent open interest, leveraged-money net position, asset-manager net position, dealer net position, each as BTC-equivalent and percent of open interest.
+- Availability: CFTC report dates are Tuesday; rows are conservatively treated as available after Saturday `00:00 UTC` to avoid assigning Friday report information to earlier forecast origins.
+
+### Validation setup
+
+Script: `scripts/backtest-cme-cot.ts`
+
+- Baseline: current `powerlaw-current` median and sigma.
+- Candidate A: weekly-origin event stats for crowded-short, crowded-long, asset-manager-long, dealer-short, and open-interest-expansion states.
+- Candidate B: median unchanged; sigma widened for event states with scale selected on validation only.
+- Validation: `2022-01-01 → 2024-12-31`.
+- Final holdout: `2025-01-01 → latest available target`.
+- Horizons: `7/14/30/60d`.
+- Metrics: event counts, up-rate, median return, large-down/large-up rates, NLL improvement, 90% coverage, q05/q95 pinball loss, and non-overlapping weekly origins.
+- Promotion gate: event counts meet at least 10 thinned holdout samples at claimed horizon, tail classification improves versus the matching unconditional baseline, NLL or tail pinball improves with positive lower95 bound, and results survive weekly-origin spacing.
+
+### Report artifacts
+
+- `docs/reports/results/btc-cme-cot-2026-06-26T05-16-53-701Z.md`
+- `docs/reports/results/btc-cme-cot-2026-06-26T05-16-53-701Z.json`
+
+### Result / verdict
+
+Verdict: `context-only` — no production forecast change.
+
+The only eligible holdout event with enough samples was `leveraged-money-crowded-short`:
+
+- 7d: n=19, up-rate `42.1%`, excess up-rate `-5.3%`, median return `-1.0%`, selected interval scale `0`, NLL improvement `0.0000`.
+- 14d: n=19, up-rate `36.8%`, excess up-rate `-11.2%`, median return `-2.0%`, selected interval scale `0.1`, NLL improvement `-0.0463` with lower95 `-0.0741`.
+- 30d: n=19, up-rate `52.6%`, excess up-rate `+3.3%`, median return `+0.3%`, selected interval scale `0`, NLL improvement `0.0000`.
+- 60d: n=19, up-rate `42.1%`, excess up-rate `-4.3%`, median return `-8.1%`, selected interval scale `0`, NLL improvement `0.0000`.
+
+Other pre-registered events were not usable in the 2025+ holdout:
+
+- `leveraged-money-crowded-long`: 0 samples across 7/14/30/60d.
+- `asset-manager-crowded-long`: 0 samples across 7/14/30/60d.
+- `dealer-short-pressure`: 0 samples across 7/14/30/60d.
+- `open-interest-expansion`: 2 samples across 7/14/30/60d.
+
+Interpretation: crowded leveraged-money short positioning may be a useful context label, but the interval/tail metric gate failed and the effect is not stable enough to alter forecasts.
+
+### Rerun criteria
+
+Rerun if:
+
+1. CFTC dataset fields or contract listings change.
+2. A materially different event definition is pre-registered before holdout review.
+3. More forward history accumulates enough to change event counts materially.
+
+### Next better experiment
+
+If COT fails, keep it as context-only institutional positioning. Do not combine it with Binance derivatives unless a separate pre-registered richer positioning experiment is defined.
