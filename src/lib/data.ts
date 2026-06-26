@@ -1,4 +1,5 @@
 import type { OHLCVData } from './api';
+import { CYCLE_PIVOTS, type CyclePivot } from './cycle';
 import {
   basePowerLawPrice,
   daysSinceGenesis,
@@ -82,7 +83,7 @@ export function computeProbabilityForecast(
   const last = ohlcv[ohlcv.length - 1];
   const lastDate = new Date(last.date + 'T00:00:00Z');
   const targetDate = addUtcDays(lastDate, horizonDays);
-  const median = channelGuardedPowerLawForecast(targetDate, last.close, lastDate);
+  const median = cycleAwarePowerLawForecast(targetDate, last.close, lastDate);
   const interval = computePowerLawInterval({ ohlcv, horizonDays, median, currentPrice: last.close });
   if (!interval) return null;
 
@@ -134,30 +135,54 @@ function dateKey(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-function powerLawChannelGuard(price: number, date: Date): number {
-  const t = daysSinceGenesis(date);
-  const floorPrice = floorPowerLawPrice(t);
-  const peakPrice = peakPowerLawPrice(t);
-  if (!Number.isFinite(price) || price <= 0) return floorPrice;
-
-  // Treat the floor/peak curves as historically validated support/resistance
-  // priors, not as decorative chart lines. Reflect excursions back into the
-  // channel instead of hard-clamping, so the visible stochastic path keeps
-  // probabilistic texture without casually implying a structural regime break.
-  if (price < floorPrice) {
-    const breach = Math.log(floorPrice / price);
-    return floorPrice * Math.exp(Math.min(breach * 0.18, 0.035));
-  }
-  if (price > peakPrice) {
-    const breach = Math.log(price / peakPrice);
-    return peakPrice * Math.exp(-Math.min(breach * 0.18, 0.035));
-  }
-  return price;
+function smoothstep(value: number): number {
+  const t = Math.min(1, Math.max(0, value));
+  return t * t * (3 - 2 * t);
 }
 
-function channelGuardedPowerLawForecast(dateFuture: Date, currentPrice: number, currentDate: Date): number {
+function lerpLog(a: number, b: number, t: number): number {
+  return Math.exp(Math.log(a) + (Math.log(b) - Math.log(a)) * smoothstep(t));
+}
+
+function pivotTargetPrice(pivot: CyclePivot): number {
+  const t = daysSinceGenesis(new Date(pivot.date + 'T00:00:00Z'));
+  return pivot.type === 'ATH' ? peakPowerLawPrice(t) : floorPowerLawPrice(t);
+}
+
+function cyclePivotTargetPrice(date: Date): number | null {
+  const dateStr = dateKey(date);
+  const pivotIndex = CYCLE_PIVOTS.findIndex(pivot => pivot.date >= dateStr);
+  const nextPivot = pivotIndex >= 0 ? CYCLE_PIVOTS[pivotIndex] : null;
+  const previousPivot = pivotIndex > 0
+    ? CYCLE_PIVOTS[pivotIndex - 1]
+    : CYCLE_PIVOTS[CYCLE_PIVOTS.length - 1]?.date < dateStr
+      ? CYCLE_PIVOTS[CYCLE_PIVOTS.length - 1]
+      : null;
+
+  if (nextPivot?.date === dateStr) return pivotTargetPrice(nextPivot);
+  if (!previousPivot || !nextPivot) return null;
+
+  const start = new Date(previousPivot.date + 'T00:00:00Z').getTime();
+  const end = new Date(nextPivot.date + 'T00:00:00Z').getTime();
+  const now = date.getTime();
+  if (end <= start || now < start || now > end) return null;
+
+  return lerpLog(
+    pivotTargetPrice(previousPivot),
+    pivotTargetPrice(nextPivot),
+    (now - start) / (end - start)
+  );
+}
+
+function cycleAwarePowerLawForecast(dateFuture: Date, currentPrice: number, currentDate: Date): number {
   const rawForecast = powerLawForecast(dateFuture, currentPrice, currentDate);
-  return powerLawChannelGuard(rawForecast, dateFuture);
+  const cycleTarget = cyclePivotTargetPrice(dateFuture);
+  if (!Number.isFinite(rawForecast) || rawForecast <= 0) return cycleTarget ?? rawForecast;
+  if (!cycleTarget || !Number.isFinite(cycleTarget) || cycleTarget <= 0) return rawForecast;
+
+  const horizonDays = Math.max(0, Math.round((dateFuture.getTime() - currentDate.getTime()) / 86400000));
+  const cycleWeight = smoothstep((horizonDays - 30) / 70);
+  return lerpLog(rawForecast, cycleTarget, cycleWeight);
 }
 
 function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lookbackDays?: number): number[] {
@@ -171,7 +196,7 @@ function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lo
 
     const prevDate = new Date(prev.date + 'T00:00:00Z');
     const currDate = new Date(curr.date + 'T00:00:00Z');
-    const expected = channelGuardedPowerLawForecast(currDate, prev.close, prevDate);
+    const expected = cycleAwarePowerLawForecast(currDate, prev.close, prevDate);
     if (!Number.isFinite(expected) || expected <= 0) continue;
 
     innovations.push(Math.log(curr.close / expected));
@@ -245,9 +270,9 @@ function generatePowerLawStochasticTraces(
 
       const prevDate = addUtcDays(anchorDate, day - 1);
       const currDate = addUtcDays(anchorDate, day);
-      const expected = channelGuardedPowerLawForecast(currDate, price, prevDate);
+      const expected = cycleAwarePowerLawForecast(currDate, price, prevDate);
       const innovation = centeredInnovations[blockStart + blockOffset++];
-      price = powerLawChannelGuard(expected * Math.exp(innovation), currDate);
+      price = expected * Math.exp(innovation);
       paths[pathIndex][day] = price;
     }
   }
@@ -313,8 +338,8 @@ export function processRealData(
 
     const prevDate = new Date(lastDate);
     prevDate.setUTCDate(prevDate.getUTCDate() + i - 1);
-    const open = i === 1 ? lastReal.close : channelGuardedPowerLawForecast(prevDate, lastReal.close, lastDate);
-    const close = channelGuardedPowerLawForecast(date, lastReal.close, lastDate);
+    const open = i === 1 ? lastReal.close : cycleAwarePowerLawForecast(prevDate, lastReal.close, lastDate);
+    const close = cycleAwarePowerLawForecast(date, lastReal.close, lastDate);
 
     const high = Math.max(open, close) * (1 + rng() * dailyVol * 0.3);
     const low = Math.min(open, close) * (1 - rng() * dailyVol * 0.3);

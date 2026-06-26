@@ -584,6 +584,31 @@ function mvrvZScoreColor(z: number): string {
   return 'rgba(16,185,129,0.95)';
 }
 
+const VOLUME_NORMALIZATION_WINDOW = 90;
+
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+}
+
+function relativeVolumeForIndex(rows: any[], index: number): number {
+  const row = rows[index];
+  const volume = Number(row?.volume);
+  if (!Number.isFinite(volume) || volume <= 0) return 0;
+
+  const start = Math.max(0, index - VOLUME_NORMALIZATION_WINDOW + 1);
+  const windowVolumes = rows
+    .slice(start, index + 1)
+    .map((d: any) => Number(d.volume))
+    .filter((value: number) => Number.isFinite(value) && value > 0);
+  const baseline = median(windowVolumes);
+  if (!Number.isFinite(baseline) || baseline <= 0) return 0;
+
+  return Math.log1p(volume / baseline);
+}
+
 // ---- Chart component ----
 
 interface ForecastChartProps {
@@ -876,7 +901,12 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     const forecast = isInPlayback ? [] : allForecast;
 
     const candleData = historical.map((d: any) => ({ time: d.date, open: d.open, high: d.high, low: d.low, close: d.close }));
-    const volumeData = historical.map((d: any) => ({ time: d.date, value: d.volume, color: d.close >= d.open ? '#10b98140' : '#ef444440' }));
+    const volumeData = historical.map((d: any, index: number) => ({
+      time: d.date,
+      value: relativeVolumeForIndex(historical, index),
+      rawVolume: d.volume,
+      color: d.close >= d.open ? '#10b98140' : '#ef444440',
+    }));
     const sma20Data = historical.filter((d: any) => d.sma20 !== null).map((d: any) => ({ time: d.date, value: d.sma20 }));
     const sma50Data = historical.filter((d: any) => d.sma50 !== null).map((d: any) => ({ time: d.date, value: d.sma50 }));
 
@@ -1033,7 +1063,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
             high: candlePoint.high,
             low: candlePoint.low,
             close: candlePoint.close,
-            volume: volData ? volData.value : undefined,
+            volume: volData ? (volData.rawVolume ?? volData.value) : undefined,
             isForecast: false,
           });
         } else if (forecastPoint) {
