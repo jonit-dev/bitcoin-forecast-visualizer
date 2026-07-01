@@ -59,8 +59,13 @@ jobs:
           git commit -m "chore: refresh forecast data"
           git push
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages when credentials are configured
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: yarn wrangler pages deploy dist --project-name bitcoin-forecast-visualizer --branch main
+        run: |
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "Cloudflare secrets are not configured in GitHub; data commit will still push and any Cloudflare Git integration can deploy it."
+            exit 0
+          fi
+          yarn wrangler pages deploy dist --project-name bitcoin-forecast-visualizer --branch main
