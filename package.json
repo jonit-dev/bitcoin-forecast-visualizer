@@ -8,6 +8,7 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
+    "api": "tsx src/server/index.ts",
     "clean": "rm -rf dist",
     "analyze:phase-signal": "tsx scripts/analyze-phase-signal.ts",
     "analyze:cross-market": "tsx scripts/analyze-cross-market-context.ts",
@@ -18,9 +19,6 @@
     "refit:powerlaw": "tsx scripts/refit-power-law.ts",
     "backtest:market": "tsx scripts/backtest-market-forecast.ts",
     "backtest:buy-zones": "tsx scripts/backtest-buy-zones.ts",
-    "backtest:cycle-system": "tsx scripts/backtest-cycle-trading-system.ts",
-    "backtest:trading-robustness": "tsx scripts/backtest-trading-system-robustness.ts",
-    "research:trading-variants": "tsx scripts/research-trading-variants.ts",
     "backtest:liquidity-derivatives": "tsx scripts/backtest-liquidity-derivatives.ts",
     "backtest:derivatives-tail-risk": "tsx scripts/backtest-derivatives-tail-risk.ts",
     "backtest:dynamic-volatility": "tsx scripts/backtest-dynamic-volatility.ts",
@@ -45,6 +43,7 @@
     "update:cot": "node scripts/update-cot-data.mjs",
     "validate:cot": "node scripts/validate-cot-data.mjs",
     "update:market-data": "node scripts/update-market-data.mjs",
+    "update:forecast-data": "node scripts/update-btc-data.mjs && yarn run update:market-data && yarn run update:onchain && yarn run update:derivatives && yarn run update:stablecoins && yarn run update:etf-flow && yarn run update:macro && yarn run update:sentiment && yarn run update:cot && yarn run build:features && yarn run write:runtime-summaries && yarn run check:freshness",
     "validate:regime-data": "node scripts/validate-regime-data.mjs",
     "write:runtime-summaries": "tsx scripts/write-runtime-summaries.ts",
     "check:freshness": "tsx scripts/check-data-freshness.ts",
@@ -52,6 +51,8 @@
     "reports:refresh": "node scripts/reports-refresh.mjs",
     "validate:mvrv": "node scripts/validate-mvrv-data.mjs",
     "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "deploy": "bash -c 'set -a; source .env; set +a; node scripts/update-btc-data.mjs && vite build && wrangler pages deploy dist --branch main'"
   },
   "dependencies": {
@@ -72,13 +73,18 @@
     "vite": "^6.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
+    "vitest": "^4.1.9",
     "wrangler": "^4.77.0"
   }
 }

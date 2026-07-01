@@ -1,58 +1,58 @@
 {
-  "generatedAt": "2026-06-26T15:51:51.663Z",
+  "generatedAt": "2026-07-01T18:00:01.709Z",
   "sources": {
     "btc": {
       "status": "fresh",
-      "latestDate": "2026-06-25",
+      "latestDate": "2026-06-30",
       "lagDays": 1,
       "required": true
     },
     "mvrv": {
       "status": "fresh",
-      "latestDate": "2026-06-25",
+      "latestDate": "2026-06-30",
       "lagDays": 1,
       "required": true
     },
     "onchain": {
       "status": "fresh",
-      "latestDate": "2026-06-25",
+      "latestDate": "2026-06-30",
       "lagDays": 1,
       "required": true
     },
     "features": {
       "status": "fresh",
-      "latestDate": "2026-06-25",
+      "latestDate": "2026-06-30",
       "lagDays": 1,
       "required": true
     },
     "derivatives": {
       "status": "available",
-      "latestDate": "2026-06-25",
+      "latestDate": "2026-06-30",
       "lagDays": 1,
       "required": false
     },
     "etf": {
       "status": "available",
-      "latestDate": "2026-06-25",
-      "lagDays": 1,
+      "latestDate": "2026-07-01",
+      "lagDays": 0,
       "required": false
     },
     "macro": {
       "status": "available",
-      "latestDate": "2026-06-24",
-      "lagDays": 2,
+      "latestDate": "2026-06-30",
+      "lagDays": 1,
       "required": false
     },
     "sentiment": {
       "status": "available",
-      "latestDate": "2026-06-26",
+      "latestDate": "2026-07-01",
       "lagDays": 0,
       "required": false
     },
     "cot": {
       "status": "available",
-      "latestDate": "2026-06-16",
-      "lagDays": 10,
+      "latestDate": "2026-06-23",
+      "lagDays": 8,
       "required": false
     }
   }

@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Activity, TrendingUp, TrendingDown, RefreshCw, BarChart2, Play, Square, Zap, Bitcoin, CalendarClock, Gauge, Layers3, CircleDollarSign, LineChart, Workflow } from 'lucide-react';
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Activity, TrendingUp, TrendingDown, RefreshCw, BarChart2, Play, Square, Zap, Bitcoin, CalendarClock, Gauge, Layers3, CircleDollarSign, LineChart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ForecastChart } from './components/Chart';
@@ -18,7 +17,6 @@ import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from './lib/
 import { computeCrossMarketContext } from './lib/crossMarket';
 import buyZoneSummaryData from './data/buy-zone-summary.json';
 import type { BuyZoneSummary } from './lib/buyZone';
-import { computeTradingSystemSummary } from './lib/tradingSystem';
 
 function formatHorizonLabel(days: number): string {
   if (days < 30) return `${days}d`;
@@ -36,12 +34,6 @@ function formatSignedPercent(value: number, digits = 1): string {
 
 function formatUnsignedPercent(value: number, digits = 1): string {
   return `${(value * 100).toFixed(digits)}%`;
-}
-
-function formatCompactCurrency(value: number): string {
-  if (Math.abs(value) >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
-  if (Math.abs(value) >= 1e3) return `$${(value / 1e3).toFixed(0)}K`;
-  return `$${value.toFixed(0)}`;
 }
 
 function formatIntervalOption(level: number, horizonDays: number, calibrationLabel?: string): string {
@@ -106,7 +98,6 @@ export default function App() {
   }));
   const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
   const [mvrvZScoreData] = useState(() => computeMVRVZScoreSeries());
-  const [tradingSystemSummary] = useState(() => computeTradingSystemSummary());
   const [reliabilitySummary] = useState(() => loadReliabilitySummary());
   const [powerLawStabilitySummary] = useState(() => loadPowerLawStabilitySummary());
   const [sourceFreshness] = useState(() => loadSourceFreshness());
@@ -135,7 +126,6 @@ export default function App() {
   const [showPeakLine, setShowPeakLine] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showBuyZones, setShowBuyZones] = useState(true);
-  const [showTradingSystem, setShowTradingSystem] = useState(false);
   const [showMVRV, setShowMVRV] = useState(false);
   const [lastRunAt, setLastRunAt] = useState(() => new Date());
   const activeAsset = getMarketAssetConfig(activeAssetId);
@@ -181,16 +171,6 @@ export default function App() {
   const buyZoneSummary = canShowBitcoinOverlays ? BUY_ZONE_SUMMARY : null;
   const latestBuyZone = buyZoneSummary?.latest ?? null;
   const primaryBuyZoneBacktest = canShowBitcoinOverlays ? PRIMARY_BUY_ZONE_BACKTEST : null;
-  const tradingSystemChartData = useMemo(() => {
-    const step = Math.max(1, Math.floor(tradingSystemSummary.points.length / 180));
-    return tradingSystemSummary.points
-      .filter((_, index) => index % step === 0 || index === tradingSystemSummary.points.length - 1)
-      .map(point => ({
-        date: point.date,
-        system: Math.round(point.value),
-        buyHold: Math.round(point.buyHoldValue),
-      }));
-  }, [tradingSystemSummary.points]);
   const drawdownStats = forecastResult.drawdownStats;
   const probabilityForecast = forecastResult.probabilityForecast;
   const adjustedProbabilityForecast = useMemo(() => {
@@ -477,19 +457,6 @@ export default function App() {
                       Buy Zones
                     </button>
                   )}
-                  {canShowBitcoinOverlays && (
-                    <button
-                      onClick={() => setShowTradingSystem(!showTradingSystem)}
-                      className={cn(
-                        "px-2.5 py-1 md:px-3 md:py-1 text-[10px] md:text-xs font-medium rounded-md transition-colors border",
-                        showTradingSystem
-                          ? "bg-lime-500/10 text-lime-300 border-lime-500/20"
-                          : "bg-transparent text-zinc-500 border-transparent hover:bg-zinc-800/50"
-                      )}
-                    >
-                      Trading System
-                    </button>
-                  )}
                   {canShowBitcoinOverlays && mvrvZScoreData.length > 0 && (
                     <button
                       onClick={() => setShowMVRV(!showMVRV)}
@@ -525,8 +492,6 @@ export default function App() {
                   heatmapData={heatmapData}
                   showBuyZones={showBuyZones}
                   buyZones={buyZoneSummary?.zones ?? []}
-                  showTradingSystem={showTradingSystem}
-                  tradingSystemMarkers={tradingSystemSummary.markers}
                   timeRange={timeRange}
                   playbackIndex={playbackIndex}
                   mvrvData={mvrvZScoreData}
@@ -739,91 +704,6 @@ export default function App() {
             </Card>
           )}
 
-          {canShowBitcoinOverlays && showTradingSystem && (
-            <Card className="rounded-lg border-lime-400/20 bg-[#0c1209]">
-              <CardHeader className="p-4 md:p-5">
-                <CardTitle className="flex items-center justify-between gap-2 text-sm">
-                  <span className="flex items-center gap-2">
-                    <Workflow className="w-4 h-4 text-lime-300" />
-                    Trading System
-                  </span>
-                  <span className="rounded-full bg-lime-400/10 px-2 py-0.5 text-[10px] font-medium text-lime-200">
-                    NO LEVERAGE
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0 md:p-5 md:pt-0 space-y-3">
-                <div className="h-32">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={tradingSystemChartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                      <XAxis dataKey="date" hide />
-                      <YAxis hide domain={['dataMin', 'dataMax']} />
-                      <Tooltip
-                        contentStyle={{ background: '#090b08', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, color: '#e4e4e7' }}
-                        formatter={(value: number, name: string) => [formatCompactCurrency(value), name === 'system' ? 'System' : 'Buy & Hold']}
-                        labelStyle={{ color: '#a1a1aa' }}
-                      />
-                      <Area type="monotone" dataKey="buyHold" stroke="#71717a" fill="#71717a" fillOpacity={0.05} strokeWidth={1} dot={false} />
-                      <Area type="monotone" dataKey="system" stroke="#a3e635" fill="#65a30d" fillOpacity={0.18} strokeWidth={2} dot={false} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="rounded-md border border-white/5 bg-black/20 p-2">
-                    <p className="text-[10px] uppercase tracking-wider text-zinc-500">System</p>
-                    <p className="mt-1 font-mono text-lg text-lime-200">{formatCompactCurrency(tradingSystemSummary.finalValue)}</p>
-                    <p className="text-[10px] text-lime-300">{formatSignedPercent(tradingSystemSummary.cagr)} CAGR</p>
-                  </div>
-                  <div className="rounded-md border border-white/5 bg-black/20 p-2">
-                    <p className="text-[10px] uppercase tracking-wider text-zinc-500">Buy & Hold</p>
-                    <p className="mt-1 font-mono text-lg text-zinc-200">{formatCompactCurrency(tradingSystemSummary.buyHoldFinalValue)}</p>
-                    <p className="text-[10px] text-zinc-400">{formatSignedPercent(tradingSystemSummary.buyHoldCagr)} CAGR</p>
-                  </div>
-                </div>
-                <div className="space-y-1.5 border-t border-white/5 pt-3">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-zinc-400">Max drawdown</span>
-                    <span className="font-mono text-lime-200">
-                      {formatSignedPercent(tradingSystemSummary.maxDrawdown)} vs {formatSignedPercent(tradingSystemSummary.buyHoldMaxDrawdown)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-zinc-400">Avg exposure / trades</span>
-                    <span className="font-mono text-zinc-200">
-                      {formatUnsignedPercent(tradingSystemSummary.averageExposure)} / {tradingSystemSummary.trades}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-zinc-400">Fees / borrow</span>
-                    <span className="font-mono text-zinc-200">
-                      {formatCompactCurrency(tradingSystemSummary.feesPaid)} / {formatCompactCurrency(tradingSystemSummary.borrowCost)}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-1.5 border-t border-white/5 pt-3 text-[10px] leading-relaxed">
-                  <div className="flex justify-between gap-3">
-                    <span className="text-zinc-500">Buy</span>
-                    <span className="text-right text-zinc-300">Target 100% BTC after confirmed uptrend or high-probability bottom zone.</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-zinc-500">Trim</span>
-                    <span className="text-right text-zinc-300">Target 35% BTC / 65% reserve after 14 hot-valuation days.</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-zinc-500">Raise</span>
-                    <span className="text-right text-zinc-300">Return to 100% BTC only after 45 cool-valuation days.</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-zinc-500">Exit</span>
-                    <span className="text-right text-zinc-300">Move to 100% reserve after 10 confirmed trend-break days.</span>
-                  </div>
-                </div>
-                <p className="text-[10px] leading-relaxed text-zinc-500">
-                  Chart markers are full portfolio targets after rebalance, not cumulative buys or sells.
-                </p>
-              </CardContent>
-            </Card>
-          )}
 
           {activeAsset.capabilities.modelTrust && (
           <Card>

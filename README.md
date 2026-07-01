@@ -23,6 +23,22 @@ View your app in AI Studio: https://ai.studio/apps/d6dd78f9-8412-4bd7-bf1b-76dad
 5. Run the app:
    `npm run dev`
 
+## Programmatic API
+
+Run the local Express API:
+
+```bash
+yarn api
+```
+
+Endpoints:
+
+- `GET /health` — liveness check.
+- `GET /api/assets` — supported forecast assets.
+- `GET /api/forecast?asset=btc&horizon=180&confidence=0.95` — compact forecast summary for `btc`, `sp500`, or `gold`.
+
+The API is implemented with lightweight Express decorators in `src/server/decorators.ts`; controllers use `@Controller` and `@Get`.
+
 ## Market Tabs
 
 The app defaults to the `BTC` tab and preserves the Bitcoin power-law forecast workspace. The `S&P 500` tab uses VOO as an investable S&P 500 proxy because it has daily OHLCV and volume data; VTI is deferred as a broader-market option.

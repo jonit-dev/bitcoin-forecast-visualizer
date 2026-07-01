@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-26T15:51:51.684Z",
-  "featureDate": "2026-06-25",
+  "generatedAt": "2026-07-01T18:00:01.735Z",
+  "featureDate": "2026-06-30",
   "regime": {
     "probabilities": {
       "accumulation-value": 0.3516483516483516,
@@ -27,11 +27,11 @@
   },
   "derivativesContext": {
     "source": "Binance USD-M Futures public REST",
-    "sourceDate": "2026-06-24",
-    "openInterestUSD": 6198898071.4592,
-    "openInterestToMarketCap": 0.005076684746203811,
-    "fundingRateDailySum": 0.00004315,
-    "fundingRateDailyAvg": 0.000014383333333333333,
+    "sourceDate": "2026-06-29",
+    "openInterestUSD": 6132283135.3584,
+    "openInterestToMarketCap": 0.005082689576594602,
+    "fundingRateDailySum": 0.00019214,
+    "fundingRateDailyAvg": 0.00006404666666666666,
     "leverageState": "crowded",
     "fundingState": "neutral",
     "insight": "Open interest is elevated, but funding is not chasing price right now.",
@@ -39,14 +39,14 @@
   },
   "networkContext": {
     "source": "CoinMetrics Community API",
-    "sourceDate": "2026-06-24",
-    "transferCount": 1099302,
-    "addressBalanceCount": 57148552,
-    "activeAddressShare": 0.011017636982298344,
-    "transfersPerTransaction": 1.462894084425323,
-    "transferActivityPercentile": 0.958082803641986,
-    "networkState": "speculative-congestion",
-    "insight": "Transfers are high while active address share is low, which can indicate churn rather than broad demand.",
+    "sourceDate": "2026-06-29",
+    "transferCount": 878615,
+    "addressBalanceCount": 57260426,
+    "activeAddressShare": 0.011518548604580762,
+    "transfersPerTransaction": 1.6562110624565267,
+    "transferActivityPercentile": 0.8151390319258497,
+    "networkState": "busy",
+    "insight": "Transfer activity is high versus history, so network usage confirms above-normal activity.",
     "status": "context-only"
   }
 }

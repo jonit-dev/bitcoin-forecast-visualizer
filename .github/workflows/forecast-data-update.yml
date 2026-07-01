@@ -1,0 +1,66 @@
+name: Forecast Data Update
+
+on:
+  schedule:
+    # Daily at 07:15 Pacific during PDT (14:15 UTC). Adjust if exact local time matters after DST changes.
+    - cron: '15 14 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  update-data-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Refresh forecast data
+        run: yarn run update:forecast-data
+
+      - name: Typecheck
+        run: yarn lint
+
+      - name: Test
+        run: yarn test
+
+      - name: Build
+        run: yarn build
+
+      - name: Commit refreshed data
+        run: |
+          if git diff --quiet; then
+            echo "No refreshed data changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data package.json package-lock.json yarn.lock
+          git diff --cached --quiet && {
+            echo "No project data/dependency changes to commit."
+            exit 0
+          }
+          git commit -m "chore: refresh forecast data"
+          git push
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: yarn wrangler pages deploy dist --project-name bitcoin-forecast-visualizer --branch main

@@ -2,7 +2,7 @@
   "metadata": {
     "source": "Farside Investors Bitcoin ETF Flow - All Data",
     "status": "available",
-    "fetchedAt": "2026-06-26T05:31:21.179Z",
+    "fetchedAt": "2026-07-01T17:59:52.126Z",
     "url": "https://farside.co.uk/bitcoin-etf-flow-all-data/",
     "fields": [
       "totalFlowUSDm",
@@ -20212,6 +20212,134 @@
       "timing": {
         "sourceDate": "2026-06-25",
         "conservativeAvailableAfter": "2026-06-26T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-26",
+      "source": "Farside Investors Bitcoin ETF Flow - All Data",
+      "latestSourceDate": "2026-06-26",
+      "availableAfter": "2026-06-27T00:00:00.000Z",
+      "metrics": {
+        "totalFlowUSDm": -444.5,
+        "totalFlowUSD": -444500000,
+        "cumulativeFlowUSDm": 51657.999999999935,
+        "cumulativeFlowUSD": 51657999999.99993,
+        "fundSumUSDm": -444.5,
+        "fundFlowsUSDm": {
+          "IBIT": -444.5,
+          "FBTC": 0,
+          "BITB": 0,
+          "ARKB": 0,
+          "BTCO": 0,
+          "EZBC": 0,
+          "BRRR": 0,
+          "HODL": 0,
+          "BTCW": 0,
+          "MSBT": 0,
+          "GBTC": 0,
+          "BTC": 0
+        }
+      },
+      "timing": {
+        "sourceDate": "2026-06-26",
+        "conservativeAvailableAfter": "2026-06-27T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-29",
+      "source": "Farside Investors Bitcoin ETF Flow - All Data",
+      "latestSourceDate": "2026-06-29",
+      "availableAfter": "2026-06-30T00:00:00.000Z",
+      "metrics": {
+        "totalFlowUSDm": -231,
+        "totalFlowUSD": -231000000,
+        "cumulativeFlowUSDm": 51426.999999999935,
+        "cumulativeFlowUSD": 51426999999.99993,
+        "fundSumUSDm": -230.99999999999994,
+        "fundFlowsUSDm": {
+          "IBIT": -300.4,
+          "FBTC": -3.9,
+          "BITB": 0,
+          "ARKB": 50,
+          "BTCO": 0,
+          "EZBC": 0,
+          "BRRR": 0,
+          "HODL": 3.8,
+          "BTCW": 0,
+          "MSBT": 7.3,
+          "GBTC": 35.1,
+          "BTC": -22.9
+        }
+      },
+      "timing": {
+        "sourceDate": "2026-06-29",
+        "conservativeAvailableAfter": "2026-06-30T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-06-30",
+      "source": "Farside Investors Bitcoin ETF Flow - All Data",
+      "latestSourceDate": "2026-06-30",
+      "availableAfter": "2026-07-01T00:00:00.000Z",
+      "metrics": {
+        "totalFlowUSDm": -222.6,
+        "totalFlowUSD": -222600000,
+        "cumulativeFlowUSDm": 51204.399999999936,
+        "cumulativeFlowUSD": 51204399999.99994,
+        "fundSumUSDm": -222.6,
+        "fundFlowsUSDm": {
+          "IBIT": -212.4,
+          "FBTC": -10.2,
+          "BITB": 0,
+          "ARKB": 0,
+          "BTCO": 0,
+          "EZBC": 0,
+          "BRRR": 0,
+          "HODL": 0,
+          "BTCW": 0,
+          "MSBT": 0,
+          "GBTC": 0,
+          "BTC": 0
+        }
+      },
+      "timing": {
+        "sourceDate": "2026-06-30",
+        "conservativeAvailableAfter": "2026-07-01T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-07-01",
+      "source": "Farside Investors Bitcoin ETF Flow - All Data",
+      "latestSourceDate": "2026-07-01",
+      "availableAfter": "2026-07-02T00:00:00.000Z",
+      "metrics": {
+        "totalFlowUSDm": 0,
+        "totalFlowUSD": 0,
+        "cumulativeFlowUSDm": 51204.399999999936,
+        "cumulativeFlowUSD": 51204399999.99994,
+        "fundSumUSDm": 0,
+        "fundFlowsUSDm": {
+          "IBIT": 0,
+          "FBTC": 0,
+          "BITB": 0,
+          "ARKB": 0,
+          "BTCO": 0,
+          "EZBC": 0,
+          "BRRR": 0,
+          "HODL": 0,
+          "BTCW": 0,
+          "MSBT": 0,
+          "GBTC": 0,
+          "BTC": 0
+        }
+      },
+      "timing": {
+        "sourceDate": "2026-07-01",
+        "conservativeAvailableAfter": "2026-07-02T00:00:00.000Z"
       },
       "missingMetrics": []
     }
