@@ -250,6 +250,14 @@ Checkpoint:
 - Scheduled/manual automation can update data, validate caches, build features, run backtests, and expose current report status.
 - `npm run lint`, `npm run build`, `npm run backtest`, data validators, and refresh commands pass.
 
+## Regression Safety Gate
+
+- Capture baseline `npm run backtest` and `npm run build` results before enabling regime, ensemble, tail-risk, UI, or automation changes.
+- After each phase, rerun `npm run backtest` and compare enabled forecast modes against the baseline power-law at `14, 30, 60, 90, 180, 365` days.
+- Required result: context-only regime/UI work cannot change forecast outputs; any enabled ensemble or tail-risk behavior must beat or preserve baseline median error, bias, NLL/pinball loss, and coverage.
+- Automation changes must run the same gates locally through `npm run reports:refresh` or equivalent before being wired to scheduled workflows.
+- Any UI label that claims improved reliability must cite the report path proving no regression.
+
 ## Risks
 
 - Regime model complexity can outpace available data; keep the first model interpretable and gated by ablation.

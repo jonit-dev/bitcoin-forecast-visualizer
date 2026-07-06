@@ -210,6 +210,13 @@ User verification:
 - Future model changes can be reviewed by comparing before/after report artifacts.
 - `npm run lint` passes after implementation.
 
+## Regression Safety Gate
+
+- Before changing forecast or metric logic, preserve a baseline report path from the current `npm run backtest` output.
+- After each phase, rerun `npm run backtest` and compare the new report against the preserved baseline for `14, 30, 60, 90, 180, 365` day median error, bias, NLL where available, pinball loss, and 80/90/95% coverage.
+- Required result: the current `powerlaw-current` quality gate remains green and no key result metric degrades beyond documented noise unless the PRD explicitly calls out an intentional metric-definition change.
+- Any intentional metric-definition change must include a bridge table that explains old vs new metric semantics so later PRDs do not mistake reporting drift for model drift.
+
 ## Risks
 
 - Existing public data may contain gaps; the runner must skip non-contiguous windows and report counts rather than silently using bad targets.

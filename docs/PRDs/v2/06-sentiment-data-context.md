@@ -273,6 +273,14 @@ Evidence required:
 - Missing or stale sentiment never blocks release gates.
 - Documentation explains source, cadence, limitations, and forecast enablement status.
 
+## Regression Safety Gate
+
+- Capture a baseline `npm run backtest` report before adding sentiment data or feature columns.
+- After each phase, rerun `npm run backtest` or `npm run backtest:report-only` and verify sentiment remains disabled/context-only in forecast logic.
+- Required result: sentiment freshness and context wiring must not change `powerlaw-current` median, intervals, quality gate, or ensemble enablement.
+- Any future sentiment promotion requires a separate ablation report with lag-safe source dates, longer holdout where available, and no degradation in baseline forecast metrics.
+- `npm run build` must confirm sentiment wiring does not import full raw sentiment or feature history into the UI bundle.
+
 ## Risks
 
 - Sentiment can be noisy and reflexive; defaulting it into forecast logic may worsen calibration.

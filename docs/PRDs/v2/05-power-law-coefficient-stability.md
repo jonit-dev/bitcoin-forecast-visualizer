@@ -235,6 +235,14 @@ User verification:
 - Long-horizon UI language is adjusted if coefficient uncertainty is `watch` or `unstable`.
 - `npm run lint`, `npm run refit:powerlaw`, `npm run backtest`, and `npm run build` pass after implementation.
 
+## Regression Safety Gate
+
+- Capture a baseline `npm run backtest` report before adding refit candidates or touching coefficient config.
+- Candidate coefficients must be evaluated side-by-side against `powerlaw-current` and must not replace defaults unless they improve or preserve median error, bias, NLL/pinball loss, and 80/90/95% coverage at gated horizons.
+- Required result: coefficient-refit reporting alone changes no runtime forecast output.
+- Any manual coefficient update must include before/after reports and a rollback note showing how to restore the prior config if later data invalidates the candidate.
+- If long-horizon uncertainty increases, UI wording must become less precise rather than masking the regression.
+
 ## Risks
 
 - Bitcoin early-history data can dominate fitted coefficients; report sensitivity with and without early years rather than silently choosing one.

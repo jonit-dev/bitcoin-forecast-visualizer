@@ -260,6 +260,14 @@ User verification:
 - Backtest reports include BTC source metadata after implementation.
 - `npm run validate:btc`, `npm run validate:data`, `npm run validate:mvrv`, `npm run backtest`, and `npm run build` pass.
 
+## Regression Safety Gate
+
+- Capture baseline BTC source metadata and a baseline `npm run backtest` report before changing BTC updater, validation, or source-selection logic.
+- Report-only candidate source evaluation must leave `src/data/btc-history.json` untouched; verify this with `git diff` or checksum before and after the command.
+- Any promoted source must include before/after backtest reports that separate data-source movement from model-code movement.
+- Required result: source promotion cannot degrade the gated `14, 30, 60, 90` day metrics or interval coverage unless the PRD explicitly documents a deliberate provenance correction and its forecast impact.
+- `predev`, `validate:btc`, `validate:mvrv`, and `npm run build` must pass after source changes so market-data quality work does not break existing runtime behavior.
+
 ## Risks
 
 - Exchange-specific candles may use different session boundaries, quote currencies, or outage handling; require UTC alignment and overlap reports before promotion.

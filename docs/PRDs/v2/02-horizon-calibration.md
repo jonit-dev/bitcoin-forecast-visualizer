@@ -207,6 +207,13 @@ User verification:
 - UI labels clearly distinguish calibrated probability bands from directional/scenario ranges.
 - `npm run lint`, `npm run calibrate:intervals`, and `npm run backtest` pass.
 
+## Regression Safety Gate
+
+- Capture a pre-change `npm run backtest` report before applying calibration changes.
+- After each phase, rerun `npm run backtest` and compare median path metrics against the baseline; interval work must not change median forecasts unless explicitly documented.
+- Required result: 14/30/60/90 day median error and bias do not degrade, and 80/90/95% coverage moves toward target bands rather than only shrinking intervals for cosmetic reasons.
+- If any horizon loses coverage or worsens NLL/pinball loss, the Markdown report must identify whether the tradeoff is intentional and why it improves overall calibration.
+
 ## Risks
 
 - Tightening intervals may reduce apparent safety; rely on coverage reports rather than subjective chart appearance.

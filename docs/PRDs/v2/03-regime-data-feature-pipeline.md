@@ -241,6 +241,14 @@ Checkpoint:
 - Sentiment remains deferred/context-only unless separately proven by ablation.
 - `npm run lint`, all new validators, `npm run build:features`, and `npm run backtest` pass.
 
+## Regression Safety Gate
+
+- Capture a baseline `npm run backtest` report before introducing or regenerating feature-table data.
+- After every data-source or feature-table phase, rerun `npm run backtest` and prove baseline model metrics are unchanged unless the phase intentionally changes source data used by the baseline.
+- Required result: newly added features remain context-only and cannot alter `powerlaw-current` median, interval, or quality-gate results.
+- If regenerated BTC/MVRV inputs or source revisions change forecast metrics, the PR must include a provenance note separating data revision effects from model-code effects.
+- `npm run validate:features` must prove every feature used by experiments has `sourceDate < originDate`; failed lag validation blocks promotion even when metrics improve.
+
 ## Risks
 
 - Public source schemas and free-tier availability may change; document source URLs and methodology in `docs/reports/data-sources.md`.
