@@ -38,6 +38,9 @@ function main(): void {
     horizonConfidence,
     ensembleEnabled: ENSEMBLE_CONFIG.defaultEnabled,
     ensembleReason: ENSEMBLE_CONFIG.enablementReason,
+    coreAssumptions: buildCoreAssumptionSummary(),
+    featureExperimentStatus: buildFeatureExperimentStatus(),
+    tier3Status: buildTier3Status(),
   }, null, 2)}\n`);
 
   writeFileSync(FRESHNESS_OUT, `${JSON.stringify({
@@ -48,6 +51,7 @@ function main(): void {
       onchain: sourceStatus((onchainHistory as any[]).at(-1)?.date, true),
       features: sourceStatus((featureTable as any[]).at(-1)?.date, true),
       derivatives: optionalCacheStatus('src/data/derivatives-history.json'),
+      stablecoins: optionalCacheStatus('src/data/stablecoin-history.json'),
       etf: optionalCacheStatus('src/data/etf-flow-history.json'),
       macro: optionalCacheStatus('src/data/macro-history.json'),
       sentiment: optionalCacheStatus('src/data/sentiment-history.json'),
@@ -189,10 +193,165 @@ function loadLatestBacktest(): any {
   const file = readdirSync(RESULTS_DIR)
     .filter(name => /^backtest-.*\.json$/.test(name))
     .sort()
-    .at(-1);
+    .reverse()
+    .find(name => {
+      const report = JSON.parse(readFileSync(join(RESULTS_DIR, name), 'utf8'));
+      return report.metadata?.command === 'npm run backtest';
+    });
   if (!file) throw new Error('No backtest JSON report found');
   const path = join(RESULTS_DIR, file);
   return { ...JSON.parse(readFileSync(path, 'utf8')), __path: `docs/reports/results/${file}` };
+}
+
+function buildCoreAssumptionSummary() {
+  const coefficient = loadJsonIfExists('src/data/powerlaw-stability-summary.json');
+  const tau = loadLatestResult(/^tau-sweep-.*\.json$/, report => Boolean(report.verdict));
+  const cycle = loadLatestResult(/^backtest-.*\.json$/, report => Boolean(report.cycleComparison));
+  const residual = loadLatestResult(/^backtest-.*\.json$/, report => Boolean(report.residualBootstrapComparison));
+
+  const coefficientVerdict = coefficient?.verdict ?? 'watch';
+  const tauVerdict = tau?.verdict?.status === 'eligible-for-manual-review' ? 'watch' : 'stable';
+  const cycleVerdict = cycle?.cycleComparison?.status === 'selected-default' ? 'stable' : 'watch';
+  const residualVerdict = residual?.residualBootstrapComparison?.status === 'retain-recent' ? 'stable' : 'watch';
+  const verdicts = [coefficientVerdict, tauVerdict, cycleVerdict, residualVerdict];
+  const longHorizonLabel = verdicts.includes('unstable') ? 'Directional only' : 'Scenario range';
+  const reason = [
+    `coefficients=${coefficientVerdict}`,
+    `tau=${tauVerdict}`,
+    `cycle=${cycleVerdict}`,
+    `residuals=${residualVerdict}`,
+  ].join('; ');
+
+  return {
+    generatedAt: new Date().toISOString(),
+    longHorizonLabel,
+    reason,
+    coefficientStability: {
+      verdict: coefficientVerdict,
+      reportPath: coefficient?.reportPath ?? null,
+    },
+    tau: {
+      verdict: tauVerdict,
+      selectedModelId: tau?.verdict?.selectedModelId ?? null,
+      reportPath: tau?.__path ?? null,
+    },
+    cycle: {
+      verdict: cycleVerdict,
+      selectedModelId: cycle?.cycleComparison?.selectedModelId ?? null,
+      reportPath: cycle?.__path ?? null,
+    },
+    residualBootstrap: {
+      verdict: residualVerdict,
+      selectedModelId: residual?.residualBootstrapComparison?.selectedModelId ?? null,
+      reportPath: residual?.__path ?? null,
+    },
+  };
+}
+
+function buildFeatureExperimentStatus() {
+  const featureReport = loadLatestResultByGeneratedAt(/^feature-continuous-.*\.json$/, report => Array.isArray(report.families) && report.families.length > 1);
+  const residualModel = loadLatestResultByGeneratedAt(/^residual-model-.*\.json$/, report => Boolean(report.verdict));
+  const familyStatuses = (featureReport?.families ?? []).map((family: any) => {
+    const gates = Array.isArray(family.continuousGates) ? family.continuousGates : [];
+    const bestGate = selectFeatureGate(gates);
+    return {
+      family: family.family,
+      status: featureFamilyStatus(family, gates),
+      latestReportPath: featureReport?.__path ?? null,
+      holdoutWindow: bestGate?.holdoutStart ?? featureReport?.metadata?.holdoutStarts?.[0] ?? null,
+      primaryMetric: featureReport?.metadata?.primaryMetric ?? 'lag-safe sample availability',
+      promotionReason: bestGate?.reason ?? (family.status === 'sample-starved' ? 'sample-starved for continuous residual testing' : 'no continuous gate evidence available'),
+    };
+  });
+
+  if (residualModel) {
+    familyStatuses.push({
+      family: 'all-features',
+      status: residualModel.verdict === 'eligible-for-manual-review' ? 'eligible-for-manual-review' : 'disabled-negative-result',
+      latestReportPath: residualModel.__path,
+      holdoutWindow: residualModel.metadata?.holdoutStarts?.join(', ') ?? null,
+      primaryMetric: 'walk-forward kitchen-sink residual model mean pinball loss',
+      promotionReason: residualModel.verdictReason ?? 'kitchen-sink residual model remains disabled',
+    });
+  }
+
+  return familyStatuses;
+}
+
+function buildTier3Status() {
+  const ensemble = loadLatestResultByGeneratedAt(/^backtest-.*\.json$/, report => Boolean(report.ensembleComparison));
+  const tailRisk = loadLatestResultByGeneratedAt(/^backtest-.*\.json$/, report => Boolean(report.tailRiskComparison));
+  return {
+    ensemble: {
+      status: ENSEMBLE_CONFIG.defaultEnabled ? 'active' : (ensemble?.ensembleComparison?.status ?? 'context-only'),
+      enabled: ENSEMBLE_CONFIG.defaultEnabled,
+      latestReportPath: ensemble?.__path ?? null,
+      reason: ENSEMBLE_CONFIG.defaultEnabled
+        ? 'validation-weighted ensemble is enabled by config'
+        : (ensemble?.ensembleComparison?.reason ?? ENSEMBLE_CONFIG.enablementReason),
+      weightsByHorizon: ensemble?.ensembleComparison?.weightsByHorizon ?? ENSEMBLE_CONFIG.candidateWeights,
+    },
+    tailRisk: {
+      status: tailRisk?.tailRiskComparison?.status ?? 'context-only',
+      enabled: false,
+      latestReportPath: tailRisk?.__path ?? null,
+      reason: tailRisk?.tailRiskComparison?.reason ?? 'tail-risk interval adjustment has not been calibrated',
+    },
+  };
+}
+
+function selectFeatureGate(gates: any[]) {
+  const priority: Record<string, number> = {
+    'eligible-for-manual-review': 4,
+    watch: 3,
+    'context-only': 2,
+    'not-evaluated': 1,
+  };
+  return [...gates].sort((a, b) =>
+    (priority[b.status] ?? 0) - (priority[a.status] ?? 0) ||
+    (b.improvement?.meanPinballLoss ?? -Infinity) - (a.improvement?.meanPinballLoss ?? -Infinity)
+  )[0] ?? null;
+}
+
+function featureFamilyStatus(family: any, gates: any[]): 'context-only' | 'watch' | 'eligible-for-manual-review' | 'disabled-negative-result' {
+  if (gates.some(gate => gate.status === 'eligible-for-manual-review')) return 'eligible-for-manual-review';
+  if (gates.some(gate => gate.status === 'watch')) return 'watch';
+  if (family.status === 'sample-starved') return 'context-only';
+  return 'context-only';
+}
+
+function loadJsonIfExists(relativePath: string): any | null {
+  const path = join(process.cwd(), relativePath);
+  if (!existsSync(path)) return null;
+  return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+function loadLatestResult(pattern: RegExp, predicate: (report: any) => boolean): any | null {
+  const file = readdirSync(RESULTS_DIR)
+    .filter(name => pattern.test(name))
+    .sort()
+    .reverse()
+    .find(name => {
+      const report = JSON.parse(readFileSync(join(RESULTS_DIR, name), 'utf8'));
+      return predicate(report);
+    });
+  if (!file) return null;
+  const path = join(RESULTS_DIR, file);
+  return { ...JSON.parse(readFileSync(path, 'utf8')), __path: `docs/reports/results/${file}` };
+}
+
+function loadLatestResultByGeneratedAt(pattern: RegExp, predicate: (report: any) => boolean): any | null {
+  const reports = readdirSync(RESULTS_DIR)
+    .filter(name => pattern.test(name))
+    .map(name => {
+      const report = JSON.parse(readFileSync(join(RESULTS_DIR, name), 'utf8'));
+      return { name, report };
+    })
+    .filter(item => predicate(item.report))
+    .sort((a, b) => String(b.report.metadata?.generatedAt ?? b.report.generatedAt ?? '').localeCompare(String(a.report.metadata?.generatedAt ?? a.report.generatedAt ?? '')));
+  const latest = reports[0];
+  if (!latest) return null;
+  return { ...latest.report, __path: `docs/reports/results/${latest.name}` };
 }
 
 function sourceStatus(latestDate: string | null | undefined, required: boolean) {

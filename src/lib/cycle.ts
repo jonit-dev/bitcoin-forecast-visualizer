@@ -1,4 +1,18 @@
+import { CYCLE_EXPERIMENT_CONFIG } from './modelConfig';
+import {
+  basePowerLawPrice,
+  daysSinceGenesis,
+  floorPowerLawPrice,
+  peakPowerLawPrice,
+  powerLawForecast,
+} from './powerLaw';
+
 export type PhaseLabel = 'Accumulation' | 'Bull' | 'Trim' | 'Bear';
+export type CycleStrategyId =
+  | 'deterministic-pivots'
+  | 'no-future-pivots'
+  | 'damped-future-pivots'
+  | 'pivot-uncertainty-wide';
 
 export interface CyclePivot {
   date: string;
@@ -111,4 +125,88 @@ export function getPhaseState(dateLike: string | Date): PhaseState | null {
 
 export function getCycleSeedAtl(): string {
   return CYCLE_SEED_ATL;
+}
+
+export function cycleAdjustedPowerLawForecast(
+  dateFuture: Date,
+  currentPrice: number,
+  currentDate: Date,
+  strategyId: CycleStrategyId = CYCLE_EXPERIMENT_CONFIG.selectedStrategyId as CycleStrategyId
+): number {
+  const rawForecast = powerLawForecast(dateFuture, currentPrice, currentDate);
+  if (strategyId === 'no-future-pivots') return rawForecast;
+
+  const cycleTarget = cyclePivotTargetPrice(dateFuture, strategyId);
+  if (!Number.isFinite(rawForecast) || rawForecast <= 0) return cycleTarget ?? rawForecast;
+  if (!cycleTarget || !Number.isFinite(cycleTarget) || cycleTarget <= 0) return rawForecast;
+
+  const horizonDays = Math.max(0, Math.round((dateFuture.getTime() - currentDate.getTime()) / 86400000));
+  const cycleWeight = smoothstep((horizonDays - 30) / 70);
+  return lerpLog(rawForecast, cycleTarget, cycleWeight);
+}
+
+export function cycleIntervalSigmaMultiplier(strategyId: CycleStrategyId, horizonDays: number): number {
+  return strategyId === 'pivot-uncertainty-wide' && horizonDays >= 90
+    ? CYCLE_EXPERIMENT_CONFIG.pivotUncertaintySigmaMultiplier
+    : 1;
+}
+
+export function cycleAmplitudeDampingForFuturePivot(
+  pivot: CyclePivot,
+  decay = CYCLE_EXPERIMENT_CONFIG.futureAmplitudeDecay
+): number {
+  if (pivot.known) return 1;
+  const futurePivotIndex = CYCLE_PIVOTS
+    .filter(candidate => !candidate.known && candidate.date <= pivot.date)
+    .length;
+  return Math.max(0.05, Math.pow(decay, Math.max(1, futurePivotIndex)));
+}
+
+function cyclePivotTargetPrice(date: Date, strategyId: CycleStrategyId): number | null {
+  const dateStr = dateKey(date);
+  const pivotIndex = CYCLE_PIVOTS.findIndex(pivot => pivot.date >= dateStr);
+  const nextPivot = pivotIndex >= 0 ? CYCLE_PIVOTS[pivotIndex] : null;
+  const previousPivot = pivotIndex > 0
+    ? CYCLE_PIVOTS[pivotIndex - 1]
+    : CYCLE_PIVOTS[CYCLE_PIVOTS.length - 1]?.date < dateStr
+      ? CYCLE_PIVOTS[CYCLE_PIVOTS.length - 1]
+      : null;
+
+  if (nextPivot?.date === dateStr) return pivotTargetPrice(nextPivot, strategyId);
+  if (!previousPivot || !nextPivot) return null;
+
+  const start = new Date(previousPivot.date + 'T00:00:00Z').getTime();
+  const end = new Date(nextPivot.date + 'T00:00:00Z').getTime();
+  const now = date.getTime();
+  if (end <= start || now < start || now > end) return null;
+
+  return lerpLog(
+    pivotTargetPrice(previousPivot, strategyId),
+    pivotTargetPrice(nextPivot, strategyId),
+    (now - start) / (end - start)
+  );
+}
+
+function pivotTargetPrice(pivot: CyclePivot, strategyId: CycleStrategyId): number {
+  const t = daysSinceGenesis(new Date(pivot.date + 'T00:00:00Z'));
+  const target = pivot.type === 'ATH' ? peakPowerLawPrice(t) : floorPowerLawPrice(t);
+  if (strategyId !== 'damped-future-pivots' && strategyId !== 'pivot-uncertainty-wide') return target;
+  if (pivot.known) return target;
+
+  const base = basePowerLawPrice(t);
+  const damping = cycleAmplitudeDampingForFuturePivot(pivot);
+  return lerpLog(base, target, damping);
+}
+
+function smoothstep(value: number): number {
+  const t = Math.min(1, Math.max(0, value));
+  return t * t * (3 - 2 * t);
+}
+
+function lerpLog(a: number, b: number, t: number): number {
+  return Math.exp(Math.log(a) + (Math.log(b) - Math.log(a)) * smoothstep(t));
+}
+
+function dateKey(date: Date): string {
+  return date.toISOString().split('T')[0];
 }

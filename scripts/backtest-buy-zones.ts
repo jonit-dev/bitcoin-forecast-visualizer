@@ -46,6 +46,12 @@ function renderMarkdown(summary: ReturnType<typeof computeBuyZoneSummary>): stri
     `## Latest\n\n` +
     (latest ? `- date: ${latest.date}\n- close: $${Math.round(latest.close).toLocaleString()}\n- bottomScore: ${fmtScore(latest.bottomScore)}\n- heavy buy: ${latest.isHeavyBuy ? 'yes' : 'no'}\n- max conviction: ${latest.isMaxConviction ? 'yes' : 'no'}\n- residual percentile: ${fmtScore(latest.residualPctPast)}\n- MVRV percentile: ${fmtScore(latest.mvrvPercentile)}\n- realized-price-distance percentile: ${fmtScore(latest.realizedPctPast)}\n- drawdown pain percentile: ${fmtScore(latest.drawdownPainPctPast)}\n\n` : 'No latest point.\n\n') +
     `## Backtests\n\n${backtests}\n` +
+    `## Pooled diagnostics\n\n` +
+    `- pooling choice: ${summary.pooledDiagnostics.poolingChoice}\n` +
+    `- unique pooled event samples: ${summary.pooledDiagnostics.uniqueEventSamples}\n` +
+    `- promotion sample threshold: ${summary.pooledDiagnostics.minPromotionSamples}\n` +
+    `- sample threshold met: ${summary.pooledDiagnostics.sampleThresholdMet ? 'yes' : 'no'}\n` +
+    `- blocked reason: ${summary.pooledDiagnostics.promotionBlockedReason ?? 'n/a'}\n\n` +
     `## Historical heavy-buy zones\n\n` +
     `| start | end | days | low | max score | max conviction |\n` +
     `| --- | --- | ---: | --- | --- | --- |\n` +

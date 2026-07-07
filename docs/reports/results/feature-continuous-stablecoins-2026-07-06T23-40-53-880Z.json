@@ -1,0 +1,723 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-06T23:40:53.880Z",
+    "command": "npm run backtest:features-continuous -- --family stablecoins",
+    "gitCommit": "84d1321b94c3d32e6e1b9f8cfee8532d1a7be99d",
+    "holdoutStarts": [
+      "2022-01-01",
+      "2025-01-01"
+    ],
+    "horizons": [
+      7,
+      14,
+      30,
+      60,
+      90,
+      180
+    ],
+    "minimumContinuousRows": 60,
+    "modelForm": "pre-holdout ridge regression on standardized family features, lambda=1",
+    "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+    "sparseDiagnosticsPolicy": "legacy event/state feature scripts are diagnostics only and are not promotion gates",
+    "dataset": {
+      "btcRows": 5828,
+      "btcFirstDate": "2010-07-17",
+      "btcLastDate": "2026-06-30",
+      "featureRows": 5827,
+      "featureFirstDate": "2010-07-18",
+      "featureLastDate": "2026-06-30"
+    }
+  },
+  "families": [
+    {
+      "family": "stablecoins",
+      "featureNames": [
+        "stablecoinSupplyUSD",
+        "stablecoinSupplyChange7d",
+        "stablecoinSupplyChange30d",
+        "stablecoinSupplyChange90d",
+        "stablecoinSupplyChange365d",
+        "stablecoinSupplyZ365d",
+        "stablecoinLiquidityImpulse30dVsAnnual",
+        "stablecoinSupplyToBtcMarketCap"
+      ],
+      "status": "ready",
+      "summaries": [
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 1635,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 1628,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 1612,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 1582,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 1552,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 1462,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 539,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 532,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 516,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 486,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 456,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 366,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        }
+      ],
+      "continuousGates": [
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1635,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1635,
+            "medianAbsError": 0.03609464057755566,
+            "meanAbsError": 0.04993021122082195,
+            "bias": 0.0020313554391874606,
+            "nll": -1.1283380581833602,
+            "pinballLoss": {
+              "q10": 0.013647404608974798,
+              "q50": 0.025045811238645552,
+              "q90": 0.014191353076675482,
+              "mean": 0.01762818964143196
+            },
+            "coverage80": 0.9125382262996942
+          },
+          "model": {
+            "samples": 1635,
+            "medianAbsError": 0.06684537217844369,
+            "meanAbsError": 0.08943206084974166,
+            "bias": 0.05289634495347506,
+            "nll": -0.7123786057359361,
+            "pinballLoss": {
+              "q10": 0.02788871561208159,
+              "q50": 0.044071341484589646,
+              "q90": 0.01884174804144556,
+              "mean": 0.030267268379372363
+            },
+            "coverage80": 0.671559633027523
+          },
+          "improvement": {
+            "meanPinballLoss": -0.012639078737940346,
+            "bootstrapLower95": -0.018700618014600764,
+            "bootstrapUpper95": -0.008267624635378569
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1628,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1628,
+            "medianAbsError": 0.05293906907417871,
+            "meanAbsError": 0.07116121316869561,
+            "bias": 0.0035946962307227474,
+            "nll": -0.7912441286038964,
+            "pinballLoss": {
+              "q10": 0.019094737940102097,
+              "q50": 0.03566672611757352,
+              "q90": 0.019951239642709506,
+              "mean": 0.024904234566795063
+            },
+            "coverage80": 0.9170761670761671
+          },
+          "model": {
+            "samples": 1628,
+            "medianAbsError": 0.11572651931365978,
+            "meanAbsError": 0.15857714733395234,
+            "bias": 0.09758000614660878,
+            "nll": 0.001055614211441628,
+            "pinballLoss": {
+              "q10": 0.05773486068285528,
+              "q50": 0.07819622206986471,
+              "q90": 0.028768129257948395,
+              "mean": 0.05489973733688928
+            },
+            "coverage80": 0.6228501228501229
+          },
+          "improvement": {
+            "meanPinballLoss": -0.029995502770094443,
+            "bootstrapLower95": -0.04163470170624026,
+            "bootstrapUpper95": -0.019924811261481486
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1612,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1612,
+            "medianAbsError": 0.08490501320988293,
+            "meanAbsError": 0.10458859462590626,
+            "bias": 0.006305406760645035,
+            "nll": -0.4183817783967175,
+            "pinballLoss": {
+              "q10": 0.027761554068014428,
+              "q50": 0.0522587416294701,
+              "q90": 0.029502243824106125,
+              "mean": 0.03650751317386361
+            },
+            "coverage80": 0.9460297766749379
+          },
+          "model": {
+            "samples": 1612,
+            "medianAbsError": 0.22971073072911075,
+            "meanAbsError": 0.3259219340067917,
+            "bias": 0.19061606272714965,
+            "nll": 1.3815482874580078,
+            "pinballLoss": {
+              "q10": 0.14628788054509256,
+              "q50": 0.16292124732595495,
+              "q90": 0.047470820964313855,
+              "mean": 0.11889331627845423
+            },
+            "coverage80": 0.5502481389578163
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0823858031045899,
+            "bootstrapLower95": -0.10906732608259216,
+            "bootstrapUpper95": -0.0575889175736139
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1582,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1582,
+            "medianAbsError": 0.13906946318595462,
+            "meanAbsError": 0.14641339291532518,
+            "bias": 0.009900245984749338,
+            "nll": -0.06883864991037741,
+            "pinballLoss": {
+              "q10": 0.039366567794383606,
+              "q50": 0.07548515598680973,
+              "q90": 0.043356707256621385,
+              "mean": 0.05273614367927153
+            },
+            "coverage80": 0.9848293299620733
+          },
+          "model": {
+            "samples": 1582,
+            "medianAbsError": 0.376825990800952,
+            "meanAbsError": 0.5973969724123207,
+            "bias": 0.36529294770669773,
+            "nll": 3.0191687289859552,
+            "pinballLoss": {
+              "q10": 0.3231811799610638,
+              "q50": 0.2971180098829102,
+              "q90": 0.0809400914660114,
+              "mean": 0.23374642710332813
+            },
+            "coverage80": 0.5587863463969659
+          },
+          "improvement": {
+            "meanPinballLoss": -0.18101028342405703,
+            "bootstrapLower95": -0.2425090600680963,
+            "bootstrapUpper95": -0.12814399204320606
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1552,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1552,
+            "medianAbsError": 0.15424400586572096,
+            "meanAbsError": 0.1643763165527847,
+            "bias": 0.0158404498151852,
+            "nll": 0.10462455529153235,
+            "pinballLoss": {
+              "q10": 0.04567700390428345,
+              "q50": 0.08630008052705357,
+              "q90": 0.0572491394180085,
+              "mean": 0.06307540794978171
+            },
+            "coverage80": 0.9826030927835051
+          },
+          "model": {
+            "samples": 1552,
+            "medianAbsError": 0.5072367135924576,
+            "meanAbsError": 0.741265037931356,
+            "bias": 0.4472624538649022,
+            "nll": 3.3086898565489657,
+            "pinballLoss": {
+              "q10": 0.39752045623921767,
+              "q50": 0.3671945171990273,
+              "q90": 0.10231319858131292,
+              "mean": 0.28900939067318643
+            },
+            "coverage80": 0.5618556701030928
+          },
+          "improvement": {
+            "meanPinballLoss": -0.225933982723404,
+            "bootstrapLower95": -0.3068098027067767,
+            "bootstrapUpper95": -0.1633041390609893
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1462,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1462,
+            "medianAbsError": 0.1393994469752437,
+            "meanAbsError": 0.17272108398870614,
+            "bias": 0.02176974283410791,
+            "nll": 0.28314208655787937,
+            "pinballLoss": {
+              "q10": 0.06128967928106237,
+              "q50": 0.08619451682177219,
+              "q90": 0.0649070170399633,
+              "mean": 0.07079707104759943
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 1462,
+            "medianAbsError": 0.4931478990189719,
+            "meanAbsError": 0.5632430094740676,
+            "bias": 0.14018172093155892,
+            "nll": 1.469394629715223,
+            "pinballLoss": {
+              "q10": 0.20115949123151253,
+              "q50": 0.28192348618639607,
+              "q90": 0.07864111254407789,
+              "mean": 0.1872413633206627
+            },
+            "coverage80": 0.5930232558139535
+          },
+          "improvement": {
+            "meanPinballLoss": -0.11644429227306276,
+            "bootstrapLower95": -0.16361600967953277,
+            "bootstrapUpper95": -0.0745744075157721
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 539,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 539,
+            "medianAbsError": 0.03499825098621134,
+            "meanAbsError": 0.0420639608251808,
+            "bias": 0.005653711301810522,
+            "nll": -1.299708893792819,
+            "pinballLoss": {
+              "q10": 0.01145549238912327,
+              "q50": 0.02105509045390955,
+              "q90": 0.011607008432071565,
+              "mean": 0.014705863758368154
+            },
+            "coverage80": 0.935064935064935
+          },
+          "model": {
+            "samples": 539,
+            "medianAbsError": 0.03501388467876577,
+            "meanAbsError": 0.04209555333865076,
+            "bias": 0.004562687743345551,
+            "nll": -1.3044816308091431,
+            "pinballLoss": {
+              "q10": 0.011465105084536228,
+              "q50": 0.021120562347350238,
+              "q90": 0.01136078194213327,
+              "mean": 0.014648816458006563
+            },
+            "coverage80": 0.9313543599257885
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0000570473003615469,
+            "bootstrapLower95": -0.00005078812870859472,
+            "bootstrapUpper95": 0.00018342106435540755
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 532,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 532,
+            "medianAbsError": 0.04845168731168206,
+            "meanAbsError": 0.06007104384773456,
+            "bias": 0.010040160107864937,
+            "nll": -0.9592650797932426,
+            "pinballLoss": {
+              "q10": 0.01606547481093889,
+              "q50": 0.03024548060156978,
+              "q90": 0.016770919661135364,
+              "mean": 0.02102729169121468
+            },
+            "coverage80": 0.9304511278195489
+          },
+          "model": {
+            "samples": 532,
+            "medianAbsError": 0.04977353353556366,
+            "meanAbsError": 0.059839797946149874,
+            "bias": 0.006751466662550583,
+            "nll": -0.9683622299376162,
+            "pinballLoss": {
+              "q10": 0.01630358791554562,
+              "q50": 0.030397449760889168,
+              "q90": 0.0159230182049018,
+              "mean": 0.0208746852937789
+            },
+            "coverage80": 0.9323308270676691
+          },
+          "improvement": {
+            "meanPinballLoss": 0.00015260639743580896,
+            "bootstrapLower95": -0.00021125050673420105,
+            "bootstrapUpper95": 0.0004907146361475408
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 516,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 516,
+            "medianAbsError": 0.07284615754972223,
+            "meanAbsError": 0.08945911918015952,
+            "bias": 0.022260335430954396,
+            "nll": -0.576801442217708,
+            "pinballLoss": {
+              "q10": 0.02259473500415204,
+              "q50": 0.044724642769322254,
+              "q90": 0.025098740570894586,
+              "mean": 0.030806039448122987
+            },
+            "coverage80": 0.939922480620155
+          },
+          "model": {
+            "samples": 516,
+            "medianAbsError": 0.06772406711407788,
+            "meanAbsError": 0.08841750655198788,
+            "bias": 0.018407957640908267,
+            "nll": -0.5901044619683248,
+            "pinballLoss": {
+              "q10": 0.022528031365641403,
+              "q50": 0.044206772499010366,
+              "q90": 0.02595336432460389,
+              "mean": 0.03089605606308525
+            },
+            "coverage80": 0.9321705426356589
+          },
+          "improvement": {
+            "meanPinballLoss": -0.00009001661496224266,
+            "bootstrapLower95": -0.0005673115635456101,
+            "bootstrapUpper95": 0.0009144471895452099
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 486,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 486,
+            "medianAbsError": 0.1256057774510667,
+            "meanAbsError": 0.1245603752981374,
+            "bias": 0.03055734668246239,
+            "nll": -0.2647134845412926,
+            "pinballLoss": {
+              "q10": 0.030038403746481927,
+              "q50": 0.06292537355721729,
+              "q90": 0.035617923362402215,
+              "mean": 0.042860566888700366
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 486,
+            "medianAbsError": 0.13005274871811268,
+            "meanAbsError": 0.12614167886820202,
+            "bias": -0.025202052273856516,
+            "nll": -0.2861884537605673,
+            "pinballLoss": {
+              "q10": 0.033926273622272934,
+              "q50": 0.06440753318947649,
+              "q90": 0.03124655645290221,
+              "mean": 0.04319345442155051
+            },
+            "coverage80": 1
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0003328875328500813,
+            "bootstrapLower95": -0.0027862715924915505,
+            "bootstrapUpper95": 0.002625043860800419
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 456,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 456,
+            "medianAbsError": 0.130907485197236,
+            "meanAbsError": 0.12927183075239423,
+            "bias": 0.03367305397751562,
+            "nll": -0.12295877982841208,
+            "pinballLoss": {
+              "q10": 0.0361668923578667,
+              "q50": 0.06318372296178996,
+              "q90": 0.047363505274872895,
+              "mean": 0.04890470686484319
+            },
+            "coverage80": 0.9978070175438597
+          },
+          "model": {
+            "samples": 456,
+            "medianAbsError": 0.1181542175236209,
+            "meanAbsError": 0.13305730826561935,
+            "bias": -0.09099314998598956,
+            "nll": -0.11507795509552951,
+            "pinballLoss": {
+              "q10": 0.044699409583587514,
+              "q50": 0.0781322666547738,
+              "q90": 0.03511968097574759,
+              "mean": 0.05265045240470295
+            },
+            "coverage80": 1
+          },
+          "improvement": {
+            "meanPinballLoss": -0.003745745539859761,
+            "bootstrapLower95": -0.010784201374476042,
+            "bootstrapUpper95": 0.005160799770984609
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 366,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 366,
+            "medianAbsError": 0.12499355047073518,
+            "meanAbsError": 0.14903797718110712,
+            "bias": 0.06301936140686629,
+            "nll": 0.052415773044619536,
+            "pinballLoss": {
+              "q10": 0.04798278832330472,
+              "q50": 0.07391312481609993,
+              "q90": 0.04964786388836638,
+              "mean": 0.05718125900925705
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 366,
+            "medianAbsError": 0.13812303097500164,
+            "meanAbsError": 0.16337834354071934,
+            "bias": -0.12323496308961582,
+            "nll": 0.0219526094136037,
+            "pinballLoss": {
+              "q10": 0.0560298384689216,
+              "q50": 0.07552356315482087,
+              "q90": 0.032453086594521875,
+              "mean": 0.054668829406088054
+            },
+            "coverage80": 1
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0025124296031689432,
+            "bootstrapLower95": -0.0066026017154357875,
+            "bootstrapUpper95": 0.014895547294209223
+          }
+        }
+      ]
+    }
+  ]
+}

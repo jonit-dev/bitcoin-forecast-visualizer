@@ -1,0 +1,2440 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-06T23:24:54.127Z",
+    "command": "npm run refit:powerlaw",
+    "gitCommit": "84d1321b94c3d32e6e1b9f8cfee8532d1a7be99d",
+    "dataset": {
+      "firstDate": "2010-07-17",
+      "lastDate": "2026-06-30",
+      "rowCount": 5828
+    },
+    "holdoutStartDate": "2022-01-01",
+    "minimumTrainingDays": 1460,
+    "fitModel": "log(price) = intercept + exponent*log(daysSinceGenesis) + sin + cos cycle terms",
+    "verdictThresholds": {
+      "watchRelativeDrift": 0.12,
+      "unstableRelativeDrift": 0.25,
+      "watchWindowJump": 0.08,
+      "unstableWindowJump": 0.18
+    }
+  },
+  "currentConfig": {
+    "coefficient": 9.48e-10,
+    "exponent": 3.6702,
+    "sinAmplitude": 0.2323,
+    "cosAmplitude": 0.4288,
+    "cycleDays": 1460
+  },
+  "fitWindows": [
+    {
+      "originDate": "2022-01-01",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2021-12-31",
+      "trainingRows": 4186,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 1.0731025886421417e-17,
+        "exponent": 5.839982688955248,
+        "sinAmplitude": 0.633442989467374,
+        "cosAmplitude": -0.1275606673706765,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1256029977515191,
+        "standardDeviation": 0.6544991693781549,
+        "p05": -0.7629653622413646,
+        "p50": 0.08703672516038533,
+        "p95": 1.2323207945608248
+      }
+    },
+    {
+      "originDate": "2022-01-01",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2021-12-31",
+      "trainingRows": 4186,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.0731025886421417e-17,
+        "exponent": 5.839982688955248,
+        "sinAmplitude": 0.633442989467374,
+        "cosAmplitude": -0.1275606673706765,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1256029977515191,
+        "standardDeviation": 0.6544991693781549,
+        "p05": -0.7629653622413646,
+        "p50": 0.08703672516038533,
+        "p95": 1.2323207945608248
+      }
+    },
+    {
+      "originDate": "2022-01-31",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-01-30",
+      "trainingRows": 4216,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 1.1235413070737682e-17,
+        "exponent": 5.833667532038512,
+        "sinAmplitude": 0.6280462404034906,
+        "cosAmplitude": -0.12562495050375588,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.12302039534848008,
+        "standardDeviation": 0.6518299904215894,
+        "p05": -0.7581613105716078,
+        "p50": 0.07820317976036595,
+        "p95": 1.2192338539457077
+      }
+    },
+    {
+      "originDate": "2022-01-31",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-01-30",
+      "trainingRows": 4216,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.1235413070737682e-17,
+        "exponent": 5.833667532038512,
+        "sinAmplitude": 0.6280462404034906,
+        "cosAmplitude": -0.12562495050375588,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.12302039534848008,
+        "standardDeviation": 0.6518299904215894,
+        "p05": -0.7581613105716078,
+        "p50": 0.07820317976036595,
+        "p95": 1.2192338539457077
+      }
+    },
+    {
+      "originDate": "2022-03-02",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-03-01",
+      "trainingRows": 4246,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 1.1824229383814575e-17,
+        "exponent": 5.826665023858857,
+        "sinAmplitude": 0.6224549797804996,
+        "cosAmplitude": -0.1228060138685161,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.12034147331620355,
+        "standardDeviation": 0.6493658848919085,
+        "p05": -0.7553570128821748,
+        "p50": 0.07022939968305822,
+        "p95": 1.2089760794070847
+      }
+    },
+    {
+      "originDate": "2022-03-02",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-03-01",
+      "trainingRows": 4246,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.1824229383814575e-17,
+        "exponent": 5.826665023858857,
+        "sinAmplitude": 0.6224549797804996,
+        "cosAmplitude": -0.1228060138685161,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.12034147331620355,
+        "standardDeviation": 0.6493658848919085,
+        "p05": -0.7553570128821748,
+        "p50": 0.07022939968305822,
+        "p95": 1.2089760794070847
+      }
+    },
+    {
+      "originDate": "2022-04-01",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-03-31",
+      "trainingRows": 4276,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 1.2442269744059419e-17,
+        "exponent": 5.819700771954059,
+        "sinAmplitude": 0.6173606073207175,
+        "cosAmplitude": -0.11938996151624076,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.11788121261516636,
+        "standardDeviation": 0.6470901628033281,
+        "p05": -0.7530368743495928,
+        "p50": 0.06468631075204206,
+        "p95": 1.20391695689172
+      }
+    },
+    {
+      "originDate": "2022-04-01",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-03-31",
+      "trainingRows": 4276,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.2442269744059419e-17,
+        "exponent": 5.819700771954059,
+        "sinAmplitude": 0.6173606073207175,
+        "cosAmplitude": -0.11938996151624076,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.11788121261516636,
+        "standardDeviation": 0.6470901628033281,
+        "p05": -0.7530368743495928,
+        "p50": 0.06468631075204206,
+        "p95": 1.20391695689172
+      }
+    },
+    {
+      "originDate": "2022-05-01",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-04-30",
+      "trainingRows": 4306,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 1.3135200114157434e-17,
+        "exponent": 5.812315762893342,
+        "sinAmplitude": 0.6125845185252239,
+        "cosAmplitude": -0.11513146964246201,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1155034123341985,
+        "standardDeviation": 0.6451006294817939,
+        "p05": -0.7468303287516123,
+        "p50": 0.061875038502047314,
+        "p95": 1.184789407686655
+      }
+    },
+    {
+      "originDate": "2022-05-01",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-04-30",
+      "trainingRows": 4306,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.3135200114157434e-17,
+        "exponent": 5.812315762893342,
+        "sinAmplitude": 0.6125845185252239,
+        "cosAmplitude": -0.11513146964246201,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1155034123341985,
+        "standardDeviation": 0.6451006294817939,
+        "p05": -0.7468303287516123,
+        "p50": 0.061875038502047314,
+        "p95": 1.184789407686655
+      }
+    },
+    {
+      "originDate": "2022-05-31",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-05-30",
+      "trainingRows": 4336,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 1.435016793265499e-17,
+        "exponent": 5.80029450361357,
+        "sinAmplitude": 0.6058520579915091,
+        "cosAmplitude": -0.10737382675426589,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.11199555173088323,
+        "standardDeviation": 0.6446894601265273,
+        "p05": -0.7426057174110612,
+        "p50": 0.05755689017022503,
+        "p95": 1.1709889875064472
+      }
+    },
+    {
+      "originDate": "2022-05-31",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-05-30",
+      "trainingRows": 4336,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.435016793265499e-17,
+        "exponent": 5.80029450361357,
+        "sinAmplitude": 0.6058520579915091,
+        "cosAmplitude": -0.10737382675426589,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.11199555173088323,
+        "standardDeviation": 0.6446894601265273,
+        "p05": -0.7426057174110612,
+        "p50": 0.05755689017022503,
+        "p95": 1.1709889875064472
+      }
+    },
+    {
+      "originDate": "2022-06-30",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-06-29",
+      "trainingRows": 4366,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 1.6175387166469492e-17,
+        "exponent": 5.784068649612077,
+        "sinAmplitude": 0.5982939109052331,
+        "cosAmplitude": -0.09595807794682491,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10791854792599888,
+        "standardDeviation": 0.6466863766466854,
+        "p05": -0.7555970625401209,
+        "p50": 0.05308254124106749,
+        "p95": 1.1643351971428906
+      }
+    },
+    {
+      "originDate": "2022-06-30",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-06-29",
+      "trainingRows": 4366,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.6175387166469492e-17,
+        "exponent": 5.784068649612077,
+        "sinAmplitude": 0.5982939109052331,
+        "cosAmplitude": -0.09595807794682491,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10791854792599888,
+        "standardDeviation": 0.6466863766466854,
+        "p05": -0.7555970625401209,
+        "p50": 0.05308254124106749,
+        "p95": 1.1643351971428906
+      }
+    },
+    {
+      "originDate": "2022-07-30",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-07-29",
+      "trainingRows": 4396,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 1.8477027737244592e-17,
+        "exponent": 5.766080818438196,
+        "sinAmplitude": 0.5915371048155635,
+        "cosAmplitude": -0.08253161010700386,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10412563215185965,
+        "standardDeviation": 0.6499740239212738,
+        "p05": -0.7842993721002909,
+        "p50": 0.05031846189655602,
+        "p95": 1.1634913168255334
+      }
+    },
+    {
+      "originDate": "2022-07-30",
+      "firstTrainingDate": "2010-08-02",
+      "lastTrainingDate": "2022-07-29",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.209171007794194e-17,
+        "exponent": 5.7437250875053705,
+        "sinAmplitude": 0.6007132851345538,
+        "cosAmplitude": -0.08587499654550669,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1082318568981663,
+        "standardDeviation": 0.6479116250423068,
+        "p05": -0.7815901866291969,
+        "p50": 0.0537669076172335,
+        "p95": 1.1584020781201034
+      }
+    },
+    {
+      "originDate": "2022-08-29",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-08-28",
+      "trainingRows": 4426,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 2.0836352459367643e-17,
+        "exponent": 5.749870899679461,
+        "sinAmplitude": 0.5870987810814862,
+        "cosAmplitude": -0.06985484230382608,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10137367953371222,
+        "standardDeviation": 0.6526287190762505,
+        "p05": -0.8078755853571631,
+        "p50": 0.04946471040799541,
+        "p95": 1.1636003265046262
+      }
+    },
+    {
+      "originDate": "2022-08-29",
+      "firstTrainingDate": "2010-09-01",
+      "lastTrainingDate": "2022-08-28",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 3.731856086110832e-17,
+        "exponent": 5.677022367202294,
+        "sinAmplitude": 0.6160290380544909,
+        "cosAmplitude": -0.08288204633608577,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.11465300130190588,
+        "standardDeviation": 0.6432779532953784,
+        "p05": -0.7925642841002933,
+        "p50": 0.06251802358688298,
+        "p95": 1.133783759997948
+      }
+    },
+    {
+      "originDate": "2022-09-28",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-09-27",
+      "trainingRows": 4456,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 2.3758611008414732e-17,
+        "exponent": 5.732203921297147,
+        "sinAmplitude": 0.5840199712836884,
+        "cosAmplitude": -0.05562979386662509,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09911629206354057,
+        "standardDeviation": 0.6565307028750718,
+        "p05": -0.8304626553828722,
+        "p50": 0.04643588740730772,
+        "p95": 1.1621866685871358
+      }
+    },
+    {
+      "originDate": "2022-09-28",
+      "firstTrainingDate": "2010-10-01",
+      "lastTrainingDate": "2022-09-27",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 7.095590478093639e-17,
+        "exponent": 5.595579740095199,
+        "sinAmplitude": 0.6359329377342839,
+        "cosAmplitude": -0.08412980801866198,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1237819220871644,
+        "standardDeviation": 0.6329899215182464,
+        "p05": -0.8033724028900626,
+        "p50": 0.07470695548463649,
+        "p95": 1.1168133087535381
+      }
+    },
+    {
+      "originDate": "2022-10-28",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-10-27",
+      "trainingRows": 4486,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 2.6945579688158304e-17,
+        "exponent": 5.71529209658671,
+        "sinAmplitude": 0.582763050834987,
+        "cosAmplitude": -0.04180255498144859,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09762428837541164,
+        "standardDeviation": 0.6603251858492701,
+        "p05": -0.8537084018203471,
+        "p50": 0.04369323839361858,
+        "p95": 1.159386237523266
+      }
+    },
+    {
+      "originDate": "2022-10-28",
+      "firstTrainingDate": "2010-10-31",
+      "lastTrainingDate": "2022-10-27",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.290876089879832e-16,
+        "exponent": 5.519832095423414,
+        "sinAmplitude": 0.6538696123518333,
+        "cosAmplitude": -0.08727668698800507,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.13264230722591916,
+        "standardDeviation": 0.6243520225635448,
+        "p05": -0.8119135989454378,
+        "p50": 0.09065587654012819,
+        "p95": 1.1197065032388
+      }
+    },
+    {
+      "originDate": "2022-11-27",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-11-26",
+      "trainingRows": 4516,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.062601956847882e-17,
+        "exponent": 5.698120733180366,
+        "sinAmplitude": 0.5832500323601758,
+        "cosAmplitude": -0.02773097522241264,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09684460306219597,
+        "standardDeviation": 0.6646631383327055,
+        "p05": -0.8557507354199846,
+        "p50": 0.043651303936441135,
+        "p95": 1.161854628600727
+      }
+    },
+    {
+      "originDate": "2022-11-27",
+      "firstTrainingDate": "2010-11-30",
+      "lastTrainingDate": "2022-11-26",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.9587573162823886e-16,
+        "exponent": 5.466771423345391,
+        "sinAmplitude": 0.664594636892087,
+        "cosAmplitude": -0.08543358627676904,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.13793886617671552,
+        "standardDeviation": 0.6255046385293973,
+        "p05": -0.8072746575638938,
+        "p50": 0.0983675237187136,
+        "p95": 1.1099581413355446
+      }
+    },
+    {
+      "originDate": "2022-12-27",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2022-12-26",
+      "trainingRows": 4546,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.476593102620274e-17,
+        "exponent": 5.681140923347925,
+        "sinAmplitude": 0.5853488323110315,
+        "cosAmplitude": -0.013955090903982706,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09676737995151803,
+        "standardDeviation": 0.66913041835788,
+        "p05": -0.8530354473104307,
+        "p50": 0.046116998098758216,
+        "p95": 1.1673061930196793
+      }
+    },
+    {
+      "originDate": "2022-12-27",
+      "firstTrainingDate": "2010-12-30",
+      "lastTrainingDate": "2022-12-26",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 3.246389007330471e-16,
+        "exponent": 5.402858263463636,
+        "sinAmplitude": 0.6777773542605694,
+        "cosAmplitude": -0.0891432902851756,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.14511631882400897,
+        "standardDeviation": 0.6222615906509291,
+        "p05": -0.7952888539310666,
+        "p50": 0.10907157449203753,
+        "p95": 1.140401243596197
+      }
+    },
+    {
+      "originDate": "2023-01-26",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-01-25",
+      "trainingRows": 4576,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.8504429434367417e-17,
+        "exponent": 5.667479814624651,
+        "sinAmplitude": 0.5882832528602535,
+        "cosAmplitude": -0.0031040379583891233,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09714933886290483,
+        "standardDeviation": 0.6719332387779721,
+        "p05": -0.8493983062588438,
+        "p50": 0.04889888518857714,
+        "p95": 1.165879500070461
+      }
+    },
+    {
+      "originDate": "2023-01-26",
+      "firstTrainingDate": "2011-01-29",
+      "lastTrainingDate": "2023-01-25",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 5.020008398424299e-16,
+        "exponent": 5.347895318774275,
+        "sinAmplitude": 0.688338356375692,
+        "cosAmplitude": -0.09515303937845233,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.15133358412834358,
+        "standardDeviation": 0.6187377002379654,
+        "p05": -0.7705744827527232,
+        "p50": 0.10710495468617126,
+        "p95": 1.1596900332160929
+      }
+    },
+    {
+      "originDate": "2023-02-25",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-02-24",
+      "trainingRows": 4606,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.1104274536014886e-17,
+        "exponent": 5.658750544735703,
+        "sinAmplitude": 0.5909947502977065,
+        "cosAmplitude": 0.003582249231900266,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09757341906231286,
+        "standardDeviation": 0.6723703682403369,
+        "p05": -0.8474153541774041,
+        "p50": 0.05146023247396901,
+        "p95": 1.1599695647525607
+      }
+    },
+    {
+      "originDate": "2023-02-25",
+      "firstTrainingDate": "2011-02-28",
+      "lastTrainingDate": "2023-02-24",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 6.067112884017479e-16,
+        "exponent": 5.323908766025207,
+        "sinAmplitude": 0.6929181529499607,
+        "cosAmplitude": -0.09621544861046513,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.153986192351363,
+        "standardDeviation": 0.6192516124495904,
+        "p05": -0.7588798157999264,
+        "p50": 0.10492680112121441,
+        "p95": 1.1690229504774865
+      }
+    },
+    {
+      "originDate": "2023-03-27",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-03-26",
+      "trainingRows": 4636,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.3273371333066254e-17,
+        "exponent": 5.651886120435947,
+        "sinAmplitude": 0.5937032261105109,
+        "cosAmplitude": 0.008603408776011215,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.0981200531978662,
+        "standardDeviation": 0.6721813926420719,
+        "p05": -0.839897542512494,
+        "p50": 0.05382529636755673,
+        "p95": 1.1523177772899587
+      }
+    },
+    {
+      "originDate": "2023-03-27",
+      "firstTrainingDate": "2011-03-30",
+      "lastTrainingDate": "2023-03-26",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 7.5423292101557795e-16,
+        "exponent": 5.296625047080173,
+        "sinAmplitude": 0.6966449564548683,
+        "cosAmplitude": -0.1014853396261766,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.15653583257930379,
+        "standardDeviation": 0.617609972309622,
+        "p05": -0.7536702725679184,
+        "p50": 0.10787153336019345,
+        "p95": 1.1861947658154126
+      }
+    },
+    {
+      "originDate": "2023-04-26",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-04-25",
+      "trainingRows": 4666,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.4271329939440847e-17,
+        "exponent": 5.648844997914694,
+        "sinAmplitude": 0.5951669329669819,
+        "cosAmplitude": 0.010685488306429822,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09832886339615196,
+        "standardDeviation": 0.6707161094627195,
+        "p05": -0.833509108820899,
+        "p50": 0.05355506987637846,
+        "p95": 1.1509416384984625
+      }
+    },
+    {
+      "originDate": "2023-04-26",
+      "firstTrainingDate": "2011-04-29",
+      "lastTrainingDate": "2023-04-25",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 9.002712850431104e-16,
+        "exponent": 5.274700329478636,
+        "sinAmplitude": 0.6976619519828553,
+        "cosAmplitude": -0.10944518425298566,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1578135201148702,
+        "standardDeviation": 0.6138571368244262,
+        "p05": -0.7435858517939342,
+        "p50": 0.10568854047915432,
+        "p95": 1.1868479482895786
+      }
+    },
+    {
+      "originDate": "2023-05-26",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-05-25",
+      "trainingRows": 4696,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.5218883136133695e-17,
+        "exponent": 5.646021835391911,
+        "sinAmplitude": 0.5967629946567723,
+        "cosAmplitude": 0.012454379639572192,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09877937588241194,
+        "standardDeviation": 0.6691870063412545,
+        "p05": -0.8311792879911464,
+        "p50": 0.05282457188721697,
+        "p95": 1.1451466151075789
+      }
+    },
+    {
+      "originDate": "2023-05-26",
+      "firstTrainingDate": "2011-05-29",
+      "lastTrainingDate": "2023-05-25",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 6.74314501218455e-16,
+        "exponent": 5.310313462332048,
+        "sinAmplitude": 0.6992306258574122,
+        "cosAmplitude": -0.09485698013684311,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.15748742696176896,
+        "standardDeviation": 0.6110471902467567,
+        "p05": -0.7493266965996941,
+        "p50": 0.09862948364683019,
+        "p95": 1.158842747262823
+      }
+    },
+    {
+      "originDate": "2023-06-25",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-06-24",
+      "trainingRows": 4726,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.6110084936788325e-17,
+        "exponent": 5.643420802317395,
+        "sinAmplitude": 0.5984049528153544,
+        "cosAmplitude": 0.013936580251984104,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09947885074333011,
+        "standardDeviation": 0.6676081251275244,
+        "p05": -0.8298659581956855,
+        "p50": 0.051378598435512055,
+        "p95": 1.1424378704826608
+      }
+    },
+    {
+      "originDate": "2023-06-25",
+      "firstTrainingDate": "2011-06-28",
+      "lastTrainingDate": "2023-06-24",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 3.6086301716704647e-16,
+        "exponent": 5.38732006378566,
+        "sinAmplitude": 0.705771967192174,
+        "cosAmplitude": -0.06490271279135555,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.15931241264449517,
+        "standardDeviation": 0.5930624821954422,
+        "p05": -0.7607876029544556,
+        "p50": 0.10597488942017591,
+        "p95": 1.1574340194126866
+      }
+    },
+    {
+      "originDate": "2023-07-25",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-07-24",
+      "trainingRows": 4756,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.6192168890126246e-17,
+        "exponent": 5.6431837979998125,
+        "sinAmplitude": 0.598571340269678,
+        "cosAmplitude": 0.014053564679276811,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09983665516039121,
+        "standardDeviation": 0.6655463501813229,
+        "p05": -0.8291000484911661,
+        "p50": 0.05555144740833598,
+        "p95": 1.1367881297966842
+      }
+    },
+    {
+      "originDate": "2023-07-25",
+      "firstTrainingDate": "2011-07-28",
+      "lastTrainingDate": "2023-07-24",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.9434609199332345e-16,
+        "exponent": 5.463640222628753,
+        "sinAmplitude": 0.7136744341058586,
+        "cosAmplitude": -0.03865623373437678,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1628659856293673,
+        "standardDeviation": 0.5770450244431656,
+        "p05": -0.7737273372317656,
+        "p50": 0.11929576942503195,
+        "p95": 1.1606649501817368
+      }
+    },
+    {
+      "originDate": "2023-08-24",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-08-23",
+      "trainingRows": 4786,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.6524203633449404e-17,
+        "exponent": 5.642229275781702,
+        "sinAmplitude": 0.5993020969934021,
+        "cosAmplitude": 0.014441598164249883,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10068717428922924,
+        "standardDeviation": 0.6636422837716703,
+        "p05": -0.8266044432315867,
+        "p50": 0.058707832385271344,
+        "p95": 1.134998349422669
+      }
+    },
+    {
+      "originDate": "2023-08-24",
+      "firstTrainingDate": "2011-08-27",
+      "lastTrainingDate": "2023-08-23",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.1508212994586538e-16,
+        "exponent": 5.528155649592303,
+        "sinAmplitude": 0.7234363680144338,
+        "cosAmplitude": -0.017526289126428236,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.16831891291977036,
+        "standardDeviation": 0.5661000252491165,
+        "p05": -0.7760636872613403,
+        "p50": 0.12806414745375838,
+        "p95": 1.1710604312026105
+      }
+    },
+    {
+      "originDate": "2023-09-23",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-09-22",
+      "trainingRows": 4816,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.726713739143969e-17,
+        "exponent": 5.64011745083351,
+        "sinAmplitude": 0.6010038459812557,
+        "cosAmplitude": 0.015151995795276865,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10219783154778986,
+        "standardDeviation": 0.6619721339623358,
+        "p05": -0.8251227940599167,
+        "p50": 0.0632549196819584,
+        "p95": 1.1346816544397296
+      }
+    },
+    {
+      "originDate": "2023-09-23",
+      "firstTrainingDate": "2011-09-26",
+      "lastTrainingDate": "2023-09-22",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 8.06074254993728e-17,
+        "exponent": 5.571891689487982,
+        "sinAmplitude": 0.7324300646853569,
+        "cosAmplitude": -0.003864323723875798,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.17385868447899824,
+        "standardDeviation": 0.5618454730460625,
+        "p05": -0.7732887078616777,
+        "p50": 0.1402153716419114,
+        "p95": 1.1784037945790897
+      }
+    },
+    {
+      "originDate": "2023-10-23",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-10-22",
+      "trainingRows": 4846,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.7712899668017957e-17,
+        "exponent": 5.63886569193566,
+        "sinAmplitude": 0.6020590271247416,
+        "cosAmplitude": 0.015469273662582026,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10367619604552492,
+        "standardDeviation": 0.6602063969486487,
+        "p05": -0.8235788166376165,
+        "p50": 0.06732934978970107,
+        "p95": 1.1311326396841968
+      }
+    },
+    {
+      "originDate": "2023-10-23",
+      "firstTrainingDate": "2011-10-26",
+      "lastTrainingDate": "2023-10-22",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 6.704974948755431e-17,
+        "exponent": 5.594578927620149,
+        "sinAmplitude": 0.7364679559358003,
+        "cosAmplitude": 0.002033519397198259,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.17645716130576009,
+        "standardDeviation": 0.5610450140301425,
+        "p05": -0.7726988128507886,
+        "p50": 0.1447215668709368,
+        "p95": 1.1773903284275995
+      }
+    },
+    {
+      "originDate": "2023-11-22",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-11-21",
+      "trainingRows": 4876,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.68181054247852e-17,
+        "exponent": 5.64139231051196,
+        "sinAmplitude": 0.5998433144102313,
+        "cosAmplitude": 0.01510630592686985,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1039536110104679,
+        "standardDeviation": 0.6582854799597575,
+        "p05": -0.8214885328942285,
+        "p50": 0.06794228198142052,
+        "p95": 1.1267141552698088
+      }
+    },
+    {
+      "originDate": "2023-11-22",
+      "firstTrainingDate": "2011-11-25",
+      "lastTrainingDate": "2023-11-21",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 6.106422080439526e-17,
+        "exponent": 5.6064692634815305,
+        "sinAmplitude": 0.7328644499704089,
+        "cosAmplitude": 0.0033604127014607494,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1741353299666305,
+        "standardDeviation": 0.5606742137201801,
+        "p05": -0.7739028412351228,
+        "p50": 0.1414359194360445,
+        "p95": 1.1671335328993409
+      }
+    },
+    {
+      "originDate": "2023-12-22",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2023-12-21",
+      "trainingRows": 4906,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.5385701079984254e-17,
+        "exponent": 5.645542889653267,
+        "sinAmplitude": 0.5961293330274413,
+        "cosAmplitude": 0.014930502043467617,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10367549432202304,
+        "standardDeviation": 0.6565706182649442,
+        "p05": -0.8219301797394843,
+        "p50": 0.06579764892529862,
+        "p95": 1.1136454006509977
+      }
+    },
+    {
+      "originDate": "2023-12-22",
+      "firstTrainingDate": "2011-12-25",
+      "lastTrainingDate": "2023-12-21",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 5.4812705751216824e-17,
+        "exponent": 5.620264524624748,
+        "sinAmplitude": 0.7276678374535736,
+        "cosAmplitude": 0.0051280328765040606,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.17084140332444214,
+        "standardDeviation": 0.5607969166787039,
+        "p05": -0.7792887130332183,
+        "p50": 0.13706383224454435,
+        "p95": 1.1461064985063631
+      }
+    },
+    {
+      "originDate": "2024-01-21",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-01-20",
+      "trainingRows": 4936,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.392694248995888e-17,
+        "exponent": 5.649911039982678,
+        "sinAmplitude": 0.5921956887895868,
+        "cosAmplitude": 0.01517756288657845,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1032840817919748,
+        "standardDeviation": 0.6549279678025824,
+        "p05": -0.8203512165108389,
+        "p50": 0.06415987190398081,
+        "p95": 1.1100255935477796
+      }
+    },
+    {
+      "originDate": "2024-01-21",
+      "firstTrainingDate": "2012-01-24",
+      "lastTrainingDate": "2024-01-20",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 4.209991936226938e-17,
+        "exponent": 5.653100716323638,
+        "sinAmplitude": 0.7288178938274532,
+        "cosAmplitude": 0.010503078211049944,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.17160299156830355,
+        "standardDeviation": 0.5603014266004044,
+        "p05": -0.7841258069428071,
+        "p50": 0.13905193177372283,
+        "p95": 1.1330913381514132
+      }
+    },
+    {
+      "originDate": "2024-02-20",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-02-19",
+      "trainingRows": 4966,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.261213431718716e-17,
+        "exponent": 5.653979757222174,
+        "sinAmplitude": 0.5885633696261361,
+        "cosAmplitude": 0.015885731797741345,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10291409922800261,
+        "standardDeviation": 0.653278379539585,
+        "p05": -0.8215536529599649,
+        "p50": 0.0631905642800688,
+        "p95": 1.1020945338443346
+      }
+    },
+    {
+      "originDate": "2024-02-20",
+      "firstTrainingDate": "2012-02-23",
+      "lastTrainingDate": "2024-02-19",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 3.469933911608176e-17,
+        "exponent": 5.677269909865432,
+        "sinAmplitude": 0.7278911619396357,
+        "cosAmplitude": 0.014773529615354143,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.17106504118908053,
+        "standardDeviation": 0.5604788971826727,
+        "p05": -0.7834103377694335,
+        "p50": 0.13868405249248866,
+        "p95": 1.1260786765629747
+      }
+    },
+    {
+      "originDate": "2024-03-21",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-03-20",
+      "trainingRows": 4996,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.025562119823713e-17,
+        "exponent": 5.661607002141273,
+        "sinAmplitude": 0.5819115916721445,
+        "cosAmplitude": 0.018019935954468172,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.10114414404173123,
+        "standardDeviation": 0.652411927964127,
+        "p05": -0.825077191346129,
+        "p50": 0.06270506773601686,
+        "p95": 1.101774303062054
+      }
+    },
+    {
+      "originDate": "2024-03-21",
+      "firstTrainingDate": "2012-03-24",
+      "lastTrainingDate": "2024-03-20",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.9118878098434e-17,
+        "exponent": 5.699567039342041,
+        "sinAmplitude": 0.7212826317280452,
+        "cosAmplitude": 0.020516846938113526,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.16703680820024283,
+        "standardDeviation": 0.5618517531087378,
+        "p05": -0.7871245171943343,
+        "p50": 0.13543747738316725,
+        "p95": 1.1280572494471783
+      }
+    },
+    {
+      "originDate": "2024-04-20",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-04-19",
+      "trainingRows": 5026,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.810702502286417e-17,
+        "exponent": 5.6689717116689495,
+        "sinAmplitude": 0.5757332615432798,
+        "cosAmplitude": 0.02083571643647087,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09937339922417847,
+        "standardDeviation": 0.651419067094935,
+        "p05": -0.8253145016592953,
+        "p50": 0.059761038737805,
+        "p95": 1.0971892308359603
+      }
+    },
+    {
+      "originDate": "2024-04-20",
+      "firstTrainingDate": "2012-04-23",
+      "lastTrainingDate": "2024-04-19",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.595013311606271e-17,
+        "exponent": 5.7145004405381306,
+        "sinAmplitude": 0.7130063546545136,
+        "cosAmplitude": 0.026725824825561857,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.16213780526066576,
+        "standardDeviation": 0.5623861368506244,
+        "p05": -0.7923234956486734,
+        "p50": 0.12552338771274327,
+        "p95": 1.1090465839666637
+      }
+    },
+    {
+      "originDate": "2024-05-20",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-05-19",
+      "trainingRows": 5056,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.6625833199594726e-17,
+        "exponent": 5.674303712693736,
+        "sinAmplitude": 0.5715276623601798,
+        "cosAmplitude": 0.023446920186071737,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.0981729639873897,
+        "standardDeviation": 0.6498748793785383,
+        "p05": -0.825513866425537,
+        "p50": 0.058152749337352753,
+        "p95": 1.094885993015017
+      }
+    },
+    {
+      "originDate": "2024-05-20",
+      "firstTrainingDate": "2012-05-23",
+      "lastTrainingDate": "2024-05-19",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.5141219473796542e-17,
+        "exponent": 5.71905264067995,
+        "sinAmplitude": 0.704755436467103,
+        "cosAmplitude": 0.03253025429473951,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1574119104966611,
+        "standardDeviation": 0.5611072826683783,
+        "p05": -0.7988729546805093,
+        "p50": 0.12360688101142064,
+        "p95": 1.0841268910835953
+      }
+    },
+    {
+      "originDate": "2024-06-19",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-06-18",
+      "trainingRows": 5086,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.528055148242554e-17,
+        "exponent": 5.679345641450257,
+        "sinAmplitude": 0.5678760797544092,
+        "cosAmplitude": 0.0264299846653821,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09697653673657418,
+        "standardDeviation": 0.6482735027221356,
+        "p05": -0.8247669976245008,
+        "p50": 0.05620010851930944,
+        "p95": 1.0818709122650922
+      }
+    },
+    {
+      "originDate": "2024-06-19",
+      "firstTrainingDate": "2012-06-22",
+      "lastTrainingDate": "2024-06-18",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.531405233964468e-17,
+        "exponent": 5.71888687876361,
+        "sinAmplitude": 0.69607687747188,
+        "cosAmplitude": 0.039319073568313365,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.15263278007734382,
+        "standardDeviation": 0.5588313919528698,
+        "p05": -0.8059991208076392,
+        "p50": 0.12290405833847756,
+        "p95": 1.0613765151800147
+      }
+    },
+    {
+      "originDate": "2024-07-19",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-07-18",
+      "trainingRows": 5116,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.466162284277331e-17,
+        "exponent": 5.6817345194323305,
+        "sinAmplitude": 0.5663321303239184,
+        "cosAmplitude": 0.02806757742073408,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09638799523677904,
+        "standardDeviation": 0.6463454629558018,
+        "p05": -0.8233476840617643,
+        "p50": 0.0566783384376001,
+        "p95": 1.070427769774697
+      }
+    },
+    {
+      "originDate": "2024-07-19",
+      "firstTrainingDate": "2012-07-22",
+      "lastTrainingDate": "2024-07-18",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.638420897530993e-17,
+        "exponent": 5.71422679621542,
+        "sinAmplitude": 0.6903129212531277,
+        "cosAmplitude": 0.044138477589460844,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.14956593391901157,
+        "standardDeviation": 0.5564624998504171,
+        "p05": -0.8084510596552731,
+        "p50": 0.12656001877823542,
+        "p95": 1.0468274121031327
+      }
+    },
+    {
+      "originDate": "2024-08-18",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-08-17",
+      "trainingRows": 5146,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.427296157041518e-17,
+        "exponent": 5.683259053592021,
+        "sinAmplitude": 0.5654720740235003,
+        "cosAmplitude": 0.029231669950223686,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09588182503608852,
+        "standardDeviation": 0.6444382309960964,
+        "p05": -0.8234850199898192,
+        "p50": 0.05721813090493753,
+        "p95": 1.0659772090010926
+      }
+    },
+    {
+      "originDate": "2024-08-18",
+      "firstTrainingDate": "2012-08-21",
+      "lastTrainingDate": "2024-08-17",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.663429396480461e-17,
+        "exponent": 5.713330828018404,
+        "sinAmplitude": 0.6875353273857152,
+        "cosAmplitude": 0.04750870688790024,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1481548672930759,
+        "standardDeviation": 0.555248905239401,
+        "p05": -0.8091125649114939,
+        "p50": 0.13168070712438873,
+        "p95": 1.039441400121842
+      }
+    },
+    {
+      "originDate": "2024-09-17",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-09-16",
+      "trainingRows": 5176,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.433526643773444e-17,
+        "exponent": 5.68301266747862,
+        "sinAmplitude": 0.5655611968399796,
+        "cosAmplitude": 0.029010024013465606,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.0955826662949303,
+        "standardDeviation": 0.6426208819059119,
+        "p05": -0.8229649236163997,
+        "p50": 0.05660930791977162,
+        "p95": 1.050989715119445
+      }
+    },
+    {
+      "originDate": "2024-09-17",
+      "firstTrainingDate": "2012-09-20",
+      "lastTrainingDate": "2024-09-16",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.935389180039381e-17,
+        "exponent": 5.70158302198097,
+        "sinAmplitude": 0.6839659111862701,
+        "cosAmplitude": 0.050172100211016354,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1463059902888347,
+        "standardDeviation": 0.5531798491588267,
+        "p05": -0.8091532307624508,
+        "p50": 0.13037697881318677,
+        "p95": 1.0321641973016655
+      }
+    },
+    {
+      "originDate": "2024-10-17",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-10-16",
+      "trainingRows": 5206,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.447097758157871e-17,
+        "exponent": 5.6824770780366025,
+        "sinAmplitude": 0.565719787825359,
+        "cosAmplitude": 0.02851474304630759,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09520146806327681,
+        "standardDeviation": 0.6408469950779763,
+        "p05": -0.8212178600257914,
+        "p50": 0.05443976337544909,
+        "p95": 1.047123560513321
+      }
+    },
+    {
+      "originDate": "2024-10-17",
+      "firstTrainingDate": "2012-10-20",
+      "lastTrainingDate": "2024-10-16",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 3.403236486647466e-17,
+        "exponent": 5.68366698276844,
+        "sinAmplitude": 0.6795956364353642,
+        "cosAmplitude": 0.05389485125928206,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.14409875646332337,
+        "standardDeviation": 0.5501110969878733,
+        "p05": -0.8098689643285946,
+        "p50": 0.12697962335037238,
+        "p95": 1.028133780490118
+      }
+    },
+    {
+      "originDate": "2024-11-16",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-11-15",
+      "trainingRows": 5236,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.447390746017569e-17,
+        "exponent": 5.682465791624193,
+        "sinAmplitude": 0.5657454702893376,
+        "cosAmplitude": 0.02850992581217501,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09470916333090101,
+        "standardDeviation": 0.6390735986325761,
+        "p05": -0.8210527794514982,
+        "p50": 0.052787584620782015,
+        "p95": 1.0455856332617202
+      }
+    },
+    {
+      "originDate": "2024-11-16",
+      "firstTrainingDate": "2012-11-19",
+      "lastTrainingDate": "2024-11-15",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 4.4133344159166224e-17,
+        "exponent": 5.652286751216282,
+        "sinAmplitude": 0.6726154977785889,
+        "cosAmplitude": 0.06247676542466782,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1407862076201351,
+        "standardDeviation": 0.5431231798522369,
+        "p05": -0.8096569987270947,
+        "p50": 0.11797540075110555,
+        "p95": 1.0185644667158575
+      }
+    },
+    {
+      "originDate": "2024-12-16",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2024-12-15",
+      "trainingRows": 5266,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.4004275617744074e-17,
+        "exponent": 5.684333553988912,
+        "sinAmplitude": 0.5656681604323726,
+        "cosAmplitude": 0.030360382514018226,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09417648656088252,
+        "standardDeviation": 0.6373728460883155,
+        "p05": -0.820488559792266,
+        "p50": 0.05440626664684685,
+        "p95": 1.0445936293708247
+      }
+    },
+    {
+      "originDate": "2024-12-16",
+      "firstTrainingDate": "2012-12-19",
+      "lastTrainingDate": "2024-12-15",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 5.727278390187105e-17,
+        "exponent": 5.6210780930388085,
+        "sinAmplitude": 0.6663671804467856,
+        "cosAmplitude": 0.07546416089809949,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.13823094374608413,
+        "standardDeviation": 0.5351737941200599,
+        "p05": -0.7950767261150815,
+        "p50": 0.1136222246670852,
+        "p95": 1.0099716208279934
+      }
+    },
+    {
+      "originDate": "2025-01-15",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-01-14",
+      "trainingRows": 5296,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.3824393589164165e-17,
+        "exponent": 5.685056551231214,
+        "sinAmplitude": 0.5657233001034947,
+        "cosAmplitude": 0.031082496798829195,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09368105542731517,
+        "standardDeviation": 0.6356321333309187,
+        "p05": -0.820145829090033,
+        "p50": 0.054379960729194265,
+        "p95": 1.0418441517969257
+      }
+    },
+    {
+      "originDate": "2025-01-15",
+      "firstTrainingDate": "2013-01-18",
+      "lastTrainingDate": "2025-01-14",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 8.174685131425057e-17,
+        "exponent": 5.578265553569555,
+        "sinAmplitude": 0.6602017267955262,
+        "cosAmplitude": 0.09001961064009646,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.13600628583412644,
+        "standardDeviation": 0.5247803719366826,
+        "p05": -0.7801831796785528,
+        "p50": 0.10561212340061786,
+        "p95": 0.9988414413362026
+      }
+    },
+    {
+      "originDate": "2025-02-14",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-02-13",
+      "trainingRows": 5326,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.380820529061547e-17,
+        "exponent": 5.685121758732357,
+        "sinAmplitude": 0.5657168912992175,
+        "cosAmplitude": 0.031150601777511937,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09318202908088646,
+        "standardDeviation": 0.6338850929830516,
+        "p05": -0.8188587950486907,
+        "p50": 0.053701022993320184,
+        "p95": 1.039846784540429
+      }
+    },
+    {
+      "originDate": "2025-02-14",
+      "firstTrainingDate": "2013-02-17",
+      "lastTrainingDate": "2025-02-13",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.131906944681325e-16,
+        "exponent": 5.5390513564937045,
+        "sinAmplitude": 0.6560894725807914,
+        "cosAmplitude": 0.10235493673092579,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.13484088725190682,
+        "standardDeviation": 0.5171219081824474,
+        "p05": -0.7645383869047466,
+        "p50": 0.10411816845610924,
+        "p95": 0.9968319590011598
+      }
+    },
+    {
+      "originDate": "2025-03-16",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-03-15",
+      "trainingRows": 5356,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.43371693726291e-17,
+        "exponent": 5.683001657145116,
+        "sinAmplitude": 0.5648490942382027,
+        "cosAmplitude": 0.029147861878187284,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.0923670488068735,
+        "standardDeviation": 0.6322325021736489,
+        "p05": -0.8187903423312001,
+        "p50": 0.05246782018388389,
+        "p95": 1.0348697963339852
+      }
+    },
+    {
+      "originDate": "2025-03-16",
+      "firstTrainingDate": "2013-03-19",
+      "lastTrainingDate": "2025-03-15",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.4474655209994592e-16,
+        "exponent": 5.509137975042863,
+        "sinAmplitude": 0.6528298793315164,
+        "cosAmplitude": 0.10702869023129062,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1335854896468679,
+        "standardDeviation": 0.5142427576487907,
+        "p05": -0.7638248882178865,
+        "p50": 0.10309381612737906,
+        "p95": 0.9945791797088708
+      }
+    },
+    {
+      "originDate": "2025-04-15",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-04-14",
+      "trainingRows": 5386,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.526524641265022e-17,
+        "exponent": 5.6793589131494455,
+        "sinAmplitude": 0.562904404733978,
+        "cosAmplitude": 0.025899548711795048,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09119357904176058,
+        "standardDeviation": 0.6307544399223223,
+        "p05": -0.8180331133890332,
+        "p50": 0.05183815444124594,
+        "p95": 1.0341838115252098
+      }
+    },
+    {
+      "originDate": "2025-04-15",
+      "firstTrainingDate": "2013-04-18",
+      "lastTrainingDate": "2025-04-14",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.442137598526486e-16,
+        "exponent": 5.509033347986377,
+        "sinAmplitude": 0.6492883839732551,
+        "cosAmplitude": 0.09866714049488287,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.13118274074009462,
+        "standardDeviation": 0.5133611487468467,
+        "p05": -0.7565824636701037,
+        "p50": 0.0990733624806619,
+        "p95": 0.985112120409519
+      }
+    },
+    {
+      "originDate": "2025-05-15",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-05-14",
+      "trainingRows": 5416,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.610850556391558e-17,
+        "exponent": 5.676131713790523,
+        "sinAmplitude": 0.5608005592313736,
+        "cosAmplitude": 0.023251077628580655,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09005995680121706,
+        "standardDeviation": 0.6291117961654628,
+        "p05": -0.8152535892623991,
+        "p50": 0.05014195187063275,
+        "p95": 1.0299800501282133
+      }
+    },
+    {
+      "originDate": "2025-05-15",
+      "firstTrainingDate": "2013-05-18",
+      "lastTrainingDate": "2025-05-14",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.406732034540927e-16,
+        "exponent": 5.511525734393869,
+        "sinAmplitude": 0.6452125669311529,
+        "cosAmplitude": 0.09069317154335076,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1286285683757716,
+        "standardDeviation": 0.5124741071299846,
+        "p05": -0.7550698070308411,
+        "p50": 0.09298255158939345,
+        "p95": 0.9820410371441883
+      }
+    },
+    {
+      "originDate": "2025-06-14",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-06-13",
+      "trainingRows": 5446,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.6863976173413484e-17,
+        "exponent": 5.673305494309361,
+        "sinAmplitude": 0.5586215114404377,
+        "cosAmplitude": 0.021212552165331227,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.08900022440290468,
+        "standardDeviation": 0.6273340871009028,
+        "p05": -0.8129771251350716,
+        "p50": 0.04851256476144635,
+        "p95": 1.0308274879779717
+      }
+    },
+    {
+      "originDate": "2025-06-14",
+      "firstTrainingDate": "2013-06-17",
+      "lastTrainingDate": "2025-06-13",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.4509754087844977e-16,
+        "exponent": 5.507375112024645,
+        "sinAmplitude": 0.6411674576302528,
+        "cosAmplitude": 0.08620590474901736,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1263891535848932,
+        "standardDeviation": 0.5117550800330416,
+        "p05": -0.7530478551779674,
+        "p50": 0.08858905457600166,
+        "p95": 0.9810960718650005
+      }
+    },
+    {
+      "originDate": "2025-07-14",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-07-13",
+      "trainingRows": 5476,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.7796605535859784e-17,
+        "exponent": 5.669898468484646,
+        "sinAmplitude": 0.5556786697447135,
+        "cosAmplitude": 0.01911684240069211,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.08774781412971344,
+        "standardDeviation": 0.6255754845701816,
+        "p05": -0.8095250940052049,
+        "p50": 0.04727784371044476,
+        "p95": 1.031099200725885
+      }
+    },
+    {
+      "originDate": "2025-07-14",
+      "firstTrainingDate": "2013-07-17",
+      "lastTrainingDate": "2025-07-13",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.7609496103599028e-16,
+        "exponent": 5.483659840674148,
+        "sinAmplitude": 0.6378901353521591,
+        "cosAmplitude": 0.08737568632234866,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.12490886390129953,
+        "standardDeviation": 0.5109634851374677,
+        "p05": -0.7463473871571804,
+        "p50": 0.09040326655310608,
+        "p95": 0.9825384378707545
+      }
+    },
+    {
+      "originDate": "2025-08-13",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-08-12",
+      "trainingRows": 5506,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.870908417338433e-17,
+        "exponent": 5.666649860637765,
+        "sinAmplitude": 0.552615890570056,
+        "cosAmplitude": 0.017526810335165937,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.0865481857578856,
+        "standardDeviation": 0.6237536404795415,
+        "p05": -0.8055138377162083,
+        "p50": 0.04734610409875917,
+        "p95": 1.032781191495407
+      }
+    },
+    {
+      "originDate": "2025-08-13",
+      "firstTrainingDate": "2013-08-16",
+      "lastTrainingDate": "2025-08-12",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.1971126741834434e-16,
+        "exponent": 5.456683528162714,
+        "sinAmplitude": 0.635607344434054,
+        "cosAmplitude": 0.090225023482414,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.12402128279964716,
+        "standardDeviation": 0.5101910643085258,
+        "p05": -0.7467923458044806,
+        "p50": 0.09204312859281141,
+        "p95": 0.9797239266567894
+      }
+    },
+    {
+      "originDate": "2025-09-12",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-09-11",
+      "trainingRows": 5536,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 3.992209548424672e-17,
+        "exponent": 5.662454842199202,
+        "sinAmplitude": 0.5484258009128488,
+        "cosAmplitude": 0.016024239513948744,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.08502259136198655,
+        "standardDeviation": 0.6220486020824969,
+        "p05": -0.8007743245689438,
+        "p50": 0.04616885317384664,
+        "p95": 1.033178167512348
+      }
+    },
+    {
+      "originDate": "2025-09-12",
+      "firstTrainingDate": "2013-09-15",
+      "lastTrainingDate": "2025-09-11",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.7136249946470707e-16,
+        "exponent": 5.430828249251998,
+        "sinAmplitude": 0.6317777460441633,
+        "cosAmplitude": 0.09199256266980155,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.12235323336816145,
+        "standardDeviation": 0.5097355203777257,
+        "p05": -0.7448923293756856,
+        "p50": 0.09283845171334665,
+        "p95": 0.9802168562908126
+      }
+    },
+    {
+      "originDate": "2025-10-12",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-10-11",
+      "trainingRows": 5566,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.124706689796467e-17,
+        "exponent": 5.658024242318445,
+        "sinAmplitude": 0.5438495961425033,
+        "cosAmplitude": 0.015026910827276465,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.08344225105626907,
+        "standardDeviation": 0.6203803347639307,
+        "p05": -0.7967175399364017,
+        "p50": 0.04537162300814096,
+        "p95": 1.035913974911338
+      }
+    },
+    {
+      "originDate": "2025-10-12",
+      "firstTrainingDate": "2013-10-15",
+      "lastTrainingDate": "2025-10-11",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 3.4534398128268525e-16,
+        "exponent": 5.401405393260434,
+        "sinAmplitude": 0.628771589306858,
+        "cosAmplitude": 0.09491497174279585,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.1211650242063127,
+        "standardDeviation": 0.5093525974372196,
+        "p05": -0.7444643472492909,
+        "p50": 0.09542610761672174,
+        "p95": 0.9829985857881516
+      }
+    },
+    {
+      "originDate": "2025-11-11",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-11-10",
+      "trainingRows": 5596,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.296591449460625e-17,
+        "exponent": 5.652496251035331,
+        "sinAmplitude": 0.5380628051727258,
+        "cosAmplitude": 0.014560019342866376,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.08150918655827716,
+        "standardDeviation": 0.618995754250308,
+        "p05": -0.7918973037736287,
+        "p50": 0.04424681009168149,
+        "p95": 1.0363435066775697
+      }
+    },
+    {
+      "originDate": "2025-11-11",
+      "firstTrainingDate": "2013-11-14",
+      "lastTrainingDate": "2025-11-10",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 3.879588508209342e-16,
+        "exponent": 5.386772037204192,
+        "sinAmplitude": 0.6203911005936491,
+        "cosAmplitude": 0.09465631447998908,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.11734335238913178,
+        "standardDeviation": 0.5081686956567062,
+        "p05": -0.7412562314704135,
+        "p50": 0.0937118977466729,
+        "p95": 0.9753458984394701
+      }
+    },
+    {
+      "originDate": "2025-12-11",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2025-12-10",
+      "trainingRows": 5626,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.5453182945851806e-17,
+        "exponent": 5.644894291452186,
+        "sinAmplitude": 0.530156831860519,
+        "cosAmplitude": 0.014950128356089894,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.07892282355302088,
+        "standardDeviation": 0.6184341709176666,
+        "p05": -0.7875222050791758,
+        "p50": 0.044019691519356786,
+        "p95": 1.0419375903398032
+      }
+    },
+    {
+      "originDate": "2025-12-11",
+      "firstTrainingDate": "2013-12-14",
+      "lastTrainingDate": "2025-12-10",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.8536627055689505e-16,
+        "exponent": 5.422415821838208,
+        "sinAmplitude": 0.5943900891263817,
+        "cosAmplitude": 0.08619890193174318,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.105614032836217,
+        "standardDeviation": 0.49225805936396455,
+        "p05": -0.7235045933513318,
+        "p50": 0.09435842999405517,
+        "p95": 0.9327215338785055
+      }
+    },
+    {
+      "originDate": "2026-01-10",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2026-01-09",
+      "trainingRows": 5656,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 4.8278737884743356e-17,
+        "exponent": 5.63676752735022,
+        "sinAmplitude": 0.5219146062242764,
+        "cosAmplitude": 0.01643214253742683,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.07631006264040288,
+        "standardDeviation": 0.6181953557522865,
+        "p05": -0.7844085948511049,
+        "p50": 0.04553439311823794,
+        "p95": 1.0444652340308291
+      }
+    },
+    {
+      "originDate": "2026-01-10",
+      "firstTrainingDate": "2014-01-13",
+      "lastTrainingDate": "2026-01-09",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 2.1546483665259104e-16,
+        "exponent": 5.454874377122689,
+        "sinAmplitude": 0.5678720969872426,
+        "cosAmplitude": 0.0815590498974276,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.09482390052684023,
+        "standardDeviation": 0.4787721698161741,
+        "p05": -0.709499153028263,
+        "p50": 0.08999151790980059,
+        "p95": 0.9043742122701991
+      }
+    },
+    {
+      "originDate": "2026-02-09",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2026-02-08",
+      "trainingRows": 5686,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 5.1532822918560653e-17,
+        "exponent": 5.628001146565689,
+        "sinAmplitude": 0.513424186515629,
+        "cosAmplitude": 0.019173943587331037,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.07369366685670287,
+        "standardDeviation": 0.618448523637384,
+        "p05": -0.7877366628712796,
+        "p50": 0.044489903096837854,
+        "p95": 1.042221018575177
+      }
+    },
+    {
+      "originDate": "2026-02-09",
+      "firstTrainingDate": "2014-02-12",
+      "lastTrainingDate": "2026-02-08",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.5958563210224267e-16,
+        "exponent": 5.489548460689663,
+        "sinAmplitude": 0.5395842805709669,
+        "cosAmplitude": 0.08023079210049132,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.08441468163322693,
+        "standardDeviation": 0.4650224015426656,
+        "p05": -0.7008679230335056,
+        "p50": 0.091999572262381,
+        "p95": 0.8714618059188894
+      }
+    },
+    {
+      "originDate": "2026-03-11",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2026-03-10",
+      "trainingRows": 5716,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 5.600468317339223e-17,
+        "exponent": 5.6168450069295055,
+        "sinAmplitude": 0.5032639440339136,
+        "cosAmplitude": 0.023922324549952415,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.07063313933467875,
+        "standardDeviation": 0.6203122800371368,
+        "p05": -0.7971097990625655,
+        "p50": 0.04533596537430569,
+        "p95": 1.0421816898710754
+      }
+    },
+    {
+      "originDate": "2026-03-11",
+      "firstTrainingDate": "2014-03-14",
+      "lastTrainingDate": "2026-03-10",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.689466408545579e-16,
+        "exponent": 5.481414967112967,
+        "sinAmplitude": 0.5200484130423714,
+        "cosAmplitude": 0.08619009951633519,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.07808210037449564,
+        "standardDeviation": 0.46468838358000164,
+        "p05": -0.7086019427315243,
+        "p50": 0.09155877241351387,
+        "p95": 0.8672250554678894
+      }
+    },
+    {
+      "originDate": "2026-04-10",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2026-04-09",
+      "trainingRows": 5746,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 6.073189957819583e-17,
+        "exponent": 5.606009452935248,
+        "sinAmplitude": 0.4941952719054597,
+        "cosAmplitude": 0.029694105555547058,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.06799373268433725,
+        "standardDeviation": 0.6220807724325446,
+        "p05": -0.808905856291289,
+        "p50": 0.04409006948914247,
+        "p95": 1.0481737160645235
+      }
+    },
+    {
+      "originDate": "2026-04-10",
+      "firstTrainingDate": "2014-04-13",
+      "lastTrainingDate": "2026-04-09",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.6373881180877384e-16,
+        "exponent": 5.483875276829504,
+        "sinAmplitude": 0.4994732171734151,
+        "cosAmplitude": 0.09372233261933406,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.07190166183082575,
+        "standardDeviation": 0.46435256064607716,
+        "p05": -0.7142374306588384,
+        "p50": 0.08055147939192295,
+        "p95": 0.8629465760226767
+      }
+    },
+    {
+      "originDate": "2026-05-10",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2026-05-09",
+      "trainingRows": 5776,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 6.527005459942589e-17,
+        "exponent": 5.596397142672244,
+        "sinAmplitude": 0.48695737484243207,
+        "cosAmplitude": 0.035714080960180555,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.06594623638088294,
+        "standardDeviation": 0.6231816084970607,
+        "p05": -0.8148900240849967,
+        "p50": 0.04112253894637698,
+        "p95": 1.0550189971997335
+      }
+    },
+    {
+      "originDate": "2026-05-10",
+      "firstTrainingDate": "2014-05-13",
+      "lastTrainingDate": "2026-05-09",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.5892204143189168e-16,
+        "exponent": 5.4863533470058,
+        "sinAmplitude": 0.48289134899155994,
+        "cosAmplitude": 0.10231546558565376,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.06737859947695904,
+        "standardDeviation": 0.4644228699872861,
+        "p05": -0.7182889111617269,
+        "p50": 0.0729008862472161,
+        "p95": 0.8717560925753671
+      }
+    },
+    {
+      "originDate": "2026-06-09",
+      "firstTrainingDate": "2010-07-17",
+      "lastTrainingDate": "2026-06-08",
+      "trainingRows": 5806,
+      "mode": "expanding",
+      "coefficients": {
+        "coefficient": 7.031602581209509e-17,
+        "exponent": 5.586489406017657,
+        "sinAmplitude": 0.4804709845226783,
+        "cosAmplitude": 0.0427633363629091,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.0641531914689946,
+        "standardDeviation": 0.6246347200841352,
+        "p05": -0.8206303392744563,
+        "p50": 0.040083940983207916,
+        "p95": 1.0500905132845642
+      }
+    },
+    {
+      "originDate": "2026-06-09",
+      "firstTrainingDate": "2014-06-12",
+      "lastTrainingDate": "2026-06-08",
+      "trainingRows": 4380,
+      "mode": "rolling",
+      "coefficients": {
+        "coefficient": 1.4385676860235933e-16,
+        "exponent": 5.49710004664272,
+        "sinAmplitude": 0.4651152643782152,
+        "cosAmplitude": 0.11367752502499219,
+        "cycleDays": 1460
+      },
+      "residual": {
+        "mean": 0.06298188824762302,
+        "standardDeviation": 0.4631007055846446,
+        "p05": -0.7188370839899856,
+        "p50": 0.06635933942065395,
+        "p95": 0.874606274517975
+      }
+    }
+  ],
+  "coefficientSummary": {
+    "coefficient": {
+      "mean": 1.0129565884656971e-16,
+      "median": 4.27890244058967e-17,
+      "standardDeviation": 1.5359368682506182e-16,
+      "p05": 1.2102347545924755e-17,
+      "p25": 3.3812252365252644e-17,
+      "p75": 1.0532973367966201e-16,
+      "p95": 3.7576572567668466e-16,
+      "currentValue": 9.48e-10,
+      "relativeDriftFromCurrent": -0.9999999548638983,
+      "maxWindowToWindowDrift": 19.335311504637417
+    },
+    "exponent": {
+      "mean": 5.62695966193445,
+      "median": 5.652798483679485,
+      "standardDeviation": 0.12939336294071396,
+      "p05": 5.387018649165853,
+      "p25": 5.5472614397422735,
+      "p75": 5.685105456857071,
+      "p95": 5.8235311105016985,
+      "currentValue": 3.6702,
+      "relativeDriftFromCurrent": 0.5401881324395087,
+      "maxWindowToWindowDrift": 0.07039670174968557
+    },
+    "sinAmplitude": {
+      "mean": 0.6120645506835297,
+      "median": 0.6002782997723926,
+      "standardDeviation": 0.06440762884844221,
+      "p05": 0.5011790442606394,
+      "p25": 0.5658921352979829,
+      "p75": 0.6555345075235519,
+      "p95": 0.7257636762059606,
+      "currentValue": 0.2323,
+      "relativeDriftFromCurrent": 1.5840650011725894,
+      "maxWindowToWindowDrift": 0.23950552291871846
+    },
+    "cosAmplitude": {
+      "mean": -0.00030924043152586947,
+      "median": 0.015323418274580239,
+      "standardDeviation": 0.06838781540259652,
+      "p05": -0.1212687903099922,
+      "p25": -0.06258448306017293,
+      "p75": 0.03218534116543262,
+      "p95": 0.09479857597453281,
+      "currentValue": 0.4288,
+      "relativeDriftFromCurrent": -0.9642644163372662,
+      "maxWindowToWindowDrift": 29.654599155685943
+    }
+  },
+  "stabilityVerdict": {
+    "verdict": "unstable",
+    "reasons": [
+      "coefficient exceeded unstable threshold: drift 100.0%, max jump 1933.5%",
+      "exponent exceeded unstable threshold: drift 54.0%, max jump 7.0%",
+      "sinAmplitude exceeded unstable threshold: drift 158.4%, max jump 24.0%",
+      "cosAmplitude exceeded unstable threshold: drift 96.4%, max jump 2965.5%"
+    ],
+    "thresholds": {
+      "watchRelativeDrift": 0.12,
+      "unstableRelativeDrift": 0.25,
+      "watchWindowJump": 0.08,
+      "unstableWindowJump": 0.18
+    }
+  },
+  "suggestedConfig": {
+    "coefficient": 4.27890244058967e-17,
+    "exponent": 5.652798483679485,
+    "sinAmplitude": 0.6002782997723926,
+    "cosAmplitude": 0.015323418274580239,
+    "cycleDays": 1460
+  },
+  "forecastImpact": [
+    {
+      "horizonDays": 180,
+      "currentForecast": 50025.02689519037,
+      "candidateMedianForecast": 98437.79015977951,
+      "candidateP05Forecast": 94688.92313182169,
+      "candidateP95Forecast": 121794.92244799985,
+      "medianRelativeDifference": 0.9677708592945057,
+      "p05RelativeDifference": 0.8928310289609361,
+      "p95RelativeDifference": 1.4346797994367446
+    },
+    {
+      "horizonDays": 365,
+      "currentForecast": 54717.98095716166,
+      "candidateMedianForecast": 92955.26104257251,
+      "candidateP05Forecast": 86245.36474807252,
+      "candidateP95Forecast": 119897.40652181215,
+      "medianRelativeDifference": 0.6988064876762644,
+      "p05RelativeDifference": 0.5761795892212003,
+      "p95RelativeDifference": 1.1911884251664737
+    }
+  ],
+  "skippedWindows": [
+    {
+      "reason": "training rows fewer than 1460 days before rolling origin",
+      "count": 0
+    }
+  ]
+}

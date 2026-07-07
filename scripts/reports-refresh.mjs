@@ -20,3 +20,5 @@ function run(command, args, optional = false) {
 
 run('npm', ['run', 'update:macro'], true);
 for (const [command, args] of required) run(command, args);
+run('npm', ['run', 'backtest:ensemble-suite'], true);
+run('npm', ['run', 'backtest:tail-risk-suite'], true);

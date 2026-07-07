@@ -60,9 +60,82 @@ export const BACKTEST_CONFIG = {
   ],
 } as const;
 
+export const TAU_EXPERIMENT_CONFIG = {
+  defaultTauDays: 210,
+  fixedCandidates: [60, 90, 120, 150, 210, 300, 420],
+  gatedHorizons: [14, 30, 60, 90],
+  volatilityConditional: {
+    id: 'powerlaw-tau-vol-conditional',
+    lowVolDailyThreshold: 0.02,
+    highVolDailyThreshold: 0.04,
+    lowVolTauDays: 300,
+    normalTauDays: 210,
+    highVolTauDays: 120,
+  },
+  promotionPolicy: 'Report-only. Retain 210 unless a candidate beats or matches median error, bias, NLL, pinball loss, and 80/90/95 coverage at every gated horizon.',
+} as const;
+
+export const CYCLE_EXPERIMENT_CONFIG = {
+  selectedStrategyId: 'no-future-pivots',
+  candidateStrategyIds: [
+    'deterministic-pivots',
+    'no-future-pivots',
+    'damped-future-pivots',
+    'pivot-uncertainty-wide',
+  ],
+  gatedHorizons: [90, 180, 365],
+  futureAmplitudeDecay: 0.65,
+  pivotUncertaintySigmaMultiplier: 1.18,
+  promotionPolicy: 'Report-only. Prefer the least assumption-heavy cycle strategy that preserves or improves median error and 80/90/95 coverage at 90, 180, and 365 day horizons.',
+} as const;
+
+export const RESIDUAL_BOOTSTRAP_CONFIG = {
+  selectedPolicyId: 'recent-730d',
+  candidatePolicyIds: ['recent-730d', 'full-history', 'vol-regime-stratified'],
+  gatedHorizons: [90, 180, 365],
+  blockDays: 14,
+  simulations: 16,
+  recentLookbackDays: 730,
+  highVolQuantile: 0.75,
+  normalPeriodMaxWidthRatio: 3.5,
+  promotionPolicy: 'Report-only. Prefer the smallest residual-bootstrap interval policy that improves high-volatility 95% coverage without making normal-period intervals uselessly wide.',
+} as const;
+
+export const RESIDUAL_MODEL_CONFIG = {
+  defaultEnabled: false,
+  modelId: 'kitchen-sink-ridge-residual',
+  lambda: 5,
+  minimumTrainingRows: 730,
+  evaluationSpacingDays: 14,
+  holdoutStarts: ['2022-01-01', '2025-01-01'],
+  horizons: [7, 14, 30, 60, 90, 180],
+  promotionPolicy: 'Report-only. Keep disabled unless walk-forward residual modeling improves mean q10/q50/q90 pinball loss without degrading 80% residual coverage.',
+} as const;
+
+export const TAIL_RISK_CONFIG = {
+  defaultEnabled: false,
+  candidateMultipliers: [1, 1.1, 1.2, 1.35],
+  gatedHorizons: [30, 60, 90],
+  minimumFlaggedSamples: 60,
+  maxNormalCoverage95: 0.985,
+  maxNormalWidthRatio95: 2.8,
+  promotionPolicy: 'Report-only. Tail-risk may widen intervals but cannot move median; keep disabled unless flagged-window coverage improves without excessive normal-period overcoverage or width.',
+} as const;
+
 export const ENSEMBLE_CONFIG = {
   defaultEnabled: false,
   enablementReason: 'Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample.',
+  candidateMembers: ['powerlaw-current', 'gbm-recent-drift', 'ma-trend-20-50-200'],
+  candidateWeights: {
+    '14': { 'powerlaw-current': 1, 'gbm-recent-drift': 0, 'ma-trend-20-50-200': 0 },
+    '30': { 'powerlaw-current': 1, 'gbm-recent-drift': 0, 'ma-trend-20-50-200': 0 },
+    '60': { 'powerlaw-current': 1, 'gbm-recent-drift': 0, 'ma-trend-20-50-200': 0 },
+    '90': { 'powerlaw-current': 1, 'gbm-recent-drift': 0, 'ma-trend-20-50-200': 0 },
+  },
+  validationWindow: {
+    start: '2022-01-01',
+    end: '2024-12-31',
+  },
   weights: {
     powerlaw: 1,
     regimeAdjustment: 0,

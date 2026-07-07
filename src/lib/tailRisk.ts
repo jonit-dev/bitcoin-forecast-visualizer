@@ -48,3 +48,8 @@ export function computeTailRisk(row: FeatureRow | null | undefined): TailRiskFla
     intervalMultiplierAdjustment: riskFlag === 'none' ? 1 : Math.min(1.35, 1 + 0.08 * (downside + upside)),
   };
 }
+
+export function tailRiskWidthAdjustment(flag: TailRiskFlag, enabled: boolean): number {
+  if (!enabled) return 1;
+  return Math.max(1, flag.intervalMultiplierAdjustment);
+}

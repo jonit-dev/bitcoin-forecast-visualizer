@@ -14,14 +14,14 @@ View your app in AI Studio: https://ai.studio/apps/d6dd78f9-8412-4bd7-bf1b-76dad
 
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key.
+   `yarn install`
+2. Create an ignored `.env.local` file for local secrets. Set `GEMINI_API_KEY` there, and use CI/deployment secret storage for hosted environments.
 3. Refresh the cached market data:
-   `npm run update:market-data`
+   `yarn run update:market-data`
 4. Run the S&P 500 statistical relevance gate:
-   `npm run backtest:market`
+   `yarn run backtest:market`
 5. Run the app:
-   `npm run dev`
+   `yarn run dev`
 
 ## Programmatic API
 

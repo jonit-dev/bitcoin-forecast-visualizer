@@ -1,19 +1,19 @@
 import type { OHLCVData } from './api';
-import { CYCLE_PIVOTS, type CyclePivot } from './cycle';
+import { cycleAdjustedPowerLawForecast } from './cycle';
 import {
   basePowerLawPrice,
   daysSinceGenesis,
   floorPowerLawPrice,
   peakPowerLawPrice,
   POWER_LAW_MEAN_REVERSION_TAU_DAYS,
-  powerLawForecast,
 } from './powerLaw';
 import {
   blendedPowerLawHeatmapVol,
   computePowerLawInterval,
   CONFIDENCE_Z_SCORES,
 } from './forecastInterval';
-import { INTERVAL_CONFIG } from './modelConfig';
+import { INTERVAL_CONFIG, RESIDUAL_BOOTSTRAP_CONFIG } from './modelConfig';
+import { seededRandom } from './random';
 
 export interface HeatmapCell {
   date: string;
@@ -36,31 +36,40 @@ export interface ProbabilityForecast {
 }
 
 export type CoefficientStabilityVerdict = 'stable' | 'watch' | 'unstable';
+export interface CoreAssumptionTrustSummary {
+  longHorizonLabel: 'Scenario range' | 'Directional only';
+  reason: string;
+  coefficientStability?: { verdict: CoefficientStabilityVerdict };
+}
 
 const STOCHASTIC_TRACE_COUNT = 12;
 const STOCHASTIC_TRACE_BACKCAST_DAYS = 7;
 const STOCHASTIC_TRACE_BLOCK_DAYS = 14;
 // Use recent regime history for visible scenario paths. Full-history BTC residuals include
 // early-era shocks that are not calibrated to the displayed confidence interval scale.
-const STOCHASTIC_TRACE_LOOKBACK_DAYS = 730;
+const STOCHASTIC_TRACE_LOOKBACK_DAYS = RESIDUAL_BOOTSTRAP_CONFIG.recentLookbackDays;
 
 export { CONFIDENCE_Z_SCORES };
 
 export function coefficientAwareCalibrationLabel(
   horizonDays: number,
   baseLabel: string,
-  stabilityVerdict?: CoefficientStabilityVerdict
+  stabilityVerdict?: CoefficientStabilityVerdict,
+  coreAssumptions?: CoreAssumptionTrustSummary
 ): string {
   if (horizonDays < 180) return baseLabel;
+  if (coreAssumptions?.longHorizonLabel) return coreAssumptions.longHorizonLabel;
   if (stabilityVerdict === 'unstable') return 'Directional only';
   return 'Scenario range';
 }
 
 export function coefficientStabilityTrustCopy(
   horizonDays: number,
-  stabilityVerdict?: CoefficientStabilityVerdict
+  stabilityVerdict?: CoefficientStabilityVerdict,
+  coreAssumptions?: CoreAssumptionTrustSummary
 ): string {
   if (horizonDays < 180) return 'Amber path = median path. Dotted bands show calibrated risk range. Scenario sketches stay hidden unless enabled.';
+  if (coreAssumptions) return `Core assumptions: ${coreAssumptions.reason}. Treat 180+ day output as ${coreAssumptions.longHorizonLabel.toLowerCase()}.`;
   if (stabilityVerdict === 'stable') return 'Long-horizon output is a scenario range backed by the latest coefficient stability check.';
   if (stabilityVerdict === 'unstable') return 'Long-horizon coefficient refits are unstable, so 180+ day output is directional only rather than exact-confidence guidance.';
   return 'Fixed structural coefficients are under review at 180-365 day horizons; treat the output as a scenario range.';
@@ -83,7 +92,7 @@ export function computeProbabilityForecast(
   const last = ohlcv[ohlcv.length - 1];
   const lastDate = new Date(last.date + 'T00:00:00Z');
   const targetDate = addUtcDays(lastDate, horizonDays);
-  const median = cycleAwarePowerLawForecast(targetDate, last.close, lastDate);
+  const median = cycleAdjustedPowerLawForecast(targetDate, last.close, lastDate);
   const interval = computePowerLawInterval({ ohlcv, horizonDays, median, currentPrice: last.close });
   if (!interval) return null;
 
@@ -135,56 +144,6 @@ function dateKey(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-function smoothstep(value: number): number {
-  const t = Math.min(1, Math.max(0, value));
-  return t * t * (3 - 2 * t);
-}
-
-function lerpLog(a: number, b: number, t: number): number {
-  return Math.exp(Math.log(a) + (Math.log(b) - Math.log(a)) * smoothstep(t));
-}
-
-function pivotTargetPrice(pivot: CyclePivot): number {
-  const t = daysSinceGenesis(new Date(pivot.date + 'T00:00:00Z'));
-  return pivot.type === 'ATH' ? peakPowerLawPrice(t) : floorPowerLawPrice(t);
-}
-
-function cyclePivotTargetPrice(date: Date): number | null {
-  const dateStr = dateKey(date);
-  const pivotIndex = CYCLE_PIVOTS.findIndex(pivot => pivot.date >= dateStr);
-  const nextPivot = pivotIndex >= 0 ? CYCLE_PIVOTS[pivotIndex] : null;
-  const previousPivot = pivotIndex > 0
-    ? CYCLE_PIVOTS[pivotIndex - 1]
-    : CYCLE_PIVOTS[CYCLE_PIVOTS.length - 1]?.date < dateStr
-      ? CYCLE_PIVOTS[CYCLE_PIVOTS.length - 1]
-      : null;
-
-  if (nextPivot?.date === dateStr) return pivotTargetPrice(nextPivot);
-  if (!previousPivot || !nextPivot) return null;
-
-  const start = new Date(previousPivot.date + 'T00:00:00Z').getTime();
-  const end = new Date(nextPivot.date + 'T00:00:00Z').getTime();
-  const now = date.getTime();
-  if (end <= start || now < start || now > end) return null;
-
-  return lerpLog(
-    pivotTargetPrice(previousPivot),
-    pivotTargetPrice(nextPivot),
-    (now - start) / (end - start)
-  );
-}
-
-function cycleAwarePowerLawForecast(dateFuture: Date, currentPrice: number, currentDate: Date): number {
-  const rawForecast = powerLawForecast(dateFuture, currentPrice, currentDate);
-  const cycleTarget = cyclePivotTargetPrice(dateFuture);
-  if (!Number.isFinite(rawForecast) || rawForecast <= 0) return cycleTarget ?? rawForecast;
-  if (!cycleTarget || !Number.isFinite(cycleTarget) || cycleTarget <= 0) return rawForecast;
-
-  const horizonDays = Math.max(0, Math.round((dateFuture.getTime() - currentDate.getTime()) / 86400000));
-  const cycleWeight = smoothstep((horizonDays - 30) / 70);
-  return lerpLog(rawForecast, cycleTarget, cycleWeight);
-}
-
 function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lookbackDays?: number): number[] {
   const innovations: number[] = [];
   const startIndex = lookbackDays ? Math.max(1, endIndex - lookbackDays + 1) : 1;
@@ -196,7 +155,7 @@ function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lo
 
     const prevDate = new Date(prev.date + 'T00:00:00Z');
     const currDate = new Date(curr.date + 'T00:00:00Z');
-    const expected = cycleAwarePowerLawForecast(currDate, prev.close, prevDate);
+    const expected = cycleAdjustedPowerLawForecast(currDate, prev.close, prevDate);
     if (!Number.isFinite(expected) || expected <= 0) continue;
 
     innovations.push(Math.log(curr.close / expected));
@@ -270,7 +229,7 @@ function generatePowerLawStochasticTraces(
 
       const prevDate = addUtcDays(anchorDate, day - 1);
       const currDate = addUtcDays(anchorDate, day);
-      const expected = cycleAwarePowerLawForecast(currDate, price, prevDate);
+      const expected = cycleAdjustedPowerLawForecast(currDate, price, prevDate);
       const innovation = centeredInnovations[blockStart + blockOffset++];
       price = expected * Math.exp(innovation);
       paths[pathIndex][day] = price;
@@ -338,8 +297,8 @@ export function processRealData(
 
     const prevDate = new Date(lastDate);
     prevDate.setUTCDate(prevDate.getUTCDate() + i - 1);
-    const open = i === 1 ? lastReal.close : cycleAwarePowerLawForecast(prevDate, lastReal.close, lastDate);
-    const close = cycleAwarePowerLawForecast(date, lastReal.close, lastDate);
+    const open = i === 1 ? lastReal.close : cycleAdjustedPowerLawForecast(prevDate, lastReal.close, lastDate);
+    const close = cycleAdjustedPowerLawForecast(date, lastReal.close, lastDate);
 
     const high = Math.max(open, close) * (1 + rng() * dailyVol * 0.3);
     const low = Math.min(open, close) * (1 - rng() * dailyVol * 0.3);
@@ -406,10 +365,8 @@ export function generateHeatmapData(
   const sampledSet = new Set(sampledDays);
   const sampledCount = sampledDays.length;
 
-  // Pre-generate deterministic random normals so identical inputs produce identical forecasts.
-  const totalRands = numSimulations * horizon;
-  const normals = new Float64Array(totalRands);
-  for (let i = 0; i < totalRands; i++) normals[i] = normalFromRng(rng);
+  const residualShocks = buildSelectedResidualPolicyShocks(ohlcv, horizon, numSimulations, dailyVol, rng);
+  const useResidualShocks = residualShocks.length === numSimulations * horizon;
 
   // Run Monte Carlo — store only sampled days in flat typed array
   const results = new Float64Array(numSimulations * sampledCount);
@@ -420,7 +377,8 @@ export function generateHeatmapData(
     let residual = Math.log(lastPrice / lastBasePrice);
 
     for (let d = 1; d <= horizon; d++) {
-      residual = residual * residualDecay + powerLawShockDrift + dailyVol * normals[rOff + d - 1];
+      const shock = useResidualShocks ? residualShocks[rOff + d - 1] : dailyVol * normalFromRng(rng);
+      residual = residual * residualDecay + powerLawShockDrift + shock;
       const price = futureBasePrices[d] * Math.exp(residual);
 
       if (sampledSet.has(d)) {
@@ -475,6 +433,38 @@ export function generateHeatmapData(
   return cells;
 }
 
+function buildSelectedResidualPolicyShocks(
+  ohlcv: OHLCVData[],
+  horizon: number,
+  numSimulations: number,
+  targetDailyVol: number,
+  rng: () => number
+): Float64Array {
+  if (RESIDUAL_BOOTSTRAP_CONFIG.selectedPolicyId !== 'recent-730d') return new Float64Array();
+  const innovations = buildPowerLawInnovationHistory(ohlcv, ohlcv.length - 1, RESIDUAL_BOOTSTRAP_CONFIG.recentLookbackDays);
+  if (innovations.length < STOCHASTIC_TRACE_BLOCK_DAYS * 4) return new Float64Array();
+
+  const centeredMean = innovations.reduce((sum, value) => sum + value, 0) / innovations.length;
+  const rawCenteredInnovations = innovations.map(value => value - centeredMean);
+  const rawInnovationSd = sampleStandardDeviation(rawCenteredInnovations);
+  if (!Number.isFinite(rawInnovationSd) || rawInnovationSd <= 0) return new Float64Array();
+
+  const centeredInnovations = rawCenteredInnovations.map(value => value * (targetDailyVol / rawInnovationSd));
+  const shocks = new Float64Array(numSimulations * horizon);
+  for (let simulation = 0; simulation < numSimulations; simulation++) {
+    let blockStart = 0;
+    let blockOffset = STOCHASTIC_TRACE_BLOCK_DAYS;
+    for (let day = 0; day < horizon; day++) {
+      if (blockOffset >= STOCHASTIC_TRACE_BLOCK_DAYS) {
+        blockStart = Math.floor(rng() * Math.max(1, centeredInnovations.length - STOCHASTIC_TRACE_BLOCK_DAYS));
+        blockOffset = 0;
+      }
+      shocks[simulation * horizon + day] = centeredInnovations[blockStart + blockOffset++];
+    }
+  }
+  return shocks;
+}
+
 // ---------------------------------------------------------------------------
 // Drawdown Analysis
 // ---------------------------------------------------------------------------
@@ -504,7 +494,7 @@ function projectedCycleMDD(c: number): number {
   return 92.8 - 5.1 * c;
 }
 
-export function computeDrawdownStats(ohlcv: OHLCVData[], horizonDays: number): DrawdownStats {
+export function computeDrawdownStats(ohlcv: OHLCVData[], horizonDays: number, seed = 0xD6A9D07): DrawdownStats {
   const lastHalvingDate = new Date('2024-04-20T00:00:00Z');
   const cycleIndex = 4;
 
@@ -539,14 +529,15 @@ export function computeDrawdownStats(ohlcv: OHLCVData[], horizonDays: number): D
 
   const N_PATHS = 500;
   const mdds = new Float64Array(N_PATHS);
+  const rng = seededRandom(seed + horizonDays * 997 + ohlcv.length);
 
   for (let s = 0; s < N_PATHS; s++) {
     let price = currentPrice;
     let peak = currentPrice;
     let maxDD = 0;
     for (let d = 0; d < gbmHorizonDays; d++) {
-      const u1 = Math.max(Math.random(), 1e-15);
-      const u2 = Math.random();
+      const u1 = Math.max(rng(), 1e-15);
+      const u2 = rng();
       const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
       price = price * Math.exp(meanReturn - halfVolSq + dailyVol * z);
       if (price > peak) peak = price;

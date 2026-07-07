@@ -1,0 +1,4873 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-06T23:40:59.711Z",
+    "command": "npm run backtest:features-continuous -- --family all",
+    "gitCommit": "84d1321b94c3d32e6e1b9f8cfee8532d1a7be99d",
+    "holdoutStarts": [
+      "2022-01-01",
+      "2025-01-01"
+    ],
+    "horizons": [
+      7,
+      14,
+      30,
+      60,
+      90,
+      180
+    ],
+    "minimumContinuousRows": 60,
+    "modelForm": "pre-holdout ridge regression on standardized family features, lambda=1",
+    "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+    "sparseDiagnosticsPolicy": "legacy event/state feature scripts are diagnostics only and are not promotion gates",
+    "dataset": {
+      "btcRows": 5828,
+      "btcFirstDate": "2010-07-17",
+      "btcLastDate": "2026-06-30",
+      "featureRows": 5827,
+      "featureFirstDate": "2010-07-18",
+      "featureLastDate": "2026-06-30"
+    }
+  },
+  "families": [
+    {
+      "family": "onchain",
+      "featureNames": [
+        "mvrvLevel",
+        "mvrvPercentile",
+        "mvrvZScore",
+        "realizedPriceDistance",
+        "activeAddresses",
+        "transactionCount",
+        "transferCount",
+        "addressBalanceCount",
+        "transfersPerTransaction",
+        "activeAddressShare",
+        "hashRate",
+        "minerStressProxy"
+      ],
+      "status": "ready",
+      "summaries": [
+        {
+          "family": "onchain",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 1635,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 1628,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 1612,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 1582,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 1552,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 1462,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 539,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 532,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 516,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 486,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 456,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 366,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        }
+      ],
+      "continuousGates": [
+        {
+          "family": "onchain",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 3653,
+          "evalRows": 1635,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1635,
+            "medianAbsError": 0.03609464057755566,
+            "meanAbsError": 0.04993021122082195,
+            "bias": 0.0020313554391874606,
+            "nll": -0.9043320416457902,
+            "pinballLoss": {
+              "q10": 0.016983140213134948,
+              "q50": 0.029863366229583667,
+              "q90": 0.013346875930874332,
+              "mean": 0.02006446079119761
+            },
+            "coverage80": 0.9376146788990826
+          },
+          "model": {
+            "samples": 1635,
+            "medianAbsError": 0.0864032514417766,
+            "meanAbsError": 0.09662429844304411,
+            "bias": -0.07281203618889219,
+            "nll": -0.6866695091464525,
+            "pinballLoss": {
+              "q10": 0.02142159281208214,
+              "q50": 0.04896312060532474,
+              "q90": 0.01972268455896723,
+              "mean": 0.030035799325458034
+            },
+            "coverage80": 0.6990825688073394
+          },
+          "improvement": {
+            "meanPinballLoss": -0.009971338534260398,
+            "bootstrapLower95": -0.012563012449051142,
+            "bootstrapUpper95": -0.006364927129461787
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 3653,
+          "evalRows": 1628,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1628,
+            "medianAbsError": 0.05293906907417871,
+            "meanAbsError": 0.07116121316869561,
+            "bias": 0.0035946962307227474,
+            "nll": -0.5532919319249597,
+            "pinballLoss": {
+              "q10": 0.02808622613633112,
+              "q50": 0.04853923117132739,
+              "q90": 0.01854977583908209,
+              "mean": 0.0317250777155802
+            },
+            "coverage80": 0.9428746928746928
+          },
+          "model": {
+            "samples": 1628,
+            "medianAbsError": 0.17178592955700814,
+            "meanAbsError": 0.18954751601808614,
+            "bias": -0.1544382588768176,
+            "nll": 0.017917751676660636,
+            "pinballLoss": {
+              "q10": 0.03646046371959967,
+              "q50": 0.0970036656047007,
+              "q90": 0.057120788319331546,
+              "mean": 0.06352830588121064
+            },
+            "coverage80": 0.5540540540540541
+          },
+          "improvement": {
+            "meanPinballLoss": -0.03180322816563042,
+            "bootstrapLower95": -0.03931136219078147,
+            "bootstrapUpper95": -0.021412566978571756
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 3653,
+          "evalRows": 1612,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1612,
+            "medianAbsError": 0.08490501320988293,
+            "meanAbsError": 0.10458859462590626,
+            "bias": 0.006305406760645035,
+            "nll": -0.15299103025621258,
+            "pinballLoss": {
+              "q10": 0.047976019588911255,
+              "q50": 0.08035821111938145,
+              "q90": 0.027125793951260704,
+              "mean": 0.05182000821985113
+            },
+            "coverage80": 0.9640198511166254
+          },
+          "model": {
+            "samples": 1612,
+            "medianAbsError": 0.3091609020811852,
+            "meanAbsError": 0.3453749498319694,
+            "bias": -0.3046550734691679,
+            "nll": 0.8189705958261452,
+            "pinballLoss": {
+              "q10": 0.059313168484528445,
+              "q50": 0.17730906805342425,
+              "q90": 0.12327888976095888,
+              "mean": 0.11996704209963696
+            },
+            "coverage80": 0.4621588089330025
+          },
+          "improvement": {
+            "meanPinballLoss": -0.06814703387978621,
+            "bootstrapLower95": -0.08649282954118287,
+            "bootstrapUpper95": -0.04646250145445787
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 3653,
+          "evalRows": 1582,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1582,
+            "medianAbsError": 0.13906946318595462,
+            "meanAbsError": 0.14641339291532518,
+            "bias": 0.009900245984749338,
+            "nll": 0.21740215085742684,
+            "pinballLoss": {
+              "q10": 0.07621839873418057,
+              "q50": 0.14413044219479879,
+              "q90": 0.034988611720304756,
+              "mean": 0.08511248421642817
+            },
+            "coverage80": 0.9892541087231352
+          },
+          "model": {
+            "samples": 1582,
+            "medianAbsError": 0.6161588099059745,
+            "meanAbsError": 0.6738917223402806,
+            "bias": -0.6246917794308559,
+            "nll": 2.370685723904175,
+            "pinballLoss": {
+              "q10": 0.10278368749176986,
+              "q50": 0.3530858945730761,
+              "q90": 0.2923342493328909,
+              "mean": 0.24940127713257954
+            },
+            "coverage80": 0.3805309734513274
+          },
+          "improvement": {
+            "meanPinballLoss": -0.16428879291615112,
+            "bootstrapLower95": -0.20866977522647695,
+            "bootstrapUpper95": -0.12260894970109665
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 3653,
+          "evalRows": 1552,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1552,
+            "medianAbsError": 0.15424400586572096,
+            "meanAbsError": 0.1643763165527847,
+            "bias": 0.0158404498151852,
+            "nll": 0.4273332239355244,
+            "pinballLoss": {
+              "q10": 0.0963526803884356,
+              "q50": 0.18362274583331017,
+              "q90": 0.04718829762002896,
+              "mean": 0.10905457461392498
+            },
+            "coverage80": 0.9922680412371134
+          },
+          "model": {
+            "samples": 1552,
+            "medianAbsError": 0.6971532273561118,
+            "meanAbsError": 0.7215791331053499,
+            "bias": -0.6673376367338629,
+            "nll": 2.003140162115279,
+            "pinballLoss": {
+              "q10": 0.11445133744462903,
+              "q50": 0.3873944391250759,
+              "q90": 0.24292472437916654,
+              "mean": 0.24825683364962403
+            },
+            "coverage80": 0.43170103092783507
+          },
+          "improvement": {
+            "meanPinballLoss": -0.13920225903569886,
+            "bootstrapLower95": -0.18159942489751166,
+            "bootstrapUpper95": -0.10341133647942298
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 3653,
+          "evalRows": 1462,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1462,
+            "medianAbsError": 0.1393994469752437,
+            "meanAbsError": 0.17272108398870614,
+            "bias": 0.02176974283410791,
+            "nll": 0.6614363938070258,
+            "pinballLoss": {
+              "q10": 0.1327066234578029,
+              "q50": 0.23482515632663858,
+              "q90": 0.046332885993769474,
+              "mean": 0.1379548885927374
+            },
+            "coverage80": 0.993844049247606
+          },
+          "model": {
+            "samples": 1462,
+            "medianAbsError": 0.6668474691454254,
+            "meanAbsError": 0.6660918055519718,
+            "bias": -0.5827851148254724,
+            "nll": 1.4248919163113882,
+            "pinballLoss": {
+              "q10": 0.11090714322789286,
+              "q50": 0.35949656012715253,
+              "q90": 0.1513826698270059,
+              "mean": 0.20726212439401703
+            },
+            "coverage80": 0.5246238030095759
+          },
+          "improvement": {
+            "meanPinballLoss": -0.06930723580128008,
+            "bootstrapLower95": -0.10069430583581589,
+            "bootstrapUpper95": -0.044168223576026615
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 4749,
+          "evalRows": 539,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 539,
+            "medianAbsError": 0.03499825098621134,
+            "meanAbsError": 0.0420639608251808,
+            "bias": 0.005653711301810522,
+            "nll": -1.0198007619712097,
+            "pinballLoss": {
+              "q10": 0.014746825365188525,
+              "q50": 0.023184673337468726,
+              "q90": 0.011465520708224174,
+              "mean": 0.01646567313696049
+            },
+            "coverage80": 0.9795918367346939
+          },
+          "model": {
+            "samples": 539,
+            "medianAbsError": 0.03534011407268088,
+            "meanAbsError": 0.04444570759138475,
+            "bias": 0.018945176077519645,
+            "nll": -1.046723130191626,
+            "pinballLoss": {
+              "q10": 0.011633372639545208,
+              "q50": 0.021933524177960285,
+              "q90": 0.014151925396422054,
+              "mean": 0.015906274071309182
+            },
+            "coverage80": 0.9387755102040817
+          },
+          "improvement": {
+            "meanPinballLoss": 0.000559399065651288,
+            "bootstrapLower95": -0.0008276857871046578,
+            "bootstrapUpper95": 0.0019959739569780583
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 4749,
+          "evalRows": 532,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 532,
+            "medianAbsError": 0.04845168731168206,
+            "meanAbsError": 0.06007104384773456,
+            "bias": 0.010040160107864937,
+            "nll": -0.6616309967809574,
+            "pinballLoss": {
+              "q10": 0.02461237950295393,
+              "q50": 0.03567510999926816,
+              "q90": 0.01592681674203647,
+              "mean": 0.025404768748086212
+            },
+            "coverage80": 0.9943609022556391
+          },
+          "model": {
+            "samples": 532,
+            "medianAbsError": 0.05176762010752578,
+            "meanAbsError": 0.06577876042314033,
+            "bias": 0.037730719510883616,
+            "nll": -0.7170341475681664,
+            "pinballLoss": {
+              "q10": 0.016489510630952577,
+              "q50": 0.03183996862913441,
+              "q90": 0.02190039536290178,
+              "mean": 0.023409958207662913
+            },
+            "coverage80": 0.9342105263157895
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0019948105404232405,
+            "bootstrapLower95": -0.0006730858373076045,
+            "bootstrapUpper95": 0.00532172976043996
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 4749,
+          "evalRows": 516,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 516,
+            "medianAbsError": 0.07284615754972223,
+            "meanAbsError": 0.08945911918015952,
+            "bias": 0.022260335430954396,
+            "nll": -0.24584428196018043,
+            "pinballLoss": {
+              "q10": 0.04184967505722373,
+              "q50": 0.05832442552741704,
+              "q90": 0.024710163930913874,
+              "mean": 0.04162808817185149
+            },
+            "coverage80": 0.9961240310077519
+          },
+          "model": {
+            "samples": 516,
+            "medianAbsError": 0.08158040123279914,
+            "meanAbsError": 0.11178368628226598,
+            "bias": 0.08680695666280759,
+            "nll": -0.3115765118791382,
+            "pinballLoss": {
+              "q10": 0.022837236021411064,
+              "q50": 0.05273034491281014,
+              "q90": 0.03637300647921659,
+              "mean": 0.03731352913781261
+            },
+            "coverage80": 0.9186046511627907
+          },
+          "improvement": {
+            "meanPinballLoss": 0.004314559034038968,
+            "bootstrapLower95": -0.003728831136021372,
+            "bootstrapUpper95": 0.01268744552616829
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 4749,
+          "evalRows": 486,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 486,
+            "medianAbsError": 0.1256057774510667,
+            "meanAbsError": 0.1245603752981374,
+            "bias": 0.03055734668246239,
+            "nll": 0.12365777686214623,
+            "pinballLoss": {
+              "q10": 0.0690385284077877,
+              "q50": 0.08151355674646127,
+              "q90": 0.03335202358789424,
+              "mean": 0.061301369580714415
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 486,
+            "medianAbsError": 0.09115652604035171,
+            "meanAbsError": 0.14393500968372708,
+            "bias": 0.11919186596257277,
+            "nll": -0.020618162660689957,
+            "pinballLoss": {
+              "q10": 0.0243861134004131,
+              "q50": 0.06646556660248802,
+              "q90": 0.04878776426789639,
+              "mean": 0.046546481423599115
+            },
+            "coverage80": 0.9567901234567902
+          },
+          "improvement": {
+            "meanPinballLoss": 0.01475488815711522,
+            "bootstrapLower95": -0.0002963583298308996,
+            "bootstrapUpper95": 0.028302678487905537
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 4749,
+          "evalRows": 456,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 456,
+            "medianAbsError": 0.130907485197236,
+            "meanAbsError": 0.12927183075239423,
+            "bias": 0.03367305397751562,
+            "nll": 0.3296066832610327,
+            "pinballLoss": {
+              "q10": 0.08755770119981654,
+              "q50": 0.09464485865335535,
+              "q90": 0.041183326458881946,
+              "mean": 0.07446196210401794
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 456,
+            "medianAbsError": 0.16370119041040732,
+            "meanAbsError": 0.1871609913555633,
+            "bias": 0.173953018717273,
+            "nll": 0.17060392775376923,
+            "pinballLoss": {
+              "q10": 0.028639521478825845,
+              "q50": 0.08133182508779017,
+              "q90": 0.06774981436003759,
+              "mean": 0.05924038697555111
+            },
+            "coverage80": 0.9583333333333334
+          },
+          "improvement": {
+            "meanPinballLoss": 0.015221575128466775,
+            "bootstrapLower95": -0.004117939218632008,
+            "bootstrapUpper95": 0.030418946149683313
+          }
+        },
+        {
+          "family": "onchain",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 4749,
+          "evalRows": 366,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 366,
+            "medianAbsError": 0.12499355047073518,
+            "meanAbsError": 0.14903797718110712,
+            "bias": 0.06301936140686629,
+            "nll": 0.5830326249458303,
+            "pinballLoss": {
+              "q10": 0.12307009279292817,
+              "q50": 0.11359058524371671,
+              "q90": 0.04496271502082413,
+              "mean": 0.09387446435248954
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 366,
+            "medianAbsError": 0.16499011022588084,
+            "meanAbsError": 0.20758102639145923,
+            "bias": 0.14596047379395696,
+            "nll": 0.26481106497057155,
+            "pinballLoss": {
+              "q10": 0.03606014805440666,
+              "q50": 0.09867586250310152,
+              "q90": 0.07385240265028103,
+              "mean": 0.06952947106926306
+            },
+            "coverage80": 0.9617486338797814
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0243449932832266,
+            "bootstrapLower95": 0.0015462204617248793,
+            "bootstrapUpper95": 0.0409001968213881
+          }
+        }
+      ]
+    },
+    {
+      "family": "derivatives",
+      "featureNames": [
+        "futuresFundingRateDailyAvg",
+        "futuresFundingRateDailySum",
+        "futuresFundingRateSum7d",
+        "futuresFundingRateSum30d",
+        "futuresFundingRateSumZ90d",
+        "futuresFundingRateAvgZ90d",
+        "futuresPremiumClose",
+        "futuresPremiumCloseZ90d",
+        "futuresPremiumRange",
+        "futuresOpenInterestUSD",
+        "futuresOpenInterestToMarketCap"
+      ],
+      "status": "sample-starved",
+      "summaries": [
+        {
+          "family": "derivatives",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 21,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1614,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 14,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1614,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 0,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1612,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 0,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1582,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 0,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1552,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 0,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1462,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 21,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 518,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 14,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 518,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 0,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 516,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 0,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 486,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 0,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 456,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 0,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 366,
+            "invalidForecast": 0
+          }
+        }
+      ],
+      "continuousGates": [
+        {
+          "family": "derivatives",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 21,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=21; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 14,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=14; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 0,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=0; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 0,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=0; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 0,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=0; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 0,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=0; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 0,
+          "evalRows": 21,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=21; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 0,
+          "evalRows": 14,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=14; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 0,
+          "evalRows": 0,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=0; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 0,
+          "evalRows": 0,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=0; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 0,
+          "evalRows": 0,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=0; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "derivatives",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 0,
+          "evalRows": 0,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=0; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        }
+      ]
+    },
+    {
+      "family": "etf",
+      "featureNames": [
+        "spotEtfFlowUSD",
+        "spotEtfFlow5dUSD",
+        "spotEtfFlow20dUSD",
+        "spotEtfCumulativeFlowUSD",
+        "spotEtfFlowToBtcMarketCap",
+        "spotEtfFlow20dToBtcMarketCap",
+        "spotEtfFlow5dToBtcMarketCap",
+        "spotEtfFlowShockZ90d"
+      ],
+      "status": "ready",
+      "summaries": [
+        {
+          "family": "etf",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 768,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 867,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 761,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 867,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 745,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 867,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 715,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 867,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 685,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 867,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 595,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 867,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 539,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 532,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 516,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 486,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 456,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 366,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        }
+      ],
+      "continuousGates": [
+        {
+          "family": "etf",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 768,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=768; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 761,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=761; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 745,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=745; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 715,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=715; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 685,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=685; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 595,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=595; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 229,
+          "evalRows": 539,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 539,
+            "medianAbsError": 0.03499825098621134,
+            "meanAbsError": 0.0420639608251808,
+            "bias": 0.005653711301810522,
+            "nll": -1.4456562626304272,
+            "pinballLoss": {
+              "q10": 0.010895311354601644,
+              "q50": 0.021123699133437673,
+              "q90": 0.00915954497278577,
+              "mean": 0.013726185153608373
+            },
+            "coverage80": 0.8738404452690167
+          },
+          "model": {
+            "samples": 539,
+            "medianAbsError": 0.10983606786414866,
+            "meanAbsError": 0.11604628231553664,
+            "bias": 0.11344793778708236,
+            "nll": 0.33468384031851817,
+            "pinballLoss": {
+              "q10": 0.04909068776800076,
+              "q50": 0.05682853371852826,
+              "q90": 0.019454117281577872,
+              "mean": 0.04179111292270226
+            },
+            "coverage80": 0.2764378478664193
+          },
+          "improvement": {
+            "meanPinballLoss": -0.028064927769093945,
+            "bootstrapLower95": -0.035109715276585594,
+            "bootstrapUpper95": -0.019092962698621742
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 229,
+          "evalRows": 532,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 532,
+            "medianAbsError": 0.04845168731168206,
+            "meanAbsError": 0.06007104384773456,
+            "bias": 0.010040160107864937,
+            "nll": -1.0982827830430124,
+            "pinballLoss": {
+              "q10": 0.015726745223669618,
+              "q50": 0.03054316528807247,
+              "q90": 0.01171202475025473,
+              "mean": 0.01932731175399893
+            },
+            "coverage80": 0.868421052631579
+          },
+          "model": {
+            "samples": 532,
+            "medianAbsError": 0.20919175186776512,
+            "meanAbsError": 0.2134374465788618,
+            "bias": 0.21288948773363559,
+            "nll": 2.116287079519875,
+            "pinballLoss": {
+              "q10": 0.10635553850601524,
+              "q50": 0.1050291463983758,
+              "q90": 0.03304709016430039,
+              "mean": 0.08147725835623063
+            },
+            "coverage80": 0.17669172932330826
+          },
+          "improvement": {
+            "meanPinballLoss": -0.06214994660223155,
+            "bootstrapLower95": -0.07683599922775348,
+            "bootstrapUpper95": -0.04035183642969932
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 229,
+          "evalRows": 516,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 516,
+            "medianAbsError": 0.07284615754972223,
+            "meanAbsError": 0.08945911918015952,
+            "bias": 0.022260335430954396,
+            "nll": -0.7231030390585182,
+            "pinballLoss": {
+              "q10": 0.021906272675318497,
+              "q50": 0.0461843139138679,
+              "q90": 0.023912989204075866,
+              "mean": 0.030667858597754064
+            },
+            "coverage80": 0.8682170542635659
+          },
+          "model": {
+            "samples": 516,
+            "medianAbsError": 0.49265782482691,
+            "meanAbsError": 0.4935132778254326,
+            "bias": 0.4935132778254326,
+            "nll": 13.792483893645548,
+            "pinballLoss": {
+              "q10": 0.33175239190001193,
+              "q50": 0.2479398459739325,
+              "q90": 0.06278749235968573,
+              "mean": 0.2141599100778768
+            },
+            "coverage80": 0.023255813953488372
+          },
+          "improvement": {
+            "meanPinballLoss": -0.1834920514801229,
+            "bootstrapLower95": -0.2254518829008557,
+            "bootstrapUpper95": -0.13912980019810156
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 229,
+          "evalRows": 486,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 486,
+            "medianAbsError": 0.1256057774510667,
+            "meanAbsError": 0.1245603752981374,
+            "bias": 0.03055734668246239,
+            "nll": -0.482772022705383,
+            "pinballLoss": {
+              "q10": 0.021609479558548462,
+              "q50": 0.06482060385217712,
+              "q90": 0.030109461592322338,
+              "mean": 0.038846515001016046
+            },
+            "coverage80": 0.8765432098765432
+          },
+          "model": {
+            "samples": 486,
+            "medianAbsError": 0.6428244550365455,
+            "meanAbsError": 0.646961183780759,
+            "bias": 0.646961183780759,
+            "nll": 12.783024266206597,
+            "pinballLoss": {
+              "q10": 0.4503537338661623,
+              "q50": 0.31064492306612085,
+              "q90": 0.08428523930317633,
+              "mean": 0.28176129874515343
+            },
+            "coverage80": 0.024691358024691357
+          },
+          "improvement": {
+            "meanPinballLoss": -0.24291478374413725,
+            "bootstrapLower95": -0.30569965855072834,
+            "bootstrapUpper95": -0.18398128408903097
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 229,
+          "evalRows": 456,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 456,
+            "medianAbsError": 0.130907485197236,
+            "meanAbsError": 0.12927183075239423,
+            "bias": 0.03367305397751562,
+            "nll": -0.3784274702821081,
+            "pinballLoss": {
+              "q10": 0.02622241639528648,
+              "q50": 0.06542656691067951,
+              "q90": 0.027946509553881838,
+              "mean": 0.03986516428661589
+            },
+            "coverage80": 0.9758771929824561
+          },
+          "model": {
+            "samples": 456,
+            "medianAbsError": 0.8283589071686818,
+            "meanAbsError": 0.869574988160491,
+            "bias": 0.869574988160491,
+            "nll": 22.341099560092413,
+            "pinballLoss": {
+              "q10": 0.6253604132309254,
+              "q50": 0.4222822223394306,
+              "q90": 0.10658799448974615,
+              "mean": 0.38474354335336763
+            },
+            "coverage80": 0.043859649122807015
+          },
+          "improvement": {
+            "meanPinballLoss": -0.34487837906675134,
+            "bootstrapLower95": -0.4503482212556428,
+            "bootstrapUpper95": -0.23914936168018885
+          }
+        },
+        {
+          "family": "etf",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 229,
+          "evalRows": 366,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 366,
+            "medianAbsError": 0.12499355047073518,
+            "meanAbsError": 0.14903797718110712,
+            "bias": 0.06301936140686629,
+            "nll": 1.2318087204203687,
+            "pinballLoss": {
+              "q10": 0.0635249217797751,
+              "q50": 0.07659266547296541,
+              "q90": 0.02666551149283554,
+              "mean": 0.055594366248525345
+            },
+            "coverage80": 0.3114754098360656
+          },
+          "model": {
+            "samples": 366,
+            "medianAbsError": 0.14140745038282931,
+            "meanAbsError": 0.16972860711006815,
+            "bias": -0.15104026122978523,
+            "nll": 3.8602025832013243,
+            "pinballLoss": {
+              "q10": 0.023826260425037906,
+              "q50": 0.08320964476816194,
+              "q90": 0.09225820460583029,
+              "mean": 0.06643136993301013
+            },
+            "coverage80": 0.2540983606557377
+          },
+          "improvement": {
+            "meanPinballLoss": -0.010837003684484744,
+            "bootstrapLower95": -0.04636561249197495,
+            "bootstrapUpper95": 0.04485223155481175
+          }
+        }
+      ]
+    },
+    {
+      "family": "macro",
+      "featureNames": [
+        "macroFedBalanceSheetChange13w",
+        "macroFedBalanceSheetChange26w",
+        "macroFedFundsRate",
+        "macroFedFundsChange13w",
+        "macroTreasury10yYield",
+        "macroTreasury10yChange30d",
+        "macroTreasury10yChange90d",
+        "macroHighYieldSpread",
+        "macroHighYieldSpreadZ252d",
+        "macroM2Change26w",
+        "macroLiquidityImpulseZ252d",
+        "macroRiskScore"
+      ],
+      "status": "ready",
+      "summaries": [
+        {
+          "family": "macro",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 937,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 698,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 930,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 698,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 914,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 698,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 884,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 698,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 854,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 698,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 764,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 698,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 539,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 532,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 516,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 486,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 456,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 366,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        }
+      ],
+      "continuousGates": [
+        {
+          "family": "macro",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 937,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=937; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 930,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=930; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 914,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=914; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 884,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=884; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 854,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=854; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 0,
+          "evalRows": 764,
+          "status": "not-evaluated",
+          "reason": "sample-starved train=0 eval=764; minimum=60",
+          "baseline": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "model": {
+            "samples": 0,
+            "medianAbsError": null,
+            "meanAbsError": null,
+            "bias": null,
+            "nll": null,
+            "pinballLoss": {
+              "q10": null,
+              "q50": null,
+              "q90": null,
+              "mean": null
+            },
+            "coverage80": null
+          },
+          "improvement": {
+            "meanPinballLoss": null,
+            "bootstrapLower95": null,
+            "bootstrapUpper95": null
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 398,
+          "evalRows": 539,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 539,
+            "medianAbsError": 0.03499825098621134,
+            "meanAbsError": 0.0420639608251808,
+            "bias": 0.005653711301810522,
+            "nll": -1.4367918294147832,
+            "pinballLoss": {
+              "q10": 0.010949816083143481,
+              "q50": 0.02102257686682224,
+              "q90": 0.009504889000873894,
+              "mean": 0.013825760650279871
+            },
+            "coverage80": 0.8868274582560297
+          },
+          "model": {
+            "samples": 539,
+            "medianAbsError": 0.0850306712150628,
+            "meanAbsError": 0.09613712077133453,
+            "bias": 0.09239345581415653,
+            "nll": -0.03263195162452698,
+            "pinballLoss": {
+              "q10": 0.03368304430597435,
+              "q50": 0.04648389177956516,
+              "q90": 0.017304032298420976,
+              "mean": 0.03249032279465345
+            },
+            "coverage80": 0.437847866419295
+          },
+          "improvement": {
+            "meanPinballLoss": -0.01866456214437362,
+            "bootstrapLower95": -0.024505610881358032,
+            "bootstrapUpper95": -0.011455361972337848
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 398,
+          "evalRows": 532,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 532,
+            "medianAbsError": 0.04845168731168206,
+            "meanAbsError": 0.06007104384773456,
+            "bias": 0.010040160107864937,
+            "nll": -1.1016703672711823,
+            "pinballLoss": {
+              "q10": 0.01565450113085768,
+              "q50": 0.030451675851726243,
+              "q90": 0.01366112511394313,
+              "mean": 0.019922434032175706
+            },
+            "coverage80": 0.8853383458646616
+          },
+          "model": {
+            "samples": 532,
+            "medianAbsError": 0.06777636115620482,
+            "meanAbsError": 0.09453059291093177,
+            "bias": 0.07769972291806648,
+            "nll": -0.2695156357799183,
+            "pinballLoss": {
+              "q10": 0.03589403234289078,
+              "q50": 0.043818591072317156,
+              "q90": 0.020046259075290385,
+              "mean": 0.033252960830166045
+            },
+            "coverage80": 0.6052631578947368
+          },
+          "improvement": {
+            "meanPinballLoss": -0.013330526797990419,
+            "bootstrapLower95": -0.02013268802058851,
+            "bootstrapUpper95": -0.005169978438924338
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 398,
+          "evalRows": 516,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 516,
+            "medianAbsError": 0.07284615754972223,
+            "meanAbsError": 0.08945911918015952,
+            "bias": 0.022260335430954396,
+            "nll": -0.714205274195828,
+            "pinballLoss": {
+              "q10": 0.022645866948116024,
+              "q50": 0.045365501420336136,
+              "q90": 0.02436275315830823,
+              "mean": 0.030791373842253444
+            },
+            "coverage80": 0.8410852713178295
+          },
+          "model": {
+            "samples": 516,
+            "medianAbsError": 0.07744117059686402,
+            "meanAbsError": 0.10708738328895774,
+            "bias": 0.04541693248505143,
+            "nll": -0.4227412528107137,
+            "pinballLoss": {
+              "q10": 0.03531330521693205,
+              "q50": 0.052581452339013984,
+              "q90": 0.02122882972453457,
+              "mean": 0.036374529093493535
+            },
+            "coverage80": 0.751937984496124
+          },
+          "improvement": {
+            "meanPinballLoss": -0.00558315525124009,
+            "bootstrapLower95": -0.016236501969468298,
+            "bootstrapUpper95": 0.0016324894280096598
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 398,
+          "evalRows": 486,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 486,
+            "medianAbsError": 0.1256057774510667,
+            "meanAbsError": 0.1245603752981374,
+            "bias": 0.03055734668246239,
+            "nll": -0.4794992723711589,
+            "pinballLoss": {
+              "q10": 0.022293086258893653,
+              "q50": 0.06444330756152215,
+              "q90": 0.031506811933172035,
+              "mean": 0.03941440191786269
+            },
+            "coverage80": 0.831275720164609
+          },
+          "model": {
+            "samples": 486,
+            "medianAbsError": 0.2197746816789239,
+            "meanAbsError": 0.2895939041606724,
+            "bias": 0.25891350821508347,
+            "nll": 3.3450110655630647,
+            "pinballLoss": {
+              "q10": 0.15621407909914992,
+              "q50": 0.1434882166151111,
+              "q90": 0.042543026802430016,
+              "mean": 0.11408177417223032
+            },
+            "coverage80": 0.3868312757201646
+          },
+          "improvement": {
+            "meanPinballLoss": -0.07466737225436772,
+            "bootstrapLower95": -0.12349126134973301,
+            "bootstrapUpper95": -0.03199338050745063
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 398,
+          "evalRows": 456,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 456,
+            "medianAbsError": 0.130907485197236,
+            "meanAbsError": 0.12927183075239423,
+            "bias": 0.03367305397751562,
+            "nll": -0.3970638338257551,
+            "pinballLoss": {
+              "q10": 0.025117585108866816,
+              "q50": 0.06337393454787177,
+              "q90": 0.027940925292350163,
+              "mean": 0.03881081498302962
+            },
+            "coverage80": 0.9714912280701754
+          },
+          "model": {
+            "samples": 456,
+            "medianAbsError": 0.8067832428449244,
+            "meanAbsError": 0.6757210577462375,
+            "bias": 0.6376038068278548,
+            "nll": 22.783959316521138,
+            "pinballLoss": {
+              "q10": 0.48909023816314945,
+              "q50": 0.3410938966528511,
+              "q90": 0.08202068419917016,
+              "mean": 0.3040682730050567
+            },
+            "coverage80": 0.21929824561403508
+          },
+          "improvement": {
+            "meanPinballLoss": -0.2652574580220274,
+            "bootstrapLower95": -0.3436377226371391,
+            "bootstrapUpper95": -0.16939331158065102
+          }
+        },
+        {
+          "family": "macro",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 398,
+          "evalRows": 366,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 366,
+            "medianAbsError": 0.12499355047073518,
+            "meanAbsError": 0.14903797718110712,
+            "bias": 0.06301936140686629,
+            "nll": -0.28806625863142,
+            "pinballLoss": {
+              "q10": 0.02822256481340451,
+              "q50": 0.07208123336404973,
+              "q90": 0.02806132844550467,
+              "mean": 0.0427883755409863
+            },
+            "coverage80": 0.6912568306010929
+          },
+          "model": {
+            "samples": 366,
+            "medianAbsError": 0.48939238864297496,
+            "meanAbsError": 0.4572679658751811,
+            "bias": 0.399408306137749,
+            "nll": 17.2702093616754,
+            "pinballLoss": {
+              "q10": 0.3172369887632661,
+              "q50": 0.23105992334101577,
+              "q90": 0.057090325574376655,
+              "mean": 0.20179574589288596
+            },
+            "coverage80": 0.2459016393442623
+          },
+          "improvement": {
+            "meanPinballLoss": -0.1590073703518998,
+            "bootstrapLower95": -0.22648508268293802,
+            "bootstrapUpper95": -0.08115692803927602
+          }
+        }
+      ]
+    },
+    {
+      "family": "sentiment",
+      "featureNames": [
+        "fearGreedIndex",
+        "fearGreedChange7d",
+        "fearGreedChange30d",
+        "extremeFearEvent",
+        "extremeGreedEvent",
+        "fearGreedResidualDivergence"
+      ],
+      "status": "ready",
+      "summaries": [
+        {
+          "family": "sentiment",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 1634,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 1627,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 1611,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 1581,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 1551,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 1461,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 1,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 539,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 532,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 516,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 486,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 456,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 366,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        }
+      ],
+      "continuousGates": [
+        {
+          "family": "sentiment",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1396,
+          "evalRows": 1634,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1634,
+            "medianAbsError": 0.036116032357539796,
+            "meanAbsError": 0.04995694094892779,
+            "bias": 0.0020287713020658593,
+            "nll": -1.1306164273550547,
+            "pinballLoss": {
+              "q10": 0.01414018820976496,
+              "q50": 0.02501171476771987,
+              "q90": 0.013797157872729936,
+              "mean": 0.017649686950071537
+            },
+            "coverage80": 0.9192166462668299
+          },
+          "model": {
+            "samples": 1634,
+            "medianAbsError": 0.04165172154178363,
+            "meanAbsError": 0.05372806155116425,
+            "bias": -0.005698388918945837,
+            "nll": -1.119334022216587,
+            "pinballLoss": {
+              "q10": 0.014178496171437033,
+              "q50": 0.026809692564455836,
+              "q90": 0.013931021886844681,
+              "mean": 0.018306403540912567
+            },
+            "coverage80": 0.897796817625459
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0006567165908409694,
+            "bootstrapLower95": -0.0010010700980019565,
+            "bootstrapUpper95": -0.0003059421900030774
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1396,
+          "evalRows": 1627,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1627,
+            "medianAbsError": 0.05291837559733896,
+            "meanAbsError": 0.07112307979715182,
+            "bias": 0.0036787766885599663,
+            "nll": -0.7887748081131319,
+            "pinballLoss": {
+              "q10": 0.01984142548486396,
+              "q50": 0.03578057796410199,
+              "q90": 0.019469033965914193,
+              "mean": 0.025030345804959973
+            },
+            "coverage80": 0.9200983405039951
+          },
+          "model": {
+            "samples": 1627,
+            "medianAbsError": 0.06096036295469143,
+            "meanAbsError": 0.07671940179753575,
+            "bias": -0.011428712756211056,
+            "nll": -0.7789944225877344,
+            "pinballLoss": {
+              "q10": 0.01968025235344106,
+              "q50": 0.038518487442186625,
+              "q90": 0.019082373792155237,
+              "mean": 0.02576037119592763
+            },
+            "coverage80": 0.9090350338045482
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0007300253909676064,
+            "bootstrapLower95": -0.001550330597988736,
+            "bootstrapUpper95": 0.00017963299951729268
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1396,
+          "evalRows": 1611,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1611,
+            "medianAbsError": 0.08471878992589388,
+            "meanAbsError": 0.10451171993179513,
+            "bias": 0.0064511169615138276,
+            "nll": -0.4219733169087135,
+            "pinballLoss": {
+              "q10": 0.028191827362445413,
+              "q50": 0.05225530986070519,
+              "q90": 0.028664066751966075,
+              "mean": 0.036370401325038874
+            },
+            "coverage80": 0.9472377405338299
+          },
+          "model": {
+            "samples": 1611,
+            "medianAbsError": 0.09599823779302069,
+            "meanAbsError": 0.11600404546711957,
+            "bias": -0.025482159538016268,
+            "nll": -0.4075439648472864,
+            "pinballLoss": {
+              "q10": 0.029429365168029555,
+              "q50": 0.05763671257989676,
+              "q90": 0.027801085285957584,
+              "mean": 0.03828905434462804
+            },
+            "coverage80": 0.9348230912476723
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0019186530195890927,
+            "bootstrapLower95": -0.0049284363221250216,
+            "bootstrapUpper95": 0.000529899304318214
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1396,
+          "evalRows": 1581,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1581,
+            "medianAbsError": 0.1390177375207363,
+            "meanAbsError": 0.14637703180413766,
+            "bias": 0.010035477202768012,
+            "nll": -0.09814268294580786,
+            "pinballLoss": {
+              "q10": 0.041216380350133204,
+              "q50": 0.07523752940627797,
+              "q90": 0.03991820978878997,
+              "mean": 0.052124039848400326
+            },
+            "coverage80": 0.9848197343453511
+          },
+          "model": {
+            "samples": 1581,
+            "medianAbsError": 0.14855271866137626,
+            "meanAbsError": 0.17401994615434416,
+            "bias": -0.056915476534633455,
+            "nll": -0.06168122936903375,
+            "pinballLoss": {
+              "q10": 0.043282808723267445,
+              "q50": 0.08712660445671333,
+              "q90": 0.03675168334629882,
+              "mean": 0.05572036550875994
+            },
+            "coverage80": 0.9253636938646427
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0035963256603595345,
+            "bootstrapLower95": -0.006555220107499512,
+            "bootstrapUpper95": 0.0003638530519752152
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1396,
+          "evalRows": 1551,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1551,
+            "medianAbsError": 0.1541903602610807,
+            "meanAbsError": 0.1643289150388775,
+            "bias": 0.01600404524680221,
+            "nll": 0.06951263936390267,
+            "pinballLoss": {
+              "q10": 0.0479364754744851,
+              "q50": 0.0886922553050493,
+              "q90": 0.0524608164064239,
+              "mean": 0.06302984906198611
+            },
+            "coverage80": 0.9851708575112831
+          },
+          "model": {
+            "samples": 1551,
+            "medianAbsError": 0.1651796679926803,
+            "meanAbsError": 0.19575425867069973,
+            "bias": -0.07692047277093998,
+            "nll": 0.09548196457396514,
+            "pinballLoss": {
+              "q10": 0.049570611504298534,
+              "q50": 0.10380852057624751,
+              "q90": 0.043695297868534926,
+              "mean": 0.06569147664969362
+            },
+            "coverage80": 0.9432624113475178
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0026616275877075616,
+            "bootstrapLower95": -0.006728980039759266,
+            "bootstrapUpper95": 0.002320610248258956
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1396,
+          "evalRows": 1461,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1461,
+            "medianAbsError": 0.1394415907921285,
+            "meanAbsError": 0.17282905010883265,
+            "bias": 0.021794898429808127,
+            "nll": 0.2373727449137143,
+            "pinballLoss": {
+              "q10": 0.05840033529827749,
+              "q50": 0.09070316379280387,
+              "q90": 0.058068906505860815,
+              "mean": 0.06905746853231409
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 1461,
+            "medianAbsError": 0.14860509911409744,
+            "meanAbsError": 0.20240217429952706,
+            "bias": -0.13029653570524086,
+            "nll": 0.22567240320977247,
+            "pinballLoss": {
+              "q10": 0.07025620261522514,
+              "q50": 0.09742230872815179,
+              "q90": 0.04430286727738493,
+              "mean": 0.07066045954025371
+            },
+            "coverage80": 0.946611909650924
+          },
+          "improvement": {
+            "meanPinballLoss": -0.001602991007939921,
+            "bootstrapLower95": -0.005865352086880032,
+            "bootstrapUpper95": 0.002384484620653846
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2491,
+          "evalRows": 539,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 539,
+            "medianAbsError": 0.03499825098621134,
+            "meanAbsError": 0.0420639608251808,
+            "bias": 0.005653711301810522,
+            "nll": -1.2913878029575991,
+            "pinballLoss": {
+              "q10": 0.01176913132568821,
+              "q50": 0.021051496426497847,
+              "q90": 0.011456800776891131,
+              "mean": 0.014759142843025727
+            },
+            "coverage80": 0.9406307977736549
+          },
+          "model": {
+            "samples": 539,
+            "medianAbsError": 0.0368661741244024,
+            "meanAbsError": 0.04382334877516533,
+            "bias": 0.0007328551249584584,
+            "nll": -1.288744868138888,
+            "pinballLoss": {
+              "q10": 0.011798925359200777,
+              "q50": 0.021907964069480805,
+              "q90": 0.01128209067038313,
+              "mean": 0.014996326699688233
+            },
+            "coverage80": 0.9294990723562152
+          },
+          "improvement": {
+            "meanPinballLoss": -0.00023718385666249945,
+            "bootstrapLower95": -0.0005269423514671135,
+            "bootstrapUpper95": -0.00001773269115345704
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2491,
+          "evalRows": 532,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 532,
+            "medianAbsError": 0.04845168731168206,
+            "meanAbsError": 0.06007104384773456,
+            "bias": 0.010040160107864937,
+            "nll": -0.9460053156302912,
+            "pinballLoss": {
+              "q10": 0.016442745774089388,
+              "q50": 0.030304817946310545,
+              "q90": 0.016574911679172688,
+              "mean": 0.02110749179985749
+            },
+            "coverage80": 0.9398496240601504
+          },
+          "model": {
+            "samples": 532,
+            "medianAbsError": 0.049718935890152756,
+            "meanAbsError": 0.06132622191158769,
+            "bias": 0.0006311613969417714,
+            "nll": -0.952197965273705,
+            "pinballLoss": {
+              "q10": 0.016214708767370797,
+              "q50": 0.03081147243042844,
+              "q90": 0.015629614784306037,
+              "mean": 0.020885265327368424
+            },
+            "coverage80": 0.9398496240601504
+          },
+          "improvement": {
+            "meanPinballLoss": 0.00022222647248911647,
+            "bootstrapLower95": -0.00033124056518555906,
+            "bootstrapUpper95": 0.0007936408473941523
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2491,
+          "evalRows": 516,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 516,
+            "medianAbsError": 0.07284615754972223,
+            "meanAbsError": 0.08945911918015952,
+            "bias": 0.022260335430954396,
+            "nll": -0.5657933200989759,
+            "pinballLoss": {
+              "q10": 0.0229367683474483,
+              "q50": 0.04477127948070302,
+              "q90": 0.024884101775183326,
+              "mean": 0.03086404986777821
+            },
+            "coverage80": 0.9496124031007752
+          },
+          "model": {
+            "samples": 516,
+            "medianAbsError": 0.08104362691066502,
+            "meanAbsError": 0.09437315551811527,
+            "bias": 0.0036414955589172343,
+            "nll": -0.5783267831326415,
+            "pinballLoss": {
+              "q10": 0.022131132479946865,
+              "q50": 0.04720065402255881,
+              "q90": 0.023939815293343242,
+              "mean": 0.03109053393194962
+            },
+            "coverage80": 0.9437984496124031
+          },
+          "improvement": {
+            "meanPinballLoss": -0.00022648406417143517,
+            "bootstrapLower95": -0.0019367635714863478,
+            "bootstrapUpper95": 0.0017305476094332597
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2491,
+          "evalRows": 486,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 486,
+            "medianAbsError": 0.1256057774510667,
+            "meanAbsError": 0.1245603752981374,
+            "bias": 0.03055734668246239,
+            "nll": -0.2691918780960774,
+            "pinballLoss": {
+              "q10": 0.031838901090668226,
+              "q50": 0.06323876731759566,
+              "q90": 0.034514758482198586,
+              "mean": 0.04319747563015417
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 486,
+            "medianAbsError": 0.10718795015810804,
+            "meanAbsError": 0.12223842536057494,
+            "bias": -0.007853391435408502,
+            "nll": -0.2875544057150221,
+            "pinballLoss": {
+              "q10": 0.03341941531081672,
+              "q50": 0.06134992067700857,
+              "q90": 0.03212274876988256,
+              "mean": 0.042297361585902624
+            },
+            "coverage80": 0.9979423868312757
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0009001140442515331,
+            "bootstrapLower95": -0.0015454087710279464,
+            "bootstrapUpper95": 0.0032521463653117024
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2491,
+          "evalRows": 456,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 456,
+            "medianAbsError": 0.130907485197236,
+            "meanAbsError": 0.12927183075239423,
+            "bias": 0.03367305397751562,
+            "nll": -0.12999291242654124,
+            "pinballLoss": {
+              "q10": 0.03965946261264373,
+              "q50": 0.0634474295617312,
+              "q90": 0.04462476701537771,
+              "mean": 0.049243886396584224
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 456,
+            "medianAbsError": 0.10058703455708787,
+            "meanAbsError": 0.12078155719439093,
+            "bias": -0.02115709134622946,
+            "nll": -0.1699572382170359,
+            "pinballLoss": {
+              "q10": 0.04118501395213892,
+              "q50": 0.06017243154912101,
+              "q90": 0.03685023419973052,
+              "mean": 0.0460692265669968
+            },
+            "coverage80": 1
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0031746598295874047,
+            "bootstrapLower95": -0.00009289052553580757,
+            "bootstrapUpper95": 0.006929343227192201
+          }
+        },
+        {
+          "family": "sentiment",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2491,
+          "evalRows": 366,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 366,
+            "medianAbsError": 0.12499355047073518,
+            "meanAbsError": 0.14903797718110712,
+            "bias": 0.06301936140686629,
+            "nll": 0.04266837506864121,
+            "pinballLoss": {
+              "q10": 0.04778903179666912,
+              "q50": 0.07170753303750009,
+              "q90": 0.04749116765523578,
+              "mean": 0.05566257749646832
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 366,
+            "medianAbsError": 0.1282597273585251,
+            "meanAbsError": 0.1402693758961248,
+            "bias": -0.005502334888532493,
+            "nll": -0.03255467547061888,
+            "pinballLoss": {
+              "q10": 0.05309929447843503,
+              "q50": 0.0701481034857725,
+              "q90": 0.04401869206056786,
+              "mean": 0.05575536334159176
+            },
+            "coverage80": 1
+          },
+          "improvement": {
+            "meanPinballLoss": -0.00009278584512343522,
+            "bootstrapLower95": -0.003667113228203759,
+            "bootstrapUpper95": 0.003212432666121814
+          }
+        }
+      ]
+    },
+    {
+      "family": "stablecoins",
+      "featureNames": [
+        "stablecoinSupplyUSD",
+        "stablecoinSupplyChange7d",
+        "stablecoinSupplyChange30d",
+        "stablecoinSupplyChange90d",
+        "stablecoinSupplyChange365d",
+        "stablecoinSupplyZ365d",
+        "stablecoinLiquidityImpulse30dVsAnnual",
+        "stablecoinSupplyToBtcMarketCap"
+      ],
+      "status": "ready",
+      "summaries": [
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 1635,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 1628,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 1612,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 1582,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 1552,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 1462,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 539,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 532,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 516,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 486,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 456,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 366,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        }
+      ],
+      "continuousGates": [
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1635,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1635,
+            "medianAbsError": 0.03609464057755566,
+            "meanAbsError": 0.04993021122082195,
+            "bias": 0.0020313554391874606,
+            "nll": -1.1283380581833602,
+            "pinballLoss": {
+              "q10": 0.013647404608974798,
+              "q50": 0.025045811238645552,
+              "q90": 0.014191353076675482,
+              "mean": 0.01762818964143196
+            },
+            "coverage80": 0.9125382262996942
+          },
+          "model": {
+            "samples": 1635,
+            "medianAbsError": 0.06684537217844369,
+            "meanAbsError": 0.08943206084974166,
+            "bias": 0.05289634495347506,
+            "nll": -0.7123786057359361,
+            "pinballLoss": {
+              "q10": 0.02788871561208159,
+              "q50": 0.044071341484589646,
+              "q90": 0.01884174804144556,
+              "mean": 0.030267268379372363
+            },
+            "coverage80": 0.671559633027523
+          },
+          "improvement": {
+            "meanPinballLoss": -0.012639078737940346,
+            "bootstrapLower95": -0.018700618014600764,
+            "bootstrapUpper95": -0.008267624635378569
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1628,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1628,
+            "medianAbsError": 0.05293906907417871,
+            "meanAbsError": 0.07116121316869561,
+            "bias": 0.0035946962307227474,
+            "nll": -0.7912441286038964,
+            "pinballLoss": {
+              "q10": 0.019094737940102097,
+              "q50": 0.03566672611757352,
+              "q90": 0.019951239642709506,
+              "mean": 0.024904234566795063
+            },
+            "coverage80": 0.9170761670761671
+          },
+          "model": {
+            "samples": 1628,
+            "medianAbsError": 0.11572651931365978,
+            "meanAbsError": 0.15857714733395234,
+            "bias": 0.09758000614660878,
+            "nll": 0.001055614211441628,
+            "pinballLoss": {
+              "q10": 0.05773486068285528,
+              "q50": 0.07819622206986471,
+              "q90": 0.028768129257948395,
+              "mean": 0.05489973733688928
+            },
+            "coverage80": 0.6228501228501229
+          },
+          "improvement": {
+            "meanPinballLoss": -0.029995502770094443,
+            "bootstrapLower95": -0.04163470170624026,
+            "bootstrapUpper95": -0.019924811261481486
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1612,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1612,
+            "medianAbsError": 0.08490501320988293,
+            "meanAbsError": 0.10458859462590626,
+            "bias": 0.006305406760645035,
+            "nll": -0.4183817783967175,
+            "pinballLoss": {
+              "q10": 0.027761554068014428,
+              "q50": 0.0522587416294701,
+              "q90": 0.029502243824106125,
+              "mean": 0.03650751317386361
+            },
+            "coverage80": 0.9460297766749379
+          },
+          "model": {
+            "samples": 1612,
+            "medianAbsError": 0.22971073072911075,
+            "meanAbsError": 0.3259219340067917,
+            "bias": 0.19061606272714965,
+            "nll": 1.3815482874580078,
+            "pinballLoss": {
+              "q10": 0.14628788054509256,
+              "q50": 0.16292124732595495,
+              "q90": 0.047470820964313855,
+              "mean": 0.11889331627845423
+            },
+            "coverage80": 0.5502481389578163
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0823858031045899,
+            "bootstrapLower95": -0.10906732608259216,
+            "bootstrapUpper95": -0.0575889175736139
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1582,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1582,
+            "medianAbsError": 0.13906946318595462,
+            "meanAbsError": 0.14641339291532518,
+            "bias": 0.009900245984749338,
+            "nll": -0.06883864991037741,
+            "pinballLoss": {
+              "q10": 0.039366567794383606,
+              "q50": 0.07548515598680973,
+              "q90": 0.043356707256621385,
+              "mean": 0.05273614367927153
+            },
+            "coverage80": 0.9848293299620733
+          },
+          "model": {
+            "samples": 1582,
+            "medianAbsError": 0.376825990800952,
+            "meanAbsError": 0.5973969724123207,
+            "bias": 0.36529294770669773,
+            "nll": 3.0191687289859552,
+            "pinballLoss": {
+              "q10": 0.3231811799610638,
+              "q50": 0.2971180098829102,
+              "q90": 0.0809400914660114,
+              "mean": 0.23374642710332813
+            },
+            "coverage80": 0.5587863463969659
+          },
+          "improvement": {
+            "meanPinballLoss": -0.18101028342405703,
+            "bootstrapLower95": -0.2425090600680963,
+            "bootstrapUpper95": -0.12814399204320606
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1552,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1552,
+            "medianAbsError": 0.15424400586572096,
+            "meanAbsError": 0.1643763165527847,
+            "bias": 0.0158404498151852,
+            "nll": 0.10462455529153235,
+            "pinballLoss": {
+              "q10": 0.04567700390428345,
+              "q50": 0.08630008052705357,
+              "q90": 0.0572491394180085,
+              "mean": 0.06307540794978171
+            },
+            "coverage80": 0.9826030927835051
+          },
+          "model": {
+            "samples": 1552,
+            "medianAbsError": 0.5072367135924576,
+            "meanAbsError": 0.741265037931356,
+            "bias": 0.4472624538649022,
+            "nll": 3.3086898565489657,
+            "pinballLoss": {
+              "q10": 0.39752045623921767,
+              "q50": 0.3671945171990273,
+              "q90": 0.10231319858131292,
+              "mean": 0.28900939067318643
+            },
+            "coverage80": 0.5618556701030928
+          },
+          "improvement": {
+            "meanPinballLoss": -0.225933982723404,
+            "bootstrapLower95": -0.3068098027067767,
+            "bootstrapUpper95": -0.1633041390609893
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 1128,
+          "evalRows": 1462,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1462,
+            "medianAbsError": 0.1393994469752437,
+            "meanAbsError": 0.17272108398870614,
+            "bias": 0.02176974283410791,
+            "nll": 0.28314208655787937,
+            "pinballLoss": {
+              "q10": 0.06128967928106237,
+              "q50": 0.08619451682177219,
+              "q90": 0.0649070170399633,
+              "mean": 0.07079707104759943
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 1462,
+            "medianAbsError": 0.4931478990189719,
+            "meanAbsError": 0.5632430094740676,
+            "bias": 0.14018172093155892,
+            "nll": 1.469394629715223,
+            "pinballLoss": {
+              "q10": 0.20115949123151253,
+              "q50": 0.28192348618639607,
+              "q90": 0.07864111254407789,
+              "mean": 0.1872413633206627
+            },
+            "coverage80": 0.5930232558139535
+          },
+          "improvement": {
+            "meanPinballLoss": -0.11644429227306276,
+            "bootstrapLower95": -0.16361600967953277,
+            "bootstrapUpper95": -0.0745744075157721
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 539,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 539,
+            "medianAbsError": 0.03499825098621134,
+            "meanAbsError": 0.0420639608251808,
+            "bias": 0.005653711301810522,
+            "nll": -1.299708893792819,
+            "pinballLoss": {
+              "q10": 0.01145549238912327,
+              "q50": 0.02105509045390955,
+              "q90": 0.011607008432071565,
+              "mean": 0.014705863758368154
+            },
+            "coverage80": 0.935064935064935
+          },
+          "model": {
+            "samples": 539,
+            "medianAbsError": 0.03501388467876577,
+            "meanAbsError": 0.04209555333865076,
+            "bias": 0.004562687743345551,
+            "nll": -1.3044816308091431,
+            "pinballLoss": {
+              "q10": 0.011465105084536228,
+              "q50": 0.021120562347350238,
+              "q90": 0.01136078194213327,
+              "mean": 0.014648816458006563
+            },
+            "coverage80": 0.9313543599257885
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0000570473003615469,
+            "bootstrapLower95": -0.00005078812870859472,
+            "bootstrapUpper95": 0.00018342106435540755
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 532,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 532,
+            "medianAbsError": 0.04845168731168206,
+            "meanAbsError": 0.06007104384773456,
+            "bias": 0.010040160107864937,
+            "nll": -0.9592650797932426,
+            "pinballLoss": {
+              "q10": 0.01606547481093889,
+              "q50": 0.03024548060156978,
+              "q90": 0.016770919661135364,
+              "mean": 0.02102729169121468
+            },
+            "coverage80": 0.9304511278195489
+          },
+          "model": {
+            "samples": 532,
+            "medianAbsError": 0.04977353353556366,
+            "meanAbsError": 0.059839797946149874,
+            "bias": 0.006751466662550583,
+            "nll": -0.9683622299376162,
+            "pinballLoss": {
+              "q10": 0.01630358791554562,
+              "q50": 0.030397449760889168,
+              "q90": 0.0159230182049018,
+              "mean": 0.0208746852937789
+            },
+            "coverage80": 0.9323308270676691
+          },
+          "improvement": {
+            "meanPinballLoss": 0.00015260639743580896,
+            "bootstrapLower95": -0.00021125050673420105,
+            "bootstrapUpper95": 0.0004907146361475408
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 516,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 516,
+            "medianAbsError": 0.07284615754972223,
+            "meanAbsError": 0.08945911918015952,
+            "bias": 0.022260335430954396,
+            "nll": -0.576801442217708,
+            "pinballLoss": {
+              "q10": 0.02259473500415204,
+              "q50": 0.044724642769322254,
+              "q90": 0.025098740570894586,
+              "mean": 0.030806039448122987
+            },
+            "coverage80": 0.939922480620155
+          },
+          "model": {
+            "samples": 516,
+            "medianAbsError": 0.06772406711407788,
+            "meanAbsError": 0.08841750655198788,
+            "bias": 0.018407957640908267,
+            "nll": -0.5901044619683248,
+            "pinballLoss": {
+              "q10": 0.022528031365641403,
+              "q50": 0.044206772499010366,
+              "q90": 0.02595336432460389,
+              "mean": 0.03089605606308525
+            },
+            "coverage80": 0.9321705426356589
+          },
+          "improvement": {
+            "meanPinballLoss": -0.00009001661496224266,
+            "bootstrapLower95": -0.0005673115635456101,
+            "bootstrapUpper95": 0.0009144471895452099
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 486,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 486,
+            "medianAbsError": 0.1256057774510667,
+            "meanAbsError": 0.1245603752981374,
+            "bias": 0.03055734668246239,
+            "nll": -0.2647134845412926,
+            "pinballLoss": {
+              "q10": 0.030038403746481927,
+              "q50": 0.06292537355721729,
+              "q90": 0.035617923362402215,
+              "mean": 0.042860566888700366
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 486,
+            "medianAbsError": 0.13005274871811268,
+            "meanAbsError": 0.12614167886820202,
+            "bias": -0.025202052273856516,
+            "nll": -0.2861884537605673,
+            "pinballLoss": {
+              "q10": 0.033926273622272934,
+              "q50": 0.06440753318947649,
+              "q90": 0.03124655645290221,
+              "mean": 0.04319345442155051
+            },
+            "coverage80": 1
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0003328875328500813,
+            "bootstrapLower95": -0.0027862715924915505,
+            "bootstrapUpper95": 0.002625043860800419
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 456,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 456,
+            "medianAbsError": 0.130907485197236,
+            "meanAbsError": 0.12927183075239423,
+            "bias": 0.03367305397751562,
+            "nll": -0.12295877982841208,
+            "pinballLoss": {
+              "q10": 0.0361668923578667,
+              "q50": 0.06318372296178996,
+              "q90": 0.047363505274872895,
+              "mean": 0.04890470686484319
+            },
+            "coverage80": 0.9978070175438597
+          },
+          "model": {
+            "samples": 456,
+            "medianAbsError": 0.1181542175236209,
+            "meanAbsError": 0.13305730826561935,
+            "bias": -0.09099314998598956,
+            "nll": -0.11507795509552951,
+            "pinballLoss": {
+              "q10": 0.044699409583587514,
+              "q50": 0.0781322666547738,
+              "q90": 0.03511968097574759,
+              "mean": 0.05265045240470295
+            },
+            "coverage80": 1
+          },
+          "improvement": {
+            "meanPinballLoss": -0.003745745539859761,
+            "bootstrapLower95": -0.010784201374476042,
+            "bootstrapUpper95": 0.005160799770984609
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2224,
+          "evalRows": 366,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 366,
+            "medianAbsError": 0.12499355047073518,
+            "meanAbsError": 0.14903797718110712,
+            "bias": 0.06301936140686629,
+            "nll": 0.052415773044619536,
+            "pinballLoss": {
+              "q10": 0.04798278832330472,
+              "q50": 0.07391312481609993,
+              "q90": 0.04964786388836638,
+              "mean": 0.05718125900925705
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 366,
+            "medianAbsError": 0.13812303097500164,
+            "meanAbsError": 0.16337834354071934,
+            "bias": -0.12323496308961582,
+            "nll": 0.0219526094136037,
+            "pinballLoss": {
+              "q10": 0.0560298384689216,
+              "q50": 0.07552356315482087,
+              "q90": 0.032453086594521875,
+              "mean": 0.054668829406088054
+            },
+            "coverage80": 1
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0025124296031689432,
+            "bootstrapLower95": -0.0066026017154357875,
+            "bootstrapUpper95": 0.014895547294209223
+          }
+        }
+      ]
+    },
+    {
+      "family": "cot",
+      "featureNames": [
+        "cmeCotOpenInterestBtc",
+        "cmeCotLeveragedMoneyNetPctOi",
+        "cmeCotLeveragedMoneyNetPctRank",
+        "cmeCotAssetManagerNetPctOi",
+        "cmeCotAssetManagerNetPctRank",
+        "cmeCotDealerNetPctOi",
+        "cmeCotDealerNetPctRank",
+        "cmeCotOpenInterestChange4w",
+        "cmeCotOpenInterestPctRank"
+      ],
+      "status": "ready",
+      "summaries": [
+        {
+          "family": "cot",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 1635,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 1628,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 1612,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 1582,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 1552,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 1462,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 539,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 532,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 516,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 486,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 456,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 366,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        }
+      ],
+      "continuousGates": [
+        {
+          "family": "cot",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 994,
+          "evalRows": 1635,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1635,
+            "medianAbsError": 0.03609464057755566,
+            "meanAbsError": 0.04993021122082195,
+            "bias": 0.0020313554391874606,
+            "nll": -1.1140417944636807,
+            "pinballLoss": {
+              "q10": 0.013699650045951514,
+              "q50": 0.02504821308543521,
+              "q90": 0.014208553670393769,
+              "mean": 0.017652138933926836
+            },
+            "coverage80": 0.9137614678899083
+          },
+          "model": {
+            "samples": 1635,
+            "medianAbsError": 0.06200505847237397,
+            "meanAbsError": 0.07785638087417274,
+            "bias": 0.024665909347918305,
+            "nll": -0.8934540182432936,
+            "pinballLoss": {
+              "q10": 0.018605887342861793,
+              "q50": 0.03862562816867013,
+              "q90": 0.01765704682879344,
+              "mean": 0.024962854113441783
+            },
+            "coverage80": 0.7486238532110092
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0073107151795149625,
+            "bootstrapLower95": -0.009874118049301517,
+            "bootstrapUpper95": -0.005419863296327594
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 994,
+          "evalRows": 1628,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1628,
+            "medianAbsError": 0.05293906907417871,
+            "meanAbsError": 0.07116121316869561,
+            "bias": 0.0035946962307227474,
+            "nll": -0.7704440805664591,
+            "pinballLoss": {
+              "q10": 0.019705752794920917,
+              "q50": 0.03581523781428923,
+              "q90": 0.02026485485442014,
+              "mean": 0.025261948487876808
+            },
+            "coverage80": 0.9213759213759214
+          },
+          "model": {
+            "samples": 1628,
+            "medianAbsError": 0.07557621828731587,
+            "meanAbsError": 0.09582881094994807,
+            "bias": 0.005802255755528338,
+            "nll": -0.6639918681378036,
+            "pinballLoss": {
+              "q10": 0.02121481289454744,
+              "q50": 0.04791660193096722,
+              "q90": 0.02273145226235753,
+              "mean": 0.030620955695957335
+            },
+            "coverage80": 0.8286240786240786
+          },
+          "improvement": {
+            "meanPinballLoss": -0.005359007208080594,
+            "bootstrapLower95": -0.008790980341744496,
+            "bootstrapUpper95": -0.0031547016375542167
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 994,
+          "evalRows": 1612,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1612,
+            "medianAbsError": 0.08490501320988293,
+            "meanAbsError": 0.10458859462590626,
+            "bias": 0.006305406760645035,
+            "nll": -0.39165834640877145,
+            "pinballLoss": {
+              "q10": 0.028745307719437202,
+              "q50": 0.052299290300547065,
+              "q90": 0.0301241484466217,
+              "mean": 0.037056248822202056
+            },
+            "coverage80": 0.9553349875930521
+          },
+          "model": {
+            "samples": 1612,
+            "medianAbsError": 0.11222076608401299,
+            "meanAbsError": 0.13657347291664354,
+            "bias": -0.10105413827806084,
+            "nll": -0.3050949156324084,
+            "pinballLoss": {
+              "q10": 0.035163489356512354,
+              "q50": 0.06900503754719596,
+              "q90": 0.02544159266459509,
+              "mean": 0.04320337318943436
+            },
+            "coverage80": 0.8728287841191067
+          },
+          "improvement": {
+            "meanPinballLoss": -0.006147124367232403,
+            "bootstrapLower95": -0.010160239453043632,
+            "bootstrapUpper95": -0.002435919123482615
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 994,
+          "evalRows": 1582,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1582,
+            "medianAbsError": 0.13906946318595462,
+            "meanAbsError": 0.14641339291532518,
+            "bias": 0.009900245984749338,
+            "nll": -0.057345602809383354,
+            "pinballLoss": {
+              "q10": 0.04056861618272113,
+              "q50": 0.07852568090183142,
+              "q90": 0.042178583693313336,
+              "mean": 0.053757626925955246
+            },
+            "coverage80": 0.9848293299620733
+          },
+          "model": {
+            "samples": 1582,
+            "medianAbsError": 0.4368397944539595,
+            "meanAbsError": 0.41994458763771103,
+            "bias": -0.0015993703188272267,
+            "nll": 1.1419635476101349,
+            "pinballLoss": {
+              "q10": 0.1168278950533151,
+              "q50": 0.20898133540019154,
+              "q90": 0.08693272845457056,
+              "mean": 0.13758065296935854
+            },
+            "coverage80": 0.3975979772439949
+          },
+          "improvement": {
+            "meanPinballLoss": -0.08382302604340375,
+            "bootstrapLower95": -0.11041147263221185,
+            "bootstrapUpper95": -0.0652769828712727
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 994,
+          "evalRows": 1552,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1552,
+            "medianAbsError": 0.15424400586572096,
+            "meanAbsError": 0.1643763165527847,
+            "bias": 0.0158404498151852,
+            "nll": 0.09245407123809696,
+            "pinballLoss": {
+              "q10": 0.046895127832431,
+              "q50": 0.10052071337469565,
+              "q90": 0.051651820144392624,
+              "mean": 0.06635588711717309
+            },
+            "coverage80": 0.9845360824742269
+          },
+          "model": {
+            "samples": 1552,
+            "medianAbsError": 0.43463098179852233,
+            "meanAbsError": 0.582584700541132,
+            "bias": 0.3317851788485885,
+            "nll": 2.649118616214838,
+            "pinballLoss": {
+              "q10": 0.27236289856802554,
+              "q50": 0.29072649384882154,
+              "q90": 0.0812231552751199,
+              "mean": 0.2147708492306558
+            },
+            "coverage80": 0.49420103092783507
+          },
+          "improvement": {
+            "meanPinballLoss": -0.14841496211348262,
+            "bootstrapLower95": -0.19943683298633474,
+            "bootstrapUpper95": -0.09706575720016145
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "trainRows": 994,
+          "evalRows": 1462,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 1462,
+            "medianAbsError": 0.1393994469752437,
+            "meanAbsError": 0.17272108398870614,
+            "bias": 0.02176974283410791,
+            "nll": 0.26387599557932145,
+            "pinballLoss": {
+              "q10": 0.06423747656522164,
+              "q50": 0.09067613631800361,
+              "q90": 0.057247510982595784,
+              "mean": 0.07072037462194031
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 1462,
+            "medianAbsError": 0.8144232097067081,
+            "meanAbsError": 0.9321769302686189,
+            "bias": 0.517170554457123,
+            "nll": 6.501730586946338,
+            "pinballLoss": {
+              "q10": 0.5045419991836091,
+              "q50": 0.4629448543383227,
+              "q90": 0.17145989417752025,
+              "mean": 0.3796489158998163
+            },
+            "coverage80": 0.27906976744186046
+          },
+          "improvement": {
+            "meanPinballLoss": -0.30892854127787694,
+            "bootstrapLower95": -0.38227513922992595,
+            "bootstrapUpper95": -0.2191385098999689
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2090,
+          "evalRows": 539,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 539,
+            "medianAbsError": 0.03499825098621134,
+            "meanAbsError": 0.0420639608251808,
+            "bias": 0.005653711301810522,
+            "nll": -1.295472448836957,
+            "pinballLoss": {
+              "q10": 0.01147003373535108,
+              "q50": 0.021049876545581388,
+              "q90": 0.011615833667695204,
+              "mean": 0.014711914649542595
+            },
+            "coverage80": 0.935064935064935
+          },
+          "model": {
+            "samples": 539,
+            "medianAbsError": 0.03588578485134349,
+            "meanAbsError": 0.042065022631710254,
+            "bias": 0.00534789412342685,
+            "nll": -1.3045995561596329,
+            "pinballLoss": {
+              "q10": 0.01148244355237306,
+              "q50": 0.021020895067286806,
+              "q90": 0.011354411188329996,
+              "mean": 0.014619249935996628
+            },
+            "coverage80": 0.9387755102040817
+          },
+          "improvement": {
+            "meanPinballLoss": 0.00009266471354594534,
+            "bootstrapLower95": -0.00007652490999459505,
+            "bootstrapUpper95": 0.00025794746723388436
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2090,
+          "evalRows": 532,
+          "status": "watch",
+          "reason": "mean pinball improves, but bootstrap lower95 is not positive",
+          "baseline": {
+            "samples": 532,
+            "medianAbsError": 0.04845168731168206,
+            "meanAbsError": 0.06007104384773456,
+            "bias": 0.010040160107864937,
+            "nll": -0.9512171005544691,
+            "pinballLoss": {
+              "q10": 0.016154723811276448,
+              "q50": 0.030273892539894248,
+              "q90": 0.016766634216958017,
+              "mean": 0.021065083522709534
+            },
+            "coverage80": 0.9323308270676691
+          },
+          "model": {
+            "samples": 532,
+            "medianAbsError": 0.04699192313342093,
+            "meanAbsError": 0.05951678099656314,
+            "bias": 0.015602046619127941,
+            "nll": -0.9678256387978543,
+            "pinballLoss": {
+              "q10": 0.015878722022408375,
+              "q50": 0.02962246445146247,
+              "q90": 0.01762954083841686,
+              "mean": 0.02104357577076254
+            },
+            "coverage80": 0.9304511278195489
+          },
+          "improvement": {
+            "meanPinballLoss": 0.000021507751947012742,
+            "bootstrapLower95": -0.0005901141873742969,
+            "bootstrapUpper95": 0.0006930140761755545
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2090,
+          "evalRows": 516,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 516,
+            "medianAbsError": 0.07284615754972223,
+            "meanAbsError": 0.08945911918015952,
+            "bias": 0.022260335430954396,
+            "nll": -0.5667560158029601,
+            "pinballLoss": {
+              "q10": 0.022902987308272896,
+              "q50": 0.04475880704879126,
+              "q90": 0.025604207354016334,
+              "mean": 0.031088667237026836
+            },
+            "coverage80": 0.9515503875968992
+          },
+          "model": {
+            "samples": 516,
+            "medianAbsError": 0.06936808913263731,
+            "meanAbsError": 0.09204134928859013,
+            "bias": 0.04798835707733221,
+            "nll": -0.5799915075579166,
+            "pinballLoss": {
+              "q10": 0.02166183524274191,
+              "q50": 0.04478608543851408,
+              "q90": 0.026966593335718284,
+              "mean": 0.031138171338991417
+            },
+            "coverage80": 0.8914728682170543
+          },
+          "improvement": {
+            "meanPinballLoss": -0.0000495041019645841,
+            "bootstrapLower95": -0.002821305108469143,
+            "bootstrapUpper95": 0.0020281227522291737
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2090,
+          "evalRows": 486,
+          "status": "eligible-for-manual-review",
+          "reason": "pinball improvement lower95 is positive without material 80% coverage degradation",
+          "baseline": {
+            "samples": 486,
+            "medianAbsError": 0.1256057774510667,
+            "meanAbsError": 0.1245603752981374,
+            "bias": 0.03055734668246239,
+            "nll": -0.26624078312857735,
+            "pinballLoss": {
+              "q10": 0.030853811559497773,
+              "q50": 0.0632783510559345,
+              "q90": 0.03490374916107142,
+              "mean": 0.04301197059216786
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 486,
+            "medianAbsError": 0.12581779781383756,
+            "meanAbsError": 0.12343002256601449,
+            "bias": 0.0134734644072193,
+            "nll": -0.3627410792569359,
+            "pinballLoss": {
+              "q10": 0.027146771665015817,
+              "q50": 0.061758821453220425,
+              "q90": 0.029752307603345737,
+              "mean": 0.0395526335738607
+            },
+            "coverage80": 0.9979423868312757
+          },
+          "improvement": {
+            "meanPinballLoss": 0.003459337018307252,
+            "bootstrapLower95": 0.0016699258958270177,
+            "bootstrapUpper95": 0.00550706232869037
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2090,
+          "evalRows": 456,
+          "status": "context-only",
+          "reason": "continuous residual gate did not beat the current residual-decay baseline",
+          "baseline": {
+            "samples": 456,
+            "medianAbsError": 0.130907485197236,
+            "meanAbsError": 0.12927183075239423,
+            "bias": 0.03367305397751562,
+            "nll": -0.14365637395761535,
+            "pinballLoss": {
+              "q10": 0.03695157915777632,
+              "q50": 0.06333693451515672,
+              "q90": 0.04197567971932356,
+              "mean": 0.04742139779741887
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 456,
+            "medianAbsError": 0.1259545480775841,
+            "meanAbsError": 0.13584324603817718,
+            "bias": -0.09238491758501312,
+            "nll": -0.24245559038764933,
+            "pinballLoss": {
+              "q10": 0.040694262259679814,
+              "q50": 0.0710933773372643,
+              "q90": 0.024696137219225454,
+              "mean": 0.04549459227205643
+            },
+            "coverage80": 0.9605263157894737
+          },
+          "improvement": {
+            "meanPinballLoss": 0.0019268055253623465,
+            "bootstrapLower95": -0.002900407831294807,
+            "bootstrapUpper95": 0.008153389406057816
+          }
+        },
+        {
+          "family": "cot",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "trainRows": 2090,
+          "evalRows": 366,
+          "status": "eligible-for-manual-review",
+          "reason": "pinball improvement lower95 is positive without material 80% coverage degradation",
+          "baseline": {
+            "samples": 366,
+            "medianAbsError": 0.12499355047073518,
+            "meanAbsError": 0.14903797718110712,
+            "bias": 0.06301936140686629,
+            "nll": 0.027733786890164307,
+            "pinballLoss": {
+              "q10": 0.048358040017089966,
+              "q50": 0.0723379060589304,
+              "q90": 0.043799263873815095,
+              "mean": 0.05483173664994519
+            },
+            "coverage80": 1
+          },
+          "model": {
+            "samples": 366,
+            "medianAbsError": 0.10213075006284464,
+            "meanAbsError": 0.11090145912721802,
+            "bias": 0.028614666011758126,
+            "nll": -0.2053989195003908,
+            "pinballLoss": {
+              "q10": 0.028974986709985343,
+              "q50": 0.054603002536836934,
+              "q90": 0.0368970743998367,
+              "mean": 0.040158354548886395
+            },
+            "coverage80": 0.9972677595628415
+          },
+          "improvement": {
+            "meanPinballLoss": 0.014673382101058835,
+            "bootstrapLower95": 0.01123696984360708,
+            "bootstrapUpper95": 0.019307685386569472
+          }
+        }
+      ]
+    }
+  ]
+}

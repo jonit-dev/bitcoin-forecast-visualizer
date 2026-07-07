@@ -28,6 +28,11 @@ export interface BacktestMetricRow {
     interval90: number | null;
     interval95: number | null;
   };
+  intervalWidthRatio: {
+    interval80: number | null;
+    interval90: number | null;
+    interval95: number | null;
+  };
 }
 
 const QUANTILES = [
@@ -41,6 +46,15 @@ const QUANTILES = [
 export function pinballLoss(actual: number, predicted: number, quantile: number): number {
   const error = actual - predicted;
   return Math.max(quantile * error, (quantile - 1) * error);
+}
+
+export function pinballLosses(actual: number, predictions: Record<number, number>): Record<number, number> {
+  return Object.fromEntries(
+    Object.entries(predictions).map(([quantile, predicted]) => {
+      const q = Number(quantile);
+      return [q, pinballLoss(actual, predicted, q)];
+    })
+  );
 }
 
 export function intervalCoverage(actual: number, low: number, high: number): boolean {
@@ -92,6 +106,11 @@ export function aggregateForecastMetrics(inputs: MetricInput[]): BacktestMetricR
     interval90: coverageRate(inputs, 'q05', 'q95'),
     interval95: coverageRate(inputs, 'q025', 'q975'),
   };
+  const intervalWidthRatio = {
+    interval80: intervalWidthRatioMean(inputs, 'q10', 'q90'),
+    interval90: intervalWidthRatioMean(inputs, 'q05', 'q95'),
+    interval95: intervalWidthRatioMean(inputs, 'q025', 'q975'),
+  };
 
   return {
     samples: inputs.length,
@@ -102,6 +121,7 @@ export function aggregateForecastMetrics(inputs: MetricInput[]): BacktestMetricR
     nll: mean(nlls),
     pinballLoss: pinball,
     coverage,
+    intervalWidthRatio,
   };
 }
 
@@ -120,4 +140,20 @@ function coverageRate(
 
   if (covered.length === 0) return null;
   return covered.filter(Boolean).length / covered.length;
+}
+
+function intervalWidthRatioMean(
+  inputs: MetricInput[],
+  lowKey: 'q025' | 'q05' | 'q10',
+  highKey: 'q90' | 'q95' | 'q975'
+): number | null {
+  const widths = inputs
+    .map(({ forecast }) => {
+      const low = forecast.quantiles?.[lowKey];
+      const high = forecast.quantiles?.[highKey];
+      return low && high && forecast.median > 0 ? (high - low) / forecast.median : null;
+    })
+    .filter((value): value is number => value !== null && Number.isFinite(value));
+
+  return mean(widths);
 }

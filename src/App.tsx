@@ -89,6 +89,12 @@ function formatCompactCount(n: number): string {
   return n.toLocaleString();
 }
 
+function featureStatusLabel(status: string): string {
+  if (status === 'eligible-for-manual-review') return 'manual review';
+  if (status === 'disabled-negative-result') return 'disabled';
+  return status;
+}
+
 export default function App() {
   const [activeAssetId, setActiveAssetId] = useState<MarketAssetId>('btc');
   const [marketDataByAsset] = useState<Record<MarketAssetId, MarketData>>(() => ({
@@ -106,6 +112,23 @@ export default function App() {
   const tailRisk = currentRegimeSummary.tailRisk;
   const derivativesContext = currentRegimeSummary.derivativesContext;
   const networkContext = currentRegimeSummary.networkContext;
+  const featureStatusRows = useMemo(() =>
+    (reliabilitySummary.featureExperimentStatus ?? [])
+      .filter(row => row.family !== 'all-features')
+      .sort((a, b) => {
+        const priority: Record<string, number> = {
+          'eligible-for-manual-review': 4,
+          watch: 3,
+          'context-only': 2,
+          'disabled-negative-result': 1,
+        };
+        return (priority[b.status] ?? 0) - (priority[a.status] ?? 0) || a.family.localeCompare(b.family);
+      })
+      .slice(0, 4),
+    [reliabilitySummary.featureExperimentStatus]
+  );
+  const residualModelStatus = reliabilitySummary.featureExperimentStatus?.find(row => row.family === 'all-features') ?? null;
+  const tier3Status = reliabilitySummary.tier3Status;
   const halvingInfo = useMemo(() => getHalvingInfo(), []);
   const [horizon, setHorizon] = useState(180);
   const [confidenceLevel, setConfidenceLevel] = useState<keyof typeof CONFIDENCE_Z_SCORES>(0.95);
@@ -181,10 +204,11 @@ export default function App() {
       calibrationLabel: coefficientAwareCalibrationLabel(
         probabilityForecast.horizonDays,
         probabilityForecast.calibrationLabel,
-        powerLawStabilitySummary.verdict
+        powerLawStabilitySummary.verdict,
+        reliabilitySummary.coreAssumptions
       ),
     };
-  }, [activeAssetId, probabilityForecast, powerLawStabilitySummary.verdict]);
+  }, [activeAssetId, probabilityForecast, powerLawStabilitySummary.verdict, reliabilitySummary.coreAssumptions]);
 
   const historicalCount = useMemo(() =>
     activeDisplayData.filter((d: any) => !d.isForecast).length,
@@ -633,7 +657,7 @@ export default function App() {
 
               <div className="space-y-1.5 md:space-y-2">
                 <label className="text-[10px] md:text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                  {coefficientAwareCalibrationLabel(horizon, 'Interval Band', activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined)}
+                  {coefficientAwareCalibrationLabel(horizon, 'Interval Band', activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)}
                 </label>
                 <select
                   value={confidenceLevel}
@@ -645,7 +669,7 @@ export default function App() {
                   <option value={0.8}>{formatIntervalOption(0.8, horizon, adjustedProbabilityForecast?.calibrationLabel)}</option>
                 </select>
                 <p className="text-[10px] leading-relaxed text-zinc-500">
-                  {coefficientStabilityTrustCopy(horizon, activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined)}
+                  {coefficientStabilityTrustCopy(horizon, activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)}
                 </p>
               </div>
 
@@ -730,6 +754,53 @@ export default function App() {
                   {reliabilitySummary.ensembleEnabled ? 'Regime ensemble' : 'Power-law'}
                 </span>
               </div>
+              {tier3Status && (
+                <div className="grid grid-cols-2 gap-2 border-t border-white/5 pt-2">
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-zinc-500">Ensemble</p>
+                    <p className={cn("truncate text-[10px] font-mono", tier3Status.ensemble.enabled ? "text-emerald-300" : "text-zinc-300")}>
+                      {featureStatusLabel(tier3Status.ensemble.status)}
+                    </p>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-zinc-500">Tail Risk</p>
+                    <p className={cn(
+                      "truncate text-[10px] font-mono",
+                      tier3Status.tailRisk.enabled ? "text-emerald-300" :
+                        tier3Status.tailRisk.status === 'eligible-for-manual-review' ? "text-amber-300" :
+                          "text-zinc-300"
+                    )}>
+                      {featureStatusLabel(tier3Status.tailRisk.status)}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {featureStatusRows.length > 0 && (
+                <div className="space-y-2 border-t border-white/5 pt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs md:text-sm text-zinc-400">Feature Gates</span>
+                    <span className="text-[10px] font-mono text-zinc-500">
+                      {residualModelStatus ? featureStatusLabel(residualModelStatus.status) : 'report-only'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {featureStatusRows.map(row => (
+                      <div key={row.family} className="min-w-0 rounded-md border border-white/5 bg-black/20 px-2 py-1.5">
+                        <p className="truncate text-[10px] text-zinc-500">{row.family}</p>
+                        <p className={cn(
+                          "mt-0.5 truncate text-[10px] font-mono",
+                          row.status === 'eligible-for-manual-review' ? "text-amber-300" :
+                            row.status === 'watch' ? "text-sky-300" :
+                              row.status === 'disabled-negative-result' ? "text-zinc-500" :
+                                "text-zinc-300"
+                        )}>
+                          {featureStatusLabel(row.status)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span className="text-xs md:text-sm text-zinc-400">180d+ Stability</span>
                 <span className={cn(
@@ -741,7 +812,7 @@ export default function App() {
               </div>
               {horizon >= 180 && (
                 <p className="text-[10px] leading-relaxed text-zinc-500">
-                  {coefficientStabilityTrustCopy(horizon, powerLawStabilitySummary.verdict)}
+                  {coefficientStabilityTrustCopy(horizon, powerLawStabilitySummary.verdict, reliabilitySummary.coreAssumptions)}
                 </p>
               )}
               {horizon < 180 && powerLawStabilitySummary.verdict === 'unstable' && (

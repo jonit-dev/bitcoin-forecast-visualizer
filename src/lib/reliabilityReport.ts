@@ -11,6 +11,38 @@ export interface ReliabilitySummary {
   horizonConfidence: Record<string, { powerlawError: number; naiveError: number; status: string }>;
   ensembleEnabled: boolean;
   ensembleReason: string;
+  featureExperimentStatus?: {
+    family: string;
+    status: 'context-only' | 'watch' | 'eligible-for-manual-review' | 'disabled-negative-result';
+    latestReportPath: string | null;
+    holdoutWindow: string | null;
+    primaryMetric: string;
+    promotionReason: string;
+  }[];
+  tier3Status?: {
+    ensemble: {
+      status: 'active' | 'disabled' | 'watch' | 'eligible-for-manual-review' | 'context-only';
+      enabled: boolean;
+      latestReportPath: string | null;
+      reason: string;
+      weightsByHorizon?: Record<string, Record<string, number>>;
+    };
+    tailRisk: {
+      status: 'active' | 'context-only' | 'watch' | 'eligible-for-manual-review';
+      enabled: boolean;
+      latestReportPath: string | null;
+      reason: string;
+    };
+  };
+  coreAssumptions?: {
+    generatedAt: string;
+    longHorizonLabel: 'Scenario range' | 'Directional only';
+    reason: string;
+    coefficientStability: { verdict: 'stable' | 'watch' | 'unstable'; reportPath: string | null };
+    tau: { verdict: 'stable' | 'watch' | 'unstable'; selectedModelId: string | null; reportPath: string | null };
+    cycle: { verdict: 'stable' | 'watch' | 'unstable'; selectedModelId: string | null; reportPath: string | null };
+    residualBootstrap: { verdict: 'stable' | 'watch' | 'unstable'; selectedModelId: string | null; reportPath: string | null };
+  };
 }
 
 export interface SourceFreshness {

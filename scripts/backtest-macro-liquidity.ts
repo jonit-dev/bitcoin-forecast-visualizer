@@ -312,6 +312,7 @@ function renderMarkdown(report: any): string {
     `- Leakage policy: ${report.preRegistration.leakagePolicy}`,
     `- Promotion gate: ${report.preRegistration.promotionGate}`,
     `- Limitation: ${report.preRegistration.limitations}`,
+    '- Diagnostic policy: sparse event/state outputs are diagnostics only; `npm run backtest:features-continuous` is the PRD v2.9 promotion gate.',
     '',
     '## Regime summary',
     '',

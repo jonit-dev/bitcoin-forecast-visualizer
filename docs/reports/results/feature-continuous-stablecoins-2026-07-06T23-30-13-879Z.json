@@ -1,0 +1,214 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-06T23:30:13.879Z",
+    "command": "npm run backtest:features-continuous -- --family stablecoins",
+    "gitCommit": "84d1321b94c3d32e6e1b9f8cfee8532d1a7be99d",
+    "holdoutStarts": [
+      "2022-01-01",
+      "2025-01-01"
+    ],
+    "horizons": [
+      7,
+      14,
+      30,
+      60,
+      90,
+      180
+    ],
+    "minimumContinuousRows": 60,
+    "dataset": {
+      "btcRows": 5828,
+      "btcFirstDate": "2010-07-17",
+      "btcLastDate": "2026-06-30",
+      "featureRows": 5827,
+      "featureFirstDate": "2010-07-18",
+      "featureLastDate": "2026-06-30"
+    }
+  },
+  "families": [
+    {
+      "family": "stablecoins",
+      "featureNames": [
+        "stablecoinSupplyUSD",
+        "stablecoinSupplyChange7d",
+        "stablecoinSupplyChange30d",
+        "stablecoinSupplyChange90d",
+        "stablecoinSupplyChange365d",
+        "stablecoinSupplyZ365d",
+        "stablecoinLiquidityImpulse30dVsAnnual",
+        "stablecoinSupplyToBtcMarketCap"
+      ],
+      "status": "ready",
+      "summaries": [
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1635,
+          "lagSafeRows": 1635,
+          "filteredRows": 1635,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1628,
+          "lagSafeRows": 1628,
+          "filteredRows": 1628,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1612,
+          "lagSafeRows": 1612,
+          "filteredRows": 1612,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1582,
+          "lagSafeRows": 1582,
+          "filteredRows": 1582,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1552,
+          "lagSafeRows": 1552,
+          "filteredRows": 1552,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2022-01-01",
+          "rawRows": 1462,
+          "lagSafeRows": 1462,
+          "filteredRows": 1462,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 7,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 539,
+          "lagSafeRows": 539,
+          "filteredRows": 539,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 14,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 532,
+          "lagSafeRows": 532,
+          "filteredRows": 532,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 30,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 516,
+          "lagSafeRows": 516,
+          "filteredRows": 516,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 60,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 486,
+          "lagSafeRows": 486,
+          "filteredRows": 486,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 90,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 456,
+          "lagSafeRows": 456,
+          "filteredRows": 456,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        },
+        {
+          "family": "stablecoins",
+          "horizonDays": 180,
+          "holdoutStart": "2025-01-01",
+          "rawRows": 366,
+          "lagSafeRows": 366,
+          "filteredRows": 366,
+          "skipped": {
+            "missingFeatureRow": 0,
+            "futureSourceDate": 0,
+            "missingFeatureValue": 0,
+            "invalidForecast": 0
+          }
+        }
+      ]
+    }
+  ]
+}

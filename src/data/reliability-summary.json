@@ -1,30 +1,156 @@
 {
-  "generatedAt": "2026-07-01T18:00:01.709Z",
-  "reportPath": "docs/reports/results/backtest-2026-06-12T23-23-47-413Z.json",
+  "generatedAt": "2026-07-07T01:42:12.422Z",
+  "reportPath": "docs/reports/results/backtest-2026-07-07T00-13-06-964Z.json",
   "qualityGateStatus": "PASS",
   "reliabilityScore": 98,
   "horizonConfidence": {
     "14d": {
-      "powerlawError": 0.05295976255101852,
-      "naiveError": 0.05416838433249539,
+      "powerlawError": 0.05293906907417875,
+      "naiveError": 0.05453301092566323,
       "status": "beats-naive"
     },
     "30d": {
-      "powerlawError": 0.08298569588394204,
-      "naiveError": 0.08705149379219239,
+      "powerlawError": 0.08490501320988297,
+      "naiveError": 0.08808128999082342,
       "status": "beats-naive"
     },
     "60d": {
-      "powerlawError": 0.139283603438968,
-      "naiveError": 0.14222123729788122,
+      "powerlawError": 0.13906946318595456,
+      "naiveError": 0.1448326571210388,
       "status": "beats-naive"
     },
     "90d": {
-      "powerlawError": 0.15546004332117405,
-      "naiveError": 0.18897599783635985,
+      "powerlawError": 0.15424400586572096,
+      "naiveError": 0.18719665862999596,
       "status": "beats-naive"
     }
   },
   "ensembleEnabled": false,
-  "ensembleReason": "Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample."
+  "ensembleReason": "Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample.",
+  "coreAssumptions": {
+    "generatedAt": "2026-07-07T01:42:12.447Z",
+    "longHorizonLabel": "Directional only",
+    "reason": "coefficients=unstable; tau=watch; cycle=stable; residuals=stable",
+    "coefficientStability": {
+      "verdict": "unstable",
+      "reportPath": "docs/reports/results/powerlaw-refit-2026-07-06T23-24-54-127Z.json"
+    },
+    "tau": {
+      "verdict": "watch",
+      "selectedModelId": "powerlaw-tau-120",
+      "reportPath": "docs/reports/results/tau-sweep-2026-07-06T23-24-56-582Z.json"
+    },
+    "cycle": {
+      "verdict": "stable",
+      "selectedModelId": "powerlaw-cycle-no-future-pivots",
+      "reportPath": "docs/reports/results/backtest-2026-07-06T23-24-55-891Z.json"
+    },
+    "residualBootstrap": {
+      "verdict": "stable",
+      "selectedModelId": "powerlaw-residual-recent-730d",
+      "reportPath": "docs/reports/results/backtest-2026-07-06T23-25-16-361Z.json"
+    }
+  },
+  "featureExperimentStatus": [
+    {
+      "family": "onchain",
+      "status": "context-only",
+      "latestReportPath": "docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.json",
+      "holdoutWindow": "2025-01-01",
+      "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+      "promotionReason": "continuous residual gate did not beat the current residual-decay baseline"
+    },
+    {
+      "family": "derivatives",
+      "status": "context-only",
+      "latestReportPath": "docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.json",
+      "holdoutWindow": "2022-01-01",
+      "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+      "promotionReason": "sample-starved train=0 eval=15; minimum=60"
+    },
+    {
+      "family": "etf",
+      "status": "context-only",
+      "latestReportPath": "docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.json",
+      "holdoutWindow": "2025-01-01",
+      "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+      "promotionReason": "continuous residual gate did not beat the current residual-decay baseline"
+    },
+    {
+      "family": "macro",
+      "status": "context-only",
+      "latestReportPath": "docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.json",
+      "holdoutWindow": "2025-01-01",
+      "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+      "promotionReason": "continuous residual gate did not beat the current residual-decay baseline"
+    },
+    {
+      "family": "sentiment",
+      "status": "watch",
+      "latestReportPath": "docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.json",
+      "holdoutWindow": "2025-01-01",
+      "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+      "promotionReason": "mean pinball improves, but bootstrap lower95 is not positive"
+    },
+    {
+      "family": "stablecoins",
+      "status": "watch",
+      "latestReportPath": "docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.json",
+      "holdoutWindow": "2025-01-01",
+      "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+      "promotionReason": "mean pinball improves, but bootstrap lower95 is not positive"
+    },
+    {
+      "family": "cot",
+      "status": "eligible-for-manual-review",
+      "latestReportPath": "docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.json",
+      "holdoutWindow": "2025-01-01",
+      "primaryMetric": "mean pinball loss across q10/q50/q90 residual quantiles",
+      "promotionReason": "pinball improvement lower95 is positive without material 80% coverage degradation"
+    },
+    {
+      "family": "all-features",
+      "status": "disabled-negative-result",
+      "latestReportPath": "docs/reports/results/residual-model-2026-07-07T00-14-32-622Z.json",
+      "holdoutWindow": "2022-01-01, 2025-01-01",
+      "primaryMetric": "walk-forward kitchen-sink residual model mean pinball loss",
+      "promotionReason": "Kitchen-sink feature residual model did not beat pure residual decay broadly enough to enable new alpha."
+    }
+  ],
+  "tier3Status": {
+    "ensemble": {
+      "status": "disabled",
+      "enabled": false,
+      "latestReportPath": "docs/reports/results/backtest-2026-07-07T00-13-11-162Z.json",
+      "reason": "ensemble did not beat the best single member reliably",
+      "weightsByHorizon": {
+        "14": {
+          "gbm-recent-drift": 0.30732452032502655,
+          "ma-trend-20-50-200": 0.33350849899679785,
+          "powerlaw-current": 0.3591669806781757
+        },
+        "30": {
+          "gbm-recent-drift": 0.2925845313299822,
+          "ma-trend-20-50-200": 0.32549123138667474,
+          "powerlaw-current": 0.3819242372833431
+        },
+        "60": {
+          "gbm-recent-drift": 0.2647148201391619,
+          "ma-trend-20-50-200": 0.3285835367348109,
+          "powerlaw-current": 0.4067016431260272
+        },
+        "90": {
+          "gbm-recent-drift": 0.24850170076391564,
+          "ma-trend-20-50-200": 0.31195953023791834,
+          "powerlaw-current": 0.4395387689981661
+        }
+      }
+    },
+    "tailRisk": {
+      "status": "eligible-for-manual-review",
+      "enabled": false,
+      "latestReportPath": "docs/reports/results/backtest-2026-07-07T00-13-13-889Z.json",
+      "reason": "at least one conditional multiplier improved flagged-window coverage within guardrails"
+    }
+  }
 }

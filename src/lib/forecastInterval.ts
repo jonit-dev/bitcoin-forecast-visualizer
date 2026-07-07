@@ -1,6 +1,8 @@
 import type { OHLCVData } from './api';
-import { INTERVAL_CONFIG } from './modelConfig';
-import { POWER_LAW_MEAN_REVERSION_TAU_DAYS } from './powerLaw';
+import { INTERVAL_CONFIG, RESIDUAL_BOOTSTRAP_CONFIG } from './modelConfig';
+import { POWER_LAW_MEAN_REVERSION_TAU_DAYS, powerLawForecast } from './powerLaw';
+
+export type ResidualBootstrapPolicyId = 'recent-730d' | 'full-history' | 'vol-regime-stratified';
 
 export const CONFIDENCE_Z_SCORES = {
   0.95: 1.96,
@@ -30,6 +32,15 @@ export interface PowerLawInterval {
   coverageStatus: string;
 }
 
+interface ResidualRow {
+  index: number;
+  residual: number;
+  volatility: number;
+}
+
+const RESIDUAL_ROWS_CACHE = new WeakMap<OHLCVData[], ResidualRow[]>();
+const RESIDUAL_SIGMA_MULTIPLIER_CACHE = new WeakMap<OHLCVData[], Map<string, number>>();
+
 export function computePowerLawInterval(input: PowerLawIntervalInput): PowerLawInterval | null {
   const { ohlcv, horizonDays, median, currentPrice } = input;
   if (ohlcv.length < 365 || horizonDays < 1 || median <= 0 || currentPrice <= 0) return null;
@@ -55,6 +66,69 @@ export function computePowerLawInterval(input: PowerLawIntervalInput): PowerLawI
   };
 }
 
+export function computeResidualBootstrapSigmaMultiplier(
+  ohlcv: OHLCVData[],
+  horizonDays: number,
+  policyId: ResidualBootstrapPolicyId,
+  endIndex: number = ohlcv.length - 1
+): number {
+  if (horizonDays < 1 || endIndex < 365) return 1;
+  const cache = residualSigmaMultiplierCache(ohlcv);
+  const cacheKey = `${policyId}:${endIndex}:${horizonDays}`;
+  const cached = cache.get(cacheKey);
+  if (cached !== undefined) return cached;
+
+  const residuals = residualsForPolicy(ohlcv, endIndex, policyId);
+  if (residuals.length < RESIDUAL_BOOTSTRAP_CONFIG.blockDays * 4) {
+    cache.set(cacheKey, 1);
+    return 1;
+  }
+
+  const sampled = sampleResidualBlocksDeterministically({
+    residuals,
+    blockDays: RESIDUAL_BOOTSTRAP_CONFIG.blockDays,
+    horizonDays,
+    simulations: RESIDUAL_BOOTSTRAP_CONFIG.simulations,
+    seed: 0xB007500 + horizonDays * 997 + policyId.length * 131 + endIndex,
+  });
+  const sampledSd = sampleStandardDeviation(sampled);
+  const baseVol = blendedPowerLawHeatmapVol(ohlcv.slice(0, endIndex + 1));
+  const baseSigma = Math.sqrt(powerLawResidualVariance(horizonDays, baseVol));
+  const multiplier = !Number.isFinite(sampledSd) || sampledSd <= 0 || !Number.isFinite(baseSigma) || baseSigma <= 0
+    ? 1
+    : Math.max(0.7, Math.min(1.8, sampledSd / baseSigma));
+  cache.set(cacheKey, multiplier);
+  return multiplier;
+}
+
+export function sampleResidualBlocksDeterministically(input: {
+  residuals: number[];
+  blockDays: number;
+  horizonDays: number;
+  simulations: number;
+  seed: number;
+}): number[] {
+  const residuals = input.residuals.filter(Number.isFinite);
+  if (residuals.length === 0 || input.horizonDays < 1 || input.simulations < 1) return [];
+  const blockDays = Math.max(1, Math.min(input.blockDays, residuals.length));
+  const rng = mulberry32(input.seed);
+  const totals: number[] = [];
+
+  for (let simulation = 0; simulation < input.simulations; simulation++) {
+    let total = 0;
+    let sampledDays = 0;
+    while (sampledDays < input.horizonDays) {
+      const start = Math.floor(rng() * Math.max(1, residuals.length - blockDays + 1));
+      for (let offset = 0; offset < blockDays && sampledDays < input.horizonDays; offset++, sampledDays++) {
+        total += residuals[start + offset];
+      }
+    }
+    totals.push(total);
+  }
+
+  return totals;
+}
+
 export function intervalMultiplierForHorizon(horizonDays: number): number {
   const table = [...INTERVAL_CONFIG.fittedMultipliers].sort((a, b) => a.horizonDays - b.horizonDays);
   const direct = table.find(row => row.horizonDays === horizonDays);
@@ -74,11 +148,6 @@ export function intervalMultiplierForHorizon(horizonDays: number): number {
   }
 
   return last.multiplier;
-}
-
-export function legacyStressMultiplierForHorizon(horizonDays: number): number {
-  const { base, amplitude, tauDays } = INTERVAL_CONFIG.stressMultiplier;
-  return base + amplitude * (1 - Math.exp(-horizonDays / tauDays));
 }
 
 export function blendedPowerLawHeatmapVol(ohlcv: OHLCVData[]) {
@@ -145,6 +214,103 @@ function computeLogReturnStats(ohlcv: OHLCVData[], lookback: number) {
     meanReturn,
     dailyVol: Math.sqrt(variance),
   };
+}
+
+function residualsForPolicy(
+  ohlcv: OHLCVData[],
+  endIndex: number,
+  policyId: ResidualBootstrapPolicyId
+): number[] {
+  const all = residualRowsForData(ohlcv).filter(row => row.index <= endIndex);
+  if (policyId === 'full-history') return all.map(row => row.residual);
+  if (policyId === 'recent-730d') return all.slice(-RESIDUAL_BOOTSTRAP_CONFIG.recentLookbackDays).map(row => row.residual);
+
+  const currentVol = trailingVolatility(ohlcv, endIndex, 30);
+  const vols = all.map(row => row.volatility).filter(Number.isFinite).sort((a, b) => a - b);
+  const lowCutoff = percentile(vols, 0.33);
+  const highCutoff = percentile(vols, 0.67);
+  const currentBucket = volatilityBucket(currentVol, lowCutoff, highCutoff);
+  const sameBucket = all.filter(row => volatilityBucket(row.volatility, lowCutoff, highCutoff) === currentBucket).map(row => row.residual);
+  return sameBucket.length >= RESIDUAL_BOOTSTRAP_CONFIG.blockDays * 4 ? sameBucket : all.map(row => row.residual);
+}
+
+function residualRowsForData(ohlcv: OHLCVData[]): ResidualRow[] {
+  const cached = RESIDUAL_ROWS_CACHE.get(ohlcv);
+  if (cached) return cached;
+
+  const rows: ResidualRow[] = [];
+  for (let index = 1; index < ohlcv.length; index++) {
+    const previous = ohlcv[index - 1];
+    const current = ohlcv[index];
+    if (previous.close <= 0 || current.close <= 0) continue;
+    const previousDate = parseDate(previous.date);
+    const currentDate = parseDate(current.date);
+    const expected = powerLawForecast(currentDate, previous.close, previousDate);
+    if (!Number.isFinite(expected) || expected <= 0) continue;
+    rows.push({
+      index,
+      residual: Math.log(current.close / expected),
+      volatility: trailingVolatility(ohlcv, index, 30),
+    });
+  }
+  const filtered = rows.filter(row => Number.isFinite(row.residual) && Number.isFinite(row.volatility));
+  RESIDUAL_ROWS_CACHE.set(ohlcv, filtered);
+  return filtered;
+}
+
+function residualSigmaMultiplierCache(ohlcv: OHLCVData[]): Map<string, number> {
+  let cache = RESIDUAL_SIGMA_MULTIPLIER_CACHE.get(ohlcv);
+  if (!cache) {
+    cache = new Map();
+    RESIDUAL_SIGMA_MULTIPLIER_CACHE.set(ohlcv, cache);
+  }
+  return cache;
+}
+
+function trailingVolatility(ohlcv: OHLCVData[], endIndex: number, lookback: number): number {
+  const start = Math.max(1, endIndex - lookback + 1);
+  const returns: number[] = [];
+  for (let index = start; index <= endIndex; index++) {
+    const previous = ohlcv[index - 1];
+    const current = ohlcv[index];
+    if (previous?.close > 0 && current?.close > 0) returns.push(Math.log(current.close / previous.close));
+  }
+  return sampleStandardDeviation(returns);
+}
+
+function volatilityBucket(value: number, lowCutoff: number, highCutoff: number): 'low' | 'normal' | 'high' {
+  if (value <= lowCutoff) return 'low';
+  if (value >= highCutoff) return 'high';
+  return 'normal';
+}
+
+function sampleStandardDeviation(values: number[]): number {
+  if (values.length < 2) return 0;
+  const avg = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const variance = values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / (values.length - 1);
+  return Math.sqrt(variance);
+}
+
+function percentile(sortedValues: number[], p: number): number {
+  if (sortedValues.length === 0) return Number.NaN;
+  const index = (sortedValues.length - 1) * p;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) return sortedValues[lower];
+  return sortedValues[lower] + (sortedValues[upper] - sortedValues[lower]) * (index - lower);
+}
+
+function mulberry32(seed: number) {
+  return () => {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function parseDate(date: string): Date {
+  return new Date(`${date}T00:00:00Z`);
 }
 
 function calibrationLabel(horizonDays: number): string {

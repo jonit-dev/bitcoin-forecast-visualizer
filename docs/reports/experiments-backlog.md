@@ -675,3 +675,193 @@ Rerun if:
 ### Next better experiment
 
 If latest-observation FRED macro fails, do not tune macro score weights on the same holdout. Use ALFRED vintages or a different macro hypothesis before revisiting.
+
+---
+
+## 2026-07-06 — Continuous residual feature-family redesign
+
+Status: `completed`
+
+### Hypothesis
+
+The failed sparse/event feature studies may be too brittle. Continuous, lag-safe residual features across on-chain, derivatives, ETF, macro, sentiment, stablecoins, and COT families may improve residual-distribution calibration without directly overfitting the median forecast.
+
+### Data/source changes
+
+No production forecast inputs were enabled. The experiment added a lag-safe residual-feature dataset builder for feature families and horizons `7/14/30/60/90/180d`, with explicit source-date checks and holdout windows.
+
+### Validation setup
+
+Script: `scripts/backtest-feature-family.ts`
+
+- Command: `npm run backtest:features-continuous`
+- Baseline: current residual-decay distribution.
+- Candidate: pre-holdout ridge residual model per family/horizon/holdout.
+- Holdouts: `2022-01-01` where history supports it, otherwise `2025-01-01`.
+- Metrics: q10/q50/q90 pinball loss, NLL, 80% residual coverage, sample counts, and block-bootstrap pinball-loss improvement intervals.
+- Promotion gate: positive mean pinball improvement with positive lower95 and no material coverage degradation.
+
+### Report artifacts
+
+- `docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.md`
+- `docs/reports/results/feature-continuous-all-2026-07-07T00-13-44-633Z.json`
+
+### Result / verdict
+
+Verdict: mixed, report-only. Do not move the production forecast from these signals.
+
+- `onchain`, `etf`, and `macro`: `context-only`; continuous residual gates did not beat the current residual-decay baseline.
+- `derivatives`: `context-only`; sample-starved in the usable holdout.
+- `sentiment` and `stablecoins`: `watch`; mean pinball improved in pockets, but bootstrap lower95 did not clear promotion.
+- `cot`: `eligible-for-manual-review`; some gates cleared pinball/coverage criteria, but this remains report-only until reviewed and promoted explicitly.
+
+### Rerun criteria
+
+Rerun if:
+
+1. New forward holdout history materially changes sample counts.
+2. A family source or feature construction changes materially.
+3. The residual baseline changes.
+4. COT manual review produces a pre-registered promotion candidate.
+
+### Next better experiment
+
+Keep all families out of forecast alpha until a family-specific candidate is reviewed against fresh holdout data and the default `npm run backtest` gate passes with the signal enabled.
+
+---
+
+## 2026-07-06 — Kitchen-sink residual model
+
+Status: `completed — rejected`
+
+### Hypothesis
+
+A walk-forward model using all available lag-safe feature families may improve residual quantile calibration more than single-family gates.
+
+### Data/source changes
+
+No new data source. The model consumes the existing lag-safe feature table and records selected feature names and training windows for each origin.
+
+### Validation setup
+
+Script: `scripts/backtest-residual-model.ts`
+
+- Command: `npm run backtest:residual-model`
+- Candidate: walk-forward kitchen-sink residual model.
+- Baseline: current residual-decay distribution.
+- Metrics: q10/q50/q90 pinball loss and 80% residual coverage.
+- Leakage guard: every evaluation records training end date before evaluation origin.
+
+### Report artifacts
+
+- `docs/reports/results/residual-model-2026-07-07T00-14-32-622Z.md`
+- `docs/reports/results/residual-model-2026-07-07T00-14-32-622Z.json`
+
+### Result / verdict
+
+Verdict: `disabled-negative-result`.
+
+The kitchen-sink model did not beat pure residual decay broadly enough to enable new alpha. Keep it as a negative research result and do not wire it into production forecasts.
+
+### Rerun criteria
+
+Rerun only if:
+
+1. The feature table changes materially.
+2. A simpler pre-registered residual model is proposed.
+3. Fresh forward data gives a materially larger evaluation window.
+
+### Next better experiment
+
+Prefer family-specific, interpretable residual hypotheses over a broad kitchen-sink model.
+
+---
+
+## 2026-07-06 — Buy-zone scoring diagnostics
+
+Status: `completed`
+
+### Hypothesis
+
+Composite bottom-zone features may identify historically favorable entry zones, but BTC bottom samples are small and overlapping.
+
+### Data/source changes
+
+Added a report-only buy-zone summary based on residual percentile, MVRV percentile, realized-price distance, and drawdown pain.
+
+### Validation setup
+
+Script: `scripts/backtest-buy-zones.ts`
+
+- Command: `npm run backtest:buy-zones`
+- Metrics: 1y/2y forward returns, 1y max gain, 180d worst drawdown, event counts, and pooled sample diagnostics.
+- Promotion gate: sample threshold must be met before any product wording can imply forecast alpha.
+
+### Report artifacts
+
+- `docs/reports/results/buy-zone-backtest-2026-07-07T00-14-33-435Z.md`
+- `src/data/buy-zone-summary.json`
+
+### Result / verdict
+
+Verdict: `candidate/watch`, not forecast alpha.
+
+Latest run: 4,929 scored points, 12 zones, latest score `0.647`, not heavy-buy. Event samples remain below the documented promotion threshold, so this remains context only.
+
+### Rerun criteria
+
+Rerun when the feature table updates or if thresholds are changed before looking at new holdout results.
+
+### Next better experiment
+
+Use buy-zone state as a watch/context overlay only. Do not let it move median forecasts or interval widths without a separate promotion gate.
+
+---
+
+## 2026-07-06 — Validation-weighted ensemble and tail-risk promotion gates
+
+Status: `completed`
+
+### Hypothesis
+
+Validation-weighted blends of power-law, GBM-recent-drift, and MA-trend models, or conditional tail-risk interval multipliers, may improve forecast calibration after core-model and feature evidence is available.
+
+### Data/source changes
+
+No new source. Added explicit disabled configuration and report-only suites for ensemble and tail-risk candidates.
+
+### Validation setup
+
+Scripts:
+
+- `npm run backtest:ensemble-suite`
+- `npm run backtest:tail-risk-suite`
+
+Baseline: current `powerlaw-current` forecast distribution. Production enablement requires the corresponding suite gate to pass when the config is explicitly enabled.
+
+### Report artifacts
+
+- `docs/reports/results/backtest-2026-07-07T00-13-11-162Z.json`
+- `docs/reports/results/backtest-2026-07-07T00-13-11-162Z.md`
+- `docs/reports/results/backtest-2026-07-07T00-13-13-889Z.json`
+- `docs/reports/results/backtest-2026-07-07T00-13-13-889Z.md`
+
+### Result / verdict
+
+Verdict: report-only.
+
+- Ensemble: `disabled`; it did not beat the best single member reliably enough to promote.
+- Tail risk: `eligible-for-manual-review`, but `enabled=false`; conditional multipliers need explicit review before they can affect intervals.
+
+### Rerun criteria
+
+Rerun if:
+
+1. The baseline model changes.
+2. Ensemble member definitions or weights change.
+3. Tail-risk flag definitions or multiplier grids change.
+4. Manual review proposes enabling either feature.
+
+### Next better experiment
+
+Do not enable ensemble or tail-risk behavior unless the relevant config is changed intentionally and the enabled-mode `npm run backtest` gate passes.

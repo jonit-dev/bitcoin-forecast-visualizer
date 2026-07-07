@@ -30,10 +30,15 @@ export function basePowerLawPrice(t: number): number {
 }
 
 export function powerLawForecast(dateFuture: Date, currentPrice: number, currentDate: Date): number {
+  return powerLawForecastWithTau(dateFuture, currentPrice, currentDate, POWER_LAW_MEAN_REVERSION_TAU_DAYS);
+}
+
+export function powerLawForecastWithTau(dateFuture: Date, currentPrice: number, currentDate: Date, tauDays: number): number {
   const tNow = daysSinceGenesis(currentDate);
   const tFut = daysSinceGenesis(dateFuture);
   const hDays = Math.round((dateFuture.getTime() - currentDate.getTime()) / 86400000);
   const rT = Math.log(currentPrice) - Math.log(basePowerLawPrice(tNow));
-  const corr = Math.exp(rT * Math.exp(-hDays / POWER_LAW_MEAN_REVERSION_TAU_DAYS));
+  const safeTauDays = Number.isFinite(tauDays) && tauDays > 0 ? tauDays : POWER_LAW_MEAN_REVERSION_TAU_DAYS;
+  const corr = Math.exp(rT * Math.exp(-hDays / safeTauDays));
   return basePowerLawPrice(tFut) * corr;
 }

@@ -1,0 +1,1833 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-06T23:24:56.582Z",
+    "command": "npm run sweep:tau",
+    "gitCommit": "84d1321b94c3d32e6e1b9f8cfee8532d1a7be99d",
+    "dataset": {
+      "firstDate": "2010-07-17",
+      "lastDate": "2026-06-30",
+      "rowCount": 5828
+    },
+    "gatedHorizons": [
+      14,
+      30,
+      60,
+      90
+    ],
+    "promotionPolicy": "Report-only. Retain 210 unless a candidate beats or matches median error, bias, NLL, pinball loss, and 80/90/95 coverage at every gated horizon."
+  },
+  "baselineModelId": "powerlaw-tau-210",
+  "defaultModelId": "powerlaw-current",
+  "candidates": [
+    {
+      "id": "powerlaw-tau-120",
+      "description": "Power-law forecast with fixed 120 day residual mean-reversion tau.",
+      "config": {
+        "tauDays": 120,
+        "reportOnly": true
+      },
+      "metrics": {
+        "7": {
+          "samples": 1635,
+          "medianAbsLogError": 0.03531812816880742,
+          "approximateMultiplicativeError": 0.035949221011943866,
+          "meanAbsLogError": 0.04955789166552941,
+          "biasLogError": 0.0020836641630746526,
+          "nll": -1.2585873251487267,
+          "pinballLoss": {
+            "q05": 0.00807403876698454,
+            "q10": 0.012625794303064262,
+            "q50": 0.024958591635492227,
+            "q90": 0.013151975785512093,
+            "q95": 0.008244001368166226
+          },
+          "coverage": {
+            "interval80": 0.854434250764526,
+            "interval90": 0.9125382262996942,
+            "interval95": 0.9394495412844037
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.18510041306173128,
+            "interval90": 0.23781817570530556,
+            "interval95": 0.28368916915863357
+          }
+        },
+        "14": {
+          "samples": 1628,
+          "medianAbsLogError": 0.05053948088303538,
+          "approximateMultiplicativeError": 0.051838390043692284,
+          "meanAbsLogError": 0.06992467160857664,
+          "biasLogError": 0.0036575143725610425,
+          "nll": -0.9342685974192998,
+          "pinballLoss": {
+            "q05": 0.010561085642273064,
+            "q10": 0.01730077899007264,
+            "q50": 0.03531121713088063,
+            "q90": 0.0188799401694251,
+            "q95": 0.01174083753569789
+          },
+          "coverage": {
+            "interval80": 0.8402948402948403,
+            "interval90": 0.8961916461916462,
+            "interval95": 0.9373464373464373
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.2581537442768604,
+            "interval90": 0.3319973208440134,
+            "interval95": 0.3964413880027454
+          }
+        },
+        "30": {
+          "samples": 1612,
+          "medianAbsLogError": 0.08369211531589799,
+          "approximateMultiplicativeError": 0.08729408107493675,
+          "meanAbsLogError": 0.10229729038169107,
+          "biasLogError": 0.00625104915653805,
+          "nll": -0.6023643724570781,
+          "pinballLoss": {
+            "q05": 0.012382138248183527,
+            "q10": 0.02159552369520275,
+            "q50": 0.051779711826537546,
+            "q90": 0.026521404832207465,
+            "q95": 0.016080149006332756
+          },
+          "coverage": {
+            "interval80": 0.8027295285359801,
+            "interval90": 0.8982630272952854,
+            "interval95": 0.9534739454094293
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.3551749051099491,
+            "interval90": 0.45757118980638806,
+            "interval95": 0.5474114188476151
+          }
+        },
+        "60": {
+          "samples": 1582,
+          "medianAbsLogError": 0.1320517273865073,
+          "approximateMultiplicativeError": 0.14116734734498348,
+          "meanAbsLogError": 0.14165106503201827,
+          "biasLogError": 0.009687727954883324,
+          "nll": -0.36131527205680664,
+          "pinballLoss": {
+            "q05": 0.013825651814005056,
+            "q10": 0.024408243199628157,
+            "q50": 0.07217675255523837,
+            "q90": 0.03405210385203166,
+            "q95": 0.020747533057953363
+          },
+          "coverage": {
+            "interval80": 0.8375474083438685,
+            "interval90": 0.9367888748419722,
+            "interval95": 0.9835651074589128
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4785447731576898,
+            "interval90": 0.6183436995128881,
+            "interval95": 0.7420954854461196
+          }
+        },
+        "90": {
+          "samples": 1552,
+          "medianAbsLogError": 0.14454244661918092,
+          "approximateMultiplicativeError": 0.15551074144721833,
+          "meanAbsLogError": 0.15779231851732914,
+          "biasLogError": 0.015075542588791674,
+          "nll": -0.28905370207661985,
+          "pinballLoss": {
+            "q05": 0.014494511474953337,
+            "q10": 0.026440221463201047,
+            "q50": 0.0810103293682086,
+            "q90": 0.03657552034826868,
+            "q95": 0.022182068778606765
+          },
+          "coverage": {
+            "interval80": 0.8163659793814433,
+            "interval90": 0.9181701030927835,
+            "interval95": 0.9716494845360825
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.48369455116312704,
+            "interval90": 0.6250948923310093,
+            "interval95": 0.7503217201975473
+          }
+        },
+        "180": {
+          "samples": 1462,
+          "medianAbsLogError": 0.13248431053292847,
+          "approximateMultiplicativeError": 0.14166110389437225,
+          "meanAbsLogError": 0.16046569350369083,
+          "biasLogError": 0.018388842227027885,
+          "nll": -0.20093043765427515,
+          "pinballLoss": {
+            "q05": 0.01601275693874256,
+            "q10": 0.02783326655300143,
+            "q50": 0.08258849558330146,
+            "q90": 0.042713342594168584,
+            "q95": 0.02698803190683719
+          },
+          "coverage": {
+            "interval80": 0.8549931600547196,
+            "interval90": 0.9295485636114911,
+            "interval95": 0.9610123119015048
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.576648047023758,
+            "interval90": 0.7473154708363186,
+            "interval95": 0.899705646626596
+          }
+        },
+        "365": {
+          "samples": 1277,
+          "medianAbsLogError": 0.12406450439325087,
+          "approximateMultiplicativeError": 0.13208889335119034,
+          "meanAbsLogError": 0.1362582866067797,
+          "biasLogError": -0.019618447708741014,
+          "nll": -0.3844629848466287,
+          "pinballLoss": {
+            "q05": 0.015010202873381069,
+            "q10": 0.027741631883864155,
+            "q50": 0.06768571576694729,
+            "q90": 0.027017269134072295,
+            "q95": 0.01695699151951211
+          },
+          "coverage": {
+            "interval80": 0.8097102584181676,
+            "interval90": 0.9138606108065779,
+            "interval95": 0.9639780736100235
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.44298843549079087,
+            "interval90": 0.5718048833649767,
+            "interval95": 0.6854828332834686
+          }
+        }
+      },
+      "checks": [
+        {
+          "horizonDays": 14,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 30,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 60,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 90,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        }
+      ],
+      "status": "eligible-for-manual-review",
+      "score": 20
+    },
+    {
+      "id": "powerlaw-tau-150",
+      "description": "Power-law forecast with fixed 150 day residual mean-reversion tau.",
+      "config": {
+        "tauDays": 150,
+        "reportOnly": true
+      },
+      "metrics": {
+        "7": {
+          "samples": 1635,
+          "medianAbsLogError": 0.03554053735087616,
+          "approximateMultiplicativeError": 0.036179651254804934,
+          "meanAbsLogError": 0.049698674546923026,
+          "biasLogError": 0.002059416116198941,
+          "nll": -1.2572781192959777,
+          "pinballLoss": {
+            "q05": 0.008080828431436416,
+            "q10": 0.012647521362450214,
+            "q50": 0.02502842339267684,
+            "q90": 0.013139078949073287,
+            "q95": 0.008241948636684732
+          },
+          "coverage": {
+            "interval80": 0.854434250764526,
+            "interval90": 0.9125382262996942,
+            "interval95": 0.9406727828746178
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.18510041306173133,
+            "interval90": 0.23781817570530553,
+            "interval95": 0.2836891691586337
+          }
+        },
+        "14": {
+          "samples": 1628,
+          "medianAbsLogError": 0.05161560569217617,
+          "approximateMultiplicativeError": 0.05297090868683707,
+          "meanAbsLogError": 0.0703785461533131,
+          "biasLogError": 0.00362858987074197,
+          "nll": -0.931609152354137,
+          "pinballLoss": {
+            "q05": 0.01055073890689515,
+            "q10": 0.01730756710926079,
+            "q50": 0.03553471539563643,
+            "q90": 0.018899876732857552,
+            "q95": 0.011782041323326607
+          },
+          "coverage": {
+            "interval80": 0.8390663390663391,
+            "interval90": 0.8968058968058968,
+            "interval95": 0.9348894348894349
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.2581537442768604,
+            "interval90": 0.3319973208440134,
+            "interval95": 0.3964413880027454
+          }
+        },
+        "30": {
+          "samples": 1612,
+          "medianAbsLogError": 0.08319759320208758,
+          "approximateMultiplicativeError": 0.0867565230357541,
+          "meanAbsLogError": 0.1031054628466866,
+          "biasLogError": 0.006275692305445127,
+          "nll": -0.595909150529391,
+          "pinballLoss": {
+            "q05": 0.01236385265062942,
+            "q10": 0.021703191780251468,
+            "q50": 0.052177568343553846,
+            "q90": 0.026734017841949776,
+            "q95": 0.016269594190285015
+          },
+          "coverage": {
+            "interval80": 0.7990074441687345,
+            "interval90": 0.8970223325062034,
+            "interval95": 0.9497518610421837
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.35517490510994926,
+            "interval90": 0.45757118980638795,
+            "interval95": 0.5474114188476153
+          }
+        },
+        "60": {
+          "samples": 1582,
+          "medianAbsLogError": 0.1346147443602982,
+          "approximateMultiplicativeError": 0.14409593002655718,
+          "meanAbsLogError": 0.14333579965677773,
+          "biasLogError": 0.00978125475432138,
+          "nll": -0.3479059225334287,
+          "pinballLoss": {
+            "q05": 0.013996077254722914,
+            "q10": 0.02469309343950192,
+            "q50": 0.07302753646744814,
+            "q90": 0.03440421422332893,
+            "q95": 0.020760990273176853
+          },
+          "coverage": {
+            "interval80": 0.8236409608091024,
+            "interval90": 0.9348925410872313,
+            "interval95": 0.9823008849557522
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4785447731576898,
+            "interval90": 0.6183436995128885,
+            "interval95": 0.7420954854461194
+          }
+        },
+        "90": {
+          "samples": 1552,
+          "medianAbsLogError": 0.145919385011601,
+          "approximateMultiplicativeError": 0.15710290445359965,
+          "meanAbsLogError": 0.16019188956432703,
+          "biasLogError": 0.01540207734490923,
+          "nll": -0.2676195448266983,
+          "pinballLoss": {
+            "q05": 0.014906131562044555,
+            "q10": 0.02736206072769757,
+            "q50": 0.08230042584293051,
+            "q90": 0.037162856941852555,
+            "q95": 0.022465530027108056
+          },
+          "coverage": {
+            "interval80": 0.7938144329896907,
+            "interval90": 0.9162371134020618,
+            "interval95": 0.9645618556701031
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4836945511631271,
+            "interval90": 0.6250948923310093,
+            "interval95": 0.7503217201975471
+          }
+        },
+        "180": {
+          "samples": 1462,
+          "medianAbsLogError": 0.1356662756559817,
+          "approximateMultiplicativeError": 0.14529961544777814,
+          "meanAbsLogError": 0.16467864399141013,
+          "biasLogError": 0.01970032740874328,
+          "nll": -0.17503866782376787,
+          "pinballLoss": {
+            "q05": 0.016441080680041378,
+            "q10": 0.02886032768325161,
+            "q50": 0.08486960039942655,
+            "q90": 0.04388158269274842,
+            "q95": 0.027352975089995044
+          },
+          "coverage": {
+            "interval80": 0.8331053351573188,
+            "interval90": 0.9199726402188783,
+            "interval95": 0.9555403556771546
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.576648047023758,
+            "interval90": 0.7473154708363184,
+            "interval95": 0.899705646626596
+          }
+        },
+        "365": {
+          "samples": 1277,
+          "medianAbsLogError": 0.12601388090629687,
+          "approximateMultiplicativeError": 0.13429791325679408,
+          "meanAbsLogError": 0.1370261668644628,
+          "biasLogError": -0.01909256905321664,
+          "nll": -0.3816886750305064,
+          "pinballLoss": {
+            "q05": 0.014915700888128283,
+            "q10": 0.027615495106749773,
+            "q50": 0.06811297656473012,
+            "q90": 0.02685181835435676,
+            "q95": 0.016860448365641746
+          },
+          "coverage": {
+            "interval80": 0.8026624902114331,
+            "interval90": 0.9154267815191856,
+            "interval95": 0.9655442443226312
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.44298843549079087,
+            "interval90": 0.5718048833649767,
+            "interval95": 0.6854828332834686
+          }
+        }
+      },
+      "checks": [
+        {
+          "horizonDays": 14,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 30,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 60,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 90,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        }
+      ],
+      "status": "eligible-for-manual-review",
+      "score": 20
+    },
+    {
+      "id": "powerlaw-tau-210",
+      "description": "Power-law forecast with fixed 210 day residual mean-reversion tau.",
+      "config": {
+        "tauDays": 210,
+        "reportOnly": false
+      },
+      "metrics": {
+        "7": {
+          "samples": 1635,
+          "medianAbsLogError": 0.03609464057755565,
+          "approximateMultiplicativeError": 0.03675396084168825,
+          "meanAbsLogError": 0.04993021122082194,
+          "biasLogError": 0.0020313554391874606,
+          "nll": -1.2548762262845428,
+          "pinballLoss": {
+            "q05": 0.008091157257035488,
+            "q10": 0.0126829875075864,
+            "q50": 0.025143751271966497,
+            "q90": 0.013133341607990295,
+            "q95": 0.008241270495224981
+          },
+          "coverage": {
+            "interval80": 0.8525993883792049,
+            "interval90": 0.9107033639143731,
+            "interval95": 0.9406727828746178
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.18510041306173133,
+            "interval90": 0.23781817570530558,
+            "interval95": 0.2836891691586337
+          }
+        },
+        "14": {
+          "samples": 1628,
+          "medianAbsLogError": 0.05293906907417875,
+          "approximateMultiplicativeError": 0.054365399702151596,
+          "meanAbsLogError": 0.0711612131686956,
+          "biasLogError": 0.003594696230722746,
+          "nll": -0.9268182061632659,
+          "pinballLoss": {
+            "q05": 0.01054865863015958,
+            "q10": 0.017321576788105503,
+            "q50": 0.0359231609476141,
+            "q90": 0.018925775386729137,
+            "q95": 0.011832308233095017
+          },
+          "coverage": {
+            "interval80": 0.8384520884520884,
+            "interval90": 0.898034398034398,
+            "interval95": 0.933046683046683
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.2581537442768604,
+            "interval90": 0.3319973208440135,
+            "interval95": 0.3964413880027454
+          }
+        },
+        "30": {
+          "samples": 1612,
+          "medianAbsLogError": 0.08490501320988297,
+          "approximateMultiplicativeError": 0.08861365787020148,
+          "meanAbsLogError": 0.10458859462590624,
+          "biasLogError": 0.006305406760645036,
+          "nll": -0.5847965976940421,
+          "pinballLoss": {
+            "q05": 0.012353314709867124,
+            "q10": 0.02191593437999397,
+            "q50": 0.05291670770513707,
+            "q90": 0.02705597605617881,
+            "q95": 0.016512760822197173
+          },
+          "coverage": {
+            "interval80": 0.7921836228287841,
+            "interval90": 0.8964019851116626,
+            "interval95": 0.9460297766749379
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.3551749051099491,
+            "interval90": 0.45757118980638795,
+            "interval95": 0.5474114188476153
+          }
+        },
+        "60": {
+          "samples": 1582,
+          "medianAbsLogError": 0.13906946318595456,
+          "approximateMultiplicativeError": 0.14920392459705178,
+          "meanAbsLogError": 0.14641339291532512,
+          "biasLogError": 0.00990024598474934,
+          "nll": -0.3255936069492705,
+          "pinballLoss": {
+            "q05": 0.014253317255760239,
+            "q10": 0.02529677735288941,
+            "q50": 0.07458948446696427,
+            "q90": 0.03511125298607757,
+            "q95": 0.02091253309199152
+          },
+          "coverage": {
+            "interval80": 0.793299620733249,
+            "interval90": 0.9304677623261695,
+            "interval95": 0.9791403286978508
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.47854477315768984,
+            "interval90": 0.6183436995128884,
+            "interval95": 0.7420954854461195
+          }
+        },
+        "90": {
+          "samples": 1552,
+          "medianAbsLogError": 0.15424400586572096,
+          "approximateMultiplicativeError": 0.16677555212571837,
+          "meanAbsLogError": 0.1643763165527847,
+          "biasLogError": 0.015840449815185207,
+          "nll": -0.23077741023014603,
+          "pinballLoss": {
+            "q05": 0.015567178225569099,
+            "q10": 0.02909541596040098,
+            "q50": 0.08455812779827628,
+            "q90": 0.03833350554739768,
+            "q95": 0.02300611368662492
+          },
+          "coverage": {
+            "interval80": 0.7673969072164949,
+            "interval90": 0.9027061855670103,
+            "interval95": 0.958118556701031
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4836945511631272,
+            "interval90": 0.6250948923310095,
+            "interval95": 0.7503217201975471
+          }
+        },
+        "180": {
+          "samples": 1462,
+          "medianAbsLogError": 0.1393994469752438,
+          "approximateMultiplicativeError": 0.14958320583764517,
+          "meanAbsLogError": 0.17272108398870614,
+          "biasLogError": 0.021769742834107927,
+          "nll": -0.12678196929645508,
+          "pinballLoss": {
+            "q05": 0.017433797335810294,
+            "q10": 0.031145644797522926,
+            "q50": 0.08923205465651382,
+            "q90": 0.04612206565533429,
+            "q95": 0.028051944702359836
+          },
+          "coverage": {
+            "interval80": 0.8023255813953488,
+            "interval90": 0.9021887824897401,
+            "interval95": 0.9466484268125855
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.576648047023758,
+            "interval90": 0.7473154708363186,
+            "interval95": 0.899705646626596
+          }
+        },
+        "365": {
+          "samples": 1277,
+          "medianAbsLogError": 0.12978120410069655,
+          "approximateMultiplicativeError": 0.1385792396011465,
+          "meanAbsLogError": 0.13936480058611295,
+          "biasLogError": -0.01793384509449274,
+          "nll": -0.3692190261231546,
+          "pinballLoss": {
+            "q05": 0.01478008419220652,
+            "q10": 0.02771397099694772,
+            "q50": 0.06936216721782448,
+            "q90": 0.02688373830295066,
+            "q95": 0.01674007632554809
+          },
+          "coverage": {
+            "interval80": 0.7870007830853563,
+            "interval90": 0.9185591229444009,
+            "interval95": 0.9671104150352389
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.44298843549079087,
+            "interval90": 0.5718048833649767,
+            "interval95": 0.6854828332834685
+          }
+        }
+      },
+      "checks": [
+        {
+          "horizonDays": 14,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 30,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 60,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 90,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        }
+      ],
+      "status": "retained-default",
+      "score": 20
+    },
+    {
+      "id": "powerlaw-tau-90",
+      "description": "Power-law forecast with fixed 90 day residual mean-reversion tau.",
+      "config": {
+        "tauDays": 90,
+        "reportOnly": true
+      },
+      "metrics": {
+        "7": {
+          "samples": 1635,
+          "medianAbsLogError": 0.03546025416767611,
+          "approximateMultiplicativeError": 0.036096466793236415,
+          "meanAbsLogError": 0.04947622334193173,
+          "biasLogError": 0.0021234541869074907,
+          "nll": -1.2591961654746084,
+          "pinballLoss": {
+            "q05": 0.008072010496723582,
+            "q10": 0.01261130971201267,
+            "q50": 0.02491908971617289,
+            "q90": 0.01318992253586072,
+            "q95": 0.008255393416460532
+          },
+          "coverage": {
+            "interval80": 0.8556574923547401,
+            "interval90": 0.9119266055045872,
+            "interval95": 0.9394495412844037
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.18510041306173133,
+            "interval90": 0.23781817570530556,
+            "interval95": 0.2836891691586337
+          }
+        },
+        "14": {
+          "samples": 1628,
+          "medianAbsLogError": 0.05115418598187191,
+          "approximateMultiplicativeError": 0.05248515923099695,
+          "meanAbsLogError": 0.06957119938131076,
+          "biasLogError": 0.0037042470612118255,
+          "nll": -0.935784519302407,
+          "pinballLoss": {
+            "q05": 0.010591482163915984,
+            "q10": 0.017310702435649576,
+            "q50": 0.03514212036077378,
+            "q90": 0.018871570035355816,
+            "q95": 0.011699630666291328
+          },
+          "coverage": {
+            "interval80": 0.8390663390663391,
+            "interval90": 0.8974201474201474,
+            "interval95": 0.9385749385749386
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.2581537442768604,
+            "interval90": 0.3319973208440134,
+            "interval95": 0.39644138800274537
+          }
+        },
+        "30": {
+          "samples": 1612,
+          "medianAbsLogError": 0.08309060177471612,
+          "approximateMultiplicativeError": 0.08664025562406841,
+          "meanAbsLogError": 0.10190017125814889,
+          "biasLogError": 0.006212618977830883,
+          "nll": -0.607435422911215,
+          "pinballLoss": {
+            "q05": 0.012428653815714705,
+            "q10": 0.021538112795542047,
+            "q50": 0.05160029280393268,
+            "q90": 0.026258118134642808,
+            "q95": 0.015855606961538492
+          },
+          "coverage": {
+            "interval80": 0.8070719602977667,
+            "interval90": 0.9057071960297767,
+            "interval95": 0.9553349875930521
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.35517490510994926,
+            "interval90": 0.45757118980638795,
+            "interval95": 0.5474114188476153
+          }
+        },
+        "60": {
+          "samples": 1582,
+          "medianAbsLogError": 0.13141133572805597,
+          "approximateMultiplicativeError": 0.14043678724211173,
+          "meanAbsLogError": 0.14005799085667187,
+          "biasLogError": 0.009551206631413468,
+          "nll": -0.374366126732883,
+          "pinballLoss": {
+            "q05": 0.013650051642273581,
+            "q10": 0.024194655719708198,
+            "q50": 0.07138603402644428,
+            "q90": 0.033740598780473405,
+            "q95": 0.020773989812549826
+          },
+          "coverage": {
+            "interval80": 0.8552465233881164,
+            "interval90": 0.9380530973451328,
+            "interval95": 0.9848293299620733
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.47854477315768984,
+            "interval90": 0.6183436995128883,
+            "interval95": 0.7420954854461195
+          }
+        },
+        "90": {
+          "samples": 1552,
+          "medianAbsLogError": 0.14357757370372387,
+          "approximateMultiplicativeError": 0.15439635813486974,
+          "meanAbsLogError": 0.1551840298165301,
+          "biasLogError": 0.014629226462269275,
+          "nll": -0.3100521838741372,
+          "pinballLoss": {
+            "q05": 0.0141005312720924,
+            "q10": 0.02553586796224486,
+            "q50": 0.07962023405854811,
+            "q90": 0.03607289801362222,
+            "q95": 0.02188450494532091
+          },
+          "coverage": {
+            "interval80": 0.8337628865979382,
+            "interval90": 0.9207474226804123,
+            "interval95": 0.9780927835051546
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.48369455116312704,
+            "interval90": 0.6250948923310092,
+            "interval95": 0.7503217201975471
+          }
+        },
+        "180": {
+          "samples": 1462,
+          "medianAbsLogError": 0.13339407309723772,
+          "approximateMultiplicativeError": 0.14270021702926838,
+          "meanAbsLogError": 0.15630248747345196,
+          "biasLogError": 0.01691387804698759,
+          "nll": -0.2257017645971672,
+          "pinballLoss": {
+            "q05": 0.01562765850424375,
+            "q10": 0.026899687528849085,
+            "q50": 0.08034476354598062,
+            "q90": 0.04179434274972849,
+            "q95": 0.026636337644322265
+          },
+          "coverage": {
+            "interval80": 0.8837209302325582,
+            "interval90": 0.9350205198358413,
+            "interval95": 0.9705882352941176
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.5766480470237579,
+            "interval90": 0.7473154708363186,
+            "interval95": 0.8997056466265964
+          }
+        },
+        "365": {
+          "samples": 1277,
+          "medianAbsLogError": 0.1228423017914463,
+          "approximateMultiplicativeError": 0.13070609656131227,
+          "meanAbsLogError": 0.13576241894399732,
+          "biasLogError": -0.020018615440436347,
+          "nll": -0.3853673115280543,
+          "pinballLoss": {
+            "q05": 0.015094614729202286,
+            "q10": 0.02785491818088983,
+            "q50": 0.06740169493886551,
+            "q90": 0.027257707995467305,
+            "q95": 0.017048081415969047
+          },
+          "coverage": {
+            "interval80": 0.8081440877055599,
+            "interval90": 0.9130775254502741,
+            "interval95": 0.9624119028974158
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.44298843549079087,
+            "interval90": 0.5718048833649766,
+            "interval95": 0.6854828332834684
+          }
+        }
+      },
+      "checks": [
+        {
+          "horizonDays": 14,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 30,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "pinball loss degraded"
+        },
+        {
+          "horizonDays": 60,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 90,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        }
+      ],
+      "status": "watch",
+      "score": 19
+    },
+    {
+      "id": "powerlaw-tau-60",
+      "description": "Power-law forecast with fixed 60 day residual mean-reversion tau.",
+      "config": {
+        "tauDays": 60,
+        "reportOnly": true
+      },
+      "metrics": {
+        "7": {
+          "samples": 1635,
+          "medianAbsLogError": 0.03648113385028055,
+          "approximateMultiplicativeError": 0.03715473671662539,
+          "meanAbsLogError": 0.04983655309025421,
+          "biasLogError": 0.002200750325232139,
+          "nll": -1.2549108323146476,
+          "pinballLoss": {
+            "q05": 0.008075640435618835,
+            "q10": 0.012621315176217179,
+            "q50": 0.025103334950687124,
+            "q90": 0.013308501462777773,
+            "q95": 0.00830232922045519
+          },
+          "coverage": {
+            "interval80": 0.8538226299694189,
+            "interval90": 0.909480122324159,
+            "interval95": 0.9412844036697248
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.18510041306173128,
+            "interval90": 0.23781817570530553,
+            "interval95": 0.2836891691586337
+          }
+        },
+        "14": {
+          "samples": 1628,
+          "medianAbsLogError": 0.05203065453017125,
+          "approximateMultiplicativeError": 0.05340803374677905,
+          "meanAbsLogError": 0.07030670918332765,
+          "biasLogError": 0.0037924329332706384,
+          "nll": -0.9292871093353471,
+          "pinballLoss": {
+            "q05": 0.01067418606699275,
+            "q10": 0.017391463453753492,
+            "q50": 0.035530620333478466,
+            "q90": 0.0189360917077588,
+            "q95": 0.011677100168804064
+          },
+          "coverage": {
+            "interval80": 0.8316953316953317,
+            "interval90": 0.894963144963145,
+            "interval95": 0.9355036855036855
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.2581537442768604,
+            "interval90": 0.3319973208440135,
+            "interval95": 0.3964413880027454
+          }
+        },
+        "30": {
+          "samples": 1612,
+          "medianAbsLogError": 0.08654837487848036,
+          "approximateMultiplicativeError": 0.09040411460849551,
+          "meanAbsLogError": 0.10366559281361752,
+          "biasLogError": 0.0061447310625982795,
+          "nll": -0.6015179835406019,
+          "pinballLoss": {
+            "q05": 0.012542065616606396,
+            "q10": 0.021735315807624597,
+            "q50": 0.05254708331199975,
+            "q90": 0.02591899792706343,
+            "q95": 0.015786553233830134
+          },
+          "coverage": {
+            "interval80": 0.8058312655086849,
+            "interval90": 0.9094292803970223,
+            "interval95": 0.955955334987593
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.35517490510994915,
+            "interval90": 0.45757118980638806,
+            "interval95": 0.5474114188476153
+          }
+        },
+        "60": {
+          "samples": 1582,
+          "medianAbsLogError": 0.13070402856688224,
+          "approximateMultiplicativeError": 0.13963043333919134,
+          "meanAbsLogError": 0.14003166174362675,
+          "biasLogError": 0.00933782202321119,
+          "nll": -0.37925770755814775,
+          "pinballLoss": {
+            "q05": 0.013485217548324947,
+            "q10": 0.024051113471424114,
+            "q50": 0.07142468141149817,
+            "q90": 0.033753203777525755,
+            "q95": 0.020901847363663167
+          },
+          "coverage": {
+            "interval80": 0.8666245259165614,
+            "interval90": 0.934260429835651,
+            "interval95": 0.9823008849557522
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4785447731576898,
+            "interval90": 0.6183436995128881,
+            "interval95": 0.7420954854461194
+          }
+        },
+        "90": {
+          "samples": 1552,
+          "medianAbsLogError": 0.1430433483293565,
+          "approximateMultiplicativeError": 0.15377981500943116,
+          "meanAbsLogError": 0.15251497702580016,
+          "biasLogError": 0.014010930698776224,
+          "nll": -0.32330634217970466,
+          "pinballLoss": {
+            "q05": 0.013747171830805233,
+            "q10": 0.024803006475949553,
+            "q50": 0.07822642583924945,
+            "q90": 0.03571331206405853,
+            "q95": 0.021763708307510437
+          },
+          "coverage": {
+            "interval80": 0.8427835051546392,
+            "interval90": 0.9304123711340206,
+            "interval95": 0.9735824742268041
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4836945511631271,
+            "interval90": 0.6250948923310093,
+            "interval95": 0.7503217201975473
+          }
+        },
+        "180": {
+          "samples": 1462,
+          "medianAbsLogError": 0.13348059467777723,
+          "approximateMultiplicativeError": 0.14279908953536968,
+          "meanAbsLogError": 0.15267895064598944,
+          "biasLogError": 0.015476658051514157,
+          "nll": -0.24541138670371745,
+          "pinballLoss": {
+            "q05": 0.01535893467072105,
+            "q10": 0.02630892466791744,
+            "q50": 0.07840859994727074,
+            "q90": 0.04114354685583423,
+            "q95": 0.02631777408796291
+          },
+          "coverage": {
+            "interval80": 0.8967168262653898,
+            "interval90": 0.9418604651162791,
+            "interval95": 0.9753761969904241
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.576648047023758,
+            "interval90": 0.7473154708363186,
+            "interval95": 0.8997056466265964
+          }
+        },
+        "365": {
+          "samples": 1277,
+          "medianAbsLogError": 0.12120880212368815,
+          "approximateMultiplicativeError": 0.12886059625068502,
+          "meanAbsLogError": 0.13554787602415877,
+          "biasLogError": -0.02021647158267596,
+          "nll": -0.3854291186613916,
+          "pinballLoss": {
+            "q05": 0.015142100164447647,
+            "q10": 0.02792393333937037,
+            "q50": 0.06727557573190829,
+            "q90": 0.027404325114913437,
+            "q95": 0.01709862305151706
+          },
+          "coverage": {
+            "interval80": 0.8057948316366484,
+            "interval90": 0.9115113547376664,
+            "interval95": 0.9624119028974158
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.442988435490791,
+            "interval90": 0.5718048833649766,
+            "interval95": 0.6854828332834686
+          }
+        }
+      },
+      "checks": [
+        {
+          "horizonDays": 14,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "pinball loss degraded"
+        },
+        {
+          "horizonDays": 30,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "median error degraded; pinball loss degraded"
+        },
+        {
+          "horizonDays": 60,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 90,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        }
+      ],
+      "status": "watch",
+      "score": 17
+    },
+    {
+      "id": "powerlaw-tau-vol-conditional",
+      "description": "Power-law forecast with tau selected from trailing realized volatility regime.",
+      "config": {
+        "id": "powerlaw-tau-vol-conditional",
+        "lowVolDailyThreshold": 0.02,
+        "highVolDailyThreshold": 0.04,
+        "lowVolTauDays": 300,
+        "normalTauDays": 210,
+        "highVolTauDays": 120
+      },
+      "metrics": {
+        "7": {
+          "samples": 1635,
+          "medianAbsLogError": 0.036137424137524014,
+          "approximateMultiplicativeError": 0.03679831781581222,
+          "meanAbsLogError": 0.049922297093247435,
+          "biasLogError": 0.0021982579080468824,
+          "nll": -1.2547381186470254,
+          "pinballLoss": {
+            "q05": 0.008092241980336392,
+            "q10": 0.012680362881367448,
+            "q50": 0.025143682160250615,
+            "q90": 0.013143480345555632,
+            "q95": 0.00824882239675465
+          },
+          "coverage": {
+            "interval80": 0.8525993883792049,
+            "interval90": 0.9107033639143731,
+            "interval95": 0.9394495412844037
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.18510041306173136,
+            "interval90": 0.23781817570530558,
+            "interval95": 0.2836891691586337
+          }
+        },
+        "14": {
+          "samples": 1628,
+          "medianAbsLogError": 0.052729139021864616,
+          "approximateMultiplicativeError": 0.054144079950280366,
+          "meanAbsLogError": 0.07111318187044154,
+          "biasLogError": 0.003928551524533963,
+          "nll": -0.925920337811429,
+          "pinballLoss": {
+            "q05": 0.010559919645517564,
+            "q10": 0.01733103795138149,
+            "q50": 0.03590891620206553,
+            "q90": 0.01897227389148742,
+            "q95": 0.011862082505372374
+          },
+          "coverage": {
+            "interval80": 0.8390663390663391,
+            "interval90": 0.8974201474201474,
+            "interval95": 0.933046683046683
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.2581537442768604,
+            "interval90": 0.3319973208440135,
+            "interval95": 0.3964413880027454
+          }
+        },
+        "30": {
+          "samples": 1612,
+          "medianAbsLogError": 0.08519976295321077,
+          "approximateMultiplicativeError": 0.08893457375905633,
+          "meanAbsLogError": 0.10480579845711331,
+          "biasLogError": 0.006981174168626144,
+          "nll": -0.5816105978096354,
+          "pinballLoss": {
+            "q05": 0.012372627363326174,
+            "q10": 0.022003146193632014,
+            "q50": 0.053057264811516736,
+            "q90": 0.027185117804738868,
+            "q95": 0.01657847811352111
+          },
+          "coverage": {
+            "interval80": 0.7897022332506204,
+            "interval90": 0.892059553349876,
+            "interval95": 0.9441687344913151
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.3551749051099491,
+            "interval90": 0.45757118980638795,
+            "interval95": 0.5474114188476153
+          }
+        },
+        "60": {
+          "samples": 1582,
+          "medianAbsLogError": 0.14131478980512685,
+          "approximateMultiplicativeError": 0.1517871617801314,
+          "meanAbsLogError": 0.14737540002115518,
+          "biasLogError": 0.011082194401173584,
+          "nll": -0.3195134083011995,
+          "pinballLoss": {
+            "q05": 0.014266659366031248,
+            "q10": 0.025462772787233728,
+            "q50": 0.07514133623461053,
+            "q90": 0.03533384048826013,
+            "q95": 0.021041421935261446
+          },
+          "coverage": {
+            "interval80": 0.786346396965866,
+            "interval90": 0.9292035398230089,
+            "interval95": 0.9778761061946902
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.47854477315768984,
+            "interval90": 0.6183436995128884,
+            "interval95": 0.7420954854461195
+          }
+        },
+        "90": {
+          "samples": 1552,
+          "medianAbsLogError": 0.1557063309072601,
+          "approximateMultiplicativeError": 0.16848300535498728,
+          "meanAbsLogError": 0.16591316495355424,
+          "biasLogError": 0.0173903170860444,
+          "nll": -0.22396739131200366,
+          "pinballLoss": {
+            "q05": 0.015527904243141164,
+            "q10": 0.029143610989696058,
+            "q50": 0.08539279299202555,
+            "q90": 0.03862275381398308,
+            "q95": 0.023159444987704027
+          },
+          "coverage": {
+            "interval80": 0.7622422680412371,
+            "interval90": 0.8994845360824743,
+            "interval95": 0.9574742268041238
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4836945511631272,
+            "interval90": 0.6250948923310093,
+            "interval95": 0.7503217201975471
+          }
+        },
+        "180": {
+          "samples": 1462,
+          "medianAbsLogError": 0.1384381473876435,
+          "approximateMultiplicativeError": 0.14847864296893665,
+          "meanAbsLogError": 0.17383204051129394,
+          "biasLogError": 0.023867354546068382,
+          "nll": -0.11357684488063557,
+          "pinballLoss": {
+            "q05": 0.017933281992789332,
+            "q10": 0.03168384984451433,
+            "q50": 0.08995352656637734,
+            "q90": 0.046680501918852896,
+            "q95": 0.02845284274932701
+          },
+          "coverage": {
+            "interval80": 0.8023255813953488,
+            "interval90": 0.9021887824897401,
+            "interval95": 0.9404924760601915
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.576648047023758,
+            "interval90": 0.7473154708363186,
+            "interval95": 0.899705646626596
+          }
+        },
+        "365": {
+          "samples": 1277,
+          "medianAbsLogError": 0.12978120410069655,
+          "approximateMultiplicativeError": 0.1385792396011465,
+          "meanAbsLogError": 0.13893596290413784,
+          "biasLogError": -0.017034917189126683,
+          "nll": -0.3720202816328563,
+          "pinballLoss": {
+            "q05": 0.014650409691107605,
+            "q10": 0.027615071322318184,
+            "q50": 0.06921466148234257,
+            "q90": 0.026947970603546444,
+            "q95": 0.016794578821692066
+          },
+          "coverage": {
+            "interval80": 0.7893500391542678,
+            "interval90": 0.9162098668754894,
+            "interval95": 0.971025841816758
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.442988435490791,
+            "interval90": 0.5718048833649767,
+            "interval95": 0.6854828332834686
+          }
+        }
+      },
+      "checks": [
+        {
+          "horizonDays": 14,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": true,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "matched or beat baseline on all tau gates"
+        },
+        {
+          "horizonDays": 30,
+          "medianPassed": true,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": true,
+          "coveragePassed": true,
+          "reason": "NLL degraded"
+        },
+        {
+          "horizonDays": 60,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded"
+        },
+        {
+          "horizonDays": 90,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded"
+        }
+      ],
+      "status": "watch",
+      "score": 13
+    },
+    {
+      "id": "powerlaw-tau-300",
+      "description": "Power-law forecast with fixed 300 day residual mean-reversion tau.",
+      "config": {
+        "tauDays": 300,
+        "reportOnly": true
+      },
+      "metrics": {
+        "7": {
+          "samples": 1635,
+          "medianAbsLogError": 0.03674637948828816,
+          "approximateMultiplicativeError": 0.03742987397434394,
+          "meanAbsLogError": 0.05016261781435491,
+          "biasLogError": 0.0020100630316582037,
+          "nll": -1.2524187666543758,
+          "pinballLoss": {
+            "q05": 0.008102581451577067,
+            "q10": 0.012715264653919405,
+            "q50": 0.025259746602792316,
+            "q90": 0.013132764631652812,
+            "q95": 0.008241076307393408
+          },
+          "coverage": {
+            "interval80": 0.8501529051987767,
+            "interval90": 0.9100917431192661,
+            "interval95": 0.9400611620795107
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.18510041306173128,
+            "interval90": 0.23781817570530556,
+            "interval95": 0.28368916915863357
+          }
+        },
+        "14": {
+          "samples": 1628,
+          "medianAbsLogError": 0.05424722542211918,
+          "approximateMultiplicativeError": 0.05574557703987182,
+          "meanAbsLogError": 0.0718901774459882,
+          "biasLogError": 0.0035686762252146627,
+          "nll": -0.9219140620760073,
+          "pinballLoss": {
+            "q05": 0.010560492489883552,
+            "q10": 0.01733628836858493,
+            "q50": 0.03628607759890908,
+            "q90": 0.018946733723517704,
+            "q95": 0.0118728377995661
+          },
+          "coverage": {
+            "interval80": 0.8396805896805897,
+            "interval90": 0.898034398034398,
+            "interval95": 0.9324324324324325
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.2581537442768604,
+            "interval90": 0.3319973208440134,
+            "interval95": 0.3964413880027454
+          }
+        },
+        "30": {
+          "samples": 1612,
+          "medianAbsLogError": 0.08560658404020335,
+          "approximateMultiplicativeError": 0.08937766542942338,
+          "meanAbsLogError": 0.10620543895072532,
+          "biasLogError": 0.006328833827116739,
+          "nll": -0.5734695697611512,
+          "pinballLoss": {
+            "q05": 0.01236774758906894,
+            "q10": 0.022121183612415416,
+            "q50": 0.05372608137920928,
+            "q90": 0.027360394728359817,
+            "q95": 0.016725776223839882
+          },
+          "coverage": {
+            "interval80": 0.7859801488833746,
+            "interval90": 0.8901985111662531,
+            "interval95": 0.9404466501240695
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.35517490510994915,
+            "interval90": 0.45757118980638795,
+            "interval95": 0.5474114188476152
+          }
+        },
+        "60": {
+          "samples": 1582,
+          "medianAbsLogError": 0.14367163942021843,
+          "approximateMultiplicativeError": 0.15450495236283324,
+          "meanAbsLogError": 0.14965857524812426,
+          "biasLogError": 0.00999885174391652,
+          "nll": -0.3026475559035413,
+          "pinballLoss": {
+            "q05": 0.014496360368950498,
+            "q10": 0.026056708295178838,
+            "q50": 0.07624206486426258,
+            "q90": 0.03593710146457388,
+            "q95": 0.02116336445810022
+          },
+          "coverage": {
+            "interval80": 0.7768647281921618,
+            "interval90": 0.9241466498103666,
+            "interval95": 0.97724399494311
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.47854477315768984,
+            "interval90": 0.6183436995128884,
+            "interval95": 0.7420954854461196
+          }
+        },
+        "90": {
+          "samples": 1552,
+          "medianAbsLogError": 0.15787311201833373,
+          "approximateMultiplicativeError": 0.1710175972208443,
+          "meanAbsLogError": 0.169101213945024,
+          "biasLogError": 0.016222232422532474,
+          "nll": -0.19115836465877742,
+          "pinballLoss": {
+            "q05": 0.016419640496781414,
+            "q10": 0.030942680340213868,
+            "q50": 0.08710819985017594,
+            "q90": 0.0396606513800889,
+            "q95": 0.023693364874046666
+          },
+          "coverage": {
+            "interval80": 0.7371134020618557,
+            "interval90": 0.8917525773195877,
+            "interval95": 0.9555412371134021
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4836945511631271,
+            "interval90": 0.6250948923310093,
+            "interval95": 0.7503217201975471
+          }
+        },
+        "180": {
+          "samples": 1462,
+          "medianAbsLogError": 0.13970646981415302,
+          "approximateMultiplicativeError": 0.14993620832420373,
+          "meanAbsLogError": 0.18239621779940093,
+          "biasLogError": 0.023860329038324406,
+          "nll": -0.06883115400358607,
+          "pinballLoss": {
+            "q05": 0.018876768054640277,
+            "q10": 0.03387094091556673,
+            "q50": 0.09450950075323242,
+            "q90": 0.049067629999563156,
+            "q95": 0.029040709506179634
+          },
+          "coverage": {
+            "interval80": 0.7708618331053352,
+            "interval90": 0.8782489740082079,
+            "interval95": 0.9336525307797537
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.5766480470237579,
+            "interval90": 0.7473154708363186,
+            "interval95": 0.899705646626596
+          }
+        },
+        "365": {
+          "samples": 1277,
+          "medianAbsLogError": 0.13627118966536783,
+          "approximateMultiplicativeError": 0.1459926328169323,
+          "meanAbsLogError": 0.1443199288608971,
+          "biasLogError": -0.01635101507570219,
+          "nll": -0.33805389732179014,
+          "pinballLoss": {
+            "q05": 0.014905531434668353,
+            "q10": 0.0287619467029991,
+            "q50": 0.07191070892477473,
+            "q90": 0.027729426353325093,
+            "q95": 0.01687138782820374
+          },
+          "coverage": {
+            "interval80": 0.7658574784651527,
+            "interval90": 0.9075959279561472,
+            "interval95": 0.9694596711041503
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.44298843549079087,
+            "interval90": 0.5718048833649766,
+            "interval95": 0.6854828332834686
+          }
+        }
+      },
+      "checks": [
+        {
+          "horizonDays": 14,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded"
+        },
+        {
+          "horizonDays": 30,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded"
+        },
+        {
+          "horizonDays": 60,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded"
+        },
+        {
+          "horizonDays": 90,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": false,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded; coverage degraded"
+        }
+      ],
+      "status": "rejected",
+      "score": 7
+    },
+    {
+      "id": "powerlaw-tau-420",
+      "description": "Power-law forecast with fixed 420 day residual mean-reversion tau.",
+      "config": {
+        "tauDays": 420,
+        "reportOnly": true
+      },
+      "metrics": {
+        "7": {
+          "samples": 1635,
+          "medianAbsLogError": 0.03701775100851605,
+          "approximateMultiplicativeError": 0.037711441099295584,
+          "meanAbsLogError": 0.050343434731374696,
+          "biasLogError": 0.0019957493410341946,
+          "nll": -1.250458828385633,
+          "pinballLoss": {
+            "q05": 0.008110276983801493,
+            "q10": 0.012739774386872552,
+            "q50": 0.025350074976085397,
+            "q90": 0.013137443601044074,
+            "q95": 0.008241010391289457
+          },
+          "coverage": {
+            "interval80": 0.8489296636085627,
+            "interval90": 0.9100917431192661,
+            "interval95": 0.9400611620795107
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.18510041306173133,
+            "interval90": 0.23781817570530556,
+            "interval95": 0.2836891691586337
+          }
+        },
+        "14": {
+          "samples": 1628,
+          "medianAbsLogError": 0.05507429226744938,
+          "approximateMultiplicativeError": 0.0566191103891871,
+          "meanAbsLogError": 0.07245645323448183,
+          "biasLogError": 0.0035510381843182797,
+          "nll": -0.9179840592702174,
+          "pinballLoss": {
+            "q05": 0.010569825115304497,
+            "q10": 0.017350497794607945,
+            "q50": 0.036568442388214516,
+            "q90": 0.018961735384590728,
+            "q95": 0.011902511823734814
+          },
+          "coverage": {
+            "interval80": 0.8402948402948403,
+            "interval90": 0.8961916461916462,
+            "interval95": 0.9324324324324325
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.2581537442768604,
+            "interval90": 0.3319973208440135,
+            "interval95": 0.3964413880027454
+          }
+        },
+        "30": {
+          "samples": 1612,
+          "medianAbsLogError": 0.08799672570346256,
+          "approximateMultiplicativeError": 0.0919845465411242,
+          "meanAbsLogError": 0.10749716929312321,
+          "biasLogError": 0.006345019050712493,
+          "nll": -0.5643226200662903,
+          "pinballLoss": {
+            "q05": 0.012391319768598814,
+            "q10": 0.022279879529077753,
+            "q50": 0.054373681662156136,
+            "q90": 0.027591570640479006,
+            "q95": 0.016878304665634572
+          },
+          "coverage": {
+            "interval80": 0.783498759305211,
+            "interval90": 0.8895781637717122,
+            "interval95": 0.9361042183622829
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.3551749051099491,
+            "interval90": 0.4575711898063879,
+            "interval95": 0.5474114188476152
+          }
+        },
+        "60": {
+          "samples": 1582,
+          "medianAbsLogError": 0.1472804228520605,
+          "approximateMultiplicativeError": 0.15867883750084766,
+          "meanAbsLogError": 0.15236066043512578,
+          "biasLogError": 0.010069444185541855,
+          "nll": -0.2837396707573224,
+          "pinballLoss": {
+            "q05": 0.014714040316558576,
+            "q10": 0.02672387254405987,
+            "q50": 0.07762114390894392,
+            "q90": 0.036612944888621615,
+            "q95": 0.02141335965981198
+          },
+          "coverage": {
+            "interval80": 0.7654867256637168,
+            "interval90": 0.9146649810366625,
+            "interval95": 0.9721871049304678
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4785447731576898,
+            "interval90": 0.6183436995128883,
+            "interval95": 0.7420954854461194
+          }
+        },
+        "90": {
+          "samples": 1552,
+          "medianAbsLogError": 0.1632779438456522,
+          "approximateMultiplicativeError": 0.17736388526136437,
+          "meanAbsLogError": 0.17332142880793078,
+          "biasLogError": 0.016505430487198578,
+          "nll": -0.15723928582535973,
+          "pinballLoss": {
+            "q05": 0.01730230555038104,
+            "q10": 0.03245961883387999,
+            "q50": 0.0893835793189663,
+            "q90": 0.04087433068019404,
+            "q95": 0.024341278177053716
+          },
+          "coverage": {
+            "interval80": 0.717139175257732,
+            "interval90": 0.8698453608247423,
+            "interval95": 0.9490979381443299
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.4836945511631271,
+            "interval90": 0.6250948923310092,
+            "interval95": 0.7503217201975473
+          }
+        },
+        "180": {
+          "samples": 1462,
+          "medianAbsLogError": 0.14778417568824426,
+          "approximateMultiplicativeError": 0.15926267229333457,
+          "meanAbsLogError": 0.1916827166869208,
+          "biasLogError": 0.025584481697727916,
+          "nll": -0.014079788983437317,
+          "pinballLoss": {
+            "q05": 0.02041991919961722,
+            "q10": 0.03661174431691556,
+            "q50": 0.09959645181063233,
+            "q90": 0.0517709676235668,
+            "q95": 0.0302802383214876
+          },
+          "coverage": {
+            "interval80": 0.7393980848153214,
+            "interval90": 0.8461012311901505,
+            "interval95": 0.9192886456908345
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.576648047023758,
+            "interval90": 0.7473154708363184,
+            "interval95": 0.8997056466265964
+          }
+        },
+        "365": {
+          "samples": 1277,
+          "medianAbsLogError": 0.14392715121836674,
+          "approximateMultiplicativeError": 0.1547999796890589,
+          "meanAbsLogError": 0.15115434161111754,
+          "biasLogError": -0.01473170545819962,
+          "nll": -0.28928454445693164,
+          "pinballLoss": {
+            "q05": 0.015686559162576715,
+            "q10": 0.030551194006041803,
+            "q50": 0.07535026887304884,
+            "q90": 0.02965891914549301,
+            "q95": 0.0176502233494493
+          },
+          "coverage": {
+            "interval80": 0.745497259201253,
+            "interval90": 0.8707909162098669,
+            "interval95": 0.9639780736100235
+          },
+          "intervalWidthRatio": {
+            "interval80": 0.44298843549079087,
+            "interval90": 0.5718048833649766,
+            "interval95": 0.6854828332834686
+          }
+        }
+      },
+      "checks": [
+        {
+          "horizonDays": 14,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded"
+        },
+        {
+          "horizonDays": 30,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": true,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded"
+        },
+        {
+          "horizonDays": 60,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": false,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded; coverage degraded"
+        },
+        {
+          "horizonDays": 90,
+          "medianPassed": false,
+          "biasPassed": true,
+          "nllPassed": false,
+          "pinballPassed": false,
+          "coveragePassed": false,
+          "reason": "median error degraded; NLL degraded; pinball loss degraded; coverage degraded"
+        }
+      ],
+      "status": "rejected",
+      "score": 6
+    }
+  ],
+  "verdict": {
+    "selectedModelId": "powerlaw-tau-120",
+    "selectedTauDays": 120,
+    "status": "eligible-for-manual-review",
+    "reason": "powerlaw-tau-120 passed every gated horizon against the 210-day tau baseline. Manual config review is still required before promotion."
+  }
+}

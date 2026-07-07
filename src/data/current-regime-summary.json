@@ -1,19 +1,20 @@
 {
-  "generatedAt": "2026-07-01T18:00:01.735Z",
-  "featureDate": "2026-06-30",
+  "generatedAt": "2026-07-07T01:42:12.521Z",
+  "featureDate": "2026-07-06",
   "regime": {
     "probabilities": {
-      "accumulation-value": 0.3516483516483516,
-      "trend-expansion": 0.12087912087912087,
-      "late-cycle-overheating": 0.0879120879120879,
-      "deleveraging-bear": 0.3516483516483516,
-      "sideways-chop": 0.0879120879120879
+      "accumulation-value": 0.24806201550387594,
+      "trend-expansion": 0.25581395348837205,
+      "late-cycle-overheating": 0.1395348837209302,
+      "deleveraging-bear": 0.2945736434108527,
+      "sideways-chop": 0.062015503875968984
     },
-    "topState": "accumulation-value",
+    "topState": "deleveraging-bear",
     "reasonCodes": [
       "value-discount",
+      "positive-residual-momentum",
       "drawdown-or-negative-momentum",
-      "hashrate-available"
+      "elevated-futures-leverage"
     ],
     "contextOnly": true
   },
@@ -21,30 +22,31 @@
     "riskFlag": "two-sided",
     "direction": "both",
     "drivers": [
-      "large-cycle-drawdown"
+      "large-cycle-drawdown",
+      "futures-leverage-crowding"
     ],
-    "intervalMultiplierAdjustment": 1.08
+    "intervalMultiplierAdjustment": 1.1400000000000001
   },
   "derivativesContext": {
     "source": "Binance USD-M Futures public REST",
-    "sourceDate": "2026-06-29",
-    "openInterestUSD": 6132283135.3584,
-    "openInterestToMarketCap": 0.005082689576594602,
-    "fundingRateDailySum": 0.00019214,
-    "fundingRateDailyAvg": 0.00006404666666666666,
+    "sourceDate": "2026-07-05",
+    "openInterestUSD": 6715367081.1296,
+    "openInterestToMarketCap": 0.005263926011731469,
+    "fundingRateDailySum": 0.00027014,
+    "fundingRateDailyAvg": 0.00009004666666666667,
     "leverageState": "crowded",
-    "fundingState": "neutral",
-    "insight": "Open interest is elevated, but funding is not chasing price right now.",
+    "fundingState": "long-crowded",
+    "insight": "Leveraged longs are crowded; treat upside breakouts as liquidation-sensitive.",
     "status": "context-only"
   },
   "networkContext": {
     "source": "CoinMetrics Community API",
-    "sourceDate": "2026-06-29",
-    "transferCount": 878615,
-    "addressBalanceCount": 57260426,
-    "activeAddressShare": 0.011518548604580762,
-    "transfersPerTransaction": 1.6562110624565267,
-    "transferActivityPercentile": 0.8151390319258497,
+    "sourceDate": "2026-07-05",
+    "transferCount": 904009,
+    "addressBalanceCount": 57303309,
+    "activeAddressShare": 0.008748796688163332,
+    "transfersPerTransaction": 1.4213843894554454,
+    "transferActivityPercentile": 0.8434499314128944,
     "networkState": "busy",
     "insight": "Transfer activity is high versus history, so network usage confirms above-normal activity.",
     "status": "context-only"

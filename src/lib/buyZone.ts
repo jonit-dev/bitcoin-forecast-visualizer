@@ -9,6 +9,7 @@ export const BUY_ZONE_CONFIG = {
   minPriorSamples: 730,
   modernStartDate: '2013-01-01',
   minZoneDays: 7,
+  minPromotionSamples: 30,
   defaultCooldownDays: 180,
   horizons: [365, 730] as const,
 } as const;
@@ -78,7 +79,14 @@ export interface BuyZoneSummary {
   latest: BuyZonePoint | null;
   zones: BuyZoneSpan[];
   backtests: BuyZoneBacktestResult[];
-  verdict: 'promote' | 'candidate' | 'context-only' | 'reject';
+  pooledDiagnostics: {
+    uniqueEventSamples: number;
+    minPromotionSamples: number;
+    sampleThresholdMet: boolean;
+    poolingChoice: string;
+    promotionBlockedReason: string | null;
+  };
+  verdict: 'promote' | 'candidate' | 'watch' | 'context-only' | 'reject';
   caveat: string;
 }
 
@@ -293,6 +301,10 @@ export function computeBuyZoneBacktests(points = computeBuyZonePoints()): BuyZon
 export function computeBuyZoneSummary(): BuyZoneSummary {
   const points = computeBuyZonePoints();
   const backtests = computeBuyZoneBacktests(points);
+  const pooledEventDates = new Set(backtests.flatMap(backtest => backtest.events.map(event => event.date)));
+  const sampleThresholdMet = pooledEventDates.size >= BUY_ZONE_CONFIG.minPromotionSamples;
+  const anyPositiveMedian = backtests.some(backtest => (backtest.medianReturn1y ?? -Infinity) > 0);
+  const verdict = anyPositiveMedian ? 'candidate' : 'watch';
   return {
     generatedAt: new Date().toISOString(),
     data: {
@@ -307,7 +319,16 @@ export function computeBuyZoneSummary(): BuyZoneSummary {
     latest: points.at(-1) ?? null,
     zones: contiguousZones(points),
     backtests,
-    verdict: 'candidate',
-    caveat: 'Small BTC bottom sample; signal is historically useful but still allowed 20–35% next-180d drawdown. Use as a buy-zone overlay, not a bottom guarantee.',
+    pooledDiagnostics: {
+      uniqueEventSamples: pooledEventDates.size,
+      minPromotionSamples: BUY_ZONE_CONFIG.minPromotionSamples,
+      sampleThresholdMet,
+      poolingChoice: 'Heavy-buy, max-conviction, and capitulation-heavy events are pooled only for sample-size diagnostics because they share the same bottom-score hypothesis.',
+      promotionBlockedReason: sampleThresholdMet ? null : `pooled unique sample count ${pooledEventDates.size} is below promotion threshold ${BUY_ZONE_CONFIG.minPromotionSamples}`,
+    },
+    verdict,
+    caveat: sampleThresholdMet
+      ? 'Buy-zone remains a candidate overlay pending a residual-model promotion gate; it is not enabled as forecast alpha.'
+      : 'Small BTC bottom sample remains below the documented promotion threshold. Use as a candidate/watch buy-zone overlay, not a bottom guarantee or forecast alpha.',
   };
 }
