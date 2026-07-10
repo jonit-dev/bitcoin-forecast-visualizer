@@ -1114,11 +1114,11 @@ Rerun only with point-in-time structural-base refitting, a frozen estimator spec
 Do not tune AR bounds or rolling windows on these evaluation slices. First build a nested point-in-time core-model benchmark that removes the static-base provenance problem.
 ### 2026-07-10 — CoinGecko scheduled-ingestion rate-limit mitigation
 
-- **Status:** implementation validation in progress
+- **Status:** validated and deployed
 - **Hypothesis:** Reusing CoinGecko's hourly market-chart payload for both price aggregation and the first UTC volume snapshot halves scheduled BTC requests while preserving the existing source and daily-candle convention, reducing shared-edge 429 failures without changing forecast inputs.
 - **Data/source changes:** No source or feature change. The seven-day CoinGecko request count changes from two to one; 429 retries now honor `Retry-After` with a bounded 30-second delay and jitter.
 - **Validation setup:** Normalization fixture for first UTC volume selection, focused Worker tests, full test/type/build gates, BTC and market backtests, preview/production scheduled invocation, and D1/API latest-date inspection.
 - **Report artifacts:** Deployment/run evidence in the implementation handoff and `refresh_runs`; existing daily quote PRD and production D1 records.
-- **Result/verdict:** Pending redeploy and scheduled verification. Signal remains operational plumbing only.
+- **Result/verdict:** Worker tests, full unit/build/lint gates, BTC and market backtests, and the 8-case browser/accessibility suite passed. The production Worker was redeployed with D1 bound and Cloudflare confirmed the `15 23 * * *` trigger. Live API smoke checks passed for BTC, S&P 500, and gold with forecast agreement; BTC retained the validated 2026-07-09 row when the upstream shared edge returned 429. This is validated operational plumbing only and does not alter forecast signals.
 - **Rerun criteria:** CoinGecko response schema, volume semantics, retry policy, or source changes.
 - **Next better experiment:** Add an authenticated CoinGecko plan or separately validated same-instrument fallback only if bounded retries remain unreliable over seven scheduled production runs.
