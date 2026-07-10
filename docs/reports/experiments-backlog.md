@@ -22,6 +22,97 @@ Skills may reference this file as the place to read/write experiment history, bu
 
 ---
 
+## 2026-07-10 — Yellow forecast-path horizon prefix stability
+
+Status: `completed — prefix invariant passed; statistical gate needs more data; report-only`
+
+### Hypothesis
+
+The yellow stochastic forecast path can be made consistent across horizon changes by deriving its random stream from stable forecast identity—asset, origin, data/configuration version, generator method, and trace index—while using horizon only as the requested sequence length. Then a longer horizon will extend the shorter path instead of redrawing it, without smoothing the path or degrading its statistical properties.
+
+### Data/source changes
+
+None. Use checked-in BTC, VOO, and GLD histories. No source, median model, interval model, channel model, heatmap model, or external data change is authorized.
+
+### Validation setup
+
+- PRD: `docs/PRDs/YELLOW_LINE_HORIZON_PREFIX_STABILITY.md`.
+- Baseline diagnosis: BTC seeds stochastic traces with `horizon * 131`; S&P 500/gold use `horizon * 97`; gold also selects a primary trace by scoring the entire requested horizon. These mechanisms make shared prefixes horizon-dependent.
+- Candidate: versioned per-trace seeds derived without horizon, stable per-trace/day random consumption, and a gold primary-selection rule based on a frozen fixed prefix or trace identity.
+- Compare supported pairs including at least 30→90, 90→180, and 180→365 days across rolling origins for all three assets.
+- Primary invariant: zero mismatched dates or primary-trace values in the shared prefix, within `1e-12` relative tolerance, regardless of navigation order or direct generation.
+- Safety metrics: terminal q10/q50/q90 pinball, 80/90/95 coverage, NLL where defined, drawdown depth/duration, realized volatility, sign-change rate, tails, residual autocorrelation, absolute-return autocorrelation, support breaches, continuity, and invalid values.
+- Promotion requires prefix invariance plus statistical non-inferiority under the v2.12 path tolerances, no more than 2 percentage points of coverage loss, no material pinball/NLL regression, and passing `npm run backtest`, `npm run backtest:market`, tests, typecheck, build, E2E, and manual visual review.
+- Verdicts are asset-specific. A BTC pass cannot enable S&P 500 or gold, and vice versa.
+
+### Report artifacts
+
+- Planning artifact: `docs/PRDs/YELLOW_LINE_HORIZON_PREFIX_STABILITY.md`.
+- Baseline artifacts: `docs/reports/results/forecast-path-prefix-baseline-2026-07-10.md` and `.json`.
+- Candidate artifacts: `docs/reports/results/forecast-path-prefix-candidate-2026-07-10.md` and `.json`.
+- Reproduction: `npm run analyze:forecast-path-stability -- --baseline` and `npm run analyze:forecast-path-stability -- --candidate prefix-stable-v1`.
+
+### Result / verdict
+
+Verdict: `needs-more-data`; keep production routing on the baseline generator. The baseline report reproduces shared-prefix mismatches for BTC, S&P 500, and gold across 30→90, 90→180, and 180→365. The frozen `prefix-stable-v1` candidate records zero mismatches for all nine asset/pair comparisons and uses per-trace identity seeds plus a 14-day gold selection window. This proves the invariance property, but the current artifact evaluates one origin per asset and does not establish rolling-origin terminal distribution, coverage, pinball/NLL, drawdown, volatility, tail, or autocorrelation non-inferiority. Phase 3 runtime enablement is therefore prohibited; the candidate remains reachable only through an explicit report/test option.
+
+### Rerun criteria
+
+Rerun `prefix-stable-v1` on a pre-registered rolling-origin cohort with the full v2.12 path diagnostics and applicable backtests. Otherwise rerun only for a new generator version, a materially changed accepted path model, a new origin/data cohort, or a distinct pre-registered selection mechanism. Do not tune seeds or gold selection windows against already-inspected visual outcomes.
+
+### Next better experiment
+
+Extend the analyzer to rolling origins and paired baseline/candidate terminal/path diagnostics, freeze tolerances from v2.12, then run both forecast backtests. Promote assets independently only if those statistical gates pass; otherwise retain the baseline limitation.
+
+---
+
+## 2026-07-10 — S&P 500 and gold forecast-channel path calibration
+
+Status: `planned — report-only until validated`
+
+### Hypothesis
+
+The current S&P 500 and gold upper/lower future channel paths are straight on the logarithmic chart because they freeze the latest historical residual quantiles and compound a constant daily drift. Origin-safe pointwise quantiles from moving-block simulated price paths may improve future-path interval score and preserve nominal coverage without excessive width. A less-straight appearance is not evidence and is not a promotion criterion.
+
+BTC uses separate power-law floor/peak paths. This experiment will audit BTC invariance but will not change BTC runtime output, styling, or forecast behavior.
+
+### Data/source changes
+
+None. Use the checked-in VOO and GLD adjusted daily OHLCV histories and the existing BTC history for invariance tests. No source, instrument, feature, median model, or production data change is authorized.
+
+### Validation setup
+
+- PRD: `docs/PRDs/MARKET_FORECAST_CHANNEL_PATHS.md`.
+- Baseline: current frozen-residual, constant-drift future channel.
+- Primary candidate: deterministic moving-block bootstrap of origin-safe empirical innovations, summarized as pointwise future-price quantiles. Any volatility-regime candidate must be separately frozen before its results are inspected.
+- Evaluate S&P 500 and gold independently with rolling origins, at least 1,000 training rows, 30/90/180-session leads, intermediate lead buckets, and an untouched outer holdout after inner parameter selection.
+- Primary metric: paired pointwise interval-score improvement. Secondary metrics: q05/q95 pinball loss, 90% coverage, log-width, width growth, origin continuity, inversions/non-finite values, and regime robustness.
+- Dependence/multiplicity: paired block bootstrap with horizon-aware blocks, non-overlapping-equivalent sample counts, and correction across assets/horizons.
+- Default promotion gate: at least 30 nominal non-overlapping outer outcomes per promoted horizon; at least 2% interval-score improvement with a positive corrected 95% lower bound; q05/q95 pinball loss no material regression; 85–95% coverage with no more than 2 percentage-point loss versus baseline; width inflation no more than 10% absent significant correction of undercoverage; zero invalid/discontinuous paths; stable neighboring parameters and regimes.
+- Curvature and direction changes are diagnostics only. They cannot promote a candidate.
+- Required regression checks before any runtime change: `npm run backtest:market`, `npm run backtest`, `npm test -- --run`, `npm run lint`, `npm run build`, and chart E2E/manual review.
+
+### Report artifacts
+
+- Planning artifact: `docs/PRDs/MARKET_FORECAST_CHANNEL_PATHS.md`.
+- Planned baseline artifacts: `docs/reports/results/market-channel-path-baseline-YYYY-MM-DD.md` and `.json`.
+- Planned candidate artifacts: `docs/reports/results/market-channel-path-candidates-YYYY-MM-DD.md` and `.json`.
+- No result artifacts exist yet; this entry registers the experiment before implementation or result inspection.
+
+### Result / verdict
+
+Pending. Current diagnosis is algebraic: for each future day, `log(bound) = log(latestTrend) + drift * day + frozenResidualQuantile`, which must draw as a straight line on the logarithmic price scale. This explains the appearance but is not evidence that an alternative model is better. Keep all runtime forecasts and UI paths unchanged until the registered validation gate passes.
+
+### Rerun criteria
+
+Rerun after the first frozen baseline/candidate evaluation only for a genuinely new outer-holdout cohort, a material source/methodology change with a new availability audit, or a distinct pre-registered channel mechanism. Do not search neighboring bootstrap parameters on an already inspected holdout.
+
+### Next better experiment
+
+Build the origin-safe baseline report first. Then evaluate exactly the pre-registered moving-block pointwise-quantile candidate. If it fails calibration or proper-scoring gates, retain the current channel and improve semantic labeling/documentation rather than adding cosmetic curves.
+
+---
+
 ## 2026-07-10 — BTC forecast-line capability research program
 
 Status: `completed — YL-1/YL-2 rejected; YL-2P rejected for calibration; prospective study needs more data`
@@ -1112,6 +1203,43 @@ Rerun only with point-in-time structural-base refitting, a frozen estimator spec
 ### Next better experiment
 
 Do not tune AR bounds or rolling windows on these evaluation slices. First build a nested point-in-time core-model benchmark that removes the static-base provenance problem.
+
+---
+
+## 2026-07-10 — Market channel moving-block candidate evaluation result
+
+Status: `completed — needs-more-data; no runtime promotion`
+
+### Hypothesis
+
+Origin-safe pointwise q05/q95 bounds from moving-block empirical price paths may improve interval score over the frozen-residual channel for VOO and GLD while preserving calibrated coverage, tail loss, width, continuity, and deterministic output.
+
+### Data/source changes
+
+No production source or runtime forecast change. The report uses the checked-in VOO and GLD adjusted daily OHLCV histories. The shared US-session calendar was corrected so Juneteenth is treated as an exchange holiday only from 2022 onward.
+
+### Validation setup
+
+Run `npm run backtest:market -- --channel-path-baseline` and `npm run backtest:market -- --channel-path-candidates`. Origins use at least 1,000 prior rows; the final 40% is treated as outer evaluation; leads are 5/10/20/30/60/90/120/180 sessions. The frozen candidate is a 1,000-simulation, 10-session moving-block bootstrap over 504 origin-available innovations. Inference uses 2,000 paired moving-block bootstrap iterations and Bonferroni correction across two assets and three gated horizons. Seeds include asset, origin, horizon, candidate id, and configuration version. Curvature is diagnostic only.
+
+### Report artifacts
+
+- `docs/reports/results/market-channel-path-baseline-2026-07-10.md`
+- `docs/reports/results/market-channel-path-baseline-2026-07-10.json`
+- `docs/reports/results/market-channel-path-candidates-2026-07-10.md`
+- `docs/reports/results/market-channel-path-candidates-2026-07-10.json`
+
+### Result / verdict
+
+Verdict: `needs-more-data` independently for S&P 500 and gold. The checked-in histories cannot supply 30 nominal non-overlapping outer outcomes at 90 and 180 sessions under the frozen split. Corrected uncertainty and/or coverage also fail at longer horizons. The candidate is therefore research-only even where point estimates improve interval score. Phase 3 runtime integration is not authorized; existing non-BTC channel behavior and all BTC behavior remain unchanged.
+
+### Rerun criteria
+
+Rerun only after enough genuinely new, uninspected observations exist to supply at least 30 non-overlapping outcomes at every promoted horizon, or after a separately pre-registered data extension with audited point-in-time provenance. Do not tune block length, lookback, quantiles, or seeds against these inspected outer results.
+
+### Next better experiment
+
+Freeze this candidate prospectively and accumulate outcomes. If earlier audited VOO/GLD proxy history is introduced, define the source and splice policy before inspecting results, then repeat nested selection and one untouched outer score.
 ### 2026-07-10 — CoinGecko scheduled-ingestion rate-limit mitigation
 
 - **Status:** validated and deployed

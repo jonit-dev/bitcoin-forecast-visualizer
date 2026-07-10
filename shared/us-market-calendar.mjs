@@ -35,9 +35,12 @@ function goodFriday(year) {
 export function usMarketHolidays(year) {
   const holidays = new Set([
     observed(year, 0, 1), nthWeekday(year, 0, 1, 3), nthWeekday(year, 1, 1, 3), goodFriday(year),
-    lastWeekday(year, 4, 1), observed(year, 5, 19), observed(year, 6, 4), nthWeekday(year, 8, 1, 1),
+    lastWeekday(year, 4, 1), observed(year, 6, 4), nthWeekday(year, 8, 1, 1),
     nthWeekday(year, 10, 4, 4), observed(year, 11, 25),
   ]);
+  // Juneteenth became an exchange holiday in 2022; treating it as closed in older
+  // histories shifts every subsequent lead by one observed trading session.
+  if (year >= 2022) holidays.add(observed(year, 5, 19));
   // A Dec 31 observation can belong to the following year's New Year's holiday.
   holidays.add(observed(year + 1, 0, 1));
   return holidays;

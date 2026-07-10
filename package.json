@@ -70,6 +70,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "analyze:forecast-path-stability": "tsx scripts/analyze-forecast-path-stability.ts",
     "test:e2e:update": "playwright test --update-snapshots",
     "deploy": "bash -c 'set -a; source .env; set +a; node scripts/update-btc-data.mjs && vite build && wrangler pages deploy dist --branch main'"
   },

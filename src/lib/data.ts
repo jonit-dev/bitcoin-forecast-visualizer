@@ -19,6 +19,7 @@ import {
   validateYellowLineForecastConfig,
 } from './modelConfig';
 import { seededRandom } from './random';
+import { FORECAST_PATH_GENERATOR_VERSION, forecastDataVersion, forecastPathSeed } from './forecastPathSeed';
 
 export interface HeatmapCell {
   date: string;
@@ -41,6 +42,7 @@ export interface ProbabilityForecast {
 }
 
 export type CoefficientStabilityVerdict = 'stable' | 'watch' | 'unstable';
+export type ForecastPathPolicy = 'production-baseline' | 'prefix-stable-v1';
 export interface CoreAssumptionTrustSummary {
   longHorizonLabel: 'Scenario range' | 'Directional only';
   reason: string;
@@ -188,7 +190,8 @@ function sampleStandardDeviation(values: number[]): number {
 
 function generatePowerLawStochasticTraces(
   ohlcv: OHLCVData[],
-  horizon: number
+  horizon: number,
+  pathPolicy: ForecastPathPolicy
 ): Map<string, number[]> {
   const tracesByDate = new Map<string, number[]>();
   if (horizon < 1 || ohlcv.length < 120) return tracesByDate;
@@ -203,7 +206,6 @@ function generatePowerLawStochasticTraces(
   const innovations = buildPowerLawInnovationHistory(ohlcv, anchorIndex, STOCHASTIC_TRACE_LOOKBACK_DAYS);
   if (innovations.length < STOCHASTIC_TRACE_BLOCK_DAYS * 4) return tracesByDate;
 
-  const rng = mulberry32(0xB17C01A + horizon * 131 + anchorIndex);
   const centeredMean = innovations.reduce((sum, value) => sum + value, 0) / innovations.length;
   const rawCenteredInnovations = innovations.map(value => value - centeredMean);
   const rawInnovationSd = sampleStandardDeviation(rawCenteredInnovations);
@@ -219,8 +221,20 @@ function generatePowerLawStochasticTraces(
   const paths: number[][] = Array.from({ length: STOCHASTIC_TRACE_COUNT }, () => []);
   const anchorValues = Array.from({ length: STOCHASTIC_TRACE_COUNT }, () => anchor.close);
   tracesByDate.set(anchor.date, anchorValues);
+  const baselineRng = mulberry32(0xB17C01A + horizon * 131 + anchorIndex);
 
   for (let pathIndex = 0; pathIndex < STOCHASTIC_TRACE_COUNT; pathIndex++) {
+    const stableSeed = forecastPathSeed({
+      assetId: 'btc',
+      originDate: ohlcv[lastIndex].date,
+      dataVersion: forecastDataVersion(ohlcv),
+      methodId: 'power-law-residual-block-bootstrap-14d',
+      generatorVersion: FORECAST_PATH_GENERATOR_VERSION,
+    }, pathIndex);
+    const rng = mulberry32(pathPolicy === 'prefix-stable-v1'
+      ? stableSeed
+      : 0);
+    const pathRng = pathPolicy === 'prefix-stable-v1' ? rng : baselineRng;
     let price = anchor.close;
     let blockStart = 0;
     let blockOffset = STOCHASTIC_TRACE_BLOCK_DAYS;
@@ -238,7 +252,7 @@ function generatePowerLawStochasticTraces(
       }
 
       if (blockOffset >= STOCHASTIC_TRACE_BLOCK_DAYS) {
-        blockStart = Math.floor(rng() * Math.max(1, centeredInnovations.length - STOCHASTIC_TRACE_BLOCK_DAYS));
+        blockStart = Math.floor(pathRng() * Math.max(1, centeredInnovations.length - STOCHASTIC_TRACE_BLOCK_DAYS));
         blockOffset = 0;
       }
 
@@ -262,9 +276,10 @@ function generatePowerLawStochasticTraces(
 export function processRealData(
   ohlcv: OHLCVData[],
   horizon: number = 14,
-  confidenceZ: number = CONFIDENCE_Z_SCORES[0.95]
+  confidenceZ: number = CONFIDENCE_Z_SCORES[0.95],
+  pathPolicy: ForecastPathPolicy = 'production-baseline'
 ): any[] {
-  const stochasticTracesByDate = generatePowerLawStochasticTraces(ohlcv, horizon);
+  const stochasticTracesByDate = generatePowerLawStochasticTraces(ohlcv, horizon, pathPolicy);
   const lastReal = ohlcv[ohlcv.length - 1];
   const rng = mulberry32(hashStringSeed(`btc-forecast-candles:${lastReal?.date ?? 'unknown'}:${horizon}`));
 

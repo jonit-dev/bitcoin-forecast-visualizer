@@ -6,7 +6,7 @@ import { buildMarketForecast } from '../marketForecast';
 // Presentation-only workspace changes must not change these frozen forecast fixtures.
 const FIXTURES = {
   btc: { end: '2020-01-01', rows: 3456, close: 7189.94, median: 16954.54260718957, q10: 12005.311200178212, q90: 23944.111920625546 },
-  sp500: { end: '2017-01-03', rows: 1591, close: 177.1337, median: 197.17312707376053, q10: 175.00965442936277, q90: 222.14341355514708 },
+  sp500: { end: '2017-01-03', rows: 1591, close: 177.1337, median: 197.17312707376053, q10: 175.00959351363804, q90: 222.1434908767771 },
   gold: { end: '2012-01-03', rows: 1794, close: 155.92, median: 164.42518564681197, q10: 131.41809678805419, q90: 205.72236499962844 },
 } as const;
 

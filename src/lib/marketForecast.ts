@@ -7,7 +7,9 @@ import {
   type DrawdownStats,
   type HeatmapCell,
   type ProbabilityForecast,
+  type ForecastPathPolicy,
 } from './data';
+import { FORECAST_PATH_GENERATOR_VERSION, forecastDataVersion, forecastPathSeed } from './forecastPathSeed';
 
 export interface MarketAssetConfig {
   id: MarketAssetId;
@@ -336,17 +338,18 @@ export function computeGoldModelInputs(ohlcv: OHLCVData[]): GenericModelInputs {
 }
 
 function generateGenericStochasticTraces(
+  assetId: Exclude<MarketAssetId, 'btc'>,
   ohlcv: OHLCVData[],
   horizon: number,
   drift: number,
   dailyVol: number,
-  returns: number[]
+  returns: number[],
+  pathPolicy: ForecastPathPolicy
 ): Map<string, number[]> {
   const traces = new Map<string, number[]>();
   const last = ohlcv[ohlcv.length - 1];
   if (!last || horizon < 1) return traces;
 
-  const rng = mulberry32(0x5A500 + horizon * 97 + ohlcv.length);
   const lastDate = new Date(`${last.date}T00:00:00Z`);
   const prices = Array.from({ length: GENERIC_STOCHASTIC_TRACE_COUNT }, () => last.close);
   const empiricalInnovations = buildScaledEmpiricalInnovations(returns, dailyVol);
@@ -355,11 +358,22 @@ function generateGenericStochasticTraces(
     { length: GENERIC_STOCHASTIC_TRACE_COUNT },
     () => GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS
   );
+  const rngs = prices.map((_, traceIndex) => mulberry32(forecastPathSeed({
+    assetId,
+    originDate: last.date,
+    dataVersion: forecastDataVersion(ohlcv),
+    methodId: 'generic-return-block-bootstrap-10d',
+    generatorVersion: FORECAST_PATH_GENERATOR_VERSION,
+  }, traceIndex)));
+  const baselineRng = mulberry32(0x5A500 + horizon * 97 + ohlcv.length);
   traces.set(last.date, [...prices]);
 
   for (let day = 1; day <= horizon; day++) {
     const date = dateKey(addUtcDays(lastDate, day));
     for (let i = 0; i < prices.length; i++) {
+      const rng = pathPolicy === 'prefix-stable-v1'
+        ? rngs[i]
+        : baselineRng;
       let innovation: number;
       if (empiricalInnovations.length > 0) {
         if (blockOffsets[i] >= GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS) {
@@ -420,8 +434,10 @@ function selectPrimaryTraceIndex(rows: any[]): number {
   return best.index;
 }
 
-function promotePrimaryTrace(rows: any[], initialPrice: number): void {
-  const primaryIndex = selectPrimaryTraceIndex(rows);
+function promotePrimaryTrace(rows: any[], initialPrice: number, selectionWindowDays = 14): number {
+  // Freeze selection to a window available at every supported horizon. Scoring
+  // a requested terminal horizon would allow path extension to rewrite its prefix.
+  const primaryIndex = selectPrimaryTraceIndex(rows.slice(0, selectionWindowDays));
   let previousRaw = initialPrice;
   let previousProjected = initialPrice;
 
@@ -445,18 +461,21 @@ function promotePrimaryTrace(rows: any[], initialPrice: number): void {
     previousRaw = Number.isFinite(rawPrimary) && rawPrimary > 0 ? rawPrimary : previousRaw;
     previousProjected = primary;
   }
+  return primaryIndex;
 }
 
 function processGenericData(
+  assetId: Exclude<MarketAssetId, 'btc'>,
   ohlcv: OHLCVData[],
   horizon: number,
   confidenceZ: number,
   modelInputs: GenericModelInputs,
   channelBounds: MarketChannelPoint[],
-  supportAwarePrimaryTrace = false
+  supportAwarePrimaryTrace = false,
+  pathPolicy: ForecastPathPolicy = 'production-baseline'
 ): any[] {
   const { returns, drift, dailyVol } = modelInputs;
-  const tracesByDate = generateGenericStochasticTraces(ohlcv, horizon, drift, dailyVol, returns);
+  const tracesByDate = generateGenericStochasticTraces(assetId, ohlcv, horizon, drift, dailyVol, returns, pathPolicy);
   const latestChannel = [...channelBounds].reverse().find((point) =>
     point.lowerResidual !== null && point.upperResidual !== null
   );
@@ -523,7 +542,12 @@ function processGenericData(
   }
 
   if (supportAwarePrimaryTrace) {
-    promotePrimaryTrace(data.filter((row) => row.isForecast), last.close);
+    if (pathPolicy === 'production-baseline') {
+      promotePrimaryTrace(data.filter((row) => row.isForecast), last.close, Number.POSITIVE_INFINITY);
+      return data;
+    }
+    const primaryTraceIndex = promotePrimaryTrace(data.filter((row) => row.isForecast), last.close);
+    for (const row of data.filter((row) => row.isForecast)) row.primaryTraceIndex = primaryTraceIndex;
   }
 
   return data;
@@ -640,11 +664,13 @@ export function buildMarketForecast(
   assetId: MarketAssetId,
   marketData: MarketData,
   horizon: number,
-  confidenceZ: number
+  confidenceZ: number,
+  options: { pathPolicy?: ForecastPathPolicy } = {}
 ): MarketForecastResult {
+  const pathPolicy = options.pathPolicy ?? 'production-baseline';
   if (assetId === 'btc') {
     return {
-      displayData: processRealData(marketData.ohlcv, horizon, confidenceZ),
+      displayData: processRealData(marketData.ohlcv, horizon, confidenceZ, pathPolicy),
       heatmapData: generateHeatmapData(marketData.ohlcv, horizon),
       drawdownStats: computeDrawdownStats(marketData.ohlcv, horizon),
       probabilityForecast: computeProbabilityForecast(marketData.ohlcv, horizon),
@@ -655,12 +681,14 @@ export function buildMarketForecast(
     const modelInputs = computeGoldModelInputs(marketData.ohlcv);
     return {
       displayData: processGenericData(
+        'gold',
         marketData.ohlcv,
         horizon,
         confidenceZ,
         modelInputs,
         computeGoldChannelBounds(marketData.ohlcv),
-        true
+        true,
+        pathPolicy
       ),
       heatmapData: generateGenericHeatmapData(marketData.ohlcv, horizon, modelInputs),
       drawdownStats: null,
@@ -676,11 +704,14 @@ export function buildMarketForecast(
   const modelInputs = computeSP500ModelInputs(marketData.ohlcv);
   return {
     displayData: processGenericData(
+      'sp500',
       marketData.ohlcv,
       horizon,
       confidenceZ,
       modelInputs,
-      computeSP500ChannelBounds(marketData.ohlcv)
+      computeSP500ChannelBounds(marketData.ohlcv),
+      false,
+      pathPolicy
     ),
     heatmapData: generateGenericHeatmapData(marketData.ohlcv, horizon, modelInputs),
     drawdownStats: null,

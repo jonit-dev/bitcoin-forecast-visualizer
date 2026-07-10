@@ -107,7 +107,7 @@ describe('Chart data transforms', () => {
     expect(relativeVolumeForIndex([{ volume: 0 }], 0)).toBe(0);
   });
 
-  it('anchors forecast candles to the latest historical close and uses primary stochastic traces', () => {
+  it('should map primary trace values to yellow forecast candles without resampling', () => {
     const series = buildChartSeriesData(rows, null, true, false, 2);
 
     expect(series.candleData).toHaveLength(3);

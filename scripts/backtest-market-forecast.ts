@@ -261,4 +261,13 @@ function main(): void {
   }
 }
 
-main();
+const channelMode = process.argv.includes('--channel-path-baseline')
+  ? 'baseline'
+  : process.argv.includes('--channel-path-candidates') ? 'candidates' : null;
+
+if (channelMode) {
+  const { runMarketChannelPathBacktest } = await import('./backtest-market-channel-path');
+  runMarketChannelPathBacktest(channelMode);
+} else {
+  main();
+}
