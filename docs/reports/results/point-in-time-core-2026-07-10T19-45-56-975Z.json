@@ -1,0 +1,1471 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-10T19:45:56.975Z",
+    "command": "npm run backtest:pit-core -- --origin-start 2025-01-01 --spacing-days 90",
+    "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e",
+    "seed": 1498152960,
+    "closeAvailabilityConvention": "UTC daily close is available after that date closes; structural fit includes the origin close; calibration targets must be strictly earlier than origin.",
+    "dataset": {
+      "firstDate": "2010-07-17",
+      "lastDate": "2026-07-06",
+      "rowCount": 5834,
+      "sha256": "ab3cc5b9db51c5bae2aa3fbb6c48742e28c8d6a229110cbb5ba085785ef20e70"
+    },
+    "originStart": "2025-01-01",
+    "spacingDays": 90,
+    "horizons": [
+      14,
+      30,
+      60,
+      90
+    ]
+  },
+  "methodology": {
+    "status": "report-only",
+    "structuralFit": "expanding point-in-time power-law fit through origin close",
+    "intervalCalibration": "prior reconstructed-policy errors with targetDate < originDate",
+    "benchmarkSchedule": "identical origin/horizon rows for all available models"
+  },
+  "benchmarkMetrics": [
+    {
+      "horizonDays": 14,
+      "modelId": "reconstructed-current-policy",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.10578416369918588
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "naive-current-price",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.09093820002847953
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "gbm-driftless",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.09093820002847953
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "gbm-recent-drift",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.10330420946530001
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.09240214063489055
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "reconstructed-current-policy",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.22396100354696727
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "naive-current-price",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.1628579337583459
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "gbm-driftless",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.1628579337583459
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "gbm-recent-drift",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.19201371620719854
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.17312631859531394
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "reconstructed-current-policy",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.3304459286910459
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "naive-current-price",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.19030002659367962
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "gbm-driftless",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.19030002659367962
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "gbm-recent-drift",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.22234913494045852
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 6,
+      "meanAbsoluteLogError": 0.21083679626761564
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "reconstructed-current-policy",
+      "samples": 5,
+      "meanAbsoluteLogError": 0.3139582870485559
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "naive-current-price",
+      "samples": 5,
+      "meanAbsoluteLogError": 0.1481792139542787
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "gbm-driftless",
+      "samples": 5,
+      "meanAbsoluteLogError": 0.1481792139542787
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "gbm-recent-drift",
+      "samples": 5,
+      "meanAbsoluteLogError": 0.27740678319657824
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 5,
+      "meanAbsoluteLogError": 0.1821469860560428
+    }
+  ],
+  "origins": [
+    {
+      "originDate": "2025-01-29",
+      "targetDate": "2025-02-12",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-01-29",
+      "trainingRows": 5311,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 3.375502936337044e-17,
+        "exponent": 5.685336638420695,
+        "sinAmplitude": 0.5657820204751612,
+        "cosAmplitude": 0.031360199544899436,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "aa3aa4948264708d9acce136a8ad05853df4e6aee182fadd687efa74d4fb3a3c",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 108034.2039954155,
+          "actual": 97874.61,
+          "absLogError": 0.09876071101675714
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 103742.97,
+          "actual": 97874.61,
+          "absLogError": 0.058229228150217
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 103742.97,
+          "actual": 97874.61,
+          "absLogError": 0.058229228150217
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 110239.43990594428,
+          "actual": 97874.61,
+          "absLogError": 0.11896755694471797
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 105339.68008352467,
+          "actual": 97874.61,
+          "absLogError": 0.07350300743241946
+        }
+      ]
+    },
+    {
+      "originDate": "2025-01-29",
+      "targetDate": "2025-02-28",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-01-29",
+      "trainingRows": 5311,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 3.375502936337044e-17,
+        "exponent": 5.685336638420695,
+        "sinAmplitude": 0.5657820204751612,
+        "cosAmplitude": 0.031360199544899436,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "aa3aa4948264708d9acce136a8ad05853df4e6aee182fadd687efa74d4fb3a3c",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 112998.32377110673,
+          "actual": 84322.57,
+          "absLogError": 0.2927234212625983
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 103742.97,
+          "actual": 84322.57,
+          "absLogError": 0.20726683432320814
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 103742.97,
+          "actual": 84322.57,
+          "absLogError": 0.20726683432320814
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 118163.5828141974,
+          "actual": 84322.57,
+          "absLogError": 0.33742039602571006
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 107194.60542175318,
+          "actual": 84322.57,
+          "absLogError": 0.2399963613564988
+        }
+      ]
+    },
+    {
+      "originDate": "2025-01-29",
+      "targetDate": "2025-03-30",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-01-29",
+      "trainingRows": 5311,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 3.375502936337044e-17,
+        "exponent": 5.685336638420695,
+        "sinAmplitude": 0.5657820204751612,
+        "cosAmplitude": 0.031360199544899436,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "aa3aa4948264708d9acce136a8ad05853df4e6aee182fadd687efa74d4fb3a3c",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 122420.65196955456,
+          "actual": 82379.51,
+          "absLogError": 0.396126340142579
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 103742.97,
+          "actual": 82379.51,
+          "absLogError": 0.23057965683431314
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 103742.97,
+          "actual": 82379.51,
+          "absLogError": 0.23057965683431314
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 134588.70806848587,
+          "actual": 82379.51,
+          "absLogError": 0.49088678023931703
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 110761.08030766188,
+          "actual": 82379.51,
+          "absLogError": 0.2960387109008946
+        }
+      ]
+    },
+    {
+      "originDate": "2025-01-29",
+      "targetDate": "2025-04-29",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-01-29",
+      "trainingRows": 5311,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 3.375502936337044e-17,
+        "exponent": 5.685336638420695,
+        "sinAmplitude": 0.5657820204751612,
+        "cosAmplitude": 0.031360199544899436,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "aa3aa4948264708d9acce136a8ad05853df4e6aee182fadd687efa74d4fb3a3c",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 131892.61828988846,
+          "actual": 94274.16,
+          "absLogError": 0.3357809607122909
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 103742.97,
+          "actual": 94274.16,
+          "absLogError": 0.09570926477761121
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 103742.97,
+          "actual": 94274.16,
+          "absLogError": 0.09570926477761121
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 153296.97956118247,
+          "actual": 94274.16,
+          "absLogError": 0.48616994988511675
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 114446.21548493294,
+          "actual": 94274.16,
+          "absLogError": 0.19389784587748352
+        }
+      ]
+    },
+    {
+      "originDate": "2025-04-29",
+      "targetDate": "2025-05-13",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-04-29",
+      "trainingRows": 5401,
+      "lastKnownTargetDate": "2025-02-12",
+      "coefficients": {
+        "coefficient": 3.572400500197073e-17,
+        "exponent": 5.677593628232932,
+        "sinAmplitude": 0.5618019456330352,
+        "cosAmplitude": 0.02441651968162784,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2025-02-12",
+        "q80AbsLogError": 0.09876071101675714,
+        "q90AbsLogError": 0.09876071101675714,
+        "q95AbsLogError": 0.09876071101675714
+      },
+      "dataHash": "a2690fea59731c81bd2f31bc5eb59b235713e36a08658e5d4fc7d992a9ab2bc1",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 99458.24993662746,
+          "actual": 104136.59,
+          "absLogError": 0.04596544533453152
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 94274.16,
+          "actual": 104136.59,
+          "absLogError": 0.09949626981477731
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 94274.16,
+          "actual": 104136.59,
+          "absLogError": 0.09949626981477731
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 92880.99268420965,
+          "actual": 104136.59,
+          "absLogError": 0.11438437766907232
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 94879.47222795816,
+          "actual": 104136.59,
+          "absLogError": 0.09309603010365777
+        }
+      ]
+    },
+    {
+      "originDate": "2025-04-29",
+      "targetDate": "2025-05-29",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-04-29",
+      "trainingRows": 5401,
+      "lastKnownTargetDate": "2025-02-28",
+      "coefficients": {
+        "coefficient": 3.572400500197073e-17,
+        "exponent": 5.677593628232932,
+        "sinAmplitude": 0.5618019456330352,
+        "cosAmplitude": 0.02441651968162784,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2025-02-28",
+        "q80AbsLogError": 0.2927234212625983,
+        "q90AbsLogError": 0.2927234212625983,
+        "q95AbsLogError": 0.2927234212625983
+      },
+      "dataHash": "a2690fea59731c81bd2f31bc5eb59b235713e36a08658e5d4fc7d992a9ab2bc1",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 105401.51285562963,
+          "actual": 105586.78,
+          "absLogError": 0.001756184568151729
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 94274.16,
+          "actual": 105586.78,
+          "absLogError": 0.11332604104007063
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 94274.16,
+          "actual": 105586.78,
+          "absLogError": 0.11332604104007063
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 91313.9934492602,
+          "actual": 105586.78,
+          "absLogError": 0.1452291292992744
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 95576.01814676377,
+          "actual": 105586.78,
+          "absLogError": 0.09961124165910067
+        }
+      ]
+    },
+    {
+      "originDate": "2025-04-29",
+      "targetDate": "2025-06-28",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-04-29",
+      "trainingRows": 5401,
+      "lastKnownTargetDate": "2025-03-30",
+      "coefficients": {
+        "coefficient": 3.572400500197073e-17,
+        "exponent": 5.677593628232932,
+        "sinAmplitude": 0.5618019456330352,
+        "cosAmplitude": 0.02441651968162784,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2025-03-30",
+        "q80AbsLogError": 0.396126340142579,
+        "q90AbsLogError": 0.396126340142579,
+        "q95AbsLogError": 0.396126340142579
+      },
+      "dataHash": "a2690fea59731c81bd2f31bc5eb59b235713e36a08658e5d4fc7d992a9ab2bc1",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 116507.52237583738,
+          "actual": 107390.13,
+          "absLogError": 0.08148756226048452
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 94274.16,
+          "actual": 107390.13,
+          "absLogError": 0.13026114540910644
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 94274.16,
+          "actual": 107390.13,
+          "absLogError": 0.13026114540910644
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 88446.77480713204,
+          "actual": 107390.13,
+          "absLogError": 0.19406732192751378
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 96895.85401546423,
+          "actual": 107390.13,
+          "absLogError": 0.10283154664716641
+        }
+      ]
+    },
+    {
+      "originDate": "2025-04-29",
+      "targetDate": "2025-07-28",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-04-29",
+      "trainingRows": 5401,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 3.572400500197073e-17,
+        "exponent": 5.677593628232932,
+        "sinAmplitude": 0.5618019456330352,
+        "cosAmplitude": 0.02441651968162784,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "a2690fea59731c81bd2f31bc5eb59b235713e36a08658e5d4fc7d992a9ab2bc1",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 127413.28075222271,
+          "actual": 117911.76,
+          "absLogError": 0.07749943411177877
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 94274.16,
+          "actual": 117911.76,
+          "absLogError": 0.2237294151148379
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 94274.16,
+          "actual": 117911.76,
+          "absLogError": 0.2237294151148379
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 85669.58555076648,
+          "actual": 117911.76,
+          "absLogError": 0.31943867989244895
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 98233.91586547345,
+          "actual": 117911.76,
+          "absLogError": 0.18258501697192786
+        }
+      ]
+    },
+    {
+      "originDate": "2025-07-28",
+      "targetDate": "2025-08-11",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-07-28",
+      "trainingRows": 5491,
+      "lastKnownTargetDate": "2025-05-13",
+      "coefficients": {
+        "coefficient": 3.8215387292582664e-17,
+        "exponent": 5.668397300412204,
+        "sinAmplitude": 0.5542900256575819,
+        "cosAmplitude": 0.018331384470591253,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2025-05-13",
+        "q80AbsLogError": 0.04596544533453152,
+        "q90AbsLogError": 0.04596544533453152,
+        "q95AbsLogError": 0.04596544533453152
+      },
+      "dataHash": "95757a5a0d3d1abf5f46ed4a62e061d19b72cc51f5b5026f8c4be3b0700c73c8",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 122982.47402178259,
+          "actual": 118817.46,
+          "absLogError": 0.034453491765780685
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 117911.76,
+          "actual": 118817.46,
+          "absLogError": 0.007651817710383779
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 117911.76,
+          "actual": 118817.46,
+          "absLogError": 0.007651817710383779
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 122087.6099770623,
+          "actual": 118817.46,
+          "absLogError": 0.027150535751924183
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 120295.52480997301,
+          "actual": 118817.46,
+          "absLogError": 0.012363056212559351
+        }
+      ]
+    },
+    {
+      "originDate": "2025-07-28",
+      "targetDate": "2025-08-27",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-07-28",
+      "trainingRows": 5491,
+      "lastKnownTargetDate": "2025-05-29",
+      "coefficients": {
+        "coefficient": 3.8215387292582664e-17,
+        "exponent": 5.668397300412204,
+        "sinAmplitude": 0.5542900256575819,
+        "cosAmplitude": 0.018331384470591253,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2025-05-29",
+        "q80AbsLogError": 0.001756184568151729,
+        "q90AbsLogError": 0.001756184568151729,
+        "q95AbsLogError": 0.001756184568151729
+      },
+      "dataHash": "95757a5a0d3d1abf5f46ed4a62e061d19b72cc51f5b5026f8c4be3b0700c73c8",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 128672.14019657968,
+          "actual": 111438.43,
+          "absLogError": 0.14379537920615637
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 117911.76,
+          "actual": 111438.43,
+          "absLogError": 0.056464307042469575
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 117911.76,
+          "actual": 111438.43,
+          "absLogError": 0.056464307042469575
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 127041.40028353747,
+          "actual": 111438.43,
+          "absLogError": 0.1310407787474154
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 123078.89391103729,
+          "actual": 111438.43,
+          "absLogError": 0.0993533225916335
+        }
+      ]
+    },
+    {
+      "originDate": "2025-07-28",
+      "targetDate": "2025-09-26",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-07-28",
+      "trainingRows": 5491,
+      "lastKnownTargetDate": "2025-06-28",
+      "coefficients": {
+        "coefficient": 3.8215387292582664e-17,
+        "exponent": 5.668397300412204,
+        "sinAmplitude": 0.5542900256575819,
+        "cosAmplitude": 0.018331384470591253,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2025-06-28",
+        "q80AbsLogError": 0.08148756226048452,
+        "q90AbsLogError": 0.08148756226048452,
+        "q95AbsLogError": 0.08148756226048452
+      },
+      "dataHash": "95757a5a0d3d1abf5f46ed4a62e061d19b72cc51f5b5026f8c4be3b0700c73c8",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 138945.2609984923,
+          "actual": 109611.18,
+          "absLogError": 0.2371406731918006
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 117911.76,
+          "actual": 109611.18,
+          "absLogError": 0.0729971715053483
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 117911.76,
+          "actual": 109611.18,
+          "absLogError": 0.0729971715053483
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 136877.92791831784,
+          "actual": 109611.18,
+          "absLogError": 0.22215011491524003
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 128472.46217310616,
+          "actual": 109611.18,
+          "absLogError": 0.15877520260367634
+        }
+      ]
+    },
+    {
+      "originDate": "2025-07-28",
+      "targetDate": "2025-10-26",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-07-28",
+      "trainingRows": 5491,
+      "lastKnownTargetDate": "2025-04-29",
+      "coefficients": {
+        "coefficient": 3.8215387292582664e-17,
+        "exponent": 5.668397300412204,
+        "sinAmplitude": 0.5542900256575819,
+        "cosAmplitude": 0.018331384470591253,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2025-04-29",
+        "q80AbsLogError": 0.3357809607122909,
+        "q90AbsLogError": 0.3357809607122909,
+        "q95AbsLogError": 0.3357809607122909
+      },
+      "dataHash": "95757a5a0d3d1abf5f46ed4a62e061d19b72cc51f5b5026f8c4be3b0700c73c8",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 148558.1855880073,
+          "actual": 114722.02,
+          "absLogError": 0.25846471885641736
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 117911.76,
+          "actual": 114722.02,
+          "absLogError": 0.02742456333059219
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 117911.76,
+          "actual": 114722.02,
+          "absLogError": 0.02742456333059219
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 147476.0755895104,
+          "actual": 114722.02,
+          "absLogError": 0.2511539784454302
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 134102.3876014868,
+          "actual": 114722.02,
+          "absLogError": 0.15609160997808424
+        }
+      ]
+    },
+    {
+      "originDate": "2025-10-26",
+      "targetDate": "2025-11-09",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-10-26",
+      "trainingRows": 5581,
+      "lastKnownTargetDate": "2025-08-11",
+      "coefficients": {
+        "coefficient": 4.20554081252137e-17,
+        "exponent": 5.655394815967146,
+        "sinAmplitude": 0.5410994021870923,
+        "cosAmplitude": 0.014708491216066705,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2025-08-11",
+        "q80AbsLogError": 0.04596544533453152,
+        "q90AbsLogError": 0.04596544533453152,
+        "q95AbsLogError": 0.04596544533453152
+      },
+      "dataHash": "445f7fb41ba86234a70151b2d02aa8fba6bb475c6431ff3f11b722d16250b77b",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 119756.73516037907,
+          "actual": 104752.95,
+          "absLogError": 0.13385775752302337
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 114722.02,
+          "actual": 104752.95,
+          "absLogError": 0.09090726408868378
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 114722.02,
+          "actual": 104752.95,
+          "absLogError": 0.09090726408868378
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 114233.6533457094,
+          "actual": 104752.95,
+          "absLogError": 0.086641220903925
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 114521.88299293896,
+          "actual": 104752.95,
+          "absLogError": 0.08916120187900108
+        }
+      ]
+    },
+    {
+      "originDate": "2025-10-26",
+      "targetDate": "2025-11-25",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-10-26",
+      "trainingRows": 5581,
+      "lastKnownTargetDate": "2025-08-27",
+      "coefficients": {
+        "coefficient": 4.20554081252137e-17,
+        "exponent": 5.655394815967146,
+        "sinAmplitude": 0.5410994021870923,
+        "cosAmplitude": 0.014708491216066705,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2025-08-27",
+        "q80AbsLogError": 0.14379537920615637,
+        "q90AbsLogError": 0.14379537920615637,
+        "q95AbsLogError": 0.14379537920615637
+      },
+      "dataHash": "445f7fb41ba86234a70151b2d02aa8fba6bb475c6431ff3f11b722d16250b77b",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 125330.44521063843,
+          "actual": 87594.72,
+          "absLogError": 0.3582330887709441
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 114722.02,
+          "actual": 87594.72,
+          "absLogError": 0.2697912626323563
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 114722.02,
+          "actual": 87594.72,
+          "absLogError": 0.2697912626323563
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 113678.06516996377,
+          "actual": 87594.72,
+          "absLogError": 0.2606497415221589
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 114293.58247598489,
+          "actual": 87594.72,
+          "absLogError": 0.26604970075446477
+        }
+      ]
+    },
+    {
+      "originDate": "2025-10-26",
+      "targetDate": "2025-12-25",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-10-26",
+      "trainingRows": 5581,
+      "lastKnownTargetDate": "2025-09-26",
+      "coefficients": {
+        "coefficient": 4.20554081252137e-17,
+        "exponent": 5.655394815967146,
+        "sinAmplitude": 0.5410994021870923,
+        "cosAmplitude": 0.014708491216066705,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2025-09-26",
+        "q80AbsLogError": 0.2371406731918006,
+        "q90AbsLogError": 0.2371406731918006,
+        "q95AbsLogError": 0.2371406731918006
+      },
+      "dataHash": "445f7fb41ba86234a70151b2d02aa8fba6bb475c6431ff3f11b722d16250b77b",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 135156.9051952703,
+          "actual": 87535.28,
+          "absLogError": 0.4343944521417605
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 114722.02,
+          "actual": 87535.28,
+          "absLogError": 0.27047007268525897
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 114722.02,
+          "actual": 87535.28,
+          "absLogError": 0.27047007268525897
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 112643.61018736011,
+          "actual": 87535.28,
+          "absLogError": 0.2521870304648642
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 113866.74498230382,
+          "actual": 87535.28,
+          "absLogError": 0.2629869489294757
+        }
+      ]
+    },
+    {
+      "originDate": "2025-10-26",
+      "targetDate": "2026-01-24",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-10-26",
+      "trainingRows": 5581,
+      "lastKnownTargetDate": "2025-07-28",
+      "coefficients": {
+        "coefficient": 4.20554081252137e-17,
+        "exponent": 5.655394815967146,
+        "sinAmplitude": 0.5410994021870923,
+        "cosAmplitude": 0.014708491216066705,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2025-07-28",
+        "q80AbsLogError": 0.07749943411177877,
+        "q90AbsLogError": 0.07749943411177877,
+        "q95AbsLogError": 0.07749943411177877
+      },
+      "dataHash": "445f7fb41ba86234a70151b2d02aa8fba6bb475c6431ff3f11b722d16250b77b",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 144011.18448794773,
+          "actual": 89294.13,
+          "absLogError": 0.47795521437576
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 114722.02,
+          "actual": 89294.13,
+          "absLogError": 0.2505762325462799
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 114722.02,
+          "actual": 89294.13,
+          "absLogError": 0.2505762325462799
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 111618.5686048652,
+          "actual": 89294.13,
+          "absLogError": 0.22315166921568763
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 113441.50154353,
+          "actual": 89294.13,
+          "absLogError": 0.23935154691260505
+        }
+      ]
+    },
+    {
+      "originDate": "2026-01-24",
+      "targetDate": "2026-02-07",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-01-24",
+      "trainingRows": 5671,
+      "lastKnownTargetDate": "2025-11-09",
+      "coefficients": {
+        "coefficient": 4.971251852277666e-17,
+        "exponent": 5.632831477166961,
+        "sinAmplitude": 0.5180445276153424,
+        "cosAmplitude": 0.01752803594083099,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 4,
+        "lastKnownTargetDate": "2025-11-09",
+        "q80AbsLogError": 0.09876071101675714,
+        "q90AbsLogError": 0.09876071101675714,
+        "q95AbsLogError": 0.09876071101675714
+      },
+      "dataHash": "1d864cb26e0034a82e912969fdde45baacd606365f852ac1a19c518e36337025",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 94206.43675266922,
+          "actual": 69375.53,
+          "absLogError": 0.30595429827856574
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 89294.13,
+          "actual": 69375.53,
+          "absLogError": 0.25240154056221425
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 89294.13,
+          "actual": 69375.53,
+          "absLogError": 0.25240154056221425
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 85880.53710945013,
+          "actual": 69375.53,
+          "absLogError": 0.21342301549945952
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 89229.59608742065,
+          "actual": 69375.53,
+          "absLogError": 0.2516785675792429
+        }
+      ]
+    },
+    {
+      "originDate": "2026-01-24",
+      "targetDate": "2026-02-23",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-01-24",
+      "trainingRows": 5671,
+      "lastKnownTargetDate": "2025-11-25",
+      "coefficients": {
+        "coefficient": 4.971251852277666e-17,
+        "exponent": 5.632831477166961,
+        "sinAmplitude": 0.5180445276153424,
+        "cosAmplitude": 0.01752803594083099,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 4,
+        "lastKnownTargetDate": "2025-11-25",
+        "q80AbsLogError": 0.2927234212625983,
+        "q90AbsLogError": 0.2927234212625983,
+        "q95AbsLogError": 0.2927234212625983
+      },
+      "dataHash": "1d864cb26e0034a82e912969fdde45baacd606365f852ac1a19c518e36337025",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 99647.65383847909,
+          "actual": 64719.45,
+          "absLogError": 0.43157872779409473
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 89294.13,
+          "actual": 64719.45,
+          "absLogError": 0.32187397767100284
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 89294.13,
+          "actual": 64719.45,
+          "absLogError": 0.32187397767100284
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 82138.78703624876,
+          "actual": 64719.45,
+          "absLogError": 0.23834856682224295
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 89155.90015199328,
+          "actual": 64719.45,
+          "absLogError": 0.32032474985034987
+        }
+      ]
+    },
+    {
+      "originDate": "2026-01-24",
+      "targetDate": "2026-03-25",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-01-24",
+      "trainingRows": 5671,
+      "lastKnownTargetDate": "2025-12-25",
+      "coefficients": {
+        "coefficient": 4.971251852277666e-17,
+        "exponent": 5.632831477166961,
+        "sinAmplitude": 0.5180445276153424,
+        "cosAmplitude": 0.01752803594083099,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 4,
+        "lastKnownTargetDate": "2025-12-25",
+        "q80AbsLogError": 0.396126340142579,
+        "q90AbsLogError": 0.396126340142579,
+        "q95AbsLogError": 0.396126340142579
+      },
+      "dataHash": "1d864cb26e0034a82e912969fdde45baacd606365f852ac1a19c518e36337025",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 109214.15043360261,
+          "actual": 71343.12,
+          "absLogError": 0.4258097244361096
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 89294.13,
+          "actual": 71343.12,
+          "absLogError": 0.2244348390343931
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 89294.13,
+          "actual": 71343.12,
+          "absLogError": 0.2244348390343931
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 75556.81807736105,
+          "actual": 71343.12,
+          "absLogError": 0.057384017336873254
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 89017.88428771518,
+          "actual": 71343.12,
+          "absLogError": 0.2213363833930871
+        }
+      ]
+    },
+    {
+      "originDate": "2026-01-24",
+      "targetDate": "2026-04-24",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-01-24",
+      "trainingRows": 5671,
+      "lastKnownTargetDate": "2025-10-26",
+      "coefficients": {
+        "coefficient": 4.971251852277666e-17,
+        "exponent": 5.632831477166961,
+        "sinAmplitude": 0.5180445276153424,
+        "cosAmplitude": 0.01752803594083099,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2025-10-26",
+        "q80AbsLogError": 0.25846471885641736,
+        "q90AbsLogError": 0.25846471885641736,
+        "q95AbsLogError": 0.25846471885641736
+      },
+      "dataHash": "1d864cb26e0034a82e912969fdde45baacd606365f852ac1a19c518e36337025",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 117750.76920759068,
+          "actual": 77360.72,
+          "absLogError": 0.42009110718653264
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 89294.13,
+          "actual": 77360.72,
+          "absLogError": 0.1434565940020722
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 89294.13,
+          "actual": 77360.72,
+          "absLogError": 0.1434565940020722
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 69502.2773523069,
+          "actual": 77360.72,
+          "absLogError": 0.10711963854420777
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 88880.08207591278,
+          "actual": 77360.72,
+          "absLogError": 0.13880891054011338
+        }
+      ]
+    },
+    {
+      "originDate": "2026-04-24",
+      "targetDate": "2026-05-08",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-04-24",
+      "trainingRows": 5761,
+      "lastKnownTargetDate": "2026-02-07",
+      "coefficients": {
+        "coefficient": 6.302751067276267e-17,
+        "exponent": 5.601057583763985,
+        "sinAmplitude": 0.49035799960754345,
+        "cosAmplitude": 0.032688620877404706,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 5,
+        "lastKnownTargetDate": "2026-02-07",
+        "q80AbsLogError": 0.13385775752302337,
+        "q90AbsLogError": 0.13385775752302337,
+        "q95AbsLogError": 0.13385775752302337
+      },
+      "dataHash": "4b54a344ff1b132d42e021d2061902d52b6f0f80cfcdc9c4bfd0f728f4f17ab9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 81543.40998988194,
+          "actual": 80272.11,
+          "absLogError": 0.015713278276456796
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 77360.72,
+          "actual": 80272.11,
+          "absLogError": 0.03694307984460112
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 77360.72,
+          "actual": 80272.11,
+          "absLogError": 0.03694307984460112
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 75653.49872884474,
+          "actual": 80272.11,
+          "absLogError": 0.05925855002270118
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 77541.34341047979,
+          "actual": 80272.11,
+          "absLogError": 0.03461098060246267
+        }
+      ]
+    },
+    {
+      "originDate": "2026-04-24",
+      "targetDate": "2026-05-24",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-04-24",
+      "trainingRows": 5761,
+      "lastKnownTargetDate": "2026-02-23",
+      "coefficients": {
+        "coefficient": 6.302751067276267e-17,
+        "exponent": 5.601057583763985,
+        "sinAmplitude": 0.49035799960754345,
+        "cosAmplitude": 0.032688620877404706,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 5,
+        "lastKnownTargetDate": "2026-02-23",
+        "q80AbsLogError": 0.3582330887709441,
+        "q90AbsLogError": 0.3582330887709441,
+        "q95AbsLogError": 0.3582330887709441
+      },
+      "dataHash": "4b54a344ff1b132d42e021d2061902d52b6f0f80cfcdc9c4bfd0f728f4f17ab9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 86119.27018603565,
+          "actual": 76711.68,
+          "absLogError": 0.11567921967985838
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 77360.72,
+          "actual": 76711.68,
+          "absLogError": 0.008425179840967838
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 77360.72,
+          "actual": 76711.68,
+          "absLogError": 0.008425179840967838
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 73748.47326910897,
+          "actual": 76711.68,
+          "absLogError": 0.03939368482638936
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 77748.28661854943,
+          "actual": 76711.68,
+          "absLogError": 0.013422535359836032
+        }
+      ]
+    },
+    {
+      "originDate": "2026-04-24",
+      "targetDate": "2026-06-23",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-04-24",
+      "trainingRows": 5761,
+      "lastKnownTargetDate": "2026-03-25",
+      "coefficients": {
+        "coefficient": 6.302751067276267e-17,
+        "exponent": 5.601057583763985,
+        "sinAmplitude": 0.49035799960754345,
+        "cosAmplitude": 0.032688620877404706,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 5,
+        "lastKnownTargetDate": "2026-03-25",
+        "q80AbsLogError": 0.4258097244361096,
+        "q90AbsLogError": 0.4258097244361096,
+        "q95AbsLogError": 0.4258097244361096
+      },
+      "dataHash": "4b54a344ff1b132d42e021d2061902d52b6f0f80cfcdc9c4bfd0f728f4f17ab9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 93985.32979850406,
+          "actual": 62515.96,
+          "absLogError": 0.40771681997354103
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 77360.72,
+          "actual": 62515.96,
+          "absLogError": 0.21305727409365782
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 77360.72,
+          "actual": 62515.96,
+          "absLogError": 0.21305727409365782
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 70304.89516545967,
+          "actual": 62515.96,
+          "absLogError": 0.11741954475894292
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 78137.79489281008,
+          "actual": 62515.96,
+          "absLogError": 0.22305198513139374
+        }
+      ]
+    }
+  ],
+  "skips": [
+    {
+      "originDate": "2026-04-24",
+      "horizonDays": 90,
+      "reason": "target-not-yet-observed"
+    }
+  ]
+}

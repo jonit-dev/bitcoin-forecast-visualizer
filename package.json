@@ -22,6 +22,7 @@
     "backtest:tail-risk-suite": "tsx scripts/backtest-forecast.ts --tail-risk-suite",
     "refit:powerlaw": "tsx scripts/refit-power-law.ts",
     "sweep:tau": "tsx scripts/sweep-tau.ts",
+    "backtest:tau-replication": "tsx scripts/backtest-tau-replication.ts",
     "backtest:market": "tsx scripts/backtest-market-forecast.ts",
     "backtest:buy-zones": "tsx scripts/backtest-buy-zones.ts",
     "backtest:liquidity-derivatives": "tsx scripts/backtest-liquidity-derivatives.ts",

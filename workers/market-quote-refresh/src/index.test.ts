@@ -46,7 +46,7 @@ const timestamp = Date.parse('2026-07-08T00:00:00Z');
 function successfulFetch(): typeof fetch {
   return (async (input: RequestInfo | URL) => {
     const url = String(input);
-    if (url.includes('coingecko') && url.includes('interval=hourly')) return Response.json({ prices: [[timestamp, 100]] });
+    if (url.includes('coingecko') && url.includes('interval=hourly')) return Response.json({ prices: [[timestamp, 100]], total_volumes: [[timestamp, 10]] });
     if (url.includes('coingecko')) return Response.json({ total_volumes: [[timestamp, 10]] });
     return Response.json({ chart: { result: [{ timestamp: [timestamp / 1000], indicators: { quote: [{ open: [100], high: [101], low: [99], close: [100], volume: [10] }], adjclose: [{ adjclose: [100] }] } }] } });
   }) as typeof fetch;

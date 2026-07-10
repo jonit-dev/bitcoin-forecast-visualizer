@@ -1,0 +1,389 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-09T19:49:42.622Z",
+    "command": "npm run backtest:tau-replication",
+    "gitCommit": "2bd91ca93e053dba677a32b65be45731ea16505b",
+    "datasetSha256": "ab3cc5b9db51c5bae2aa3fbb6c48742e28c8d6a229110cbb5ba085785ef20e70",
+    "dataset": {
+      "firstDate": "2010-07-17",
+      "lastDate": "2026-07-06",
+      "rowCount": 5834
+    },
+    "evaluationStart": "2017-01-01",
+    "horizons": [
+      14,
+      30,
+      60,
+      90
+    ],
+    "baselineTauDays": 210,
+    "candidateTauDays": 120,
+    "bootstrapIterations": 10000,
+    "practicalEffectFraction": 0.01
+  },
+  "claimLimitations": [
+    "The candidate was selected by prior tau searches; this run is a research-only replication, not a fresh confirmatory test.",
+    "The 2022+ and 2025+ periods have been repeatedly inspected and are not untouched holdouts.",
+    "Static power-law coefficients may contain information from after some historical origins, so results are conditional on the current structural curve.",
+    "Current interval multipliers were previously calibrated on 2022+; distribution metrics are descriptive guardrails, not clean out-of-sample calibration evidence."
+  ],
+  "formula": {
+    "forecast": "F_tau(o,h) = B(o+h) * exp(log(P_o / B(o)) * exp(-h/tau))",
+    "loss": "L_tau(o,h) = abs(log(F_tau(o,h) / P_(o+h)))",
+    "pairedImprovement": "d(o,h) = L_210(o,h) - L_120(o,h)",
+    "practicalNull": "H0_h: E[d(o,h)] <= 0.01 * E[L_210(o,h)]"
+  },
+  "historicalGatePassed": false,
+  "verdict": "rejected",
+  "verdictReason": "The single fixed-tau candidate failed at least one pre-specified statistical, practical, calibration, sample-size, or origin-subperiod gate.",
+  "results": [
+    {
+      "horizonDays": 14,
+      "samples": 3460,
+      "nominalNonOverlappingEquivalents": 247,
+      "baseline": {
+        "samples": 3460,
+        "medianAbsLogError": 0.0725905288497937,
+        "approximateMultiplicativeError": 0.07529014646418641,
+        "meanAbsLogError": 0.09695966571752936,
+        "biasLogError": 0.005019438853122917,
+        "nll": -0.6242662321941755,
+        "pinballLoss": {
+          "q05": 0.014215465349096953,
+          "q10": 0.022745598147513296,
+          "q50": 0.049020693149363394,
+          "q90": 0.026402979430419346,
+          "q95": 0.01669520855820241
+        },
+        "coverage": {
+          "interval80": 0.8187861271676301,
+          "interval90": 0.8858381502890174,
+          "interval95": 0.9257225433526012
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.32817253812240227,
+          "interval90": 0.42272769874493843,
+          "interval95": 0.5056555415907993
+        }
+      },
+      "candidate": {
+        "samples": 3460,
+        "medianAbsLogError": 0.07209824994046915,
+        "approximateMultiplicativeError": 0.07476093407441398,
+        "meanAbsLogError": 0.0991328665093589,
+        "biasLogError": 0.013853086527669116,
+        "nll": -0.5895195979419029,
+        "pinballLoss": {
+          "q05": 0.015113536282144667,
+          "q10": 0.023817464370599544,
+          "q50": 0.05067872966300165,
+          "q90": 0.027083974569991162,
+          "q95": 0.0170506939419502
+        },
+        "coverage": {
+          "interval80": 0.8112716763005781,
+          "interval90": 0.8786127167630058,
+          "interval95": 0.923121387283237
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.3281725381224022,
+          "interval90": 0.42272769874493843,
+          "interval95": 0.5056555415907992
+        }
+      },
+      "meanAbsLogErrorImprovement": -0.0021732007918295886,
+      "relativeMeanAbsLogErrorImprovement": -0.022413451776543154,
+      "bootstrap": {
+        "blockLength": 14,
+        "iterations": 10000,
+        "lower95": -0.004097048336738413,
+        "twoSided95": [
+          -0.004556012286611037,
+          0.0004569297564585323
+        ],
+        "practicalNullMargin": 0.0009695966571752935,
+        "oneSidedPValue": 0.9933006699330067
+      },
+      "subperiodMeanImprovements": {
+        "2017-2021": -0.005210485128394214,
+        "2022-2024": 0.0015550484164863366,
+        "2025+": 0.0005404052792721833
+      },
+      "coverageDeltas": {
+        "interval80": -0.007514450867052047,
+        "interval90": -0.007225433526011571,
+        "interval95": -0.0026011560693641744
+      },
+      "unadjustedPassed": false,
+      "reasons": [
+        "mean improvement -0.002173 is below 1% practical margin 0.000970",
+        "one-sided 95% lower bound -0.004097 is not positive",
+        "2017-2021 mean improvement -0.005210 is negative",
+        "Holm-adjusted p=1.00000 is not below 0.05"
+      ],
+      "holmAdjustedPValue": 1,
+      "passed": false
+    },
+    {
+      "horizonDays": 30,
+      "samples": 3444,
+      "nominalNonOverlappingEquivalents": 114,
+      "baseline": {
+        "samples": 3444,
+        "medianAbsLogError": 0.11336260486528879,
+        "approximateMultiplicativeError": 0.12003799054958764,
+        "meanAbsLogError": 0.14641434555442018,
+        "biasLogError": 0.009391515587928334,
+        "nll": -0.2190869030731283,
+        "pinballLoss": {
+          "q05": 0.019912303171104578,
+          "q10": 0.032602908873825644,
+          "q50": 0.07473376580455386,
+          "q90": 0.03977449468009174,
+          "q95": 0.02488271916736877
+        },
+        "coverage": {
+          "interval80": 0.7619047619047619,
+          "interval90": 0.8649825783972126,
+          "interval95": 0.9198606271777003
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.4523161191429577,
+          "interval90": 0.5844842936280068,
+          "interval95": 0.7015034700922903
+        }
+      },
+      "candidate": {
+        "samples": 3444,
+        "medianAbsLogError": 0.11497390150944742,
+        "approximateMultiplicativeError": 0.12184415875069488,
+        "meanAbsLogError": 0.1503020681254019,
+        "biasLogError": 0.02644283257248544,
+        "nll": -0.16436633801742437,
+        "pinballLoss": {
+          "q05": 0.023380047680764255,
+          "q10": 0.0364768109029279,
+          "q50": 0.07861538103918449,
+          "q90": 0.040716086984319916,
+          "q95": 0.02528614918798073
+        },
+        "coverage": {
+          "interval80": 0.7592915214866435,
+          "interval90": 0.8507549361207898,
+          "interval95": 0.9117305458768873
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.4523161191429578,
+          "interval90": 0.5844842936280068,
+          "interval95": 0.7015034700922902
+        }
+      },
+      "meanAbsLogErrorImprovement": -0.0038877225709821853,
+      "relativeMeanAbsLogErrorImprovement": -0.026552880158434836,
+      "bootstrap": {
+        "blockLength": 30,
+        "iterations": 10000,
+        "lower95": -0.008966273641249942,
+        "twoSided95": [
+          -0.010160981897587084,
+          0.0032546283077007397
+        ],
+        "practicalNullMargin": 0.0014641434555442018,
+        "oneSidedPValue": 0.9563043695630437
+      },
+      "subperiodMeanImprovements": {
+        "2017-2021": -0.009362078561891453,
+        "2022-2024": 0.002126251642025292,
+        "2025+": 0.0026349944825506126
+      },
+      "coverageDeltas": {
+        "interval80": -0.00261324041811839,
+        "interval90": -0.014227642276422814,
+        "interval95": -0.008130081300813052
+      },
+      "unadjustedPassed": false,
+      "reasons": [
+        "mean improvement -0.003888 is below 1% practical margin 0.001464",
+        "one-sided 95% lower bound -0.008966 is not positive",
+        "2017-2021 mean improvement -0.009362 is negative",
+        "Holm-adjusted p=1.00000 is not below 0.05"
+      ],
+      "holmAdjustedPValue": 1,
+      "passed": false
+    },
+    {
+      "horizonDays": 60,
+      "samples": 3414,
+      "nominalNonOverlappingEquivalents": 56,
+      "baseline": {
+        "samples": 3414,
+        "medianAbsLogError": 0.17405680944723378,
+        "approximateMultiplicativeError": 0.19012317413961188,
+        "meanAbsLogError": 0.2102725921819902,
+        "biasLogError": 0.015127660139647078,
+        "nll": 0.09978055344887365,
+        "pinballLoss": {
+          "q05": 0.023270014999467376,
+          "q10": 0.04025217004084052,
+          "q50": 0.1077547071471077,
+          "q90": 0.058446983159365105,
+          "q95": 0.037142908127942666
+        },
+        "coverage": {
+          "interval80": 0.7337434094903339,
+          "interval90": 0.8579379027533685,
+          "interval95": 0.9150556531927357
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.6117282998065118,
+          "interval90": 0.7947151015341305,
+          "interval95": 0.9592664868265447
+        }
+      },
+      "candidate": {
+        "samples": 3414,
+        "medianAbsLogError": 0.17305491904644382,
+        "approximateMultiplicativeError": 0.188931398269776,
+        "meanAbsLogError": 0.21434331341901333,
+        "biasLogError": 0.04333689093410213,
+        "nll": 0.16635533663958596,
+        "pinballLoss": {
+          "q05": 0.031535767946969856,
+          "q10": 0.048850254800169336,
+          "q50": 0.11466750992513916,
+          "q90": 0.06000848824693952,
+          "q95": 0.037384260792864034
+        },
+        "coverage": {
+          "interval80": 0.7495606326889279,
+          "interval90": 0.8488576449912126,
+          "interval95": 0.9115407147041593
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.611728299806512,
+          "interval90": 0.7947151015341306,
+          "interval95": 0.9592664868265447
+        }
+      },
+      "meanAbsLogErrorImprovement": -0.004070721237022651,
+      "relativeMeanAbsLogErrorImprovement": -0.019359257403834425,
+      "bootstrap": {
+        "blockLength": 60,
+        "iterations": 10000,
+        "lower95": -0.012728563977050775,
+        "twoSided95": [
+          -0.014995706698282173,
+          0.010558245601035757
+        ],
+        "practicalNullMargin": 0.0021027259218199023,
+        "oneSidedPValue": 0.9073092690730927
+      },
+      "subperiodMeanImprovements": {
+        "2017-2021": -0.011719162034242135,
+        "2022-2024": 0.004213096750653813,
+        "2025+": 0.005862181976858241
+      },
+      "coverageDeltas": {
+        "interval80": 0.01581722319859402,
+        "interval90": -0.009080257762155819,
+        "interval95": -0.0035149384885764245
+      },
+      "unadjustedPassed": false,
+      "reasons": [
+        "mean improvement -0.004071 is below 1% practical margin 0.002103",
+        "one-sided 95% lower bound -0.012729 is not positive",
+        "2017-2021 mean improvement -0.011719 is negative",
+        "Holm-adjusted p=1.00000 is not below 0.05"
+      ],
+      "holmAdjustedPValue": 1,
+      "passed": false
+    },
+    {
+      "horizonDays": 90,
+      "samples": 3384,
+      "nominalNonOverlappingEquivalents": 37,
+      "baseline": {
+        "samples": 3384,
+        "medianAbsLogError": 0.1958673116908444,
+        "approximateMultiplicativeError": 0.2163654971449318,
+        "meanAbsLogError": 0.2462883584006807,
+        "biasLogError": 0.01801963842470107,
+        "nll": 0.3044725000163829,
+        "pinballLoss": {
+          "q05": 0.026302912543291274,
+          "q10": 0.04666844887378557,
+          "q50": 0.12618516831806129,
+          "q90": 0.07041339817450447,
+          "q95": 0.04600414577336177
+        },
+        "coverage": {
+          "interval80": 0.6761229314420804,
+          "interval90": 0.8020094562647754,
+          "interval95": 0.8717494089834515
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.6196964377286022,
+          "interval90": 0.8053078745218812,
+          "interval95": 0.9723617972763438
+        }
+      },
+      "candidate": {
+        "samples": 3384,
+        "medianAbsLogError": 0.19629524278160781,
+        "approximateMultiplicativeError": 0.21688612914825756,
+        "meanAbsLogError": 0.252283528584094,
+        "biasLogError": 0.05301592813610208,
+        "nll": 0.3693981910025754,
+        "pinballLoss": {
+          "q05": 0.03615428117349784,
+          "q10": 0.057200605699646814,
+          "q50": 0.1364659470122326,
+          "q90": 0.07000350299526688,
+          "q95": 0.043760476451269945
+        },
+        "coverage": {
+          "interval80": 0.683806146572104,
+          "interval90": 0.7969858156028369,
+          "interval95": 0.875886524822695
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.6196964377286022,
+          "interval90": 0.8053078745218815,
+          "interval95": 0.9723617972763438
+        }
+      },
+      "meanAbsLogErrorImprovement": -0.005995170183413982,
+      "relativeMeanAbsLogErrorImprovement": -0.024342076996025048,
+      "bootstrap": {
+        "blockLength": 90,
+        "iterations": 10000,
+        "lower95": -0.019805043383163825,
+        "twoSided95": [
+          -0.023630922944593864,
+          0.01885117887387754
+        ],
+        "practicalNullMargin": 0.002462883584006807,
+        "oneSidedPValue": 0.8858114188581142
+      },
+      "subperiodMeanImprovements": {
+        "2017-2021": -0.01656483042675006,
+        "2022-2024": 0.007038464181782771,
+        "2025+": 0.004860536180387005
+      },
+      "coverageDeltas": {
+        "interval80": 0.0076832151300236795,
+        "interval90": -0.0050236406619385,
+        "interval95": 0.004137115839243477
+      },
+      "unadjustedPassed": false,
+      "reasons": [
+        "mean improvement -0.005995 is below 1% practical margin 0.002463",
+        "one-sided 95% lower bound -0.019805 is not positive",
+        "2017-2021 mean improvement -0.016565 is negative",
+        "Holm-adjusted p=1.00000 is not below 0.05"
+      ],
+      "holmAdjustedPValue": 1,
+      "passed": false
+    }
+  ]
+}

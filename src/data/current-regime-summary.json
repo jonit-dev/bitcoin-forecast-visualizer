@@ -1,20 +1,19 @@
 {
-  "generatedAt": "2026-07-07T01:42:12.521Z",
-  "featureDate": "2026-07-06",
+  "generatedAt": "2026-07-10T20:42:20.793Z",
+  "featureDate": "2026-07-09",
   "regime": {
     "probabilities": {
-      "accumulation-value": 0.24806201550387594,
-      "trend-expansion": 0.25581395348837205,
-      "late-cycle-overheating": 0.1395348837209302,
-      "deleveraging-bear": 0.2945736434108527,
-      "sideways-chop": 0.062015503875968984
+      "accumulation-value": 0.30188679245283023,
+      "trend-expansion": 0.07547169811320756,
+      "late-cycle-overheating": 0.07547169811320756,
+      "deleveraging-bear": 0.30188679245283023,
+      "sideways-chop": 0.24528301886792456
     },
-    "topState": "deleveraging-bear",
+    "topState": "accumulation-value",
     "reasonCodes": [
       "value-discount",
-      "positive-residual-momentum",
       "drawdown-or-negative-momentum",
-      "elevated-futures-leverage"
+      "low-momentum-low-volatility"
     ],
     "contextOnly": true
   },
@@ -22,33 +21,21 @@
     "riskFlag": "two-sided",
     "direction": "both",
     "drivers": [
-      "large-cycle-drawdown",
-      "futures-leverage-crowding"
+      "large-cycle-drawdown"
     ],
-    "intervalMultiplierAdjustment": 1.1400000000000001
+    "intervalMultiplierAdjustment": 1.08
   },
   "derivativesContext": {
     "source": "Binance USD-M Futures public REST",
-    "sourceDate": "2026-07-05",
-    "openInterestUSD": 6715367081.1296,
-    "openInterestToMarketCap": 0.005263926011731469,
-    "fundingRateDailySum": 0.00027014,
-    "fundingRateDailyAvg": 0.00009004666666666667,
+    "sourceDate": "2026-07-08",
+    "openInterestUSD": 6296278784.3424,
+    "openInterestToMarketCap": 0.0050466370605452004,
+    "fundingRateDailySum": 0.00012741,
+    "fundingRateDailyAvg": 0.00004247,
     "leverageState": "crowded",
-    "fundingState": "long-crowded",
-    "insight": "Leveraged longs are crowded; treat upside breakouts as liquidation-sensitive.",
+    "fundingState": "neutral",
+    "insight": "Open interest is elevated, but funding is not chasing price right now.",
     "status": "context-only"
   },
-  "networkContext": {
-    "source": "CoinMetrics Community API",
-    "sourceDate": "2026-07-05",
-    "transferCount": 904009,
-    "addressBalanceCount": 57303309,
-    "activeAddressShare": 0.008748796688163332,
-    "transfersPerTransaction": 1.4213843894554454,
-    "transferActivityPercentile": 0.8434499314128944,
-    "networkState": "busy",
-    "insight": "Transfer activity is high versus history, so network usage confirms above-normal activity.",
-    "status": "context-only"
-  }
+  "networkContext": null
 }

@@ -27,4 +27,9 @@ describe('market candle normalization', () => {
   it('should treat a closed-market response as a no-op when no new session exists', () => {
     expect(normalizeYahoo(MARKET_ASSET_REGISTRY.gold, { chart: { result: [{ timestamp: [], indicators: { quote: [{}], adjclose: [{ adjclose: [] }] } }] } })).toEqual([]);
   });
+
+  it('should keep the first UTC volume snapshot when hourly CoinGecko data is used', () => {
+    const rows = normalizeCoinGecko(MARKET_ASSET_REGISTRY.btc, { prices: [[day('2026-07-08'), 100], [day('2026-07-08', 1), 101]], total_volumes: [[day('2026-07-08'), 50], [day('2026-07-08', 1), 999]] }, { total_volumes: [[day('2026-07-08'), 50], [day('2026-07-08', 1), 999]] }, new Date('2026-07-09T12:00:00Z'));
+    expect(rows[0].volume).toBe(50);
+  });
 });

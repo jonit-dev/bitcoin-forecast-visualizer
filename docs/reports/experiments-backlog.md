@@ -111,6 +111,55 @@ Stop median-model complexity because both pre-registered median candidates faile
 
 ---
 
+## 2026-07-10 — Daily production market-quote refresh architecture
+
+Status: `implementation validated locally — preview/production observation pending`
+
+### Hypothesis
+
+A daily Cloudflare scheduled Worker can refresh validated BTC, VOO, and GLD candles into shared D1 storage, keeping production quotes current without daily rebuilds while preserving the bundled-data fallback and existing forecast calibration.
+
+### Data/source changes
+
+Planned operationalization of the existing sources and instruments only:
+
+- BTC/USD daily UTC candles from the current CoinGecko market-chart methodology.
+- VOO adjusted daily OHLCV as the S&P 500 proxy from the current Yahoo chart methodology.
+- GLD adjusted daily OHLCV as the gold proxy from the current Yahoo chart methodology.
+- New mutable D1 storage for validated recent candles and refresh-run metadata; no source promotion and no forecast feature/model change.
+
+### Validation setup
+
+- PRD: `docs/PRDs/DAILY_PRODUCTION_MARKET_QUOTES.md`.
+- Verify source adapters against captured fixtures and the current CLI updater conventions.
+- Prove completed-candle filtering, schema/OHLC validation, recent-window repair, per-asset isolation, and idempotent D1 upserts.
+- Verify weekend/holiday no-op behavior for VOO/GLD and completed-UTC-day behavior for BTC.
+- Verify browser hydration and `/api/forecast` use the same latest candle, with bundled JSON fallback during D1/source failure.
+- Run `npm run backtest`, `npm run backtest:market`, `npm test`, and `npm run lint` after implementation.
+- This entry validates data delivery and operational parity only. It cannot authorize new sources, model inputs, coefficients, or UI/forecast behavior beyond freshness/status plumbing.
+
+### Report artifacts
+
+- Planned PRD: `docs/PRDs/DAILY_PRODUCTION_MARKET_QUOTES.md`.
+- Local implementation evidence: 17 Vitest files / 45 tests passed; TypeScript and production build passed; local D1 migration applied successfully.
+- BTC regression: `docs/reports/results/backtest-2026-07-10T19-27-53-869Z.md` and `.json` (`npm run backtest`: quality and robustness PASS).
+- VOO/GLD regression: `npm run backtest:market` PASS at every configured horizon (console evidence in implementation handoff).
+- Preview/production scheduled-run logs, D1 inspection, and endpoint smoke output remain deployment-environment evidence.
+
+### Result / verdict
+
+Local verdict: positive operational implementation signal. Source adapters, D1 idempotency, fallback API behavior, browser merge behavior, TypeScript, tests, build, and forecast regression gates pass. Forecast formulas and source identities are unchanged. Production enablement remains gated on replacing D1 ID placeholders and completing preview scheduled-run/API agreement proof; seven-day reliability observation remains follow-up evidence.
+
+### Rerun criteria
+
+Rerun operational validation when an upstream response schema/methodology changes, a supported asset or source is added, the cron schedule/storage changes, or freshness/forecast endpoints disagree in production.
+
+### Next better experiment
+
+Implement the PRD in gated vertical slices, observe at least seven consecutive scheduled runs including one equity-market weekend, then evaluate source reliability and freshness misses before considering any source replacement or wider data-pipeline scheduling.
+
+---
+
 ## 2026-06-26 — Spot ETF demand pressure
 
 Status: `completed — rejected`
@@ -955,52 +1004,121 @@ Rerun if:
 
 Do not enable ensemble or tail-risk behavior unless the relevant config is changed intentionally and the enabled-mode `npm run backtest` gate passes.
 
+## 2026-07-09 — Fixed-tau 120 replication with dependence and multiplicity controls
 
-## 2026-07-10 — Daily production market-quote refresh architecture
-
-Status: `implementation validated locally — preview/production observation pending`
+Status: `completed — rejected (pre-specified replication protocol)`
 
 ### Hypothesis
 
-A daily Cloudflare scheduled Worker can refresh validated BTC, VOO, and GLD candles into shared D1 storage, keeping production quotes current without daily rebuilds while preserving the bundled-data fallback and existing forecast calibration.
+Conditioned on the app's existing static power-law curve, shortening residual mean reversion from `tau=210` days to the single pre-specified replication candidate `tau=120` days reduces endpoint forecast mean absolute log error at `14/30/60/90d` without materially degrading probabilistic calibration.
+
+This is a replication/robustness test, not a fresh confirmatory holdout. Prior work already searched tau grids and inspected 2022+ and 2025+ results. The experiment therefore cannot authorize a production change regardless of its result; promotion requires a prospectively frozen forward holdout.
 
 ### Data/source changes
 
-Planned operationalization of the existing sources and instruments only:
+No data-source or production-model changes. Use the checked-in daily UTC BTC close history in `src/data/btc-history.json`. Compare only the existing fixed `tau=210` model with the single fixed `tau=120` candidate, holding the power-law curve and interval construction constant.
 
-- BTC/USD daily UTC candles from the current CoinGecko market-chart methodology.
-- VOO adjusted daily OHLCV as the S&P 500 proxy from the current Yahoo chart methodology.
-- GLD adjusted daily OHLCV as the gold proxy from the current Yahoo chart methodology.
-- New mutable D1 storage for validated recent candles and refresh-run metadata; no source promotion and no forecast feature/model change.
+Known provenance limitation: static power-law coefficients may have been fitted with data later than some historical origins. The paired comparison isolates tau conditional on that curve but is not a fully point-in-time backtest of the entire model.
 
 ### Validation setup
 
-- PRD: `docs/PRDs/DAILY_PRODUCTION_MARKET_QUOTES.md`.
-- Verify source adapters against captured fixtures and the current CLI updater conventions.
-- Prove completed-candle filtering, schema/OHLC validation, recent-window repair, per-asset isolation, and idempotent D1 upserts.
-- Verify weekend/holiday no-op behavior for VOO/GLD and completed-UTC-day behavior for BTC.
-- Verify browser hydration and `/api/forecast` use the same latest candle, with bundled JSON fallback during D1/source failure.
-- Run `npm run backtest`, `npm run backtest:market`, `npm test`, and `npm run lint` after implementation.
-- This entry validates data delivery and operational parity only. It cannot authorize new sources, model inputs, coefficients, or UI/forecast behavior beyond freshness/status plumbing.
+Script: `scripts/backtest-tau-replication.ts`
+
+- Baseline: current `powerlaw-current` behavior with `tau=210`.
+- Candidate: identical model with fixed `tau=120`; no parameter selection in this run.
+- Evaluation window: `2017-01-01` through latest origin with an observed target, reported in full and by `2017-2021`, `2022-2024`, and `2025+` subperiods.
+- Horizons: `14/30/60/90d`.
+- Primary metric: paired mean absolute log-error improvement, `|log(F_210/Y)| - |log(F_120/Y)|`.
+- Secondary metrics: median absolute log error, bias, Gaussian NLL, q10/q50/q90 mean pinball loss, 80/90/95 coverage, and interval width.
+- Dependence control: seeded moving-block bootstrap with block length equal to the forecast horizon and 10,000 iterations.
+- Multiple testing: one-sided bootstrap p-values across the four primary horizons adjusted by Holm's method.
+- Practical gate: at every horizon, at least 30 nominal non-overlapping equivalents, at least 1% relative mean absolute log-error improvement, positive uncentered 95% bootstrap lower bound against zero, Holm-adjusted `p < 0.05` against the stricter 1% practical null, no interval coverage loss greater than 2 percentage points, and no negative mean improvement in any reported origin subperiod.
+- Failure criteria: failure of any gate, evidence of future target use, fewer than 30 nominal non-overlapping equivalents, or instability across origin subperiods. Regardless of point results, status remains `research-only` because no untouched final holdout exists.
 
 ### Report artifacts
 
-- Planned PRD: `docs/PRDs/DAILY_PRODUCTION_MARKET_QUOTES.md`.
-- Local implementation evidence: 17 Vitest files / 45 tests passed; TypeScript and production build passed; local D1 migration applied successfully.
-- BTC regression: `docs/reports/results/backtest-2026-07-10T19-27-53-869Z.md` and `.json` (`npm run backtest`: quality and robustness PASS).
-- VOO/GLD regression: `npm run backtest:market` PASS at every configured horizon (console evidence in implementation handoff).
-- Preview/production scheduled-run logs, D1 inspection, and endpoint smoke output remain deployment-environment evidence.
+- `docs/reports/results/tau-120-replication-2026-07-09T19-49-42-622Z.md`
+- `docs/reports/results/tau-120-replication-2026-07-09T19-49-42-622Z.json`
+- `docs/reports/results/backtest-2026-07-09T19-50-25-123Z.md`
+- `docs/reports/results/backtest-2026-07-09T19-50-25-123Z.json`
 
 ### Result / verdict
 
-Local verdict: positive operational implementation signal. Source adapters, D1 idempotency, fallback API behavior, browser merge behavior, TypeScript, tests, build, and forecast regression gates pass. Forecast formulas and source identities are unchanged. Production enablement remains gated on replacing D1 ID placeholders and completing preview scheduled-run/API agreement proof; seven-day reliability observation remains follow-up evidence.
+Verdict: `rejected`; retain `tau=210`. The apparently promising short-tau result did not replicate over the broader `2017+` window and is too regime-unstable and selection-contaminated to promote.
+
+Across the full pre-specified `2017+` evaluation, `tau=120` worsened mean absolute log error at every gated horizon:
+
+- 14d: `-2.24%` relative improvement; lower95 `-0.004097`; Holm-adjusted `p=1.0`.
+- 30d: `-2.66%`; lower95 `-0.008966`; Holm-adjusted `p=1.0`.
+- 60d: `-1.94%`; lower95 `-0.012729`; Holm-adjusted `p=1.0`.
+- 90d: `-2.43%`; lower95 `-0.019805`; Holm-adjusted `p=1.0`.
+
+The candidate improved paired mean error for origins in `2022-2024` and `2025+`, but worsened origins in `2017-2021` at every horizon (`-0.00521/-0.00936/-0.01172/-0.01656` log-error improvement at 14/30/60/90d). That sign reversal fails the pre-specified origin-subperiod robustness gate. It shows regime instability; it does not rule out a time-varying tau effect.
+
+Coverage deltas stayed within the 2 percentage-point guardrail, but NLL worsened at every horizon. No product, UI, configuration, or production forecast behavior was changed.
+
+Reproduction and regression commands:
+
+- `npm run backtest:tau-replication` — deterministic candidate report, verdict `rejected`.
+- `npm run backtest` — quality gate `PASS`; robustness audit `PASS`.
+- `npm run lint` — `PASS`.
+- `npm test -- --run` — 11 files and 24 tests passed.
+
+Independent role review also found that the current nominal holdouts are not clean: 2025+ has been repeatedly inspected; interval multipliers were calibrated and evaluated on 2022+; static power-law coefficient provenance is retrospective. Separately, residual-model training should purge rows whose `targetDate` is not yet known at the evaluation origin, and feature-family holdout training should purge targets crossing the holdout boundary. These issues further strengthen the no-promotion verdict.
 
 ### Rerun criteria
 
-Rerun operational validation when an upstream response schema/methodology changes, a supported asset or source is added, the cron schedule/storage changes, or freshness/forecast endpoints disagree in production.
+Do not rerun neighboring fixed tau values on the same history. Revisit residual-decay structure only if the baseline power-law curve changes materially or a distinct mechanism is pre-registered. Any promotion claim requires a prospectively frozen forward holdout with at least 30 non-overlapping 90-day outcomes.
 
 ### Next better experiment
 
-Implement the PRD in gated vertical slices, observe at least seven consecutive scheduled runs including one equity-market weekend, then evaluate source reliability and freshness misses before considering any source replacement or wider data-pipeline scheduling.
+Retain `tau=210`. The next better core-model experiment is a point-in-time nested walk-forward benchmark that fits structural coefficients and interval calibration using data available before each origin, then freezes a genuinely untouched prospective confirmation period. Do not search neighboring tau values on this evaluation window.
 
 ---
+
+## 2026-07-09 — Expanding-window AR(1) residual-decay diagnostic
+
+Status: `completed — rejected, report-only diagnostic`
+
+### Hypothesis
+
+A causal no-intercept expanding AR(1) estimate of the residual around the current power-law base may adapt mean-reversion speed through time and outperform fixed `tau=210` without using future prices.
+
+### Data/source changes
+
+No data or production changes. Use checked-in daily BTC closes and the current static power-law base. At each origin, estimate `phi = sum(r[t-1]r[t]) / sum(r[t-1]^2)` from residual pairs available through the origin, clip to `(0, 0.9999)`, and forecast `r[o+h] = phi^h r[o]`.
+
+### Validation setup
+
+- Report-only specialist diagnostic; not a pre-specified promotion test.
+- Origin periods: `2022-2024` and `2025+`.
+- Horizons: `14/30/60/90d`.
+- Comparators: fixed `tau=120` and `tau=210`.
+- Metric: median absolute log error.
+- Limitations: already-inspected periods, retrospective structural-base coefficients, and no immutable standalone reproduction command. The result cannot support promotion.
+
+### Report artifacts
+
+- `docs/reports/results/adaptive-ar1-tau-diagnostic-2026-07-09.md`
+
+### Result / verdict
+
+Verdict: `rejected`. The estimator implied an effective tau near `742-750` days and lost to fixed `tau=120` in seven of eight period/horizon cells. It also generally lost to `tau=210` at longer horizons. The near-unit-root estimate likely absorbs structural-base drift and adds estimation variance without forecast benefit.
+
+### Rerun criteria
+
+Rerun only with point-in-time structural-base refitting, a frozen estimator specification and reproducible script, and a genuinely untouched prospective holdout.
+
+### Next better experiment
+
+Do not tune AR bounds or rolling windows on these evaluation slices. First build a nested point-in-time core-model benchmark that removes the static-base provenance problem.
+### 2026-07-10 — CoinGecko scheduled-ingestion rate-limit mitigation
+
+- **Status:** implementation validation in progress
+- **Hypothesis:** Reusing CoinGecko's hourly market-chart payload for both price aggregation and the first UTC volume snapshot halves scheduled BTC requests while preserving the existing source and daily-candle convention, reducing shared-edge 429 failures without changing forecast inputs.
+- **Data/source changes:** No source or feature change. The seven-day CoinGecko request count changes from two to one; 429 retries now honor `Retry-After` with a bounded 30-second delay and jitter.
+- **Validation setup:** Normalization fixture for first UTC volume selection, focused Worker tests, full test/type/build gates, BTC and market backtests, preview/production scheduled invocation, and D1/API latest-date inspection.
+- **Report artifacts:** Deployment/run evidence in the implementation handoff and `refresh_runs`; existing daily quote PRD and production D1 records.
+- **Result/verdict:** Pending redeploy and scheduled verification. Signal remains operational plumbing only.
+- **Rerun criteria:** CoinGecko response schema, volume semantics, retry policy, or source changes.
+- **Next better experiment:** Add an authenticated CoinGecko plan or separately validated same-instrument fallback only if bounded retries remain unreliable over seven scheduled production runs.

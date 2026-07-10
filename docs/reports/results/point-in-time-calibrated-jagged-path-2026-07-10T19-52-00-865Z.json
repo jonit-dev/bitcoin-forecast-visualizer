@@ -1,0 +1,3951 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-10T19:52:00.865Z",
+    "command": "npm run backtest:pit-core -- --candidate calibrated-jagged-path --origin-start 2022-01-01 --spacing-days 180",
+    "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e",
+    "seed": 1498152960,
+    "closeAvailabilityConvention": "UTC daily close is available after that date closes; structural fit includes the origin close; calibration targets must be strictly earlier than origin.",
+    "dataset": {
+      "firstDate": "2010-07-17",
+      "lastDate": "2026-07-09",
+      "rowCount": 5837,
+      "sha256": "23b947fb572a724e75314608e57d56203b734f0cd134a389a30c9d264fab4919"
+    },
+    "originStart": "2022-01-01",
+    "spacingDays": 180,
+    "horizons": [
+      14,
+      30,
+      60,
+      90
+    ],
+    "candidate": "calibrated-jagged-path"
+  },
+  "methodology": {
+    "status": "report-only",
+    "structuralFit": "expanding point-in-time power-law fit through origin close",
+    "intervalCalibration": "prior reconstructed-policy errors with targetDate < originDate",
+    "benchmarkSchedule": "identical origin/horizon rows for all available models",
+    "nestedSelection": "frozen parameter grids; structural weights selected only from matured prior outer outcomes; state-space parameters selected by training-only likelihood"
+  },
+  "frozenSpecification": {
+    "structuralShrinkageWeights": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "stateSpaceGridSize": 3,
+    "bootstrapIterations": 1000,
+    "bootstrapBlockDays": "max(horizon, observed origin spacing)",
+    "holmFamily": "four horizons",
+    "pathMethods": [
+      "moving-block",
+      "volatility-regime",
+      "state-space"
+    ],
+    "seed": 1498152960
+  },
+  "benchmarkMetrics": [
+    {
+      "horizonDays": 14,
+      "modelId": "reconstructed-current-policy",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.07789844050820284
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "naive-current-price",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.07749830163383503
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "gbm-driftless",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.07749830163383503
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "gbm-recent-drift",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.07120318145846105
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.06762070626758347
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "reconstructed-current-policy",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.17127646615491587
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "naive-current-price",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.15552722292689103
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "gbm-driftless",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.15552722292689103
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "gbm-recent-drift",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.1599651456323562
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.1373348272655868
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "reconstructed-current-policy",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.26215036936596847
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "naive-current-price",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.19060797304106797
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "gbm-driftless",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.19060797304106797
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "gbm-recent-drift",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.19521434090262169
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 9,
+      "meanAbsoluteLogError": 0.1461084008969289
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "reconstructed-current-policy",
+      "samples": 8,
+      "meanAbsoluteLogError": 0.2230907124499932
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "naive-current-price",
+      "samples": 8,
+      "meanAbsoluteLogError": 0.20859397432386573
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "gbm-driftless",
+      "samples": 8,
+      "meanAbsoluteLogError": 0.20859397432386573
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "gbm-recent-drift",
+      "samples": 8,
+      "meanAbsoluteLogError": 0.26374181319930734
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 8,
+      "meanAbsoluteLogError": 0.13340221945412378
+    }
+  ],
+  "candidateEvaluation": {
+    "candidate": "calibrated-jagged-path",
+    "status": "research-only",
+    "verdict": "rejected-development-gate",
+    "checks": [
+      {
+        "horizonDays": 14,
+        "samples": 9,
+        "baselineMale": 0.07789844050820284,
+        "candidateMale": 0.07789844050820284,
+        "relativeMaleImprovement": 0,
+        "medianAbsoluteLogError": 0.07961764545083078,
+        "biasLogError": 0.001979266520788558,
+        "directionHitRate": 0.5555555555555556,
+        "bootstrap95": [
+          0,
+          0
+        ],
+        "rawPValue": 1,
+        "holmAdjustedPValue": 1,
+        "regimeRobustness": {
+          "2017-2021": {
+            "samples": 0,
+            "meanPairedImprovement": 0
+          },
+          "2022-2024": {
+            "samples": 6,
+            "meanPairedImprovement": 0
+          },
+          "2025+": {
+            "samples": 3,
+            "meanPairedImprovement": 0
+          }
+        },
+        "parameterSensitivity": [],
+        "distributionCalibration": [
+          {
+            "level": 0.8,
+            "samples": 8,
+            "empiricalCoverage": 0.625
+          },
+          {
+            "level": 0.9,
+            "samples": 8,
+            "empiricalCoverage": 0.625
+          },
+          {
+            "level": 0.95,
+            "samples": 8,
+            "empiricalCoverage": 0.625
+          }
+        ]
+      },
+      {
+        "horizonDays": 30,
+        "samples": 9,
+        "baselineMale": 0.17127646615491587,
+        "candidateMale": 0.17127646615491587,
+        "relativeMaleImprovement": 0,
+        "medianAbsoluteLogError": 0.11567921967985838,
+        "biasLogError": 0.05238751661322357,
+        "directionHitRate": 0.5555555555555556,
+        "bootstrap95": [
+          0,
+          0
+        ],
+        "rawPValue": 1,
+        "holmAdjustedPValue": 1,
+        "regimeRobustness": {
+          "2017-2021": {
+            "samples": 0,
+            "meanPairedImprovement": 0
+          },
+          "2022-2024": {
+            "samples": 6,
+            "meanPairedImprovement": 0
+          },
+          "2025+": {
+            "samples": 3,
+            "meanPairedImprovement": 0
+          }
+        },
+        "parameterSensitivity": [],
+        "distributionCalibration": [
+          {
+            "level": 0.8,
+            "samples": 8,
+            "empiricalCoverage": 0.75
+          },
+          {
+            "level": 0.9,
+            "samples": 8,
+            "empiricalCoverage": 0.75
+          },
+          {
+            "level": 0.95,
+            "samples": 8,
+            "empiricalCoverage": 0.75
+          }
+        ]
+      },
+      {
+        "horizonDays": 60,
+        "samples": 9,
+        "baselineMale": 0.26215036936596847,
+        "candidateMale": 0.26215036936596847,
+        "relativeMaleImprovement": 0,
+        "medianAbsoluteLogError": 0.18914877844528746,
+        "biasLogError": 0.13779568737116193,
+        "directionHitRate": 0.3333333333333333,
+        "bootstrap95": [
+          0,
+          0
+        ],
+        "rawPValue": 1,
+        "holmAdjustedPValue": 1,
+        "regimeRobustness": {
+          "2017-2021": {
+            "samples": 0,
+            "meanPairedImprovement": 0
+          },
+          "2022-2024": {
+            "samples": 6,
+            "meanPairedImprovement": 0
+          },
+          "2025+": {
+            "samples": 3,
+            "meanPairedImprovement": 0
+          }
+        },
+        "parameterSensitivity": [],
+        "distributionCalibration": [
+          {
+            "level": 0.8,
+            "samples": 8,
+            "empiricalCoverage": 0.5
+          },
+          {
+            "level": 0.9,
+            "samples": 8,
+            "empiricalCoverage": 0.625
+          },
+          {
+            "level": 0.95,
+            "samples": 8,
+            "empiricalCoverage": 0.625
+          }
+        ]
+      },
+      {
+        "horizonDays": 90,
+        "samples": 8,
+        "baselineMale": 0.2230907124499932,
+        "candidateMale": 0.2230907124499932,
+        "relativeMaleImprovement": 0,
+        "medianAbsoluteLogError": 0.22348655678225027,
+        "biasLogError": 0.07823851385340737,
+        "directionHitRate": 0.375,
+        "bootstrap95": [
+          0,
+          0
+        ],
+        "rawPValue": 1,
+        "holmAdjustedPValue": 1,
+        "regimeRobustness": {
+          "2017-2021": {
+            "samples": 0,
+            "meanPairedImprovement": 0
+          },
+          "2022-2024": {
+            "samples": 6,
+            "meanPairedImprovement": 0
+          },
+          "2025+": {
+            "samples": 2,
+            "meanPairedImprovement": 0
+          }
+        },
+        "parameterSensitivity": [],
+        "distributionCalibration": [
+          {
+            "level": 0.8,
+            "samples": 7,
+            "empiricalCoverage": 0.5714285714285714
+          },
+          {
+            "level": 0.9,
+            "samples": 7,
+            "empiricalCoverage": 0.5714285714285714
+          },
+          {
+            "level": 0.95,
+            "samples": 7,
+            "empiricalCoverage": 0.5714285714285714
+          }
+        ]
+      }
+    ],
+    "pathDiagnostics": {
+      "samples": 35,
+      "method": "volatility-regime contiguous blocks",
+      "diagnostics": {
+        "variance": {
+          "source": 0.003934384419916994,
+          "generated": 0.001219679415478819,
+          "relativeDifference": -0.7023534147412741
+        },
+        "lag1Autocorrelation": {
+          "source": 0.3322324031480655,
+          "generated": 0.3040200284729819,
+          "relativeDifference": -0.08480404911802467
+        },
+        "absoluteLag1Autocorrelation": {
+          "source": 0.4285485249503354,
+          "generated": 0.13190845321109002,
+          "relativeDifference": -0.6920369061084225
+        },
+        "signChangeRate": {
+          "source": 0.33680683655811294,
+          "generated": 0.3446867986223101,
+          "relativeDifference": 0.023378037752202766
+        },
+        "maximumDrawdown": {
+          "source": 11.572609722521229,
+          "generated": 11.137381204781851,
+          "relativeDifference": -0.0392488152744618
+        },
+        "maximumDrawdownDuration": {
+          "source": 4640.428571428572,
+          "generated": 2674.942857142857,
+          "relativeDifference": -0.42349821397677095
+        }
+      },
+      "terminalCalibration": "candidate q50 unchanged; empirical 80/90/95 coverage reported per horizon"
+    },
+    "previouslyInspectedPeriods": "2017-2021, 2022-2024, and 2025+ are robustness diagnostics, not clean confirmation"
+  },
+  "origins": [
+    {
+      "originDate": "2022-05-15",
+      "targetDate": "2022-05-29",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-05-15",
+      "trainingRows": 4321,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 1.3677119585541594e-17,
+        "exponent": 5.806818209917752,
+        "sinAmplitude": 0.6093775913393227,
+        "cosAmplitude": -0.1116739421794246,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "61c64aa466b7eca94f12967f7b2ed144534a59776e987f96e46e226be8e910f5",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 32719.86259588091,
+          "actual": 29452.23,
+          "absLogError": 0.10521268354050373
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 31296.11,
+          "actual": 29452.23,
+          "absLogError": 0.06072417987957339
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 31296.11,
+          "actual": 29452.23,
+          "absLogError": 0.06072417987957339
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 29835.560203074816,
+          "actual": 29452.23,
+          "absLogError": 0.012931348712652382
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 30134.362381342955,
+          "actual": 29452.23,
+          "absLogError": 0.02289649917742502
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 32719.86259588091,
+        "absLogError": 0.10521268354050373,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2022-05-15",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0009221319795689815,
+            "variance": 0.004371520659918428,
+            "lag1Autocorrelation": 0.32863687355341203,
+            "absoluteLag1Autocorrelation": 0.4253323158850327,
+            "signChangeRate": 0.3375,
+            "q05": -0.07604558822984886,
+            "q50": -0.0029979945804100364,
+            "q95": 0.08803867421330303,
+            "maximumDrawdown": 11.087506005445046,
+            "maximumDrawdownDuration": 3941
+          },
+          "generated": {
+            "mean": -0.0021173836467377927,
+            "variance": 0.002892634274352519,
+            "lag1Autocorrelation": 0.3639106288457676,
+            "absoluteLag1Autocorrelation": 0.14138586436630052,
+            "signChangeRate": 0.32849162011173183,
+            "q05": -0.08742066982615154,
+            "q50": -0.0028099057230043245,
+            "q95": 0.0859590716141054,
+            "maximumDrawdown": 3.6193399052397046,
+            "maximumDrawdownDuration": 784
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 0,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-05-15",
+      "targetDate": "2022-06-14",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-05-15",
+      "trainingRows": 4321,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 1.3677119585541594e-17,
+        "exponent": 5.806818209917752,
+        "sinAmplitude": 0.6093775913393227,
+        "cosAmplitude": -0.1116739421794246,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "61c64aa466b7eca94f12967f7b2ed144534a59776e987f96e46e226be8e910f5",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 34262.99376509865,
+          "actual": 22118.37,
+          "absLogError": 0.4376573877950074
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 31296.11,
+          "actual": 22118.37,
+          "absLogError": 0.34708532370269585
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 31296.11,
+          "actual": 22118.37,
+          "absLogError": 0.34708532370269585
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 28249.63674791809,
+          "actual": 22118.37,
+          "absLogError": 0.2446721140592936
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 28859.363342041946,
+          "actual": 22118.37,
+          "absLogError": 0.26602600791237785
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 34262.99376509865,
+        "absLogError": 0.4376573877950074,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2022-05-15",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0009221319795689815,
+            "variance": 0.004371520659918428,
+            "lag1Autocorrelation": 0.32863687355341203,
+            "absoluteLag1Autocorrelation": 0.4253323158850327,
+            "signChangeRate": 0.3375,
+            "q05": -0.07604558822984886,
+            "q50": -0.0029979945804100364,
+            "q95": 0.08803867421330303,
+            "maximumDrawdown": 11.087506005445046,
+            "maximumDrawdownDuration": 3941
+          },
+          "generated": {
+            "mean": 0.0015438038893452895,
+            "variance": 0.0027951484549129757,
+            "lag1Autocorrelation": 0.31070973197436674,
+            "absoluteLag1Autocorrelation": 0.14641385608672722,
+            "signChangeRate": 0.36737884314747266,
+            "q05": -0.08812454430899568,
+            "q50": 0.0021960295022884213,
+            "q95": 0.08312722522040394,
+            "maximumDrawdown": 6.917907897256238,
+            "maximumDrawdownDuration": 1737
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 0,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-05-15",
+      "targetDate": "2022-07-14",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-05-15",
+      "trainingRows": 4321,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 1.3677119585541594e-17,
+        "exponent": 5.806818209917752,
+        "sinAmplitude": 0.6093775913393227,
+        "cosAmplitude": -0.1116739421794246,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "61c64aa466b7eca94f12967f7b2ed144534a59776e987f96e46e226be8e910f5",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 36874.94257426455,
+          "actual": 20577.38,
+          "absLogError": 0.5833398431152309
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 31296.11,
+          "actual": 20577.38,
+          "absLogError": 0.4193013944369454
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 31296.11,
+          "actual": 20577.38,
+          "absLogError": 0.4193013944369454
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 25499.717900701537,
+          "actual": 20577.38,
+          "absLogError": 0.21447497515014105
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 26612.34423409154,
+          "actual": 20577.38,
+          "absLogError": 0.2571827628563097
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 36874.94257426455,
+        "absLogError": 0.5833398431152309,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2022-05-15",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0009221319795689815,
+            "variance": 0.004371520659918428,
+            "lag1Autocorrelation": 0.32863687355341203,
+            "absoluteLag1Autocorrelation": 0.4253323158850327,
+            "signChangeRate": 0.3375,
+            "q05": -0.07604558822984886,
+            "q50": -0.0029979945804100364,
+            "q95": 0.08803867421330303,
+            "maximumDrawdown": 11.087506005445046,
+            "maximumDrawdownDuration": 3941
+          },
+          "generated": {
+            "mean": 0.002017589663483129,
+            "variance": 0.002754035943226861,
+            "lag1Autocorrelation": 0.34140831450337766,
+            "absoluteLag1Autocorrelation": 0.20692548191547339,
+            "signChangeRate": 0.35816618911174786,
+            "q05": -0.08427384573196564,
+            "q50": 0.0008237274044924359,
+            "q95": 0.08550350164391629,
+            "maximumDrawdown": 6.339391749111141,
+            "maximumDrawdownDuration": 1945
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 0,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-05-15",
+      "targetDate": "2022-08-13",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-05-15",
+      "trainingRows": 4321,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 1.3677119585541594e-17,
+        "exponent": 5.806818209917752,
+        "sinAmplitude": 0.6093775913393227,
+        "cosAmplitude": -0.1116739421794246,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "61c64aa466b7eca94f12967f7b2ed144534a59776e987f96e46e226be8e910f5",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 39064.67388635756,
+          "actual": 24449.86,
+          "absLogError": 0.4685940875057696
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 31296.11,
+          "actual": 24449.86,
+          "absLogError": 0.24686931873928822
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 31296.11,
+          "actual": 24449.86,
+          "absLogError": 0.24686931873928822
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 23017.485811150425,
+          "actual": 24449.86,
+          "absLogError": 0.06037031019091827
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 24540.28029793935,
+          "actual": 24449.86,
+          "absLogError": 0.00369137136833454
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 39064.67388635756,
+        "absLogError": 0.4685940875057696,
+        "selectedParameter": "method=volatility-regime;block=90",
+        "innerTrainingEnd": "2022-05-15",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0009221319795689815,
+            "variance": 0.004371520659918428,
+            "lag1Autocorrelation": 0.32863687355341203,
+            "absoluteLag1Autocorrelation": 0.4253323158850327,
+            "signChangeRate": 0.3375,
+            "q05": -0.07604558822984886,
+            "q50": -0.0029979945804100364,
+            "q95": 0.08803867421330303,
+            "maximumDrawdown": 11.087506005445046,
+            "maximumDrawdownDuration": 3941
+          },
+          "generated": {
+            "mean": -0.0009264882535819002,
+            "variance": 0.002856294995703318,
+            "lag1Autocorrelation": 0.28841501860527385,
+            "absoluteLag1Autocorrelation": 0.1441951767504722,
+            "signChangeRate": 0.3523181107831221,
+            "q05": -0.0812592582725358,
+            "q50": -0.0018097830811374394,
+            "q95": 0.08116964643709243,
+            "maximumDrawdown": 19.21604847112429,
+            "maximumDrawdownDuration": 4320
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 0,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-11-11",
+      "targetDate": "2022-11-25",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-11-11",
+      "trainingRows": 4501,
+      "lastKnownTargetDate": "2022-05-29",
+      "coefficients": {
+        "coefficient": 2.858882881753845e-17,
+        "exponent": 5.707349306158201,
+        "sinAmplitude": 0.5827806077769142,
+        "cosAmplitude": -0.035286660617397526,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2022-05-29",
+        "q80AbsLogError": 0.10521268354050373,
+        "q90AbsLogError": 0.10521268354050373,
+        "q95AbsLogError": 0.10521268354050373
+      },
+      "dataHash": "4682c1b8af1de0c0bee3ed92e2aaa19af553653b1254dfc118ca21d0c7ccb6cb",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 17876.42395899848,
+          "actual": 16508.33,
+          "absLogError": 0.07961764545083078
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 17007.72,
+          "actual": 16508.33,
+          "absLogError": 0.029802256624800506
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 17007.72,
+          "actual": 16508.33,
+          "absLogError": 0.029802256624800506
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 16074.06912845516,
+          "actual": 16508.33,
+          "absLogError": 0.026657741578985893
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 16941.297998995324,
+          "actual": 16508.33,
+          "absLogError": 0.025889207607545848
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 17876.42395899848,
+        "absLogError": 0.07961764545083078,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2022-11-11",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.00045334441198182496,
+            "variance": 0.004271924675037486,
+            "lag1Autocorrelation": 0.33054741230367535,
+            "absoluteLag1Autocorrelation": 0.4255423727400963,
+            "signChangeRate": 0.338,
+            "q05": -0.07583864570649584,
+            "q50": -0.0038923488057034453,
+            "q95": 0.086940360456633,
+            "maximumDrawdown": 11.75701838990853,
+            "maximumDrawdownDuration": 4121
+          },
+          "generated": {
+            "mean": -0.005190987726999719,
+            "variance": 0.0035163578136236965,
+            "lag1Autocorrelation": 0.3294029417555261,
+            "absoluteLag1Autocorrelation": 0.12722826674797397,
+            "signChangeRate": 0.3307262569832402,
+            "q05": -0.10549025862507547,
+            "q50": -0.005428712506749048,
+            "q95": 0.09388412572238092,
+            "maximumDrawdown": 8.461512198886432,
+            "maximumDrawdownDuration": 801
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 1,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-11-11",
+      "targetDate": "2022-12-11",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-11-11",
+      "trainingRows": 4501,
+      "lastKnownTargetDate": "2022-06-14",
+      "coefficients": {
+        "coefficient": 2.858882881753845e-17,
+        "exponent": 5.707349306158201,
+        "sinAmplitude": 0.5827806077769142,
+        "cosAmplitude": -0.035286660617397526,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2022-06-14",
+        "q80AbsLogError": 0.4376573877950074,
+        "q90AbsLogError": 0.4376573877950074,
+        "q95AbsLogError": 0.4376573877950074
+      },
+      "dataHash": "4682c1b8af1de0c0bee3ed92e2aaa19af553653b1254dfc118ca21d0c7ccb6cb",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 18796.944026188437,
+          "actual": 17094.83,
+          "absLogError": 0.09491822621081751
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 17007.72,
+          "actual": 17094.83,
+          "absLogError": 0.0051087199905609885
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 17007.72,
+          "actual": 17094.83,
+          "absLogError": 0.0051087199905609885
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 15069.632832180892,
+          "actual": 17094.83,
+          "absLogError": 0.12609443042724613
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 16865.70471997056,
+          "actual": 17094.83,
+          "absLogError": 0.013493825027535543
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 18796.944026188437,
+        "absLogError": 0.09491822621081751,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2022-11-11",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.00045334441198182496,
+            "variance": 0.004271924675037486,
+            "lag1Autocorrelation": 0.33054741230367535,
+            "absoluteLag1Autocorrelation": 0.4255423727400963,
+            "signChangeRate": 0.338,
+            "q05": -0.07583864570649584,
+            "q50": -0.0038923488057034453,
+            "q95": 0.086940360456633,
+            "maximumDrawdown": 11.75701838990853,
+            "maximumDrawdownDuration": 4121
+          },
+          "generated": {
+            "mean": 0.005266623139872273,
+            "variance": 0.003120997167413052,
+            "lag1Autocorrelation": 0.3443883762098797,
+            "absoluteLag1Autocorrelation": 0.16312826021742574,
+            "signChangeRate": 0.3449713392391871,
+            "q05": -0.0841617040287681,
+            "q50": 0.0028046415423416127,
+            "q95": 0.09597088644042778,
+            "maximumDrawdown": 4.185263395667087,
+            "maximumDrawdownDuration": 718
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 1,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-11-11",
+      "targetDate": "2023-01-10",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-11-11",
+      "trainingRows": 4501,
+      "lastKnownTargetDate": "2022-07-14",
+      "coefficients": {
+        "coefficient": 2.858882881753845e-17,
+        "exponent": 5.707349306158201,
+        "sinAmplitude": 0.5827806077769142,
+        "cosAmplitude": -0.035286660617397526,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2022-07-14",
+        "q80AbsLogError": 0.5833398431152309,
+        "q90AbsLogError": 0.5833398431152309,
+        "q95AbsLogError": 0.5833398431152309
+      },
+      "dataHash": "4682c1b8af1de0c0bee3ed92e2aaa19af553653b1254dfc118ca21d0c7ccb6cb",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 20286.11395904787,
+          "actual": 17442.44,
+          "absLogError": 0.15103029360697984
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 17007.72,
+          "actual": 17442.44,
+          "absLogError": 0.025238958328404684
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 17007.72,
+          "actual": 17442.44,
+          "absLogError": 0.025238958328404684
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 13352.397246470677,
+          "actual": 17442.44,
+          "absLogError": 0.26721037920177504
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 16724.87527435995,
+          "actual": 17442.44,
+          "absLogError": 0.042009168402353685
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 20286.11395904787,
+        "absLogError": 0.15103029360697984,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2022-11-11",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.00045334441198182496,
+            "variance": 0.004271924675037486,
+            "lag1Autocorrelation": 0.33054741230367535,
+            "absoluteLag1Autocorrelation": 0.4255423727400963,
+            "signChangeRate": 0.338,
+            "q05": -0.07583864570649584,
+            "q50": -0.0038923488057034453,
+            "q95": 0.086940360456633,
+            "maximumDrawdown": 11.75701838990853,
+            "maximumDrawdownDuration": 4121
+          },
+          "generated": {
+            "mean": 0.001975695596103441,
+            "variance": 0.003331611720103023,
+            "lag1Autocorrelation": 0.27995753530861395,
+            "absoluteLag1Autocorrelation": 0.15085534551725607,
+            "signChangeRate": 0.348267778067205,
+            "q05": -0.08097750360987568,
+            "q50": 0.0011928103869837184,
+            "q95": 0.08602711122830164,
+            "maximumDrawdown": 8.759226777008337,
+            "maximumDrawdownDuration": 2169
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 1,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-11-11",
+      "targetDate": "2023-02-09",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-11-11",
+      "trainingRows": 4501,
+      "lastKnownTargetDate": "2022-08-13",
+      "coefficients": {
+        "coefficient": 2.858882881753845e-17,
+        "exponent": 5.707349306158201,
+        "sinAmplitude": 0.5827806077769142,
+        "cosAmplitude": -0.035286660617397526,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2022-08-13",
+        "q80AbsLogError": 0.4685940875057696,
+        "q90AbsLogError": 0.4685940875057696,
+        "q95AbsLogError": 0.4685940875057696
+      },
+      "dataHash": "4682c1b8af1de0c0bee3ed92e2aaa19af553653b1254dfc118ca21d0c7ccb6cb",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 21435.233758499537,
+          "actual": 21807.55,
+          "absLogError": 0.017220234662968896
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 17007.72,
+          "actual": 21807.55,
+          "absLogError": 0.2485888814887239
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 17007.72,
+          "actual": 21807.55,
+          "absLogError": 0.2485888814887239
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 11830.84645876909,
+          "actual": 21807.55,
+          "absLogError": 0.6115460127987794
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 16585.22176139374,
+          "actual": 21807.55,
+          "absLogError": 0.2737441965996473
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 21435.233758499537,
+        "absLogError": 0.017220234662968896,
+        "selectedParameter": "method=volatility-regime;block=90",
+        "innerTrainingEnd": "2022-11-11",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.00045334441198182496,
+            "variance": 0.004271924675037486,
+            "lag1Autocorrelation": 0.33054741230367535,
+            "absoluteLag1Autocorrelation": 0.4255423727400963,
+            "signChangeRate": 0.338,
+            "q05": -0.07583864570649584,
+            "q50": -0.0038923488057034453,
+            "q95": 0.086940360456633,
+            "maximumDrawdown": 11.75701838990853,
+            "maximumDrawdownDuration": 4121
+          },
+          "generated": {
+            "mean": 0.0011019027406707124,
+            "variance": 0.003303833331196917,
+            "lag1Autocorrelation": 0.30254347422425587,
+            "absoluteLag1Autocorrelation": 0.18344664628830815,
+            "signChangeRate": 0.3667303351276263,
+            "q05": -0.08371917210730756,
+            "q50": -0.0004778146534109573,
+            "q95": 0.08584214442530369,
+            "maximumDrawdown": 11.015853118081811,
+            "maximumDrawdownDuration": 2040
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 1,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-05-10",
+      "targetDate": "2023-05-24",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-05-10",
+      "trainingRows": 4681,
+      "lastKnownTargetDate": "2022-11-25",
+      "coefficients": {
+        "coefficient": 4.467675144793741e-17,
+        "exponent": 5.647629609071349,
+        "sinAmplitude": 0.5958284853674404,
+        "cosAmplitude": 0.011466791880991627,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2022-11-25",
+        "q80AbsLogError": 0.07961764545083078,
+        "q90AbsLogError": 0.07961764545083078,
+        "q95AbsLogError": 0.07961764545083078
+      },
+      "dataHash": "34b17fe7f2477d32a52087c8b435d2da8aa77dadd2a7a79442cfc5c5a54b871e",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 26993.924396104703,
+          "actual": 26326.17,
+          "absLogError": 0.02504831683964669
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 27628.73,
+          "actual": 26326.17,
+          "absLogError": 0.048292671870758544
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 27628.73,
+          "actual": 26326.17,
+          "absLogError": 0.048292671870758544
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 28664.53394087752,
+          "actual": 26326.17,
+          "absLogError": 0.08509710592966563
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 27893.569360144003,
+          "actual": 26326.17,
+          "absLogError": 0.05783267190008884
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 26993.924396104703,
+        "absLogError": 0.02504831683964669,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2023-05-10",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0010422081082672862,
+            "variance": 0.004151160298452919,
+            "lag1Autocorrelation": 0.3336558464872486,
+            "absoluteLag1Autocorrelation": 0.42707130553971556,
+            "signChangeRate": 0.3371794871794872,
+            "q05": -0.07443694414472696,
+            "q50": -0.003120489564800384,
+            "q95": 0.0861885205364169,
+            "maximumDrawdown": 11.67358379148813,
+            "maximumDrawdownDuration": 4301
+          },
+          "generated": {
+            "mean": -0.008909294656206082,
+            "variance": 0.00051202819457964,
+            "lag1Autocorrelation": 0.22395718462649072,
+            "absoluteLag1Autocorrelation": 0.024352273525276538,
+            "signChangeRate": 0.3407821229050279,
+            "q05": -0.04376773305147444,
+            "q50": -0.009973495430585455,
+            "q95": 0.02931881174452551,
+            "maximumDrawdown": 8.017293523731352,
+            "maximumDrawdownDuration": 896
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 2,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-05-10",
+      "targetDate": "2023-06-09",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-05-10",
+      "trainingRows": 4681,
+      "lastKnownTargetDate": "2022-12-11",
+      "coefficients": {
+        "coefficient": 4.467675144793741e-17,
+        "exponent": 5.647629609071349,
+        "sinAmplitude": 0.5958284853674404,
+        "cosAmplitude": 0.011466791880991627,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2022-12-11",
+        "q80AbsLogError": 0.09491822621081751,
+        "q90AbsLogError": 0.09491822621081751,
+        "q95AbsLogError": 0.09491822621081751
+      },
+      "dataHash": "34b17fe7f2477d32a52087c8b435d2da8aa77dadd2a7a79442cfc5c5a54b871e",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 26272.38780984655,
+          "actual": 26483.81,
+          "absLogError": 0.008015108395882717
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 27628.73,
+          "actual": 26483.81,
+          "absLogError": 0.04232257045363051
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 27628.73,
+          "actual": 26483.81,
+          "absLogError": 0.04232257045363051
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 29895.94396228392,
+          "actual": 26483.81,
+          "absLogError": 0.12118921486557425
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 28199.3528910058,
+          "actual": 26483.81,
+          "absLogError": 0.06276542765933808
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 26272.38780984655,
+        "absLogError": 0.008015108395882717,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2023-05-10",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0010422081082672862,
+            "variance": 0.004151160298452919,
+            "lag1Autocorrelation": 0.3336558464872486,
+            "absoluteLag1Autocorrelation": 0.42707130553971556,
+            "signChangeRate": 0.3371794871794872,
+            "q05": -0.07443694414472696,
+            "q50": -0.003120489564800384,
+            "q95": 0.0861885205364169,
+            "maximumDrawdown": 11.67358379148813,
+            "maximumDrawdownDuration": 4301
+          },
+          "generated": {
+            "mean": -0.004829382463443087,
+            "variance": 0.0006366802288135123,
+            "lag1Autocorrelation": 0.305723347036767,
+            "absoluteLag1Autocorrelation": 0.0837499470695913,
+            "signChangeRate": 0.33350703491401773,
+            "q05": -0.04053335759288243,
+            "q50": -0.007282568172479891,
+            "q95": 0.0377471247199905,
+            "maximumDrawdown": 9.98475922953656,
+            "maximumDrawdownDuration": 1860
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 2,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-05-10",
+      "targetDate": "2023-07-09",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-05-10",
+      "trainingRows": 4681,
+      "lastKnownTargetDate": "2023-01-10",
+      "coefficients": {
+        "coefficient": 4.467675144793741e-17,
+        "exponent": 5.647629609071349,
+        "sinAmplitude": 0.5958284853674404,
+        "cosAmplitude": 0.011466791880991627,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2023-01-10",
+        "q80AbsLogError": 0.15103029360697984,
+        "q90AbsLogError": 0.15103029360697984,
+        "q95AbsLogError": 0.15103029360697984
+      },
+      "dataHash": "34b17fe7f2477d32a52087c8b435d2da8aa77dadd2a7a79442cfc5c5a54b871e",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 24971.83676143592,
+          "actual": 30171.49,
+          "absLogError": 0.18914877844528746
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 27628.73,
+          "actual": 30171.49,
+          "absLogError": 0.08804126541195181
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 27628.73,
+          "actual": 30171.49,
+          "absLogError": 0.08804126541195181
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 32349.205533371252,
+          "actual": 30171.49,
+          "absLogError": 0.06969202341193564
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 28781.760995582397,
+          "actual": 30171.49,
+          "absLogError": 0.047155551000536845
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 24971.83676143592,
+        "absLogError": 0.18914877844528746,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2023-05-10",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0010422081082672862,
+            "variance": 0.004151160298452919,
+            "lag1Autocorrelation": 0.3336558464872486,
+            "absoluteLag1Autocorrelation": 0.42707130553971556,
+            "signChangeRate": 0.3371794871794872,
+            "q05": -0.07443694414472696,
+            "q50": -0.003120489564800384,
+            "q95": 0.0861885205364169,
+            "maximumDrawdown": 11.67358379148813,
+            "maximumDrawdownDuration": 4301
+          },
+          "generated": {
+            "mean": -0.004514644739756531,
+            "variance": 0.0007159372936592168,
+            "lag1Autocorrelation": 0.336609458344308,
+            "absoluteLag1Autocorrelation": 0.2206351504807131,
+            "signChangeRate": 0.3438395415472779,
+            "q05": -0.04376773305147444,
+            "q50": -0.005681958650963156,
+            "q95": 0.03912851293273774,
+            "maximumDrawdown": 18.729308306256648,
+            "maximumDrawdownDuration": 3784
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 2,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-05-10",
+      "targetDate": "2023-08-08",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-05-10",
+      "trainingRows": 4681,
+      "lastKnownTargetDate": "2023-02-09",
+      "coefficients": {
+        "coefficient": 4.467675144793741e-17,
+        "exponent": 5.647629609071349,
+        "sinAmplitude": 0.5958284853674404,
+        "cosAmplitude": 0.011466791880991627,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2023-02-09",
+        "q80AbsLogError": 0.017220234662968896,
+        "q90AbsLogError": 0.017220234662968896,
+        "q95AbsLogError": 0.017220234662968896
+      },
+      "dataHash": "34b17fe7f2477d32a52087c8b435d2da8aa77dadd2a7a79442cfc5c5a54b871e",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 23808.240242699703,
+          "actual": 29770.51,
+          "absLogError": 0.22348655678225027
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 27628.73,
+          "actual": 29770.51,
+          "absLogError": 0.07466213287360347
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 27628.73,
+          "actual": 29770.51,
+          "absLogError": 0.07466213287360347
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 35003.78178258906,
+          "actual": 29770.51,
+          "absLogError": 0.1619378003622276
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 29376.197716616527,
+          "actual": 29770.51,
+          "absLogError": 0.013333561256480926
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 23808.240242699703,
+        "absLogError": 0.22348655678225027,
+        "selectedParameter": "method=volatility-regime;block=90",
+        "innerTrainingEnd": "2023-05-10",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0010422081082672862,
+            "variance": 0.004151160298452919,
+            "lag1Autocorrelation": 0.3336558464872486,
+            "absoluteLag1Autocorrelation": 0.42707130553971556,
+            "signChangeRate": 0.3371794871794872,
+            "q05": -0.07443694414472696,
+            "q50": -0.003120489564800384,
+            "q95": 0.0861885205364169,
+            "maximumDrawdown": 11.67358379148813,
+            "maximumDrawdownDuration": 4301
+          },
+          "generated": {
+            "mean": -0.0045495799159058865,
+            "variance": 0.0008328207687706219,
+            "lag1Autocorrelation": 0.32887231148302964,
+            "absoluteLag1Autocorrelation": 0.20561057522798593,
+            "signChangeRate": 0.32991838860913353,
+            "q05": -0.04437854322725657,
+            "q50": -0.006668803141850831,
+            "q95": 0.042317742089742955,
+            "maximumDrawdown": 26.205580315617905,
+            "maximumDrawdownDuration": 5760
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 2,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-11-06",
+      "targetDate": "2023-11-20",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-11-06",
+      "trainingRows": 4861,
+      "lastKnownTargetDate": "2023-05-24",
+      "coefficients": {
+        "coefficient": 4.732747526295811e-17,
+        "exponent": 5.6399479169903985,
+        "sinAmplitude": 0.6011172437576898,
+        "cosAmplitude": 0.015283862734546964,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2023-05-24",
+        "q80AbsLogError": 0.07961764545083078,
+        "q90AbsLogError": 0.07961764545083078,
+        "q95AbsLogError": 0.07961764545083078
+      },
+      "dataHash": "2d68b506bd72f33ac1177bc965b43cca9020cc3a8903decdd69ed7f550a8e22a",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 34005.336450486786,
+          "actual": 37476.66,
+          "absLogError": 0.09720087247889277
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 35054.59,
+          "actual": 37476.66,
+          "absLogError": 0.06681177852097837
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 35054.59,
+          "actual": 37476.66,
+          "absLogError": 0.06681177852097837
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 35956.95438080674,
+          "actual": 37476.66,
+          "absLogError": 0.04139582782675258
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 36169.91006395081,
+          "actual": 37476.66,
+          "absLogError": 0.035490779726032304
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 34005.336450486786,
+        "absLogError": 0.09720087247889277,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2023-11-06",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0014700110022061357,
+            "variance": 0.004018358726798763,
+            "lag1Autocorrelation": 0.33450970001895325,
+            "absoluteLag1Autocorrelation": 0.4295012644525956,
+            "signChangeRate": 0.33415637860082303,
+            "q05": -0.07347546010604408,
+            "q50": -0.0020080567297579358,
+            "q95": 0.08466793448657689,
+            "maximumDrawdown": 11.649467514091366,
+            "maximumDrawdownDuration": 4481
+          },
+          "generated": {
+            "mean": -0.0036176272355232203,
+            "variance": 0.0007643114487099114,
+            "lag1Autocorrelation": 0.2908431823840415,
+            "absoluteLag1Autocorrelation": 0.015600304691894464,
+            "signChangeRate": 0.34413407821229053,
+            "q05": -0.045978152163544964,
+            "q50": -0.006217096527082855,
+            "q95": 0.043179322721897145,
+            "maximumDrawdown": 3.561890648810157,
+            "maximumDrawdownDuration": 798
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 3,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-11-06",
+      "targetDate": "2023-12-06",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-11-06",
+      "trainingRows": 4861,
+      "lastKnownTargetDate": "2023-06-09",
+      "coefficients": {
+        "coefficient": 4.732747526295811e-17,
+        "exponent": 5.6399479169903985,
+        "sinAmplitude": 0.6011172437576898,
+        "cosAmplitude": 0.015283862734546964,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2023-06-09",
+        "q80AbsLogError": 0.09491822621081751,
+        "q90AbsLogError": 0.09491822621081751,
+        "q95AbsLogError": 0.09491822621081751
+      },
+      "dataHash": "2d68b506bd72f33ac1177bc965b43cca9020cc3a8903decdd69ed7f550a8e22a",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 33126.08638185351,
+          "actual": 43771.01,
+          "absLogError": 0.2786506459003066
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 35054.59,
+          "actual": 43771.01,
+          "absLogError": 0.22206516541811455
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 35054.59,
+          "actual": 43771.01,
+          "absLogError": 0.22206516541811455
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 37016.70555267322,
+          "actual": 43771.01,
+          "absLogError": 0.16760241393048805
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 37488.07890886781,
+          "actual": 43771.01,
+          "absLogError": 0.15494873942894452
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 33126.08638185351,
+        "absLogError": 0.2786506459003066,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2023-11-06",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0014700110022061357,
+            "variance": 0.004018358726798763,
+            "lag1Autocorrelation": 0.33450970001895325,
+            "absoluteLag1Autocorrelation": 0.4295012644525956,
+            "signChangeRate": 0.33415637860082303,
+            "q05": -0.07347546010604408,
+            "q50": -0.0020080567297579358,
+            "q95": 0.08466793448657689,
+            "maximumDrawdown": 11.649467514091366,
+            "maximumDrawdownDuration": 4481
+          },
+          "generated": {
+            "mean": -0.004069619715186454,
+            "variance": 0.0007274713706535699,
+            "lag1Autocorrelation": 0.32228925841350214,
+            "absoluteLag1Autocorrelation": 0.07542765381448564,
+            "signChangeRate": 0.327774882751433,
+            "q05": -0.04540665496038351,
+            "q50": -0.0057672422794472905,
+            "q95": 0.03974748204212669,
+            "maximumDrawdown": 8.198475801497779,
+            "maximumDrawdownDuration": 1889
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 3,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-11-06",
+      "targetDate": "2024-01-05",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-11-06",
+      "trainingRows": 4861,
+      "lastKnownTargetDate": "2023-07-09",
+      "coefficients": {
+        "coefficient": 4.732747526295811e-17,
+        "exponent": 5.6399479169903985,
+        "sinAmplitude": 0.6011172437576898,
+        "cosAmplitude": 0.015283862734546964,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2023-07-09",
+        "q80AbsLogError": 0.18914877844528746,
+        "q90AbsLogError": 0.18914877844528746,
+        "q95AbsLogError": 0.18914877844528746
+      },
+      "dataHash": "2d68b506bd72f33ac1177bc965b43cca9020cc3a8903decdd69ed7f550a8e22a",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 32330.815546204005,
+          "actual": 44178.89,
+          "absLogError": 0.3122262560873865
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 35054.59,
+          "actual": 44178.89,
+          "absLogError": 0.2313405125015256
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 35054.59,
+          "actual": 44178.89,
+          "absLogError": 0.2313405125015256
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 39088.646878292086,
+          "actual": 44178.89,
+          "absLogError": 0.12241500952627239
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 40090.50056718676,
+          "actual": 44178.89,
+          "absLogError": 0.09710766052318531
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 32330.815546204005,
+        "absLogError": 0.3122262560873865,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2023-11-06",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0014700110022061357,
+            "variance": 0.004018358726798763,
+            "lag1Autocorrelation": 0.33450970001895325,
+            "absoluteLag1Autocorrelation": 0.4295012644525956,
+            "signChangeRate": 0.33415637860082303,
+            "q05": -0.07347546010604408,
+            "q50": -0.0020080567297579358,
+            "q95": 0.08466793448657689,
+            "maximumDrawdown": 11.649467514091366,
+            "maximumDrawdownDuration": 4481
+          },
+          "generated": {
+            "mean": -0.0035802227551117636,
+            "variance": 0.0008081410460796224,
+            "lag1Autocorrelation": 0.3137132742140019,
+            "absoluteLag1Autocorrelation": 0.1812368343774329,
+            "signChangeRate": 0.33576452201094037,
+            "q05": -0.04526820855548097,
+            "q50": -0.0044417421746145835,
+            "q95": 0.04025203458521939,
+            "maximumDrawdown": 15.585741528228299,
+            "maximumDrawdownDuration": 3834
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 3,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-11-06",
+      "targetDate": "2024-02-04",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-11-06",
+      "trainingRows": 4861,
+      "lastKnownTargetDate": "2023-08-08",
+      "coefficients": {
+        "coefficient": 4.732747526295811e-17,
+        "exponent": 5.6399479169903985,
+        "sinAmplitude": 0.6011172437576898,
+        "cosAmplitude": 0.015283862734546964,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2023-08-08",
+        "q80AbsLogError": 0.22348655678225027,
+        "q90AbsLogError": 0.22348655678225027,
+        "q95AbsLogError": 0.22348655678225027
+      },
+      "dataHash": "2d68b506bd72f33ac1177bc965b43cca9020cc3a8903decdd69ed7f550a8e22a",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 32565.478569473617,
+          "actual": 42570.21,
+          "absLogError": 0.2679019251660289
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 35054.59,
+          "actual": 42570.21,
+          "absLogError": 0.19424815219523772
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 35054.59,
+          "actual": 42570.21,
+          "absLogError": 0.19424815219523772
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 41276.56127046866,
+          "actual": 42570.21,
+          "absLogError": 0.03085989773235793
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 42873.582282910946,
+          "actual": 42570.21,
+          "absLogError": 0.0071011257722727525
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 32565.478569473617,
+        "absLogError": 0.2679019251660289,
+        "selectedParameter": "method=volatility-regime;block=90",
+        "innerTrainingEnd": "2023-11-06",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0014700110022061357,
+            "variance": 0.004018358726798763,
+            "lag1Autocorrelation": 0.33450970001895325,
+            "absoluteLag1Autocorrelation": 0.4295012644525956,
+            "signChangeRate": 0.33415637860082303,
+            "q05": -0.07347546010604408,
+            "q50": -0.0020080567297579358,
+            "q95": 0.08466793448657689,
+            "maximumDrawdown": 11.649467514091366,
+            "maximumDrawdownDuration": 4481
+          },
+          "generated": {
+            "mean": -0.004492556182377152,
+            "variance": 0.0008126753122739932,
+            "lag1Autocorrelation": 0.3071140411368801,
+            "absoluteLag1Autocorrelation": 0.18493434395066582,
+            "signChangeRate": 0.33998958152457026,
+            "q05": -0.04462733542388801,
+            "q50": -0.0057907793156703954,
+            "q95": 0.03979960241956401,
+            "maximumDrawdown": 25.877123610492397,
+            "maximumDrawdownDuration": 5760
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 3,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-05-04",
+      "targetDate": "2024-05-18",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-05-04",
+      "trainingRows": 5041,
+      "lastKnownTargetDate": "2023-11-20",
+      "coefficients": {
+        "coefficient": 3.731818667965602e-17,
+        "exponent": 5.67178385026503,
+        "sinAmplitude": 0.5734755326499347,
+        "cosAmplitude": 0.022140645013723245,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 4,
+        "lastKnownTargetDate": "2023-11-20",
+        "q80AbsLogError": 0.09720087247889277,
+        "q90AbsLogError": 0.09720087247889277,
+        "q95AbsLogError": 0.09720087247889277
+      },
+      "dataHash": "09c296eeb641334103ba9e22393bd9853505398a1cbf35d34ccf4a1511a6ebaa",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 64733.46167189215,
+          "actual": 66927.56,
+          "absLogError": 0.033332590689061144
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 63904.51,
+          "actual": 66927.56,
+          "absLogError": 0.04622090252656946
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 63904.51,
+          "actual": 66927.56,
+          "absLogError": 0.04622090252656946
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 68073.09702269475,
+          "actual": 66927.56,
+          "absLogError": 0.016971243591277642
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 63969.692601048075,
+          "actual": 66927.56,
+          "absLogError": 0.04520142235984638
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 64733.46167189215,
+        "absLogError": 0.033332590689061144,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2024-05-04",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0016913070191495985,
+            "variance": 0.0039042395097390625,
+            "lag1Autocorrelation": 0.3329692665246726,
+            "absoluteLag1Autocorrelation": 0.4288371677630525,
+            "signChangeRate": 0.3345238095238095,
+            "q05": -0.07247650746607093,
+            "q50": -0.0015313270689039093,
+            "q95": 0.08346731279431013,
+            "maximumDrawdown": 11.750524671420912,
+            "maximumDrawdownDuration": 4661
+          },
+          "generated": {
+            "mean": -0.002572744311278824,
+            "variance": 0.0008803477461451101,
+            "lag1Autocorrelation": 0.24654857742710937,
+            "absoluteLag1Autocorrelation": 0.056111071462431446,
+            "signChangeRate": 0.3754189944134078,
+            "q05": -0.04893329938829777,
+            "q50": -0.00409077082478515,
+            "q95": 0.048008741522682585,
+            "maximumDrawdown": 2.8569463339056864,
+            "maximumDrawdownDuration": 872
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 4,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-05-04",
+      "targetDate": "2024-06-03",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-05-04",
+      "trainingRows": 5041,
+      "lastKnownTargetDate": "2023-12-06",
+      "coefficients": {
+        "coefficient": 3.731818667965602e-17,
+        "exponent": 5.67178385026503,
+        "sinAmplitude": 0.5734755326499347,
+        "cosAmplitude": 0.022140645013723245,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 4,
+        "lastKnownTargetDate": "2023-12-06",
+        "q80AbsLogError": 0.2786506459003066,
+        "q90AbsLogError": 0.2786506459003066,
+        "q95AbsLogError": 0.2786506459003066
+      },
+      "dataHash": "09c296eeb641334103ba9e22393bd9853505398a1cbf35d34ccf4a1511a6ebaa",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 66023.058614494,
+          "actual": 68799.6,
+          "absLogError": 0.04119387701212091
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 63904.51,
+          "actual": 68799.6,
+          "absLogError": 0.07380799304626798
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 63904.51,
+          "actual": 68799.6,
+          "absLogError": 0.07380799304626798
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 73171.18380562613,
+          "actual": 68799.6,
+          "absLogError": 0.06160374863483289
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 64044.26841793881,
+          "actual": 68799.6,
+          "absLogError": 0.0716233926890043
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 66023.058614494,
+        "absLogError": 0.04119387701212091,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2024-05-04",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0016913070191495985,
+            "variance": 0.0039042395097390625,
+            "lag1Autocorrelation": 0.3329692665246726,
+            "absoluteLag1Autocorrelation": 0.4288371677630525,
+            "signChangeRate": 0.3345238095238095,
+            "q05": -0.07247650746607093,
+            "q50": -0.0015313270689039093,
+            "q95": 0.08346731279431013,
+            "maximumDrawdown": 11.750524671420912,
+            "maximumDrawdownDuration": 4661
+          },
+          "generated": {
+            "mean": -0.0028375794559713807,
+            "variance": 0.0009222661063845564,
+            "lag1Autocorrelation": 0.3060984368829234,
+            "absoluteLag1Autocorrelation": 0.09062780283224363,
+            "signChangeRate": 0.3423658155289213,
+            "q05": -0.048400433674220616,
+            "q50": -0.0027066635288779672,
+            "q95": 0.04301015084172388,
+            "maximumDrawdown": 6.348412393197308,
+            "maximumDrawdownDuration": 1860
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 4,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-05-04",
+      "targetDate": "2024-07-03",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-05-04",
+      "trainingRows": 5041,
+      "lastKnownTargetDate": "2024-01-05",
+      "coefficients": {
+        "coefficient": 3.731818667965602e-17,
+        "exponent": 5.67178385026503,
+        "sinAmplitude": 0.5734755326499347,
+        "cosAmplitude": 0.022140645013723245,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 4,
+        "lastKnownTargetDate": "2024-01-05",
+        "q80AbsLogError": 0.3122262560873865,
+        "q90AbsLogError": 0.3122262560873865,
+        "q95AbsLogError": 0.3122262560873865
+      },
+      "dataHash": "09c296eeb641334103ba9e22393bd9853505398a1cbf35d34ccf4a1511a6ebaa",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 69321.10603555304,
+          "actual": 60157.2,
+          "absLogError": 0.1417882842190902
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 63904.51,
+          "actual": 60157.2,
+          "absLogError": 0.060428801917385984
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 63904.51,
+          "actual": 60157.2,
+          "absLogError": 0.060428801917385984
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 83781.60069636279,
+          "actual": 60157.2,
+          "absLogError": 0.3312522852795875
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 64184.3324859074,
+          "actual": 60157.2,
+          "absLogError": 0.06479800263191338
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 69321.10603555304,
+        "absLogError": 0.1417882842190902,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2024-05-04",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0016913070191495985,
+            "variance": 0.0039042395097390625,
+            "lag1Autocorrelation": 0.3329692665246726,
+            "absoluteLag1Autocorrelation": 0.4288371677630525,
+            "signChangeRate": 0.3345238095238095,
+            "q05": -0.07247650746607093,
+            "q50": -0.0015313270689039093,
+            "q95": 0.08346731279431013,
+            "maximumDrawdown": 11.750524671420912,
+            "maximumDrawdownDuration": 4661
+          },
+          "generated": {
+            "mean": -0.003500227061482943,
+            "variance": 0.0009775834824678614,
+            "lag1Autocorrelation": 0.31863856677538804,
+            "absoluteLag1Autocorrelation": 0.16046966384109412,
+            "signChangeRate": 0.35399843709299295,
+            "q05": -0.0506858846932342,
+            "q50": -0.004750930624632471,
+            "q95": 0.047709876640696286,
+            "maximumDrawdown": 13.871391839109364,
+            "maximumDrawdownDuration": 2941
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 4,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-05-04",
+      "targetDate": "2024-08-02",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-05-04",
+      "trainingRows": 5041,
+      "lastKnownTargetDate": "2024-02-04",
+      "coefficients": {
+        "coefficient": 3.731818667965602e-17,
+        "exponent": 5.67178385026503,
+        "sinAmplitude": 0.5734755326499347,
+        "cosAmplitude": 0.022140645013723245,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 4,
+        "lastKnownTargetDate": "2024-02-04",
+        "q80AbsLogError": 0.2679019251660289,
+        "q90AbsLogError": 0.2679019251660289,
+        "q95AbsLogError": 0.2679019251660289
+      },
+      "dataHash": "09c296eeb641334103ba9e22393bd9853505398a1cbf35d34ccf4a1511a6ebaa",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 73629.15909401192,
+          "actual": 61422.3,
+          "absLogError": 0.181268169220294
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 63904.51,
+          "actual": 61422.3,
+          "absLogError": 0.03961697652544892
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 63904.51,
+          "actual": 61422.3,
+          "absLogError": 0.03961697652544892
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 95930.614350742,
+          "actual": 61422.3,
+          "absLogError": 0.44585220156875144
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 64324.70287235882,
+          "actual": 61422.3,
+          "absLogError": 0.04617077759724021
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 73629.15909401192,
+        "absLogError": 0.181268169220294,
+        "selectedParameter": "method=volatility-regime;block=90",
+        "innerTrainingEnd": "2024-05-04",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0016913070191495985,
+            "variance": 0.0039042395097390625,
+            "lag1Autocorrelation": 0.3329692665246726,
+            "absoluteLag1Autocorrelation": 0.4288371677630525,
+            "signChangeRate": 0.3345238095238095,
+            "q05": -0.07247650746607093,
+            "q50": -0.0015313270689039093,
+            "q95": 0.08346731279431013,
+            "maximumDrawdown": 11.750524671420912,
+            "maximumDrawdownDuration": 4661
+          },
+          "generated": {
+            "mean": -0.003987925354866288,
+            "variance": 0.0008788395009862657,
+            "lag1Autocorrelation": 0.3067261520162279,
+            "absoluteLag1Autocorrelation": 0.19885937025786407,
+            "signChangeRate": 0.345372460496614,
+            "q05": -0.045614889104966604,
+            "q50": -0.005102681060871889,
+            "q95": 0.04206993470431106,
+            "maximumDrawdown": 24.947108519251884,
+            "maximumDrawdownDuration": 5690
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 4,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-10-31",
+      "targetDate": "2024-11-14",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-10-31",
+      "trainingRows": 5221,
+      "lastKnownTargetDate": "2024-05-18",
+      "coefficients": {
+        "coefficient": 3.45251894681294e-17,
+        "exponent": 5.682263498203872,
+        "sinAmplitude": 0.565765878899846,
+        "cosAmplitude": 0.028311032417002543,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 5,
+        "lastKnownTargetDate": "2024-05-18",
+        "q80AbsLogError": 0.09720087247889277,
+        "q90AbsLogError": 0.09720087247889277,
+        "q95AbsLogError": 0.09720087247889277
+      },
+      "dataHash": "3ffc0e190c8115e27cb2baa38bb9b2ac2256b70eee2b0c20eb70cc66cba99e98",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 74039.9379588749,
+          "actual": 87334.19,
+          "absLogError": 0.1651373744408789
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 70207.54,
+          "actual": 87334.19,
+          "absLogError": 0.21828631153377287
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 70207.54,
+          "actual": 87334.19,
+          "absLogError": 0.21828631153377287
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 71682.79834486645,
+          "actual": 87334.19,
+          "absLogError": 0.19749121689111682
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 71188.7258554313,
+          "actual": 87334.19,
+          "absLogError": 0.2044075630521913
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 74039.9379588749,
+        "absLogError": 0.1651373744408789,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2024-10-31",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0011545992691035841,
+            "variance": 0.003798361220560897,
+            "lag1Autocorrelation": 0.3335533696538453,
+            "absoluteLag1Autocorrelation": 0.4288499578686569,
+            "signChangeRate": 0.3342911877394636,
+            "q05": -0.07169213179305267,
+            "q50": -0.002251137420362384,
+            "q95": 0.08221853185810801,
+            "maximumDrawdown": 11.796799673947708,
+            "maximumDrawdownDuration": 4841
+          },
+          "generated": {
+            "mean": -0.0024659257343337985,
+            "variance": 0.00047448668873075037,
+            "lag1Autocorrelation": 0.24427755527164843,
+            "absoluteLag1Autocorrelation": 0.017951120426309097,
+            "signChangeRate": 0.37094972067039106,
+            "q05": -0.03664933280572982,
+            "q50": -0.003756661273188744,
+            "q95": 0.03641682663358399,
+            "maximumDrawdown": 2.276724615346437,
+            "maximumDrawdownDuration": 896
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 5,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-10-31",
+      "targetDate": "2024-11-30",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-10-31",
+      "trainingRows": 5221,
+      "lastKnownTargetDate": "2024-06-03",
+      "coefficients": {
+        "coefficient": 3.45251894681294e-17,
+        "exponent": 5.682263498203872,
+        "sinAmplitude": 0.565765878899846,
+        "cosAmplitude": 0.028311032417002543,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 5,
+        "lastKnownTargetDate": "2024-06-03",
+        "q80AbsLogError": 0.2786506459003066,
+        "q90AbsLogError": 0.2786506459003066,
+        "q95AbsLogError": 0.2786506459003066
+      },
+      "dataHash": "3ffc0e190c8115e27cb2baa38bb9b2ac2256b70eee2b0c20eb70cc66cba99e98",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 78561.6766282379,
+          "actual": 96473.51,
+          "absLogError": 0.20538445706115332
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 70207.54,
+          "actual": 96473.51,
+          "absLogError": 0.3178127502173542
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 70207.54,
+          "actual": 96473.51,
+          "absLogError": 0.3178127502173542
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 73406.80406539186,
+          "actual": 96473.51,
+          "absLogError": 0.2732518331259482
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 72326.88315971797,
+          "actual": 96473.51,
+          "absLogError": 0.2880725748996795
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 78561.6766282379,
+        "absLogError": 0.20538445706115332,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2024-10-31",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0011545992691035841,
+            "variance": 0.003798361220560897,
+            "lag1Autocorrelation": 0.3335533696538453,
+            "absoluteLag1Autocorrelation": 0.4288499578686569,
+            "signChangeRate": 0.3342911877394636,
+            "q05": -0.07169213179305267,
+            "q50": -0.002251137420362384,
+            "q95": 0.08221853185810801,
+            "maximumDrawdown": 11.796799673947708,
+            "maximumDrawdownDuration": 4841
+          },
+          "generated": {
+            "mean": -0.004330129160682531,
+            "variance": 0.0005315747937882606,
+            "lag1Autocorrelation": 0.286425688043199,
+            "absoluteLag1Autocorrelation": 0.10627629621915874,
+            "signChangeRate": 0.33663366336633666,
+            "q05": -0.03996886812350631,
+            "q50": -0.004732184281734109,
+            "q95": 0.033290044867774475,
+            "maximumDrawdown": 8.51630376960283,
+            "maximumDrawdownDuration": 1918
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 5,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-10-31",
+      "targetDate": "2024-12-30",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-10-31",
+      "trainingRows": 5221,
+      "lastKnownTargetDate": "2024-07-03",
+      "coefficients": {
+        "coefficient": 3.45251894681294e-17,
+        "exponent": 5.682263498203872,
+        "sinAmplitude": 0.565765878899846,
+        "cosAmplitude": 0.028311032417002543,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 5,
+        "lastKnownTargetDate": "2024-07-03",
+        "q80AbsLogError": 0.3122262560873865,
+        "q90AbsLogError": 0.3122262560873865,
+        "q95AbsLogError": 0.3122262560873865
+      },
+      "dataHash": "3ffc0e190c8115e27cb2baa38bb9b2ac2256b70eee2b0c20eb70cc66cba99e98",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 87406.2692652658,
+          "actual": 92646.21,
+          "absLogError": 0.058221034443955606
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 70207.54,
+          "actual": 92646.21,
+          "absLogError": 0.27733233258537493
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 70207.54,
+          "actual": 92646.21,
+          "absLogError": 0.27733233258537493
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 76751.8543320964,
+          "actual": 92646.21,
+          "absLogError": 0.18821049840256257
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 74510.20257367649,
+          "actual": 92646.21,
+          "absLogError": 0.21785198195002525
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 87406.2692652658,
+        "absLogError": 0.058221034443955606,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2024-10-31",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0011545992691035841,
+            "variance": 0.003798361220560897,
+            "lag1Autocorrelation": 0.3335533696538453,
+            "absoluteLag1Autocorrelation": 0.4288499578686569,
+            "signChangeRate": 0.3342911877394636,
+            "q05": -0.07169213179305267,
+            "q50": -0.002251137420362384,
+            "q95": 0.08221853185810801,
+            "maximumDrawdown": 11.796799673947708,
+            "maximumDrawdownDuration": 4841
+          },
+          "generated": {
+            "mean": -0.0038480237300414022,
+            "variance": 0.0006625003516969802,
+            "lag1Autocorrelation": 0.304508783056967,
+            "absoluteLag1Autocorrelation": 0.15220063501404754,
+            "signChangeRate": 0.3378483980203178,
+            "q05": -0.04217896247510021,
+            "q50": -0.004895156643593024,
+            "q95": 0.0387115986372783,
+            "maximumDrawdown": 14.809250208234925,
+            "maximumDrawdownDuration": 3834
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 5,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-10-31",
+      "targetDate": "2025-01-29",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-10-31",
+      "trainingRows": 5221,
+      "lastKnownTargetDate": "2024-08-02",
+      "coefficients": {
+        "coefficient": 3.45251894681294e-17,
+        "exponent": 5.682263498203872,
+        "sinAmplitude": 0.565765878899846,
+        "cosAmplitude": 0.028311032417002543,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 5,
+        "lastKnownTargetDate": "2024-08-02",
+        "q80AbsLogError": 0.2679019251660289,
+        "q90AbsLogError": 0.2679019251660289,
+        "q95AbsLogError": 0.2679019251660289
+      },
+      "dataHash": "3ffc0e190c8115e27cb2baa38bb9b2ac2256b70eee2b0c20eb70cc66cba99e98",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 96651.9440714291,
+          "actual": 103742.97,
+          "absLogError": 0.07080007777509538
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 70207.54,
+          "actual": 103742.97,
+          "absLogError": 0.3904606851075058
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 70207.54,
+          "actual": 103742.97,
+          "absLogError": 0.3904606851075058
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 80249.33408308707,
+          "actual": 103742.97,
+          "absLogError": 0.2567779338332872
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 76759.4294822638,
+          "actual": 103742.97,
+          "absLogError": 0.3012401591544817
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 96651.9440714291,
+        "absLogError": 0.07080007777509538,
+        "selectedParameter": "method=volatility-regime;block=90",
+        "innerTrainingEnd": "2024-10-31",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0011545992691035841,
+            "variance": 0.003798361220560897,
+            "lag1Autocorrelation": 0.3335533696538453,
+            "absoluteLag1Autocorrelation": 0.4288499578686569,
+            "signChangeRate": 0.3342911877394636,
+            "q05": -0.07169213179305267,
+            "q50": -0.002251137420362384,
+            "q95": 0.08221853185810801,
+            "maximumDrawdown": 11.796799673947708,
+            "maximumDrawdownDuration": 4841
+          },
+          "generated": {
+            "mean": -0.001474224362985924,
+            "variance": 0.0007263915681441839,
+            "lag1Autocorrelation": 0.34488756388147407,
+            "absoluteLag1Autocorrelation": 0.1943395706698518,
+            "signChangeRate": 0.3186317068935579,
+            "q05": -0.04217896247510021,
+            "q50": -0.002224277668043173,
+            "q95": 0.042090157662855454,
+            "maximumDrawdown": 9.65601619986456,
+            "maximumDrawdownDuration": 5669
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 5,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-04-29",
+      "targetDate": "2025-05-13",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-04-29",
+      "trainingRows": 5401,
+      "lastKnownTargetDate": "2024-11-14",
+      "coefficients": {
+        "coefficient": 3.572400500197073e-17,
+        "exponent": 5.677593628232932,
+        "sinAmplitude": 0.5618019456330352,
+        "cosAmplitude": 0.02441651968162784,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 6,
+        "lastKnownTargetDate": "2024-11-14",
+        "q80AbsLogError": 0.10521268354050373,
+        "q90AbsLogError": 0.10521268354050373,
+        "q95AbsLogError": 0.10521268354050373
+      },
+      "dataHash": "a2690fea59731c81bd2f31bc5eb59b235713e36a08658e5d4fc7d992a9ab2bc1",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 99458.24993662746,
+          "actual": 104136.59,
+          "absLogError": 0.04596544533453152
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 94274.16,
+          "actual": 104136.59,
+          "absLogError": 0.09949626981477731
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 94274.16,
+          "actual": 104136.59,
+          "absLogError": 0.09949626981477731
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 92880.99268420965,
+          "actual": 104136.59,
+          "absLogError": 0.11438437766907232
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 94879.47222795816,
+          "actual": 104136.59,
+          "absLogError": 0.09309603010365777
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 99458.24993662746,
+        "absLogError": 0.04596544533453152,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2025-04-29",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0008968163042657089,
+            "variance": 0.0036997518669398895,
+            "lag1Autocorrelation": 0.3328977319476571,
+            "absoluteLag1Autocorrelation": 0.4288958010318632,
+            "signChangeRate": 0.3364814814814815,
+            "q05": -0.07117931131580593,
+            "q50": -0.002502791397054234,
+            "q95": 0.08071070336011038,
+            "maximumDrawdown": 11.734369104182923,
+            "maximumDrawdownDuration": 5021
+          },
+          "generated": {
+            "mean": -0.0021930765563443365,
+            "variance": 0.0004129708313364071,
+            "lag1Autocorrelation": 0.3123694599013862,
+            "absoluteLag1Autocorrelation": 0.09668247326612063,
+            "signChangeRate": 0.3418994413407821,
+            "q05": -0.032320817990185075,
+            "q50": -0.003071831169621564,
+            "q95": 0.03158267233139916,
+            "maximumDrawdown": 2.1843276426366423,
+            "maximumDrawdownDuration": 891
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 6,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-04-29",
+      "targetDate": "2025-05-29",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-04-29",
+      "trainingRows": 5401,
+      "lastKnownTargetDate": "2024-11-30",
+      "coefficients": {
+        "coefficient": 3.572400500197073e-17,
+        "exponent": 5.677593628232932,
+        "sinAmplitude": 0.5618019456330352,
+        "cosAmplitude": 0.02441651968162784,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 6,
+        "lastKnownTargetDate": "2024-11-30",
+        "q80AbsLogError": 0.2786506459003066,
+        "q90AbsLogError": 0.2786506459003066,
+        "q95AbsLogError": 0.2786506459003066
+      },
+      "dataHash": "a2690fea59731c81bd2f31bc5eb59b235713e36a08658e5d4fc7d992a9ab2bc1",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 105401.51285562963,
+          "actual": 105586.78,
+          "absLogError": 0.001756184568151729
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 94274.16,
+          "actual": 105586.78,
+          "absLogError": 0.11332604104007063
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 94274.16,
+          "actual": 105586.78,
+          "absLogError": 0.11332604104007063
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 91313.9934492602,
+          "actual": 105586.78,
+          "absLogError": 0.1452291292992744
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 95576.01814676377,
+          "actual": 105586.78,
+          "absLogError": 0.09961124165910067
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 105401.51285562963,
+        "absLogError": 0.001756184568151729,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2025-04-29",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0008968163042657089,
+            "variance": 0.0036997518669398895,
+            "lag1Autocorrelation": 0.3328977319476571,
+            "absoluteLag1Autocorrelation": 0.4288958010318632,
+            "signChangeRate": 0.3364814814814815,
+            "q05": -0.07117931131580593,
+            "q50": -0.002502791397054234,
+            "q95": 0.08071070336011038,
+            "maximumDrawdown": 11.734369104182923,
+            "maximumDrawdownDuration": 5021
+          },
+          "generated": {
+            "mean": -0.003397820215319037,
+            "variance": 0.0005652539221169217,
+            "lag1Autocorrelation": 0.2746914272007606,
+            "absoluteLag1Autocorrelation": 0.11868618074239505,
+            "signChangeRate": 0.34340802501302764,
+            "q05": -0.03935500769424008,
+            "q50": -0.005469815113972599,
+            "q95": 0.03791514417540026,
+            "maximumDrawdown": 6.700558944298538,
+            "maximumDrawdownDuration": 1912
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 6,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-04-29",
+      "targetDate": "2025-06-28",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-04-29",
+      "trainingRows": 5401,
+      "lastKnownTargetDate": "2024-12-30",
+      "coefficients": {
+        "coefficient": 3.572400500197073e-17,
+        "exponent": 5.677593628232932,
+        "sinAmplitude": 0.5618019456330352,
+        "cosAmplitude": 0.02441651968162784,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 6,
+        "lastKnownTargetDate": "2024-12-30",
+        "q80AbsLogError": 0.3122262560873865,
+        "q90AbsLogError": 0.3122262560873865,
+        "q95AbsLogError": 0.3122262560873865
+      },
+      "dataHash": "a2690fea59731c81bd2f31bc5eb59b235713e36a08658e5d4fc7d992a9ab2bc1",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 116507.52237583738,
+          "actual": 107390.13,
+          "absLogError": 0.08148756226048452
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 94274.16,
+          "actual": 107390.13,
+          "absLogError": 0.13026114540910644
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 94274.16,
+          "actual": 107390.13,
+          "absLogError": 0.13026114540910644
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 88446.77480713204,
+          "actual": 107390.13,
+          "absLogError": 0.19406732192751378
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 96895.85401546423,
+          "actual": 107390.13,
+          "absLogError": 0.10283154664716641
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 116507.52237583738,
+        "absLogError": 0.08148756226048452,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2025-04-29",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0008968163042657089,
+            "variance": 0.0036997518669398895,
+            "lag1Autocorrelation": 0.3328977319476571,
+            "absoluteLag1Autocorrelation": 0.4288958010318632,
+            "signChangeRate": 0.3364814814814815,
+            "q05": -0.07117931131580593,
+            "q50": -0.002502791397054234,
+            "q95": 0.08071070336011038,
+            "maximumDrawdown": 11.734369104182923,
+            "maximumDrawdownDuration": 5021
+          },
+          "generated": {
+            "mean": -0.007250012319045356,
+            "variance": 0.0006521280477368383,
+            "lag1Autocorrelation": 0.31898149989522934,
+            "absoluteLag1Autocorrelation": 0.12680935848439526,
+            "signChangeRate": 0.319353998437093,
+            "q05": -0.04515799779683666,
+            "q50": -0.008834978146590719,
+            "q95": 0.034528324374965585,
+            "maximumDrawdown": 27.840047305134167,
+            "maximumDrawdownDuration": 3840
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 6,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-04-29",
+      "targetDate": "2025-07-28",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-04-29",
+      "trainingRows": 5401,
+      "lastKnownTargetDate": "2025-01-29",
+      "coefficients": {
+        "coefficient": 3.572400500197073e-17,
+        "exponent": 5.677593628232932,
+        "sinAmplitude": 0.5618019456330352,
+        "cosAmplitude": 0.02441651968162784,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 6,
+        "lastKnownTargetDate": "2025-01-29",
+        "q80AbsLogError": 0.2679019251660289,
+        "q90AbsLogError": 0.2679019251660289,
+        "q95AbsLogError": 0.2679019251660289
+      },
+      "dataHash": "a2690fea59731c81bd2f31bc5eb59b235713e36a08658e5d4fc7d992a9ab2bc1",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 127413.28075222271,
+          "actual": 117911.76,
+          "absLogError": 0.07749943411177877
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 94274.16,
+          "actual": 117911.76,
+          "absLogError": 0.2237294151148379
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 94274.16,
+          "actual": 117911.76,
+          "absLogError": 0.2237294151148379
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 85669.58555076648,
+          "actual": 117911.76,
+          "absLogError": 0.31943867989244895
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 98233.91586547345,
+          "actual": 117911.76,
+          "absLogError": 0.18258501697192786
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 127413.28075222271,
+        "absLogError": 0.07749943411177877,
+        "selectedParameter": "method=volatility-regime;block=90",
+        "innerTrainingEnd": "2025-04-29",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0008968163042657089,
+            "variance": 0.0036997518669398895,
+            "lag1Autocorrelation": 0.3328977319476571,
+            "absoluteLag1Autocorrelation": 0.4288958010318632,
+            "signChangeRate": 0.3364814814814815,
+            "q05": -0.07117931131580593,
+            "q50": -0.002502791397054234,
+            "q95": 0.08071070336011038,
+            "maximumDrawdown": 11.734369104182923,
+            "maximumDrawdownDuration": 5021
+          },
+          "generated": {
+            "mean": -0.002742401924419096,
+            "variance": 0.000756177320224079,
+            "lag1Autocorrelation": 0.3352579158521936,
+            "absoluteLag1Autocorrelation": 0.1902574125130889,
+            "signChangeRate": 0.33807952769578054,
+            "q05": -0.04490465047922754,
+            "q50": -0.0034303255474135708,
+            "q95": 0.040177994570039996,
+            "maximumDrawdown": 16.71510338743113,
+            "maximumDrawdownDuration": 5670
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 6,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-10-26",
+      "targetDate": "2025-11-09",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-10-26",
+      "trainingRows": 5581,
+      "lastKnownTargetDate": "2025-05-13",
+      "coefficients": {
+        "coefficient": 4.20554081252137e-17,
+        "exponent": 5.655394815967146,
+        "sinAmplitude": 0.5410994021870923,
+        "cosAmplitude": 0.014708491216066705,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 7,
+        "lastKnownTargetDate": "2025-05-13",
+        "q80AbsLogError": 0.09720087247889277,
+        "q90AbsLogError": 0.10521268354050373,
+        "q95AbsLogError": 0.10521268354050373
+      },
+      "dataHash": "445f7fb41ba86234a70151b2d02aa8fba6bb475c6431ff3f11b722d16250b77b",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 119756.73516037907,
+          "actual": 104752.95,
+          "absLogError": 0.13385775752302337
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 114722.02,
+          "actual": 104752.95,
+          "absLogError": 0.09090726408868378
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 114722.02,
+          "actual": 104752.95,
+          "absLogError": 0.09090726408868378
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 114233.6533457094,
+          "actual": 104752.95,
+          "absLogError": 0.086641220903925
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 114521.88299293896,
+          "actual": 104752.95,
+          "absLogError": 0.08916120187900108
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 119756.73516037907,
+        "absLogError": 0.13385775752302337,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2025-10-26",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0007795622734873784,
+            "variance": 0.003586960855149773,
+            "lag1Autocorrelation": 0.3319827660714877,
+            "absoluteLag1Autocorrelation": 0.4315010858254649,
+            "signChangeRate": 0.33906810035842294,
+            "q05": -0.06964002520410666,
+            "q50": -0.002664118037146529,
+            "q95": 0.07954927186612593,
+            "maximumDrawdown": 11.4416000544629,
+            "maximumDrawdownDuration": 5201
+          },
+          "generated": {
+            "mean": -0.0020461191939401342,
+            "variance": 0.000489393886471003,
+            "lag1Autocorrelation": 0.282775292587541,
+            "absoluteLag1Autocorrelation": 0.01824269355126708,
+            "signChangeRate": 0.33854748603351953,
+            "q05": -0.036151839750939836,
+            "q50": -0.003680662579894828,
+            "q95": 0.037202918483546676,
+            "maximumDrawdown": 2.6453925397663913,
+            "maximumDrawdownDuration": 854
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 7,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-10-26",
+      "targetDate": "2025-11-25",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-10-26",
+      "trainingRows": 5581,
+      "lastKnownTargetDate": "2025-05-29",
+      "coefficients": {
+        "coefficient": 4.20554081252137e-17,
+        "exponent": 5.655394815967146,
+        "sinAmplitude": 0.5410994021870923,
+        "cosAmplitude": 0.014708491216066705,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 7,
+        "lastKnownTargetDate": "2025-05-29",
+        "q80AbsLogError": 0.20538445706115332,
+        "q90AbsLogError": 0.2786506459003066,
+        "q95AbsLogError": 0.2786506459003066
+      },
+      "dataHash": "445f7fb41ba86234a70151b2d02aa8fba6bb475c6431ff3f11b722d16250b77b",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 125330.44521063843,
+          "actual": 87594.72,
+          "absLogError": 0.3582330887709441
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 114722.02,
+          "actual": 87594.72,
+          "absLogError": 0.2697912626323563
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 114722.02,
+          "actual": 87594.72,
+          "absLogError": 0.2697912626323563
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 113678.06516996377,
+          "actual": 87594.72,
+          "absLogError": 0.2606497415221589
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 114293.58247598489,
+          "actual": 87594.72,
+          "absLogError": 0.26604970075446477
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 125330.44521063843,
+        "absLogError": 0.3582330887709441,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2025-10-26",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0007795622734873784,
+            "variance": 0.003586960855149773,
+            "lag1Autocorrelation": 0.3319827660714877,
+            "absoluteLag1Autocorrelation": 0.4315010858254649,
+            "signChangeRate": 0.33906810035842294,
+            "q05": -0.06964002520410666,
+            "q50": -0.002664118037146529,
+            "q95": 0.07954927186612593,
+            "maximumDrawdown": 11.4416000544629,
+            "maximumDrawdownDuration": 5201
+          },
+          "generated": {
+            "mean": -0.004712412519978829,
+            "variance": 0.0005057771266911863,
+            "lag1Autocorrelation": 0.304227794345546,
+            "absoluteLag1Autocorrelation": 0.1269115318299497,
+            "signChangeRate": 0.34861907243355916,
+            "q05": -0.04012193231999653,
+            "q50": -0.00595596802152365,
+            "q95": 0.03339275466772211,
+            "maximumDrawdown": 9.440303596673143,
+            "maximumDrawdownDuration": 1858
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 7,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-10-26",
+      "targetDate": "2025-12-25",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-10-26",
+      "trainingRows": 5581,
+      "lastKnownTargetDate": "2025-06-28",
+      "coefficients": {
+        "coefficient": 4.20554081252137e-17,
+        "exponent": 5.655394815967146,
+        "sinAmplitude": 0.5410994021870923,
+        "cosAmplitude": 0.014708491216066705,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 7,
+        "lastKnownTargetDate": "2025-06-28",
+        "q80AbsLogError": 0.18914877844528746,
+        "q90AbsLogError": 0.3122262560873865,
+        "q95AbsLogError": 0.3122262560873865
+      },
+      "dataHash": "445f7fb41ba86234a70151b2d02aa8fba6bb475c6431ff3f11b722d16250b77b",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 135156.9051952703,
+          "actual": 87535.28,
+          "absLogError": 0.4343944521417605
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 114722.02,
+          "actual": 87535.28,
+          "absLogError": 0.27047007268525897
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 114722.02,
+          "actual": 87535.28,
+          "absLogError": 0.27047007268525897
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 112643.61018736011,
+          "actual": 87535.28,
+          "absLogError": 0.2521870304648642
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 113866.74498230382,
+          "actual": 87535.28,
+          "absLogError": 0.2629869489294757
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 135156.9051952703,
+        "absLogError": 0.4343944521417605,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2025-10-26",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0007795622734873784,
+            "variance": 0.003586960855149773,
+            "lag1Autocorrelation": 0.3319827660714877,
+            "absoluteLag1Autocorrelation": 0.4315010858254649,
+            "signChangeRate": 0.33906810035842294,
+            "q05": -0.06964002520410666,
+            "q50": -0.002664118037146529,
+            "q95": 0.07954927186612593,
+            "maximumDrawdown": 11.4416000544629,
+            "maximumDrawdownDuration": 5201
+          },
+          "generated": {
+            "mean": -0.0030716286612027847,
+            "variance": 0.0006210283741060776,
+            "lag1Autocorrelation": 0.338591558208565,
+            "absoluteLag1Autocorrelation": 0.16577704823862968,
+            "signChangeRate": 0.3433185725449336,
+            "q05": -0.039226798780922514,
+            "q50": -0.004530088994156446,
+            "q95": 0.03823093619375603,
+            "maximumDrawdown": 12.316861412798705,
+            "maximumDrawdownDuration": 3768
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 7,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-10-26",
+      "targetDate": "2026-01-24",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-10-26",
+      "trainingRows": 5581,
+      "lastKnownTargetDate": "2025-07-28",
+      "coefficients": {
+        "coefficient": 4.20554081252137e-17,
+        "exponent": 5.655394815967146,
+        "sinAmplitude": 0.5410994021870923,
+        "cosAmplitude": 0.014708491216066705,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 7,
+        "lastKnownTargetDate": "2025-07-28",
+        "q80AbsLogError": 0.22348655678225027,
+        "q90AbsLogError": 0.2679019251660289,
+        "q95AbsLogError": 0.2679019251660289
+      },
+      "dataHash": "445f7fb41ba86234a70151b2d02aa8fba6bb475c6431ff3f11b722d16250b77b",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 144011.18448794773,
+          "actual": 89294.13,
+          "absLogError": 0.47795521437576
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 114722.02,
+          "actual": 89294.13,
+          "absLogError": 0.2505762325462799
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 114722.02,
+          "actual": 89294.13,
+          "absLogError": 0.2505762325462799
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 111618.5686048652,
+          "actual": 89294.13,
+          "absLogError": 0.22315166921568763
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 113441.50154353,
+          "actual": 89294.13,
+          "absLogError": 0.23935154691260505
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 144011.18448794773,
+        "absLogError": 0.47795521437576,
+        "selectedParameter": "method=volatility-regime;block=90",
+        "innerTrainingEnd": "2025-10-26",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0007795622734873784,
+            "variance": 0.003586960855149773,
+            "lag1Autocorrelation": 0.3319827660714877,
+            "absoluteLag1Autocorrelation": 0.4315010858254649,
+            "signChangeRate": 0.33906810035842294,
+            "q05": -0.06964002520410666,
+            "q50": -0.002664118037146529,
+            "q95": 0.07954927186612593,
+            "maximumDrawdown": 11.4416000544629,
+            "maximumDrawdownDuration": 5201
+          },
+          "generated": {
+            "mean": -0.003731233233745466,
+            "variance": 0.0007200048114918481,
+            "lag1Autocorrelation": 0.2961262054782237,
+            "absoluteLag1Autocorrelation": 0.16579011571344393,
+            "signChangeRate": 0.3377322451814551,
+            "q05": -0.04356378824339313,
+            "q50": -0.004805491179098564,
+            "q95": 0.03957913622204329,
+            "maximumDrawdown": 24.035812780064866,
+            "maximumDrawdownDuration": 5759
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 7,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2026-04-24",
+      "targetDate": "2026-05-08",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-04-24",
+      "trainingRows": 5761,
+      "lastKnownTargetDate": "2025-11-09",
+      "coefficients": {
+        "coefficient": 6.302751067276267e-17,
+        "exponent": 5.601057583763985,
+        "sinAmplitude": 0.49035799960754345,
+        "cosAmplitude": 0.032688620877404706,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 8,
+        "lastKnownTargetDate": "2025-11-09",
+        "q80AbsLogError": 0.10521268354050373,
+        "q90AbsLogError": 0.13385775752302337,
+        "q95AbsLogError": 0.13385775752302337
+      },
+      "dataHash": "4b54a344ff1b132d42e021d2061902d52b6f0f80cfcdc9c4bfd0f728f4f17ab9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 81543.40998988194,
+          "actual": 80272.11,
+          "absLogError": 0.015713278276456796
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 77360.72,
+          "actual": 80272.11,
+          "absLogError": 0.03694307984460112
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 77360.72,
+          "actual": 80272.11,
+          "absLogError": 0.03694307984460112
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 75653.49872884474,
+          "actual": 80272.11,
+          "absLogError": 0.05925855002270118
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 77541.34341047979,
+          "actual": 80272.11,
+          "absLogError": 0.03461098060246267
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 81543.40998988194,
+        "absLogError": 0.015713278276456796,
+        "selectedParameter": "method=volatility-regime;block=14",
+        "innerTrainingEnd": "2026-04-24",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0004298020383500711,
+            "variance": 0.0034981144822352943,
+            "lag1Autocorrelation": 0.3310407479794947,
+            "absoluteLag1Autocorrelation": 0.43235776294527434,
+            "signChangeRate": 0.3411458333333333,
+            "q05": -0.06872639397348407,
+            "q50": -0.00277366271783748,
+            "q95": 0.07814355648327853,
+            "maximumDrawdown": 11.159287822817628,
+            "maximumDrawdownDuration": 5381
+          },
+          "generated": {
+            "mean": -0.003715887947366757,
+            "variance": 0.0004486080841825819,
+            "lag1Autocorrelation": 0.23810154420609633,
+            "absoluteLag1Autocorrelation": 0.0642811456757632,
+            "signChangeRate": 0.3486033519553073,
+            "q05": -0.03607999069964204,
+            "q50": -0.005665859601294787,
+            "q95": 0.0333156188925037,
+            "maximumDrawdown": 3.619305200131877,
+            "maximumDrawdownDuration": 740
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 8,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2026-04-24",
+      "targetDate": "2026-05-24",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-04-24",
+      "trainingRows": 5761,
+      "lastKnownTargetDate": "2025-11-25",
+      "coefficients": {
+        "coefficient": 6.302751067276267e-17,
+        "exponent": 5.601057583763985,
+        "sinAmplitude": 0.49035799960754345,
+        "cosAmplitude": 0.032688620877404706,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 8,
+        "lastKnownTargetDate": "2025-11-25",
+        "q80AbsLogError": 0.2786506459003066,
+        "q90AbsLogError": 0.3582330887709441,
+        "q95AbsLogError": 0.3582330887709441
+      },
+      "dataHash": "4b54a344ff1b132d42e021d2061902d52b6f0f80cfcdc9c4bfd0f728f4f17ab9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 86119.27018603565,
+          "actual": 76711.68,
+          "absLogError": 0.11567921967985838
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 77360.72,
+          "actual": 76711.68,
+          "absLogError": 0.008425179840967838
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 77360.72,
+          "actual": 76711.68,
+          "absLogError": 0.008425179840967838
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 73748.47326910897,
+          "actual": 76711.68,
+          "absLogError": 0.03939368482638936
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 77748.28661854943,
+          "actual": 76711.68,
+          "absLogError": 0.013422535359836032
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 86119.27018603565,
+        "absLogError": 0.11567921967985838,
+        "selectedParameter": "method=volatility-regime;block=30",
+        "innerTrainingEnd": "2026-04-24",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0004298020383500711,
+            "variance": 0.0034981144822352943,
+            "lag1Autocorrelation": 0.3310407479794947,
+            "absoluteLag1Autocorrelation": 0.43235776294527434,
+            "signChangeRate": 0.3411458333333333,
+            "q05": -0.06872639397348407,
+            "q50": -0.00277366271783748,
+            "q95": 0.07814355648327853,
+            "maximumDrawdown": 11.159287822817628,
+            "maximumDrawdownDuration": 5381
+          },
+          "generated": {
+            "mean": -0.002175046799160653,
+            "variance": 0.0005069771906164573,
+            "lag1Autocorrelation": 0.28382248783045977,
+            "absoluteLag1Autocorrelation": 0.1426626791575933,
+            "signChangeRate": 0.3757165190203231,
+            "q05": -0.04022981469490165,
+            "q50": -0.0026752399779904554,
+            "q95": 0.036242443297653505,
+            "maximumDrawdown": 4.7015110623192,
+            "maximumDrawdownDuration": 1716
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 8,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2026-04-24",
+      "targetDate": "2026-06-23",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2026-04-24",
+      "trainingRows": 5761,
+      "lastKnownTargetDate": "2025-12-25",
+      "coefficients": {
+        "coefficient": 6.302751067276267e-17,
+        "exponent": 5.601057583763985,
+        "sinAmplitude": 0.49035799960754345,
+        "cosAmplitude": 0.032688620877404706,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 8,
+        "lastKnownTargetDate": "2025-12-25",
+        "q80AbsLogError": 0.3122262560873865,
+        "q90AbsLogError": 0.4343944521417605,
+        "q95AbsLogError": 0.4343944521417605
+      },
+      "dataHash": "4b54a344ff1b132d42e021d2061902d52b6f0f80cfcdc9c4bfd0f728f4f17ab9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 93985.32979850406,
+          "actual": 62515.96,
+          "absLogError": 0.40771681997354103
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 77360.72,
+          "actual": 62515.96,
+          "absLogError": 0.21305727409365782
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 77360.72,
+          "actual": 62515.96,
+          "absLogError": 0.21305727409365782
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 70304.89516545967,
+          "actual": 62515.96,
+          "absLogError": 0.11741954475894292
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 78137.79489281008,
+          "actual": 62515.96,
+          "absLogError": 0.22305198513139374
+        }
+      ],
+      "candidate": {
+        "id": "calibrated-jagged-path",
+        "median": 93985.32979850406,
+        "absLogError": 0.40771681997354103,
+        "selectedParameter": "method=volatility-regime;block=60",
+        "innerTrainingEnd": "2026-04-24",
+        "sensitivity": [],
+        "pathDiagnostics": {
+          "source": {
+            "mean": 0.0004298020383500711,
+            "variance": 0.0034981144822352943,
+            "lag1Autocorrelation": 0.3310407479794947,
+            "absoluteLag1Autocorrelation": 0.43235776294527434,
+            "signChangeRate": 0.3411458333333333,
+            "q05": -0.06872639397348407,
+            "q50": -0.00277366271783748,
+            "q95": 0.07814355648327853,
+            "maximumDrawdown": 11.159287822817628,
+            "maximumDrawdownDuration": 5381
+          },
+          "generated": {
+            "mean": -0.003033867119810188,
+            "variance": 0.000575490344368851,
+            "lag1Autocorrelation": 0.3077864086273441,
+            "absoluteLag1Autocorrelation": 0.16873371146452124,
+            "signChangeRate": 0.3547798905965095,
+            "q05": -0.039508923416322894,
+            "q50": -0.004180820677247364,
+            "q95": 0.03653345894757069,
+            "maximumDrawdown": 11.65224794105096,
+            "maximumDrawdownDuration": 3840
+          },
+          "method": "volatility-regime",
+          "simulations": 64
+        }
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 8,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    }
+  ],
+  "skips": [
+    {
+      "originDate": "2026-04-24",
+      "horizonDays": 90,
+      "reason": "target-not-yet-observed"
+    }
+  ]
+}

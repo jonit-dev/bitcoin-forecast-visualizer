@@ -1,0 +1,2009 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-10T20:02:59.710Z",
+    "command": "npm run backtest:pit-core -- --candidate structural-shrinkage --origin-start 2022-01-01 --spacing-days 365",
+    "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e",
+    "seed": 1498152960,
+    "closeAvailabilityConvention": "UTC daily close is available after that date closes; structural fit includes the origin close; calibration targets must be strictly earlier than origin.",
+    "dataset": {
+      "firstDate": "2010-07-17",
+      "lastDate": "2026-07-09",
+      "rowCount": 5837,
+      "sha256": "23b947fb572a724e75314608e57d56203b734f0cd134a389a30c9d264fab4919"
+    },
+    "originStart": "2022-01-01",
+    "spacingDays": 365,
+    "horizons": [
+      14,
+      30,
+      60,
+      90
+    ],
+    "candidate": "structural-shrinkage",
+    "deterministicContentSha256": "36da1995df4a78cb5ab19e4e35ceec376eb374a2260eca340882d6653457c304",
+    "deterministicRerunContract": "same data/config/seed produces the same content hash; generatedAt and artifact filename excluded"
+  },
+  "methodology": {
+    "status": "report-only",
+    "structuralFit": "expanding point-in-time power-law fit through origin close",
+    "intervalCalibration": "prior reconstructed-policy errors with targetDate < originDate",
+    "benchmarkSchedule": "identical origin/horizon rows for all available models",
+    "nestedSelection": "six inner walk-forward folds wholly before each outer origin; candidates selected on inner target MALE only"
+  },
+  "frozenSpecification": {
+    "innerFolds": 6,
+    "minimumTrainingRows": 1460,
+    "fitWindows": "expanding through inner origin; YL-1 anchor ends at least one horizon earlier",
+    "initialization": "YL-1 default weight 0.5 and YL-2 grid index 1 only when no valid inner folds",
+    "missingData": "state-space prediction-only update; invalid structural fits score Infinity",
+    "failureBehavior": "report skip/reject; never silently enable candidate",
+    "structuralShrinkageWeights": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "stateSpaceGridSize": 3,
+    "bootstrapIterations": 1000,
+    "bootstrapBlockDays": "max(horizon, observed origin spacing)",
+    "holmFamily": "four horizons",
+    "pathMethods": [
+      "current-recent-window",
+      "moving-block",
+      "volatility-regime",
+      "state-space"
+    ],
+    "seed": 1498152960
+  },
+  "benchmarkMetrics": [
+    {
+      "horizonDays": 14,
+      "modelId": "reconstructed-current-policy",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.05450984745790544
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "naive-current-price",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.08145238311701651
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "gbm-driftless",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.08145238311701651
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "gbm-recent-drift",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.12143512588794704
+    },
+    {
+      "horizonDays": 14,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.10451166674163555
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "reconstructed-current-policy",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.06181373723478755
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "naive-current-price",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.05529543854023829
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "gbm-driftless",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.05529543854023829
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "gbm-recent-drift",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.14313481119489335
+    },
+    {
+      "horizonDays": 30,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.10687025588136863
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "reconstructed-current-policy",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.1423591005073187
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "naive-current-price",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.07658751119920597
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "gbm-driftless",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.07658751119920597
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "gbm-recent-drift",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.24751138992871197
+    },
+    {
+      "horizonDays": 60,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.17498227930166252
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "reconstructed-current-policy",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.2396834508120873
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "naive-current-price",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.07911059956071473
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "gbm-driftless",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.07911059956071473
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "gbm-recent-drift",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.32382726209222845
+    },
+    {
+      "horizonDays": 90,
+      "modelId": "ma-trend-20-50-200",
+      "samples": 4,
+      "meanAbsoluteLogError": 0.2150335961516543
+    }
+  ],
+  "candidateEvaluation": {
+    "candidate": "structural-shrinkage",
+    "status": "research-only",
+    "verdict": "rejected-development-gate",
+    "checks": [
+      {
+        "horizonDays": 14,
+        "samples": 4,
+        "baselineMale": 0.05450984745790544,
+        "candidateMale": 0.05684445085456491,
+        "bestNaive": {
+          "id": "naive-current-price",
+          "male": 0.08145238311701651
+        },
+        "relativeMaleImprovement": -0.04282902091153962,
+        "medianAbsoluteLogError": 0.08543689890023665,
+        "biasLogError": -0.034824709972600024,
+        "directionHitRate": 1,
+        "bootstrap95": [
+          -0.00487997706617224,
+          -0.0005131944315117064
+        ],
+        "rawPValue": 1,
+        "holmAdjustedPValue": 1,
+        "regimeRobustness": {
+          "2017-2021": {
+            "samples": 0,
+            "meanPairedImprovement": 0
+          },
+          "2022-2024": {
+            "samples": 3,
+            "meanPairedImprovement": -0.002723304642698588
+          },
+          "2025+": {
+            "samples": 1,
+            "meanPairedImprovement": -0.0011684996585421409
+          }
+        },
+        "parameterSensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "male": 0.05684445085456491
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "male": 0.05563663469042367
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "male": 0.05442089991581776
+          }
+        ],
+        "distributionCalibration": {
+          "terminalQuantiles": [
+            "q10",
+            "q50",
+            "q90"
+          ],
+          "pinball": {
+            "q10": 0,
+            "q50": 0,
+            "q90": 0
+          },
+          "nll": 0,
+          "coverage": [
+            {
+              "level": 0.8,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            },
+            {
+              "level": 0.9,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            },
+            {
+              "level": 0.95,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            }
+          ],
+          "actualLogSamples": 4
+        }
+      },
+      {
+        "horizonDays": 30,
+        "samples": 4,
+        "baselineMale": 0.06181373723478755,
+        "candidateMale": 0.05581612987487382,
+        "bestNaive": {
+          "id": "naive-current-price",
+          "male": 0.05529543854023829
+        },
+        "relativeMaleImprovement": 0.09702709507973897,
+        "medianAbsoluteLogError": 0.07711036986733179,
+        "biasLogError": 0.023923573204867397,
+        "directionHitRate": 1,
+        "bootstrap95": [
+          -0.001193819694185659,
+          0.01774626926139072
+        ],
+        "rawPValue": 0.122,
+        "holmAdjustedPValue": 0.488,
+        "regimeRobustness": {
+          "2017-2021": {
+            "samples": 0,
+            "meanPairedImprovement": 0
+          },
+          "2022-2024": {
+            "samples": 3,
+            "meanPairedImprovement": 0.008792689609342071
+          },
+          "2025+": {
+            "samples": 1,
+            "meanPairedImprovement": -0.002387639388371318
+          }
+        },
+        "parameterSensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "male": 0.05581612987487382
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "male": 0.057804936895086145
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "male": 0.05980438851285569
+          }
+        ],
+        "distributionCalibration": {
+          "terminalQuantiles": [
+            "q10",
+            "q50",
+            "q90"
+          ],
+          "pinball": {
+            "q10": 0,
+            "q50": 0,
+            "q90": 0
+          },
+          "nll": 0,
+          "coverage": [
+            {
+              "level": 0.8,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            },
+            {
+              "level": 0.9,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            },
+            {
+              "level": 0.95,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            }
+          ],
+          "actualLogSamples": 4
+        }
+      },
+      {
+        "horizonDays": 60,
+        "samples": 4,
+        "baselineMale": 0.1423591005073187,
+        "candidateMale": 0.1501554428883019,
+        "bestNaive": {
+          "id": "naive-current-price",
+          "male": 0.07658751119920597
+        },
+        "relativeMaleImprovement": -0.05476532482433317,
+        "medianAbsoluteLogError": 0.19265148627434944,
+        "biasLogError": 0.1501554428883019,
+        "directionHitRate": 0.5,
+        "bootstrap95": [
+          -0.027629890348266482,
+          0.004969113101088503
+        ],
+        "rawPValue": 0.733,
+        "holmAdjustedPValue": 1,
+        "regimeRobustness": {
+          "2017-2021": {
+            "samples": 0,
+            "meanPairedImprovement": 0
+          },
+          "2022-2024": {
+            "samples": 3,
+            "meanPairedImprovement": -0.00990962324412987
+          },
+          "2025+": {
+            "samples": 1,
+            "meanPairedImprovement": -0.001456499791543081
+          }
+        },
+        "parameterSensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "male": 0.15088317340849083
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "male": 0.14802078223081336
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "male": 0.1451787270871595
+          }
+        ],
+        "distributionCalibration": {
+          "terminalQuantiles": [
+            "q10",
+            "q50",
+            "q90"
+          ],
+          "pinball": {
+            "q10": 0,
+            "q50": 0,
+            "q90": 0
+          },
+          "nll": 0,
+          "coverage": [
+            {
+              "level": 0.8,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            },
+            {
+              "level": 0.9,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            },
+            {
+              "level": 0.95,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            }
+          ],
+          "actualLogSamples": 4
+        }
+      },
+      {
+        "horizonDays": 90,
+        "samples": 4,
+        "baselineMale": 0.2396834508120873,
+        "candidateMale": 0.2352401552271174,
+        "bestNaive": {
+          "id": "naive-current-price",
+          "male": 0.07911059956071473
+        },
+        "relativeMaleImprovement": 0.01853818263178078,
+        "medianAbsoluteLogError": 0.3002309673553292,
+        "biasLogError": 0.21132918484597196,
+        "directionHitRate": 0.5,
+        "bootstrap95": [
+          -0.002994620990790675,
+          0.01188121216073047
+        ],
+        "rawPValue": 0.141,
+        "holmAdjustedPValue": 0.488,
+        "regimeRobustness": {
+          "2017-2021": {
+            "samples": 0,
+            "meanPairedImprovement": 0
+          },
+          "2022-2024": {
+            "samples": 3,
+            "meanPairedImprovement": 0.007920808107153647
+          },
+          "2025+": {
+            "samples": 1,
+            "meanPairedImprovement": -0.00598924198158135
+          }
+        },
+        "parameterSensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "male": 0.2279205553688387
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "male": 0.23187204931500172
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "male": 0.2357948418750977
+          }
+        ],
+        "distributionCalibration": {
+          "terminalQuantiles": [
+            "q10",
+            "q50",
+            "q90"
+          ],
+          "pinball": {
+            "q10": 0,
+            "q50": 0,
+            "q90": 0
+          },
+          "nll": 0,
+          "coverage": [
+            {
+              "level": 0.8,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            },
+            {
+              "level": 0.9,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            },
+            {
+              "level": 0.95,
+              "samples": 0,
+              "empiricalCoverage": null,
+              "deltaFromNominal": null,
+              "meanLogWidth": 0
+            }
+          ],
+          "actualLogSamples": 4
+        }
+      }
+    ],
+    "gateChecks": [
+      {
+        "horizonDays": 14,
+        "maxRegressionPass": false,
+        "signPass": true,
+        "regimePass": true,
+        "sensitivityPass": true,
+        "calibrationPass": true,
+        "fitPass": true
+      },
+      {
+        "horizonDays": 30,
+        "maxRegressionPass": true,
+        "signPass": true,
+        "regimePass": true,
+        "sensitivityPass": true,
+        "calibrationPass": true,
+        "fitPass": true
+      },
+      {
+        "horizonDays": 60,
+        "maxRegressionPass": false,
+        "signPass": true,
+        "regimePass": true,
+        "sensitivityPass": true,
+        "calibrationPass": true,
+        "fitPass": true
+      },
+      {
+        "horizonDays": 90,
+        "maxRegressionPass": true,
+        "signPass": true,
+        "regimePass": true,
+        "sensitivityPass": true,
+        "calibrationPass": true,
+        "fitPass": true
+      }
+    ],
+    "pathDiagnostics": null,
+    "previouslyInspectedPeriods": "2017-2021, 2022-2024, and 2025+ are robustness diagnostics, not clean confirmation"
+  },
+  "origins": [
+    {
+      "originDate": "2022-07-14",
+      "targetDate": "2022-07-28",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-07-14",
+      "trainingRows": 4381,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 1.735362737431101e-17,
+        "exponent": 5.774556683055545,
+        "sinAmplitude": 0.5945019348314908,
+        "cosAmplitude": -0.08894833544930118,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "7504b3b92a310e78e8316c6fdb0360fe4fbdf7ed4e4ed026c219a76458814a63",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 21902.13646739472,
+          "actual": 23855.65,
+          "absLogError": 0.08543689890023665
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 20577.38,
+          "actual": 23855.65,
+          "absLogError": 0.14782867231779448
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 20577.38,
+          "actual": 23855.65,
+          "absLogError": 0.14782867231779448
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 18515.714928749385,
+          "actual": 23855.65,
+          "absLogError": 0.2534012594441307
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 19419.63350583379,
+          "actual": 23855.65,
+          "absLogError": 0.2057364958643546
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.75",
+        "median": 21902.13646739472,
+        "absLogError": 0.08543689890023665,
+        "selectedParameter": "refitWeight=0.75",
+        "innerTrainingEnd": "2022-07-13",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 21902.13646739472,
+            "absLogError": 0.08543689890023665
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 21902.13646739472,
+            "absLogError": 0.08543689890023665
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 21902.13646739472,
+            "absLogError": 0.08543689890023665
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 0,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-07-14",
+      "targetDate": "2022-08-13",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-07-14",
+      "trainingRows": 4381,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 1.735362737431101e-17,
+        "exponent": 5.774556683055545,
+        "sinAmplitude": 0.5945019348314908,
+        "cosAmplitude": -0.08894833544930118,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "7504b3b92a310e78e8316c6fdb0360fe4fbdf7ed4e4ed026c219a76458814a63",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 23363.91780256546,
+          "actual": 24449.86,
+          "absLogError": 0.04543163188461844
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 20577.38,
+          "actual": 24449.86,
+          "absLogError": 0.17243207569765712
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 20577.38,
+          "actual": 24449.86,
+          "absLogError": 0.17243207569765712
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 16411.22319315912,
+          "actual": 24449.86,
+          "absLogError": 0.3986590481112348
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 18176.039594326387,
+          "actual": 24449.86,
+          "absLogError": 0.2965202690117149
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.75",
+        "median": 23363.91780256546,
+        "absLogError": 0.04543163188461844,
+        "selectedParameter": "refitWeight=0.75",
+        "innerTrainingEnd": "2022-07-13",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 23363.91780256546,
+            "absLogError": 0.04543163188461844
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 23363.91780256546,
+            "absLogError": 0.04543163188461844
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 23363.91780256546,
+            "absLogError": 0.04543163188461844
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 0,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-07-14",
+      "targetDate": "2022-09-12",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-07-14",
+      "trainingRows": 4381,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 1.735362737431101e-17,
+        "exponent": 5.774556683055545,
+        "sinAmplitude": 0.5945019348314908,
+        "cosAmplitude": -0.08894833544930118,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "7504b3b92a310e78e8316c6fdb0360fe4fbdf7ed4e4ed026c219a76458814a63",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 25902.469523789663,
+          "actual": 22400.52,
+          "absLogError": 0.1452541396917277
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 20577.38,
+          "actual": 22400.52,
+          "absLogError": 0.08489175864180082
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 20577.38,
+          "actual": 22400.52,
+          "absLogError": 0.08489175864180082
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 13088.558732729034,
+          "actual": 22400.52,
+          "absLogError": 0.537345703468956
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 16054.93096470593,
+          "actual": 22400.52,
+          "absLogError": 0.3330681452699161
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.75",
+        "median": 25902.469523789663,
+        "absLogError": 0.1452541396917277,
+        "selectedParameter": "refitWeight=0.75",
+        "innerTrainingEnd": "2022-07-13",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 25902.469523789663,
+            "absLogError": 0.1452541396917277
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 25902.469523789663,
+            "absLogError": 0.1452541396917277
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 25902.469523789663,
+            "absLogError": 0.1452541396917277
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 0,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2022-07-14",
+      "targetDate": "2022-10-12",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2022-07-14",
+      "trainingRows": 4381,
+      "lastKnownTargetDate": null,
+      "coefficients": {
+        "coefficient": 1.735362737431101e-17,
+        "exponent": 5.774556683055545,
+        "sinAmplitude": 0.5945019348314908,
+        "cosAmplitude": -0.08894833544930118,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 0,
+        "lastKnownTargetDate": null,
+        "q80AbsLogError": null,
+        "q90AbsLogError": null,
+        "q95AbsLogError": null
+      },
+      "dataHash": "7504b3b92a310e78e8316c6fdb0360fe4fbdf7ed4e4ed026c219a76458814a63",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 28103.107341578838,
+          "actual": 19154.85,
+          "absLogError": 0.3833242045084716
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 20577.38,
+          "actual": 19154.85,
+          "absLogError": 0.07163646696707239
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 20577.38,
+          "actual": 19154.85,
+          "absLogError": 0.07163646696707239
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 10438.61068025123,
+          "actual": 19154.85,
+          "absLogError": 0.6070444502736606
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 14181.351605436248,
+          "actual": 19154.85,
+          "absLogError": 0.30062811297510045
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.75",
+        "median": 28103.107341578838,
+        "absLogError": 0.3833242045084716,
+        "selectedParameter": "refitWeight=0.75",
+        "innerTrainingEnd": "2022-07-13",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 28103.107341578838,
+            "absLogError": 0.3833242045084716
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 28103.107341578838,
+            "absLogError": 0.3833242045084716
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 28103.107341578838,
+            "absLogError": 0.3833242045084716
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 0,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-07-14",
+      "targetDate": "2023-07-28",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-07-14",
+      "trainingRows": 4746,
+      "lastKnownTargetDate": "2022-07-28",
+      "coefficients": {
+        "coefficient": 4.61527748532519e-17,
+        "exponent": 5.6432974889352625,
+        "sinAmplitude": 0.5984892618500738,
+        "cosAmplitude": 0.014000180485321563,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2022-07-28",
+        "q80AbsLogError": 0.08543689890023665,
+        "q90AbsLogError": 0.08543689890023665,
+        "q95AbsLogError": 0.08543689890023665
+      },
+      "dataHash": "16f4fef607878abc48c3fa590fc08062ffd9ab21e063f56dbef56a5b614022c9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 29239.96674023628,
+          "actual": 29316.82,
+          "absLogError": 0.002624915340125547
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 30331.09,
+          "actual": 29316.82,
+          "absLogError": 0.034011846323664406
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 30331.09,
+          "actual": 29316.82,
+          "absLogError": 0.034011846323664406
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 30332.574269744906,
+          "actual": 29316.82,
+          "absLogError": 0.03406078071505225
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 31004.42631132731,
+          "actual": 29316.82,
+          "absLogError": 0.055968565782575336
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 29574.232669543104,
+        "absLogError": 0.008742051542174487,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2023-07-13",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 29574.232669543104,
+            "absLogError": 0.008742051542174487
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 29462.979051882197,
+            "absLogError": 0.004973115099809487
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 29351.554811151746,
+            "absLogError": 0.0011841069510465587
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 1,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-07-14",
+      "targetDate": "2023-08-13",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-07-14",
+      "trainingRows": 4746,
+      "lastKnownTargetDate": "2022-08-13",
+      "coefficients": {
+        "coefficient": 4.61527748532519e-17,
+        "exponent": 5.6432974889352625,
+        "sinAmplitude": 0.5984892618500738,
+        "cosAmplitude": 0.014000180485321563,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2022-08-13",
+        "q80AbsLogError": 0.04543163188461844,
+        "q90AbsLogError": 0.04543163188461844,
+        "q95AbsLogError": 0.04543163188461844
+      },
+      "dataHash": "16f4fef607878abc48c3fa590fc08062ffd9ab21e063f56dbef56a5b614022c9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 28114.926831992223,
+          "actual": 29281.55,
+          "absLogError": 0.040656985564162744
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 30331.09,
+          "actual": 29281.55,
+          "absLogError": 0.03521563421944244
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 30331.09,
+          "actual": 29281.55,
+          "absLogError": 0.03521563421944244
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 30334.270666964127,
+          "actual": 29281.55,
+          "absLogError": 0.035320493629559684
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 31792.276158804663,
+          "actual": 29281.55,
+          "absLogError": 0.08226574734567976
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 28749.03333061318,
+        "absLogError": 0.01835348145539441,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2023-07-13",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 28749.03333061318,
+            "absLogError": 0.01835348145539441
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 28536.645452106128,
+            "absLogError": 0.025768558178556524
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 28325.2574975658,
+            "absLogError": 0.033203727154557425
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 1,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-07-14",
+      "targetDate": "2023-09-12",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-07-14",
+      "trainingRows": 4746,
+      "lastKnownTargetDate": "2022-09-12",
+      "coefficients": {
+        "coefficient": 4.61527748532519e-17,
+        "exponent": 5.6432974889352625,
+        "sinAmplitude": 0.5984892618500738,
+        "cosAmplitude": 0.014000180485321563,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2022-09-12",
+        "q80AbsLogError": 0.1452541396917277,
+        "q90AbsLogError": 0.1452541396917277,
+        "q95AbsLogError": 0.1452541396917277
+      },
+      "dataHash": "16f4fef607878abc48c3fa590fc08062ffd9ab21e063f56dbef56a5b614022c9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 26373.30677201074,
+          "actual": 25840.34,
+          "absLogError": 0.020415554795260783
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 30331.09,
+          "actual": 25840.34,
+          "absLogError": 0.16023642234732763
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 30331.09,
+          "actual": 25840.34,
+          "absLogError": 0.16023642234732763
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 30337.451667468602,
+          "actual": 25840.34,
+          "absLogError": 0.160446141167562
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 33323.85428145508,
+          "actual": 25840.34,
+          "absLogError": 0.2543366485998023
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 27363.013940067263,
+        "absLogError": 0.057255408592949426,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2023-07-13",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 27363.013940067263,
+            "absLogError": 0.057255408592949426
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 27027.828850623977,
+            "absLogError": 0.044930196648355306
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 26697.869598709978,
+            "absLogError": 0.03264693518972643
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 1,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2023-07-14",
+      "targetDate": "2023-10-12",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2023-07-14",
+      "trainingRows": 4746,
+      "lastKnownTargetDate": "2022-10-12",
+      "coefficients": {
+        "coefficient": 4.61527748532519e-17,
+        "exponent": 5.6432974889352625,
+        "sinAmplitude": 0.5984892618500738,
+        "cosAmplitude": 0.014000180485321563,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 1,
+        "lastKnownTargetDate": "2022-10-12",
+        "q80AbsLogError": 0.3833242045084716,
+        "q90AbsLogError": 0.3833242045084716,
+        "q95AbsLogError": 0.3833242045084716
+      },
+      "dataHash": "16f4fef607878abc48c3fa590fc08062ffd9ab21e063f56dbef56a5b614022c9",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 25142.873759689435,
+          "actual": 26756.23,
+          "absLogError": 0.06219283654257637
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 30331.09,
+          "actual": 26756.23,
+          "absLogError": 0.12540591564796585
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 30331.09,
+          "actual": 26756.23,
+          "absLogError": 0.12540591564796585
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 30340.633001548405,
+          "actual": 26756.23,
+          "absLogError": 0.12572049387831744
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 34929.21546808194,
+          "actual": 26756.23,
+          "absLogError": 0.26655625502667835
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.75",
+        "median": 25506.808146307816,
+        "absLogError": 0.04782194076229085,
+        "selectedParameter": "refitWeight=0.75",
+        "innerTrainingEnd": "2023-07-13",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 26264.646677371216,
+            "absLogError": 0.018543541329176013
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 25880.812698640395,
+            "absLogError": 0.03326547170730939
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 25506.808146307816,
+            "absLogError": 0.04782194076229085
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 1,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-07-13",
+      "targetDate": "2024-07-27",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-07-13",
+      "trainingRows": 5111,
+      "lastKnownTargetDate": "2023-07-28",
+      "coefficients": {
+        "coefficient": 3.4766671306100956e-17,
+        "exponent": 5.681325705784278,
+        "sinAmplitude": 0.5665788023503905,
+        "cosAmplitude": 0.027769398474176185,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2023-07-28",
+        "q80AbsLogError": 0.002624915340125547,
+        "q90AbsLogError": 0.002624915340125547,
+        "q95AbsLogError": 0.002624915340125547
+      },
+      "dataHash": "5a7ca27850031f601be2f52116d168a62e7fced76b7492c2970e95ec9be994cd",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 61698.17782164667,
+          "actual": 67904.55,
+          "absLogError": 0.0958486450280464
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 59231.06,
+          "actual": 67904.55,
+          "absLogError": 0.1366569761637861
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 59231.06,
+          "actual": 67904.55,
+          "absLogError": 0.1366569761637861
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 58274.636805750255,
+          "actual": 67904.55,
+          "absLogError": 0.15293609014599724
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 58243.439226933995,
+          "actual": 67904.55,
+          "absLogError": 0.1534715878236798
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 61571.655082436635,
+        "absLogError": 0.09790142275409322,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2024-07-12",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 61571.655082436635,
+            "absLogError": 0.09790142275409322
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 61613.11057446505,
+            "absLogError": 0.09722836073425115
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 61655.29495194088,
+            "absLogError": 0.09654392940827676
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 2,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-07-13",
+      "targetDate": "2024-08-12",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-07-13",
+      "trainingRows": 5111,
+      "lastKnownTargetDate": "2023-08-13",
+      "coefficients": {
+        "coefficient": 3.4766671306100956e-17,
+        "exponent": 5.681325705784278,
+        "sinAmplitude": 0.5665788023503905,
+        "cosAmplitude": 0.027769398474176185,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2023-08-13",
+        "q80AbsLogError": 0.040656985564162744,
+        "q90AbsLogError": 0.040656985564162744,
+        "q95AbsLogError": 0.040656985564162744
+      },
+      "dataHash": "5a7ca27850031f601be2f52116d168a62e7fced76b7492c2970e95ec9be994cd",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 64720.57732240758,
+          "actual": 59360.89,
+          "absLogError": 0.08644360101140854
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 59231.06,
+          "actual": 59360.89,
+          "absLogError": 0.002189525543130394
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 59231.06,
+          "actual": 59360.89,
+          "absLogError": 0.002189525543130394
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 57200.47775945444,
+          "actual": 59360.89,
+          "absLogError": 0.0370733412192972
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 57134.87814069381,
+          "actual": 59360.89,
+          "absLogError": 0.03822083624290276
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 64457.40566052361,
+        "absLogError": 0.08236903629215066,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2024-07-12",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 64457.40566052361,
+            "absLogError": 0.08236903629215066
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 64543.55166929381,
+            "absLogError": 0.0837046236142742
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 64631.29475759786,
+            "absLogError": 0.08506314044980014
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 2,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-07-13",
+      "targetDate": "2024-09-11",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-07-13",
+      "trainingRows": 5111,
+      "lastKnownTargetDate": "2023-09-12",
+      "coefficients": {
+        "coefficient": 3.4766671306100956e-17,
+        "exponent": 5.681325705784278,
+        "sinAmplitude": 0.5665788023503905,
+        "cosAmplitude": 0.027769398474176185,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2023-09-12",
+        "q80AbsLogError": 0.020415554795260783,
+        "q90AbsLogError": 0.020415554795260783,
+        "q95AbsLogError": 0.020415554795260783
+      },
+      "dataHash": "5a7ca27850031f601be2f52116d168a62e7fced76b7492c2970e95ec9be994cd",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 70938.9052352685,
+          "actual": 57354.27,
+          "absLogError": 0.21257172105948005
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 59231.06,
+          "actual": 57354.27,
+          "absLogError": 0.03219877056105449
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 59231.06,
+          "actual": 57354.27,
+          "absLogError": 0.03219877056105449
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 55239.50872920123,
+          "actual": 57354.27,
+          "absLogError": 0.03756886079127923
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 55112.87996790757,
+          "actual": 57354.27,
+          "absLogError": 0.03986385083849024
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 70436.24911846049,
+        "absLogError": 0.20546073699418102,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2024-07-12",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 70436.24911846049,
+            "absLogError": 0.20546073699418102
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 70600.61076196394,
+            "absLogError": 0.2077914995770979
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 70768.19262869608,
+            "absLogError": 0.2101623471928345
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 2,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2024-07-13",
+      "targetDate": "2024-10-11",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2024-07-13",
+      "trainingRows": 5111,
+      "lastKnownTargetDate": "2023-10-12",
+      "coefficients": {
+        "coefficient": 3.4766671306100956e-17,
+        "exponent": 5.681325705784278,
+        "sinAmplitude": 0.5665788023503905,
+        "cosAmplitude": 0.027769398474176185,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 2,
+        "lastKnownTargetDate": "2023-10-12",
+        "q80AbsLogError": 0.06219283654257637,
+        "q90AbsLogError": 0.06219283654257637,
+        "q95AbsLogError": 0.06219283654257637
+      },
+      "dataHash": "5a7ca27850031f601be2f52116d168a62e7fced76b7492c2970e95ec9be994cd",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 77821.6970528078,
+          "actual": 62517.42,
+          "absLogError": 0.21897503682355335
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 59231.06,
+          "actual": 62517.42,
+          "absLogError": 0.05399917144210023
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 59231.06,
+          "actual": 62517.42,
+          "absLogError": 0.05399917144210023
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 53345.76640208473,
+          "actual": 62517.42,
+          "absLogError": 0.15865061847060075
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 53162.440127681046,
+          "actual": 62517.42,
+          "absLogError": 0.16209310354141737
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 77094.25361347536,
+        "absLogError": 0.20958350828237793,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2024-07-12",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 77094.25361347536,
+            "absLogError": 0.20958350828237793
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 77332.04538583051,
+            "absLogError": 0.21266319045878906
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 77574.56036897228,
+            "absLogError": 0.2157943052371727
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 2,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-07-13",
+      "targetDate": "2025-07-27",
+      "horizonDays": 14,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-07-13",
+      "trainingRows": 5476,
+      "lastKnownTargetDate": "2024-07-27",
+      "coefficients": {
+        "coefficient": 3.7796605535859784e-17,
+        "exponent": 5.669898468484646,
+        "sinAmplitude": 0.5556786697447135,
+        "cosAmplitude": 0.01911684240069211,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2024-07-27",
+        "q80AbsLogError": 0.08543689890023665,
+        "q90AbsLogError": 0.08543689890023665,
+        "q95AbsLogError": 0.08543689890023665
+      },
+      "dataHash": "c451d6d46036206d8cb2789cdf2923a47d1ba67c227dba8f41ce17c1cd270525",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 123665.6054063704,
+          "actual": 119516.24,
+          "absLogError": 0.034128930563213165
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 118645.52,
+          "actual": 119516.24,
+          "absLogError": 0.007312037662820987
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 118645.52,
+          "actual": 119516.24,
+          "absLogError": 0.007312037662820987
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 125060.12666422124,
+          "actual": 119516.24,
+          "absLogError": 0.045342373246607955
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 119859.74639874675,
+          "actual": 119516.24,
+          "absLogError": 0.002870017495932407
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 123810.19308293496,
+        "absLogError": 0.035297430221755306,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2025-07-12",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 123810.19308293496,
+            "absLogError": 0.035297430221755306
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 123762.0073393998,
+            "absLogError": 0.03490816402739737
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 123713.81147086009,
+            "absLogError": 0.034518664403711076
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 14,
+        "eligibleRows": 3,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-07-13",
+      "targetDate": "2025-08-12",
+      "horizonDays": 30,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-07-13",
+      "trainingRows": 5476,
+      "lastKnownTargetDate": "2024-08-12",
+      "coefficients": {
+        "coefficient": 3.7796605535859784e-17,
+        "exponent": 5.669898468484646,
+        "sinAmplitude": 0.5556786697447135,
+        "cosAmplitude": 0.01911684240069211,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2024-08-12",
+        "q80AbsLogError": 0.04543163188461844,
+        "q90AbsLogError": 0.04543163188461844,
+        "q95AbsLogError": 0.04543163188461844
+      },
+      "dataHash": "c451d6d46036206d8cb2789cdf2923a47d1ba67c227dba8f41ce17c1cd270525",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 129309.33417531036,
+          "actual": 119999.16,
+          "absLogError": 0.07472273047896047
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 118645.52,
+          "actual": 119999.16,
+          "absLogError": 0.011344518700723212
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 118645.52,
+          "actual": 119999.16,
+          "absLogError": 0.011344518700723212
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 132816.84907738524,
+          "actual": 119999.16,
+          "absLogError": 0.10148636181948167
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 121262.65720423951,
+          "actual": 119999.16,
+          "absLogError": 0.010474170925177039
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 129618.4471131345,
+        "absLogError": 0.07711036986733179,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2025-07-12",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 129618.4471131345,
+            "absLogError": 0.07711036986733179
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 129515.38493376246,
+            "absLogError": 0.07631493390289541
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 129412.3473228152,
+            "absLogError": 0.07551905456244673
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 30,
+        "eligibleRows": 3,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-07-13",
+      "targetDate": "2025-09-11",
+      "horizonDays": 60,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-07-13",
+      "trainingRows": 5476,
+      "lastKnownTargetDate": "2024-09-11",
+      "coefficients": {
+        "coefficient": 3.7796605535859784e-17,
+        "exponent": 5.669898468484646,
+        "sinAmplitude": 0.5556786697447135,
+        "cosAmplitude": 0.01911684240069211,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2024-09-11",
+        "q80AbsLogError": 0.1452541396917277,
+        "q90AbsLogError": 0.1452541396917277,
+        "q95AbsLogError": 0.1452541396917277
+      },
+      "dataHash": "c451d6d46036206d8cb2789cdf2923a47d1ba67c227dba8f41ce17c1cd270525",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 139534.53275993327,
+          "actual": 115251.55,
+          "absLogError": 0.19119498648280636
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 118645.52,
+          "actual": 115251.55,
+          "absLogError": 0.02902309324664095
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 118645.52,
+          "actual": 115251.55,
+          "absLogError": 0.02902309324664095
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 148680.8385082296,
+          "actual": 115251.55,
+          "absLogError": 0.25468485428705057
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 123937.52441923556,
+          "actual": 115251.55,
+          "absLogError": 0.07266047249844142
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.75",
+        "median": 139737.91285338896,
+        "absLogError": 0.19265148627434944,
+        "selectedParameter": "refitWeight=0.75",
+        "innerTrainingEnd": "2025-07-12",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 140145.27163662598,
+            "absLogError": 0.19556240835510522
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 139941.49239787844,
+            "absLogError": 0.19410729300607257
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 139737.91285338896,
+            "absLogError": 0.19265148627434944
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 60,
+        "eligibleRows": 3,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    },
+    {
+      "originDate": "2025-07-13",
+      "targetDate": "2025-10-11",
+      "horizonDays": 90,
+      "trainingStart": "2010-07-17",
+      "trainingEnd": "2025-07-13",
+      "trainingRows": 5476,
+      "lastKnownTargetDate": "2024-10-11",
+      "coefficients": {
+        "coefficient": 3.7796605535859784e-17,
+        "exponent": 5.669898468484646,
+        "sinAmplitude": 0.5556786697447135,
+        "cosAmplitude": 0.01911684240069211,
+        "cycleDays": 1460
+      },
+      "interval": {
+        "maturedErrors": 3,
+        "lastKnownTargetDate": "2024-10-11",
+        "q80AbsLogError": 0.21897503682355335,
+        "q90AbsLogError": 0.21897503682355335,
+        "q95AbsLogError": 0.21897503682355335
+      },
+      "dataHash": "c451d6d46036206d8cb2789cdf2923a47d1ba67c227dba8f41ce17c1cd270525",
+      "seed": 1498152960,
+      "benchmarks": [
+        {
+          "modelId": "reconstructed-current-policy",
+          "median": 149154.264898448,
+          "actual": 111134.3,
+          "absLogError": 0.2942417253737479
+        },
+        {
+          "modelId": "naive-current-price",
+          "median": 118645.52,
+          "actual": 111134.3,
+          "absLogError": 0.06540084418572048
+        },
+        {
+          "modelId": "gbm-driftless",
+          "median": 118645.52,
+          "actual": 111134.3,
+          "absLogError": 0.06540084418572048
+        },
+        {
+          "modelId": "gbm-recent-drift",
+          "median": 166439.6640416479,
+          "actual": 111134.3,
+          "absLogError": 0.40389348574633493
+        },
+        {
+          "modelId": "ma-trend-20-50-200",
+          "median": 126671.39507999818,
+          "actual": 111134.3,
+          "absLogError": 0.1308569130634211
+        }
+      ],
+      "candidate": {
+        "id": "structural-shrinkage",
+        "parameter": "refitWeight=0.25",
+        "median": 150050.26639001176,
+        "absLogError": 0.3002309673553292,
+        "selectedParameter": "refitWeight=0.25",
+        "innerTrainingEnd": "2025-07-12",
+        "sensitivity": [
+          {
+            "parameter": "refitWeight=0.25",
+            "median": 150050.26639001176,
+            "absLogError": 0.3002309673553292
+          },
+          {
+            "parameter": "refitWeight=0.5",
+            "median": 149751.1191549638,
+            "absLogError": 0.2982353305854369
+          },
+          {
+            "parameter": "refitWeight=0.75",
+            "median": 149452.45221568627,
+            "absLogError": 0.29623891699245564
+          }
+        ]
+      },
+      "supervisedPolicy": {
+        "targetBoundary": "strictly-before-origin",
+        "embargoDays": 90,
+        "eligibleRows": 3,
+        "excludedUnresolvedTargets": 0,
+        "excludedByEmbargo": 0
+      },
+      "gitCommit": "28d5c863aaa389e2b8fae6ebaba95b98c392da1e"
+    }
+  ],
+  "skips": []
+}

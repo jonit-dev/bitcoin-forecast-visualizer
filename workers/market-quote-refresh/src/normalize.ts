@@ -71,7 +71,10 @@ export function normalizeCoinGecko(
   const volumeByDate = new Map<string, number>();
   for (const point of volumes) {
     if (!Array.isArray(point) || point.length < 2 || !point.every(Number.isFinite)) throw new CandleValidationError('Unexpected CoinGecko volume point');
-    volumeByDate.set(utcDate(point[0] as number), point[1] as number);
+    const date = utcDate(point[0] as number);
+    // Keep the first snapshot for each UTC date. CoinGecko's hourly payload
+    // reports rolling 24h volume, so the first point is the daily boundary.
+    if (!volumeByDate.has(date)) volumeByDate.set(date, point[1] as number);
   }
   const ingestedAt = now.toISOString();
   return ensureUniqueSorted([...grouped].map(([date, value]) => validateCandle({

@@ -5,7 +5,7 @@ compatibility_date = "2026-07-10"
 [[d1_databases]]
 binding = "MARKET_QUOTES_DB"
 database_name = "bitcoin-market-quotes-production"
-database_id = "REPLACE_WITH_PRODUCTION_D1_DATABASE_ID"
+database_id = "3efe33d7-700f-402b-a261-94a1a50fbaff"
 migrations_dir = "../../migrations"
 
 [env.production]
@@ -17,7 +17,7 @@ crons = ["15 23 * * *"]
 [[env.production.d1_databases]]
 binding = "MARKET_QUOTES_DB"
 database_name = "bitcoin-market-quotes-production"
-database_id = "REPLACE_WITH_PRODUCTION_D1_DATABASE_ID"
+database_id = "3efe33d7-700f-402b-a261-94a1a50fbaff"
 migrations_dir = "../../migrations"
 
 [env.preview]
@@ -26,5 +26,5 @@ name = "bitcoin-market-quote-refresh-preview"
 [[env.preview.d1_databases]]
 binding = "MARKET_QUOTES_DB"
 database_name = "bitcoin-market-quotes-preview"
-database_id = "REPLACE_WITH_PREVIEW_D1_DATABASE_ID"
+database_id = "c4ea39f1-ee3f-42c0-9b84-cf24f9e9cb08"
 migrations_dir = "../../migrations"
