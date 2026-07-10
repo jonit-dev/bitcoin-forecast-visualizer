@@ -1,2 +1,19 @@
 name = "bitcoin-forecast-visualizer"
 pages_build_output_dir = "dist"
+
+# Create separate preview/production D1 databases and replace this placeholder
+# before deployment. Local Wrangler uses an isolated local database by default.
+[[d1_databases]]
+binding = "MARKET_QUOTES_DB"
+database_name = "bitcoin-market-quotes-production"
+database_id = "REPLACE_WITH_PRODUCTION_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[env.preview]
+name = "bitcoin-forecast-visualizer-preview"
+
+[[env.preview.d1_databases]]
+binding = "MARKET_QUOTES_DB"
+database_name = "bitcoin-market-quotes-preview"
+database_id = "REPLACE_WITH_PREVIEW_D1_DATABASE_ID"
+migrations_dir = "migrations"

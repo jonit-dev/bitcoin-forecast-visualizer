@@ -865,3 +865,53 @@ Rerun if:
 ### Next better experiment
 
 Do not enable ensemble or tail-risk behavior unless the relevant config is changed intentionally and the enabled-mode `npm run backtest` gate passes.
+
+
+## 2026-07-10 — Daily production market-quote refresh architecture
+
+Status: `implementation validated locally — preview/production observation pending`
+
+### Hypothesis
+
+A daily Cloudflare scheduled Worker can refresh validated BTC, VOO, and GLD candles into shared D1 storage, keeping production quotes current without daily rebuilds while preserving the bundled-data fallback and existing forecast calibration.
+
+### Data/source changes
+
+Planned operationalization of the existing sources and instruments only:
+
+- BTC/USD daily UTC candles from the current CoinGecko market-chart methodology.
+- VOO adjusted daily OHLCV as the S&P 500 proxy from the current Yahoo chart methodology.
+- GLD adjusted daily OHLCV as the gold proxy from the current Yahoo chart methodology.
+- New mutable D1 storage for validated recent candles and refresh-run metadata; no source promotion and no forecast feature/model change.
+
+### Validation setup
+
+- PRD: `docs/PRDs/DAILY_PRODUCTION_MARKET_QUOTES.md`.
+- Verify source adapters against captured fixtures and the current CLI updater conventions.
+- Prove completed-candle filtering, schema/OHLC validation, recent-window repair, per-asset isolation, and idempotent D1 upserts.
+- Verify weekend/holiday no-op behavior for VOO/GLD and completed-UTC-day behavior for BTC.
+- Verify browser hydration and `/api/forecast` use the same latest candle, with bundled JSON fallback during D1/source failure.
+- Run `npm run backtest`, `npm run backtest:market`, `npm test`, and `npm run lint` after implementation.
+- This entry validates data delivery and operational parity only. It cannot authorize new sources, model inputs, coefficients, or UI/forecast behavior beyond freshness/status plumbing.
+
+### Report artifacts
+
+- Planned PRD: `docs/PRDs/DAILY_PRODUCTION_MARKET_QUOTES.md`.
+- Local implementation evidence: 17 Vitest files / 45 tests passed; TypeScript and production build passed; local D1 migration applied successfully.
+- BTC regression: `docs/reports/results/backtest-2026-07-10T19-27-53-869Z.md` and `.json` (`npm run backtest`: quality and robustness PASS).
+- VOO/GLD regression: `npm run backtest:market` PASS at every configured horizon (console evidence in implementation handoff).
+- Preview/production scheduled-run logs, D1 inspection, and endpoint smoke output remain deployment-environment evidence.
+
+### Result / verdict
+
+Local verdict: positive operational implementation signal. Source adapters, D1 idempotency, fallback API behavior, browser merge behavior, TypeScript, tests, build, and forecast regression gates pass. Forecast formulas and source identities are unchanged. Production enablement remains gated on replacing D1 ID placeholders and completing preview scheduled-run/API agreement proof; seven-day reliability observation remains follow-up evidence.
+
+### Rerun criteria
+
+Rerun operational validation when an upstream response schema/methodology changes, a supported asset or source is added, the cron schedule/storage changes, or freshness/forecast endpoints disagree in production.
+
+### Next better experiment
+
+Implement the PRD in gated vertical slices, observe at least seven consecutive scheduled runs including one equity-market weekend, then evaluate source reliability and freshness misses before considering any source replacement or wider data-pipeline scheduling.
+
+---

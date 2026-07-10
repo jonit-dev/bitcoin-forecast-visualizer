@@ -1,6 +1,7 @@
 import { CONFIDENCE_Z_SCORES } from '../../src/lib/data';
-import { loadMarketData, type MarketAssetId } from '../../src/lib/api';
+import { type MarketAssetId } from '../../src/lib/api';
 import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from '../../src/lib/marketForecast';
+import { loadMergedMarketData, type MarketDataEnv } from '../_shared/marketDataRepository';
 
 const VALID_ASSETS = new Set<MarketAssetId>(MARKET_ASSETS.map((asset) => asset.id));
 const VALID_CONFIDENCE_LEVELS = Object.keys(CONFIDENCE_Z_SCORES).map(Number);
@@ -47,7 +48,7 @@ function forecastSummary(result: ReturnType<typeof buildMarketForecast>) {
   };
 }
 
-export async function onRequestGet(context: { request: Request }) {
+export async function onRequestGet(context: { request: Request; env?: MarketDataEnv }) {
   const url = new URL(context.request.url);
   const assetId = parseAsset(url.searchParams.get('asset'));
   const horizonDays = parseHorizon(url.searchParams.get('horizon'));
@@ -63,7 +64,7 @@ export async function onRequestGet(context: { request: Request }) {
   }
 
   const asset = getMarketAssetConfig(assetId);
-  const marketData = loadMarketData(assetId);
+  const { marketData, freshness } = await loadMergedMarketData(context.env ?? {}, assetId);
   const confidenceZ = CONFIDENCE_Z_SCORES[confidence as keyof typeof CONFIDENCE_Z_SCORES];
   const result = buildMarketForecast(assetId, marketData, horizonDays, confidenceZ);
   const latest = marketData.ohlcv[marketData.ohlcv.length - 1];
@@ -90,6 +91,13 @@ export async function onRequestGet(context: { request: Request }) {
     },
     forecast: forecastSummary(result),
     drawdownStats: result.drawdownStats,
+    marketData: {
+      latestDate: freshness.latestDate,
+      source: freshness.source,
+      refreshedAt: freshness.refreshedAt,
+      status: freshness.status,
+      runStatus: freshness.runStatus,
+    },
     generatedAt: new Date().toISOString(),
   }, { headers: jsonHeaders });
 }

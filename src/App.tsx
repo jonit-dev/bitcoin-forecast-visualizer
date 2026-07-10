@@ -10,7 +10,9 @@ import {
   HISTORICAL_CYCLE_DRAWDOWNS,
   CONFIDENCE_Z_SCORES,
 } from './lib/data';
-import { computeMVRVStats, computeMVRVZScoreSeries, loadMarketData, type MarketAssetId, type MarketData, type MVRVStats } from './lib/api';
+import { computeMVRVStats, computeMVRVZScoreSeries, loadMarketData, type MarketAssetId, type MarketData, type MarketDataStatus as DataStatus, type MVRVStats } from './lib/api';
+import { hydrateMarketData } from './lib/marketDataClient';
+import { MarketDataStatus } from './components/MarketDataStatus';
 import { cn } from './lib/utils';
 import { loadCurrentRegimeSummary, loadPowerLawStabilitySummary, loadReliabilitySummary, loadSourceFreshness } from './lib/reliabilityReport';
 import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from './lib/marketForecast';
@@ -97,11 +99,12 @@ function featureStatusLabel(status: string): string {
 
 export default function App() {
   const [activeAssetId, setActiveAssetId] = useState<MarketAssetId>('btc');
-  const [marketDataByAsset] = useState<Record<MarketAssetId, MarketData>>(() => ({
+  const [marketDataByAsset, setMarketDataByAsset] = useState<Record<MarketAssetId, MarketData>>(() => ({
     btc: loadMarketData('btc'),
     sp500: loadMarketData('sp500'),
     gold: loadMarketData('gold'),
   }));
+  const [marketStatusByAsset, setMarketStatusByAsset] = useState<Record<MarketAssetId, DataStatus>>({ btc: 'fallback', sp500: 'fallback', gold: 'fallback' });
   const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
   const [mvrvZScoreData] = useState(() => computeMVRVZScoreSeries());
   const [reliabilitySummary] = useState(() => loadReliabilitySummary());
@@ -164,6 +167,17 @@ export default function App() {
   const [playbackIndex, setPlaybackIndex] = useState<number | null>(null);
   const forecastInitialized = React.useRef(false);
 
+  useEffect(() => {
+    let active = true;
+    (Object.keys(marketDataByAsset) as MarketAssetId[]).forEach(async (assetId) => {
+      const hydrated = await hydrateMarketData(assetId, marketDataByAsset[assetId]);
+      if (!active) return;
+      setMarketDataByAsset((current) => ({ ...current, [assetId]: hydrated.data }));
+      setMarketStatusByAsset((current) => ({ ...current, [assetId]: hydrated.status }));
+    });
+    return () => { active = false; };
+  }, []);
+
   const refreshForecast = (delay = 300) => {
     setIsPlaying(false);
     setPlaybackIndex(null);
@@ -187,7 +201,7 @@ export default function App() {
       return;
     }
     return refreshForecast(350);
-  }, [horizon, confidenceLevel, activeAssetId]);
+  }, [horizon, confidenceLevel, activeAssetId, marketData]);
 
   const activeDisplayData = forecastResult.displayData;
   const heatmapData = forecastResult.heatmapData;
@@ -318,7 +332,7 @@ export default function App() {
           <div className="flex items-center gap-2 md:gap-3 text-xs text-zinc-400">
             <span className="hidden sm:inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              {activeAsset.ticker} through {marketData.ohlcv[marketData.ohlcv.length - 1].date}
+              <MarketDataStatus date={marketData.ohlcv[marketData.ohlcv.length - 1].date} status={marketStatusByAsset[activeAssetId]} />
             </span>
             <span className="inline-flex items-center gap-2 rounded-md border border-amber-400/20 bg-amber-400/10 px-2.5 py-1.5 text-amber-200">
               <RefreshCw className={cn("h-3.5 w-3.5", isGenerating && "animate-spin")} />

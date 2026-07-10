@@ -22,6 +22,28 @@ export interface MarketData {
 }
 
 export type MarketAssetId = 'btc' | 'sp500' | 'gold';
+export type MarketDataStatus = 'current' | 'delayed' | 'fallback' | 'unavailable';
+
+export function isValidOHLCV(row: unknown): row is OHLCVData {
+  const value = row as OHLCVData;
+  return Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value.date)
+    && [value.open, value.high, value.low, value.close, value.volume].every(Number.isFinite)
+    && value.open > 0 && value.high > 0 && value.low > 0 && value.close > 0 && value.volume >= 0
+    && value.high >= Math.max(value.open, value.close, value.low)
+    && value.low <= Math.min(value.open, value.close, value.high));
+}
+
+export function mergeOHLCVRows(bundle: OHLCVData[], remote: unknown[]): OHLCVData[] {
+  const merged = new Map(bundle.map((row) => [row.date, row]));
+  for (const candidate of remote) if (isValidOHLCV(candidate)) merged.set(candidate.date, candidate);
+  return [...merged.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+export function withOHLCV(data: MarketData, ohlcv: OHLCVData[]): MarketData {
+  const last = ohlcv.at(-1)!;
+  const previous = ohlcv.at(-2);
+  return { ...data, ohlcv, currentPrice: last.close, priceChange24h: previous ? ((last.close - previous.close) / previous.close) * 100 : 0, volume24h: last.volume };
+}
 
 export interface MVRVPoint {
   date: string;
