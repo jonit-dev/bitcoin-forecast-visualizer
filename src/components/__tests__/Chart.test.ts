@@ -74,11 +74,31 @@ const rows = [
     forecastLower: 125,
     floorPriceModel: 100,
     peakPriceModel: 220,
-    stochasticTraces: [158, 161],
+    stochasticTraces: [132, 161],
   },
 ];
 
 describe('Chart data transforms', () => {
+  it('should preserve trace-based yellow forecast candles', () => {
+    const first = buildChartSeriesData(rows, null, true, false, 2);
+    const second = buildChartSeriesData(rows, null, true, false, 2);
+
+    const expectedForecastPath = [135, 148, 132];
+    expect(first.forecastData.map(point => point.close)).toEqual(expectedForecastPath);
+    expect(first.forecastData).toEqual(second.forecastData);
+    expect(first.forecastData.slice(1).map(point => point.open)).toEqual([135, 148]);
+
+    // Baseline visible-character diagnostics for this frozen fixture: daily
+    // innovations remain non-zero, keep their magnitudes, and do not acquire
+    // an artificial smooth-median endpoint (155).
+    const innovations = expectedForecastPath.slice(1).map((value, index) => value - expectedForecastPath[index]);
+    expect(innovations).toEqual([13, -16]);
+    expect(innovations.filter(value => Math.sign(value) !== 0)).toHaveLength(2);
+    expect(new Set(innovations.map(Math.sign))).toEqual(new Set([-1, 1]));
+    expect(first.forecastData.at(-1)?.close).toBe(132);
+    expect(first.forecastData.at(-1)?.close).not.toBe(first.forecastMedianData.at(-1)?.value);
+  });
+
   it('normalizes volume against the rolling positive-volume median', () => {
     expect(median([3, 1, 2])).toBe(2);
     expect(median([10, 2, 6, 4])).toBe(5);
@@ -94,7 +114,7 @@ describe('Chart data transforms', () => {
     expect(series.forecastData).toEqual([
       { time: '2024-01-03', open: 135, high: 135, low: 135, close: 135 },
       { time: '2024-01-04', open: 135, high: 148, low: 135, close: 148 },
-      { time: '2024-01-05', open: 148, high: 158, low: 148, close: 158 },
+      { time: '2024-01-05', open: 148, high: 148, low: 132, close: 132 },
     ]);
     expect(series.forecastMedianData).toEqual([
       { time: '2024-01-03', value: 135 },
@@ -105,7 +125,7 @@ describe('Chart data transforms', () => {
       { time: '2024-01-01', value: 110 },
       { time: '2024-01-02', value: 125 },
       { time: '2024-01-04', value: 148 },
-      { time: '2024-01-05', value: 158 },
+      { time: '2024-01-05', value: 132 },
     ]);
   });
 

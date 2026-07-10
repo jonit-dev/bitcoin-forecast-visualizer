@@ -7,10 +7,31 @@ import { computeTailRisk } from '../tailRisk';
 import type { OHLCVData } from '../api';
 import type { FeatureRow } from '../features';
 import { computeBuyZoneBacktests, type BuyZonePoint } from '../buyZone';
+import { yellowLineForecastRoute } from '../data';
+import {
+  YELLOW_LINE_FORECAST_CONFIG,
+  validateYellowLineForecastConfig,
+  type YellowLineForecastCandidateConfig,
+} from '../modelConfig';
 
 const ohlcv = (btcHistory as OHLCVData[]).slice(-900);
 
 describe('engineering hygiene guardrails', () => {
+  it('should require evidence artifact for enabled forecast candidate', () => {
+    expect(YELLOW_LINE_FORECAST_CONFIG.enabled).toBe(false);
+    expect(yellowLineForecastRoute(90)).toBe('production-baseline');
+
+    const invalid: YellowLineForecastCandidateConfig = {
+      enabled: true,
+      candidateId: 'state-space-residual',
+      horizons: [90],
+      evidenceArtifact: null,
+      evidenceSha256: null,
+      configSha256: null,
+    };
+    expect(() => validateYellowLineForecastConfig(invalid)).toThrow(/requires an exact results artifact/);
+  });
+
   it('should keep forecast quantiles ordered', () => {
     const latest = ohlcv.at(-1)!;
     const interval = computePowerLawInterval({

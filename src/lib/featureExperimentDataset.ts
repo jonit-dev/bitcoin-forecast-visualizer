@@ -46,6 +46,67 @@ export interface ResidualDatasetResult {
   summary: ResidualDatasetSummary;
 }
 
+export interface PurgedResidualDataset {
+  rows: ResidualDatasetRow[];
+  excludedUnresolvedTargets: number;
+  excludedByEmbargo: number;
+  lastKnownTargetDate: string | null;
+}
+
+/**
+ * Select supervised rows observable at an evaluation origin.
+ *
+ * The target boundary is strict: a target dated on the evaluation day is not
+ * considered known. The optional embargo additionally removes rows whose
+ * origins fall within `embargoDays` calendar days before evaluation. This is
+ * intended for fold boundaries where adjacent examples share price paths.
+ */
+export function purgeResidualRowsForEvaluation(
+  rows: ResidualDatasetRow[],
+  evaluationOriginDate: string,
+  embargoDays = 0
+): PurgedResidualDataset {
+  if (!Number.isInteger(embargoDays) || embargoDays < 0) {
+    throw new Error(`embargoDays must be a non-negative integer, received ${embargoDays}`);
+  }
+  const evaluationTime = parseDate(evaluationOriginDate).getTime();
+  const embargoBoundary = evaluationTime - embargoDays * 86_400_000;
+  let excludedUnresolvedTargets = 0;
+  let excludedByEmbargo = 0;
+  const selected = rows.filter(row => {
+    if (parseDate(row.targetDate).getTime() >= evaluationTime) {
+      excludedUnresolvedTargets++;
+      return false;
+    }
+    if (embargoDays > 0 && parseDate(row.originDate).getTime() >= embargoBoundary) {
+      excludedByEmbargo++;
+      return false;
+    }
+    return true;
+  });
+  const sorted = [...selected].sort((a, b) => a.targetDate.localeCompare(b.targetDate));
+  return {
+    rows: selected,
+    excludedUnresolvedTargets,
+    excludedByEmbargo,
+    lastKnownTargetDate: sorted.at(-1)?.targetDate ?? null,
+  };
+}
+
+/** Phase-2 fold policy: use an embargo at least as long as the evaluated
+ * horizon, preventing adjacent origin paths from straddling the fold. */
+export function purgeAndEmbargoResidualRows(
+  rows: ResidualDatasetRow[],
+  evaluationOriginDate: string,
+  horizonDays: number,
+  embargoDays = horizonDays
+): PurgedResidualDataset {
+  if (embargoDays < horizonDays) {
+    throw new Error(`embargoDays (${embargoDays}) must be at least horizonDays (${horizonDays})`);
+  }
+  return purgeResidualRowsForEvaluation(rows, evaluationOriginDate, embargoDays);
+}
+
 export const FEATURE_FAMILIES: Record<FeatureFamily, FeatureFamilySpec> = {
   onchain: {
     family: 'onchain',

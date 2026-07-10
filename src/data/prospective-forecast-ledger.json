@@ -1,0 +1,9 @@
+{
+  "protocolVersion": "yellow-line-prospective-v1",
+  "appendOnly": true,
+  "protocolSha256": "9e225c90573f18ab321324b4d7286fc4ed9b751d63f714193a0f475abc4bc4bc",
+  "schemaSha256": "db3e8dabac44321521f521e571a7b7222655363b221e88a90bdcb857c4f766ae",
+  "genesisHash": "e5558fc1ab21248a61e2074b49ce7189fc6232d91da094e97ed5f1b0b6a9cbfb",
+  "frozenCandidates": [],
+  "rows": []
+}

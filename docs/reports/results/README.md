@@ -8,6 +8,27 @@
 `npm run backtest:features-continuous` writes timestamped continuous feature residual dataset JSON and Markdown reports in this directory.
 `npm run backtest:residual-model` writes timestamped kitchen-sink walk-forward residual model JSON and Markdown reports in this directory.
 
+## Forecast scoring and yellow-line rendering contract
+
+Forecast reports score explicit statistical targets: the q50/median close for
+point accuracy and q10/q50/q90 plus nominal intervals for distribution accuracy.
+Those scored targets do not require the chart to draw q50 as its primary path.
+
+The chart's primary forecast treatment remains the deterministic, jagged path
+owned by `stochasticTraces[0]`. Its values drive the forecast candles, and its
+amber line remains the prominent scenario trace. The smooth q50 line is a
+separate, opt-in core-model overlay; research must not substitute it for, hide,
+smooth, or visually demote the trace-based yellow path.
+
+The Phase 1 regression fixture records the current visible-character baseline:
+an anchored close path of `[135, 148, 132]`, innovations of `[13, -16]`, two
+non-zero opposite-sign innovations, and a trace endpoint (`132`) distinct from q50 (`155`).
+These fixture-scale values are rendering sentinels, not claims about BTC path
+calibration. Later path research must report origin-safe innovation variance,
+autocorrelation, sign-change rate, tails, drawdown depth/duration, and realized
+volatility against historical residual paths while preserving this ownership,
+determinism, styling, and visibly non-smooth character.
+
 Required quality gate:
 
 - `powerlaw-current` must beat `naive-current-price` on median absolute log error at 14, 30, 60, and 90 day horizons.

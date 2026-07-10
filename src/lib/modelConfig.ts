@@ -112,6 +112,40 @@ export const RESIDUAL_MODEL_CONFIG = {
   promotionPolicy: 'Report-only. Keep disabled unless walk-forward residual modeling improves mean q10/q50/q90 pinball loss without degrading 80% residual coverage.',
 } as const;
 
+export interface YellowLineForecastCandidateConfig {
+  enabled: boolean;
+  candidateId: 'structural-shrinkage' | 'state-space-residual' | null;
+  horizons: readonly (14 | 30 | 60 | 90)[];
+  evidenceArtifact: string | null;
+  evidenceSha256: string | null;
+  configSha256: string | null;
+}
+
+/** Phase 5 rejection state. Historical development evidence cannot enable a
+ * candidate; this remains disabled until the prospective protocol reaches its
+ * stopping rule and an exact evidence/config hash passes the release gate. */
+export const YELLOW_LINE_FORECAST_CONFIG: YellowLineForecastCandidateConfig = Object.freeze({
+  enabled: false,
+  candidateId: null,
+  horizons: Object.freeze([]),
+  evidenceArtifact: null,
+  evidenceSha256: null,
+  configSha256: null,
+});
+
+export function validateYellowLineForecastConfig(config: YellowLineForecastCandidateConfig): void {
+  if (!config.enabled) return;
+  if (!config.candidateId || config.horizons.length === 0) {
+    throw new Error('enabled yellow-line candidate must identify a candidate and at least one validated horizon');
+  }
+  if (!config.evidenceArtifact?.startsWith('docs/reports/results/') || !config.evidenceSha256 || !config.configSha256) {
+    throw new Error('enabled yellow-line candidate requires an exact results artifact, evidence hash, and config hash');
+  }
+  if (new Set(config.horizons).size !== config.horizons.length) {
+    throw new Error('enabled yellow-line candidate horizons must be unique');
+  }
+}
+
 export const TAIL_RISK_CONFIG = {
   defaultEnabled: false,
   candidateMultipliers: [1, 1.1, 1.2, 1.35],

@@ -22,6 +22,95 @@ Skills may reference this file as the place to read/write experiment history, bu
 
 ---
 
+## 2026-07-10 — BTC forecast-line capability research program
+
+Status: `completed — YL-1/YL-2 rejected; YL-2P rejected for calibration; prospective study needs more data`
+
+### Hypothesis
+
+The BTC forecast distribution can improve at 14/30/60/90-day horizons by first removing point-in-time benchmark leakage and then testing a small, pre-registered portfolio of causal structural and residual models. A nested structural power-law refit or local-level/state-space residual model may reduce medium-horizon absolute log error without degrading interval calibration.
+
+The prominent jagged yellow chart path is currently built from a seeded stochastic trace. Its existing jagged shape, styling, prominence, and rendering behavior must remain unchanged; this program does not authorize replacing it with a smooth median line. Accuracy evidence comes from explicit out-of-sample metrics rather than visual smoothness.
+
+The retained noise must be statistically relevant rather than decorative. Candidate YL-2P will test point-in-time moving-block, volatility-regime-conditioned, and state-space innovation generators for residual dependence, volatility clustering, tails, drawdowns, sign changes, realized-volatility distribution, and terminal quantile calibration. The same origin/config seed must reproduce the same path.
+
+### Data/source changes
+
+No new source is planned initially. Use checked-in daily UTC BTC OHLCV plus existing lag-safe feature caches where a later, explicitly scoped candidate requires them.
+
+Required methodology changes before candidate evaluation:
+
+- Refit structural coefficients using only data available by each forecast origin.
+- Fit interval/calibration state only from forecast errors whose targets have matured by that origin.
+- Purge supervised rows whose `targetDate` is not earlier than the evaluation origin and apply horizon-aware embargoes.
+- Freeze candidate definitions, grids, seeds, metrics, and stopping rules before prospective confirmation.
+
+### Validation setup
+
+PRD: `docs/PRDs/v2/12-yellow-line-forecast-capability.md`.
+
+- Foundation: nested point-in-time rolling-origin benchmark against the current policy, naive current price, GBM driftless/recent drift, and MA trend.
+- Candidates, in order: YL-1 nested structural refit with shrinkage; YL-2 local-level/state-space residual dynamics; YL-2P statistically calibrated jagged-path innovations; YL-3 a single manually reviewed horizon-scoped COT residual only when fresh sample size permits; YL-4 a simple regime mixture only if YL-1 or YL-2 first passes development evidence.
+- Horizons: 14/30/60/90d.
+- Primary metric: paired mean absolute log-error improvement.
+- Secondary: median absolute log error, bias, direction hit rate, q10/q50/q90 pinball loss, NLL, 80/90/95 coverage, and interval width.
+- YL-2P path metrics: innovation mean/variance, residual and absolute-return autocorrelation, volatility clustering, tail quantiles, drawdown depth/duration, sign-change rate, realized-volatility distribution, and terminal calibration. Passing path validity does not imply improved median accuracy.
+- Dependence/multiplicity: moving-block bootstrap with block length at least the horizon; Holm correction across candidates and horizons.
+- Default practical gate: at least 2% relative MALE improvement at a promoted 30/60/90d horizon, no worse than 0.5% regression elsewhere, positive 95% lower bound after correction, no coverage loss over 2 percentage points, no material pinball/NLL regression, parameter/regime robustness, and at least 30 nominal non-overlapping prospective outcomes per promoted horizon.
+- The repeatedly inspected 2022+ and 2025+ periods are development diagnostics only. Promotion requires a frozen append-only prospective forecast ledger and pre-registered stopping rule.
+- Required regression commands after any proposed promotion: `npm run backtest`, `npm test -- --run`, `npm run lint`, and `npm run build`.
+
+### Report artifacts
+
+- Planning artifact: `docs/PRDs/v2/12-yellow-line-forecast-capability.md`.
+- Rendering/scoring contract: `docs/reports/results/README.md` and the exact named chart regression tests.
+- YL-0 point-in-time benchmark: `docs/reports/results/point-in-time-core-2026-07-10T19-52-43-293Z.json` and `.md`.
+- YL-1 structural shrinkage: `docs/reports/results/point-in-time-structural-shrinkage-2026-07-10T20-07-07-288Z.json` and `.md`.
+- YL-2 state-space residual: `docs/reports/results/point-in-time-state-space-residual-2026-07-10T20-06-58-771Z.json` and `.md`.
+- YL-2P calibrated jagged path: `docs/reports/results/point-in-time-calibrated-jagged-path-2026-07-10T20-08-24-434Z.json` and `.md`.
+- Prospective protocol and empty append-only ledger: `docs/reports/results/yellow-line-prospective-protocol.md` and `src/data/prospective-forecast-ledger.json`.
+
+Reproduction and regression commands:
+
+- `npm run backtest:pit-core`
+- `npm run backtest:pit-core -- --candidate structural-shrinkage`
+- `npm run backtest:pit-core -- --candidate state-space-residual`
+- `npm run backtest:pit-core -- --candidate calibrated-jagged-path`
+- `npm run evaluate:prospective-forecast`
+- `npx vitest run src/components/__tests__/Chart.component.test.tsx src/components/__tests__/Chart.test.ts src/lib/__tests__/pointInTimeForecast.test.ts src/lib/__tests__/stateSpaceResidual.test.ts src/lib/__tests__/prospectiveLedger.test.ts`
+
+### Result / verdict
+
+Verdict: `rejected / needs more data`; keep the production median and displayed yellow path unchanged.
+
+- Phase 1 preservation contract passed: the primary amber `LineSeries` still receives deterministic `stochasticTraces[0]`, forecast candles retain the anchored opposite-sign jagged fixture, and the smooth q50 remains opt-in. Focused chart tests passed 9/9 and the production build passed. No chart runtime file changed.
+- YL-0 passed as a methodology foundation. The final full artifact contains 458 origin/horizon rows, strict origin-close structural fits, calibration targets strictly before each origin, horizon embargo metadata, per-origin hashes/commit/seeds/skips, and all five benchmarks on the same schedule. Future-price mutation tests cover all earlier origins, including targets crossing the mutation boundary.
+- YL-1 was rejected at the development gate. Relative MALE changes at 14/30/60/90d were `-0.09%/-0.20%/-0.27%/-0.29%`; Holm-adjusted p-values were `1.0`; every reported regime had negative paired improvement; mean pinball loss also regressed. The candidate never met the 2% effect or statistical/calibration gates.
+- YL-2 was rejected decisively. Relative MALE changes were `-22.67%/-19.53%/-12.00%/-10.16%`; Holm-adjusted p-values were `1.0`; pinball and coverage regressed, and 60/90d signs reversed between 2025+ and older regimes. No neighboring state-space parameters may be searched on these outcomes.
+- YL-2P kept q50 unchanged and was rejected for path/distribution promotion. Its horizon-scaled terminal simulations worsened mean pinball and lost more than two coverage points at every gated horizon. Generated realized-volatility quantiles were materially below the origin-safe source distribution. This is not a statistically accepted replacement for the current visible generator.
+- Candidate selection used six frozen inner walk-forward folds with targets before each outer origin, a minimum 1,460-row training window, frozen grids/seeds/failure behavior, moving-block intervals, Holm correction, regime/sensitivity checks, per-path diagnostics, terminal quantiles, pinball/NLL/coverage/width, and deterministic content hashes. The 2017-2021, 2022-2024, and 2025+ slices are labeled development robustness evidence, never clean confirmation.
+- The prospective protocol is implemented but has no eligible candidate to freeze. The hash-bound ledger is intentionally empty; `npm run evaluate:prospective-forecast` returns `needs more data`, 0/30 non-overlapping outcomes, and suppresses interim comparative scores.
+- No candidate is enabled. `YELLOW_LINE_FORECAST_CONFIG.enabled=false`; runtime routing explicitly remains `production-baseline`, and enabled configurations without exact evidence/config hashes are rejected.
+
+Existing negative evidence remains binding: do not revive neighboring fixed-tau searches, the expanding AR(1) diagnostic, kitchen-sink ridge, generic ETF-flow adjustment, or generic funding/premium median adjustment on already-inspected history.
+
+### Rerun criteria
+
+Do not rerun YL-1, YL-2, or YL-2P parameter neighborhoods on the same history. Candidate reruns require one of:
+
+1. A materially changed accepted baseline or structural specification.
+2. A genuinely new prospective confirmation cohort reaching the pre-registered stopping rule.
+3. A documented data/source methodology change with a fresh point-in-time audit.
+4. A distinct causal mechanism pre-registered before its outcomes are inspected.
+
+Do not rerun rejected parameter neighborhoods on the same evaluation window.
+
+### Next better experiment
+
+Stop median-model complexity because both pre-registered median candidates failed. Keep the production baseline and current visible generator. The next better experiment is a distinct, newly pre-registered mechanism or a new point-in-time data source with an availability audit; do not freeze prospective candidate rows until such a candidate passes the development gate. Continue the empty protocol/ledger integrity checks without inspecting or fabricating outcomes.
+
+---
+
 ## 2026-06-26 — Spot ETF demand pressure
 
 Status: `completed — rejected`

@@ -12,7 +12,12 @@ import {
   computePowerLawInterval,
   CONFIDENCE_Z_SCORES,
 } from './forecastInterval';
-import { INTERVAL_CONFIG, RESIDUAL_BOOTSTRAP_CONFIG } from './modelConfig';
+import {
+  INTERVAL_CONFIG,
+  RESIDUAL_BOOTSTRAP_CONFIG,
+  YELLOW_LINE_FORECAST_CONFIG,
+  validateYellowLineForecastConfig,
+} from './modelConfig';
 import { seededRandom } from './random';
 
 export interface HeatmapCell {
@@ -50,6 +55,16 @@ const STOCHASTIC_TRACE_BLOCK_DAYS = 14;
 const STOCHASTIC_TRACE_LOOKBACK_DAYS = RESIDUAL_BOOTSTRAP_CONFIG.recentLookbackDays;
 
 export { CONFIDENCE_Z_SCORES };
+
+/** Runtime routing is deliberately explicit. Until evidence-backed enablement
+ * exists, chart, API, and terminal summaries all continue through the accepted
+ * production baseline. */
+export function yellowLineForecastRoute(horizonDays: number): 'production-baseline' | 'validated-candidate' {
+  validateYellowLineForecastConfig(YELLOW_LINE_FORECAST_CONFIG);
+  return YELLOW_LINE_FORECAST_CONFIG.enabled && YELLOW_LINE_FORECAST_CONFIG.horizons.includes(horizonDays as 14 | 30 | 60 | 90)
+    ? 'validated-candidate'
+    : 'production-baseline';
+}
 
 export function coefficientAwareCalibrationLabel(
   horizonDays: number,

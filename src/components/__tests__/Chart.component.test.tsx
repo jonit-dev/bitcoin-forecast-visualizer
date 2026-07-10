@@ -30,8 +30,9 @@ vi.mock('lightweight-charts', () => {
       const timeScale = makeTimeScale();
       const chart = {
         options,
-        addSeries: vi.fn((_seriesType, seriesOptions) => {
+        addSeries: vi.fn((seriesType, seriesOptions) => {
           const series = {
+            seriesType,
             seriesOptions,
             setData: vi.fn(),
             applyOptions: vi.fn(),
@@ -58,7 +59,7 @@ const rows = [
   { date: '2024-01-02', open: 110, high: 130, low: 105, close: 125, volume: 2000, sma20: 112, sma50: null, powerLawModel: 115, floorPriceModel: 85, peakPriceModel: 190 },
   { date: '2024-01-03', open: 125, high: 140, low: 120, close: 135, volume: 3000, sma20: 120, sma50: 116, powerLawModel: 125, floorPriceModel: 90, peakPriceModel: 200 },
   { date: '2024-01-04', isForecast: true, open: 135, high: 150, low: 130, close: 145, forecastUpper: 170, forecastLower: 120, floorPriceModel: 95, peakPriceModel: 210, stochasticTraces: [148, 151] },
-  { date: '2024-01-05', isForecast: true, open: 145, high: 160, low: 140, close: 155, forecastUpper: 180, forecastLower: 125, floorPriceModel: 100, peakPriceModel: 220, stochasticTraces: [158, 161] },
+  { date: '2024-01-05', isForecast: true, open: 145, high: 160, low: 140, close: 155, forecastUpper: 180, forecastLower: 125, floorPriceModel: 100, peakPriceModel: 220, stochasticTraces: [132, 161] },
 ];
 
 function renderChart(overrides = {}) {
@@ -104,6 +105,48 @@ afterEach(() => {
 });
 
 describe('ForecastChart component', () => {
+  it('should preserve the jagged yellow forecast as the primary visual', async () => {
+    renderChart({ showModelLine: true, showScenarios: false, showCoreModelLine: false });
+
+    await waitFor(() => expect(seriesMocks.length).toBeGreaterThanOrEqual(20));
+
+    // Series 4 owns the trace-based forecast candles. Series 5 is the smooth
+    // statistical median, while series 8 is the primary amber scenario trace.
+    expect(seriesMocks[4].seriesType).toBe('CandlestickSeries');
+    expect(seriesMocks[4].seriesOptions).toEqual({
+      upColor: 'rgba(16, 185, 129, 0.5)',
+      downColor: 'rgba(239, 68, 68, 0.5)',
+      borderVisible: false,
+      wickUpColor: 'rgba(16, 185, 129, 0.5)',
+      wickDownColor: 'rgba(239, 68, 68, 0.5)',
+    });
+    expect(seriesMocks[8].seriesType).toBe('LineSeries');
+    expect(seriesMocks[8].seriesOptions).toMatchObject({
+      color: 'rgba(251, 191, 36, 0.55)',
+      lineWidth: 2,
+      lineStyle: 0,
+      crosshairMarkerVisible: false,
+      lastValueVisible: false,
+      priceLineVisible: false,
+      visible: false,
+    });
+    expect(seriesMocks[8].applyOptions).toHaveBeenLastCalledWith({ visible: true });
+    expect(seriesMocks[8].setData).toHaveBeenCalledWith([
+      { time: '2024-01-04', value: 148 },
+      { time: '2024-01-05', value: 132 },
+    ]);
+    expect(seriesMocks[9].seriesOptions).toMatchObject({
+      color: 'rgba(251, 191, 36, 0.22)',
+      lineWidth: 1,
+    });
+    expect(seriesMocks[9].applyOptions).toHaveBeenLastCalledWith({ visible: false });
+    expect(seriesMocks[5].seriesOptions).toMatchObject({
+      color: 'rgba(251, 191, 36, 0.95)',
+      lineWidth: 3,
+    });
+    expect(seriesMocks[5].applyOptions).toHaveBeenLastCalledWith({ visible: false });
+  });
+
   it('creates chart series, pushes stable data, and renders the latest legend', async () => {
     const screen = renderChart();
 
