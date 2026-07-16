@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
@@ -42,5 +42,34 @@ describe('script guardrails', () => {
 
   it('should pass current UI import guard', () => {
     expect(() => execFileSync('node', ['scripts/guard-ui-imports.mjs'], { cwd: process.cwd() })).not.toThrow();
+  });
+
+  it('should preserve the optional derivatives cache when Binance is unavailable', () => {
+    const script = readFileSync('scripts/update-derivatives-data.mjs', 'utf8');
+    const failureHandler = script.slice(script.indexOf('main().catch'));
+    expect(failureHandler).toContain('preserving existing cache');
+    expect(failureHandler).not.toContain('rows: []');
+    expect(failureHandler).not.toContain('process.exitCode = 1');
+  });
+
+  it('should give the production watchdog a working default deployment URL', () => {
+    const workflow = readFileSync('.github/workflows/market-data-watchdog.yml', 'utf8');
+    expect(workflow).toContain("MARKET_DATA_BASE_URL: ${{ vars.MARKET_DATA_BASE_URL || 'https://bitcoin-forecast-visualizer.pages.dev' }}");
+  });
+
+  it('should restore an optional data cache when its updater fails', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'optional-update-'));
+    const cache = join(dir, 'cache.json');
+    const updater = join(dir, 'fail.mjs');
+    writeFileSync(cache, '{"rows":[{"date":"2026-07-01"}]}\n');
+    writeFileSync(updater, `import { writeFileSync } from 'node:fs';\nwriteFileSync(${JSON.stringify(cache)}, '{"rows":[]}\\n');\nprocess.exit(1);\n`);
+
+    const result = spawnSync('node', ['scripts/run-optional-update.mjs', cache, process.execPath, updater], { cwd: process.cwd(), encoding: 'utf8' });
+    const restored = readFileSync(cache, 'utf8');
+    rmSync(dir, { recursive: true, force: true });
+
+    expect(result.status).toBe(0);
+    expect(restored).toBe('{"rows":[{"date":"2026-07-01"}]}\n');
+    expect(`${result.stderr}${result.stdout}`).toContain('preserved previous cache');
   });
 });

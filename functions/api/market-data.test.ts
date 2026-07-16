@@ -12,7 +12,12 @@ class ReadStatement implements D1PreparedStatement {
   async all<T>(): Promise<D1Result<T>> {
     if (!this.sql.includes('FROM market_candles')) return { success: true, results: [] };
     const [asset, since] = this.values as string[];
-    return { success: true, results: this.db.rows.filter((row) => row.asset_id === asset && row.date > since).sort((a, b) => a.date.localeCompare(b.date)) as T[] };
+    const direction = this.sql.includes('ORDER BY date DESC') ? -1 : 1;
+    const rows = this.db.rows
+      .filter((row) => row.asset_id === asset && row.date > since)
+      .sort((a, b) => direction * a.date.localeCompare(b.date))
+      .slice(0, 8);
+    return { success: true, results: rows as T[] };
   }
   async first<T>(): Promise<T | null> {
     if (this.sql.includes('FROM refresh_runs')) return { status: 'completed' } as T;
@@ -45,6 +50,17 @@ describe('market data API', () => {
     const response = await onRequestGet({ request: new Request('https://example.test/api/market-data?asset=btc&since=2026-07-07'), env: { MARKET_QUOTES_DB: db } });
     const body = await response.json();
     expect(body.rows.map((row: any) => row.date)).toEqual(['2026-07-08', '2026-07-09']);
+  });
+
+  it('should return the newest repair rows in ascending order when more than eight exist', async () => {
+    const rows = Array.from({ length: 10 }, (_, index) => runtimeRow('btc', `2026-07-${String(index + 3).padStart(2, '0')}`, 103 + index));
+    const db = new ReadDb(rows);
+    const response = await onRequestGet({ request: new Request('https://example.test/api/market-data?asset=btc&since=2026-07-02'), env: { MARKET_QUOTES_DB: db } });
+    const body = await response.json();
+    expect(body.rows.map((row: any) => row.date)).toEqual([
+      '2026-07-05', '2026-07-06', '2026-07-07', '2026-07-08',
+      '2026-07-09', '2026-07-10', '2026-07-11', '2026-07-12',
+    ]);
   });
 
   it('should use the D1 close as forecast anchor when newer than the bundle', async () => {

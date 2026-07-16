@@ -34,10 +34,10 @@ export async function readRuntimeMarketData(env: MarketDataEnv, assetId: MarketA
   if (!env.MARKET_QUOTES_DB) return { rows: since ? bundled.filter((row) => row.date > since) : bundled, latestDate: latestBundle.date, source: 'bundle', refreshedAt: null, status: 'fallback', runStatus: null };
   try {
     const dbRows = (await env.MARKET_QUOTES_DB.prepare(`SELECT asset_id, date, open, high, low, close, volume, source, source_timestamp, ingested_at
-      FROM market_candles WHERE asset_id = ? AND date > ? ORDER BY date ASC LIMIT 8`).bind(assetId, since ?? '0000-00-00').all<any>()).results ?? [];
+      FROM market_candles WHERE asset_id = ? AND date > ? ORDER BY date DESC LIMIT 8`).bind(assetId, since ?? '0000-00-00').all<any>()).results ?? [];
     const latestDb = await env.MARKET_QUOTES_DB.prepare('SELECT date, source, ingested_at FROM market_candles WHERE asset_id = ? ORDER BY date DESC LIMIT 1').bind(assetId).first<any>();
     const latestRun = await env.MARKET_QUOTES_DB.prepare('SELECT status FROM refresh_runs ORDER BY started_at DESC LIMIT 1').first<{ status: string }>();
-    const rows = dbRows.map((row) => {
+    const rows = dbRows.reverse().map((row) => {
       validateCandle({ assetId, ...toOhlcv(row), source: row.source, sourceTimestamp: row.source_timestamp, ingestedAt: row.ingested_at });
       return toOhlcv(row);
     });

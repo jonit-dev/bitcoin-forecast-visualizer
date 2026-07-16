@@ -53,7 +53,7 @@
     "update:cot": "node scripts/update-cot-data.mjs",
     "validate:cot": "node scripts/validate-cot-data.mjs",
     "update:market-data": "node scripts/update-market-data.mjs",
-    "update:forecast-data": "node scripts/update-btc-data.mjs && yarn run update:market-data && yarn run update:onchain && yarn run update:derivatives && yarn run update:stablecoins && yarn run update:etf-flow && yarn run update:macro && yarn run update:sentiment && yarn run update:cot && yarn run build:features && yarn run write:runtime-summaries && yarn run check:freshness",
+    "update:forecast-data": "node scripts/update-btc-data.mjs && yarn run update:market-data && yarn run update:onchain && node scripts/run-optional-update.mjs src/data/derivatives-history.json node scripts/update-derivatives-data.mjs && node scripts/run-optional-update.mjs src/data/stablecoin-history.json node scripts/update-stablecoin-data.mjs && node scripts/run-optional-update.mjs src/data/etf-flow-history.json node scripts/update-etf-flow-data.mjs && node scripts/run-optional-update.mjs src/data/macro-history.json node scripts/update-macro-data.mjs && node scripts/run-optional-update.mjs src/data/sentiment-history.json node scripts/update-sentiment-data.mjs && node scripts/run-optional-update.mjs src/data/cot-history.json node scripts/update-cot-data.mjs && yarn run build:features && yarn run write:runtime-summaries && yarn run check:freshness",
     "validate:regime-data": "node scripts/validate-regime-data.mjs",
     "write:runtime-summaries": "tsx scripts/write-runtime-summaries.ts",
     "check:freshness": "tsx scripts/check-data-freshness.ts",
