@@ -1,6 +1,24 @@
 import featureTable from '../src/data/feature-table.json';
+import { pathToFileURL } from 'node:url';
 
 const MS_PER_DAY = 86400000;
+
+export const FEATURE_MINIMUM_COVERAGE: Record<string, number> = {
+  futuresOpenInterestUSD: 30,
+  futuresOpenInterestToMarketCap: 30,
+};
+
+export function assertMinimumFeatureCoverage(rows: any[], minimums = FEATURE_MINIMUM_COVERAGE): void {
+  for (const [feature, minimum] of Object.entries(minimums)) {
+    const count = rows.reduce(
+      (total, row) => total + (Number.isFinite(row?.features?.[feature]) ? 1 : 0),
+      0
+    );
+    if (count < minimum) {
+      throw new Error(`feature coverage below minimum: feature=${feature} count=${count} minimum=${minimum}`);
+    }
+  }
+}
 
 function main(): void {
   const rows = featureTable as any[];
@@ -38,6 +56,8 @@ function main(): void {
     previousDate = row.date;
   }
 
+  assertMinimumFeatureCoverage(rows);
+
   console.log('[Feature validation] OK');
   console.log(
     [
@@ -61,4 +81,6 @@ function addUtcDays(date: string, days: number): string {
   return next.toISOString().split('T')[0];
 }
 
-main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}

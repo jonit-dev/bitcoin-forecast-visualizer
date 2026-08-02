@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mergeByKey } from './lib/mergeRows.mjs';
+import { appendVintageRecords } from './lib/vintageStore.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(__dirname, '../src/data/cot-history.json');
@@ -159,6 +161,18 @@ async function main() {
     oiHistory.push(openInterestBtc);
   }
 
+  const existing = existsSync(OUT_PATH)
+    ? (() => {
+        const cache = JSON.parse(readFileSync(OUT_PATH, 'utf8'));
+        return Array.isArray(cache) ? cache : cache.rows ?? [];
+      })()
+    : [];
+  const mergedRows = mergeByKey(existing, rows, 'date');
+  appendVintageRecords(
+    'COT',
+    rows.map(row => ({ asOfDate: row.date, observedAt: fetchedAt, value: row }))
+  );
+
   writeFileSync(OUT_PATH, `${JSON.stringify({
     metadata: {
       source: 'CFTC TFF Futures Only public reporting',
@@ -179,6 +193,7 @@ async function main() {
       ],
       cadence: 'weekly',
       credentialRequired: false,
+      vintageSeries: 'COT',
       limitations: [
         'CFTC report dates are Tuesday and publication is later in the week; rows use a conservative Saturday 00:00 UTC availableAfter.',
         'BTC and Micro BTC positions are aggregated in BTC-equivalent contract exposure using fixed contract sizes.',
@@ -188,7 +203,7 @@ async function main() {
         disaggregatedFuturesOnly: 'https://publicreporting.cftc.gov/stories/s/Disaggregated-Futures-Only/ubmb-6exi/',
       },
     },
-    rows,
+    rows: mergedRows,
   }, null, 2)}\n`);
 
   console.log([
@@ -202,21 +217,6 @@ async function main() {
 }
 
 main().catch(err => {
-  const fetchedAt = new Date().toISOString();
-  writeFileSync(OUT_PATH, `${JSON.stringify({
-    metadata: {
-      source: 'CFTC TFF Futures Only public reporting',
-      status: 'unavailable',
-      fetchedAt,
-      dataset: BASE_URL,
-      contracts: CONTRACTS,
-      fields: ['openInterestBtc'],
-      cadence: 'weekly',
-      credentialRequired: false,
-      note: `Fetch failed: ${err.message}`,
-    },
-    rows: [],
-  }, null, 2)}\n`);
   console.error(`[COT data] FAILED: ${err.message}`);
   process.exitCode = 1;
 });

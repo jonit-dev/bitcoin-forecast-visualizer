@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mergeByKey } from './lib/mergeRows.mjs';
+import { appendVintageRecords } from './lib/vintageStore.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(__dirname, '../src/data/onchain-history.json');
@@ -123,8 +125,18 @@ async function main() {
     .filter(row => row.metrics.mvrv && row.metrics.marketCapUSD)
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  mkdirSync(dirname(OUT_PATH), { recursive: true });
-  writeFileSync(OUT_PATH, `${JSON.stringify(normalized)}\n`);
+  const existing = existsSync(OUT_PATH)
+    ? (() => {
+        const cache = JSON.parse(readFileSync(OUT_PATH, 'utf8'));
+        return Array.isArray(cache) ? cache : cache.rows ?? [];
+      })()
+    : [];
+  const mergedRows = mergeByKey(existing, normalized, 'date');
+  appendVintageRecords(
+    'ONCHAIN',
+    normalized.map(row => ({ asOfDate: row.date, observedAt: fetchedAt, value: row }))
+  );
+  writeFileSync(OUT_PATH, `${JSON.stringify(mergedRows)}\n`);
 
   const missingDates = [];
   for (let i = 1; i < normalized.length; i++) {
@@ -135,7 +147,8 @@ async function main() {
   console.log(
     [
       '[On-chain data] updated',
-      `rows=${normalized.length}`,
+      `rows=${mergedRows.length}`,
+      `incomingRows=${normalized.length}`,
       `latestSourceDate=${latestSourceDate}`,
       `daysLag=${normalized.at(-1)?.daysLag ?? 'n/a'}`,
       `missingDateGaps=${missingDates.length}`,

@@ -7,6 +7,7 @@ import featureTable from '../src/data/feature-table.json';
 import { ENSEMBLE_CONFIG } from '../src/lib/modelConfig';
 import { classifyRegime } from '../src/lib/regimeModel';
 import { computeTailRisk } from '../src/lib/tailRisk';
+import { SOURCE_FRESHNESS_CAP_DAYS } from './lib/sourceFreshness.mjs';
 
 const RESULTS_DIR = join(process.cwd(), 'docs/reports/results');
 const RELIABILITY_OUT = join(process.cwd(), 'src/data/reliability-summary.json');
@@ -46,24 +47,28 @@ function main(): void {
   writeFileSync(FRESHNESS_OUT, `${JSON.stringify({
     generatedAt: new Date().toISOString(),
     sources: {
-      btc: sourceStatus((btcHistory as any[]).at(-1)?.date, true),
-      mvrv: sourceStatus((mvrvHistory as any[]).at(-1)?.date, true),
-      onchain: sourceStatus((onchainHistory as any[]).at(-1)?.date, true),
-      features: sourceStatus((featureTable as any[]).at(-1)?.date, true),
-      derivatives: optionalCacheStatus('src/data/derivatives-history.json'),
-      stablecoins: optionalCacheStatus('src/data/stablecoin-history.json'),
-      etf: optionalCacheStatus('src/data/etf-flow-history.json'),
-      macro: optionalCacheStatus('src/data/macro-history.json'),
-      sentiment: optionalCacheStatus('src/data/sentiment-history.json'),
-      cot: optionalCacheStatus('src/data/cot-history.json'),
+      btc: sourceStatus((btcHistory as any[]).at(-1)?.date, true, 'btc'),
+      mvrv: sourceStatus((mvrvHistory as any[]).at(-1)?.date, true, 'mvrv'),
+      onchain: sourceStatus((onchainHistory as any[]).at(-1)?.date, true, 'onchain'),
+      features: sourceStatus((featureTable as any[]).at(-1)?.date, true, 'features'),
+      derivatives: optionalCacheStatus('src/data/derivatives-history.json', 'derivatives'),
+      stablecoins: optionalCacheStatus('src/data/stablecoin-history.json', 'stablecoins'),
+      etf: optionalCacheStatus('src/data/etf-flow-history.json', 'etf'),
+      macro: optionalCacheStatus('src/data/macro-history.json', 'macro'),
+      sentiment: optionalCacheStatus('src/data/sentiment-history.json', 'sentiment'),
+      cot: optionalCacheStatus('src/data/cot-history.json', 'cot'),
     },
   }, null, 2)}\n`);
 
   const latestFeatureRow = (featureTable as any[]).at(-1);
+  const regime = classifyRegime(latestFeatureRow);
   writeFileSync(REGIME_OUT, `${JSON.stringify({
     generatedAt: new Date().toISOString(),
     featureDate: latestFeatureRow?.date ?? null,
-    regime: classifyRegime(latestFeatureRow),
+    regime: {
+      ...regime,
+      status: regime.topState === 'insufficient-data' ? 'insufficient-data' : 'available',
+    },
     tailRisk: computeTailRisk(latestFeatureRow),
     derivativesContext: latestFeatureRow ? buildDerivativesContext(latestFeatureRow) : null,
     networkContext: latestFeatureRow ? buildNetworkContext(latestFeatureRow, featureTable as any[]) : null,
@@ -354,27 +359,36 @@ function loadLatestResultByGeneratedAt(pattern: RegExp, predicate: (report: any)
   return { ...latest.report, __path: `docs/reports/results/${latest.name}` };
 }
 
-function sourceStatus(latestDate: string | null | undefined, required: boolean) {
+function sourceStatus(latestDate: string | null | undefined, required: boolean, sourceName: string) {
   const lagDays = latestDate ? daysBetween(latestDate, dateKey(Date.now())) : null;
+  const maxLagDays = SOURCE_FRESHNESS_CAP_DAYS[sourceName] ?? 3;
   return {
-    status: latestDate ? (lagDays !== null && lagDays <= 3 ? 'fresh' : 'stale') : 'missing',
+    status: latestDate ? (lagDays !== null && lagDays <= maxLagDays ? 'fresh' : 'stale') : 'missing',
     latestDate: latestDate ?? null,
     lagDays,
+    maxLagDays,
     required,
   };
 }
 
-function optionalCacheStatus(relativePath: string) {
+function optionalCacheStatus(relativePath: string, sourceName: string) {
   const path = join(process.cwd(), relativePath);
   if (!existsSync(path)) return { status: 'missing', latestDate: null, lagDays: null, required: false };
   const cache = JSON.parse(readFileSync(path, 'utf8'));
   const rows = Array.isArray(cache) ? cache : cache.rows || [];
   const metadata = Array.isArray(cache) ? {} : cache.metadata || {};
   const latestDate = rows.at(-1)?.date ?? null;
+  const lagDays = latestDate ? daysBetween(latestDate, dateKey(Date.now())) : null;
+  const maxLagDays = SOURCE_FRESHNESS_CAP_DAYS[sourceName] ?? 3;
   return {
-    status: metadata.status || (latestDate ? 'available' : 'unavailable'),
+    status: metadata.status === 'unavailable'
+      ? 'unavailable'
+      : latestDate
+        ? (lagDays !== null && lagDays <= maxLagDays ? 'fresh' : 'stale')
+        : 'missing',
     latestDate,
-    lagDays: latestDate ? daysBetween(latestDate, dateKey(Date.now())) : null,
+    lagDays,
+    maxLagDays,
     required: false,
   };
 }

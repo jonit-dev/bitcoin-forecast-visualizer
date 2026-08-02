@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mergeByKey } from './lib/mergeRows.mjs';
+import { appendVintageRecords } from './lib/vintageStore.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(__dirname, '../src/data/stablecoin-history.json');
@@ -97,6 +99,18 @@ async function main() {
     };
   });
 
+  const existing = existsSync(OUT_PATH)
+    ? (() => {
+        const cache = JSON.parse(readFileSync(OUT_PATH, 'utf8'));
+        return Array.isArray(cache) ? cache : cache.rows ?? [];
+      })()
+    : [];
+  const mergedRows = mergeByKey(existing, rows, 'date');
+  appendVintageRecords(
+    'STABLECOIN',
+    rows.map(row => ({ asOfDate: row.date, observedAt: fetchedAt, value: row }))
+  );
+
   writeFileSync(OUT_PATH, `${JSON.stringify({
     metadata: {
       source: 'DeFiLlama Stablecoins API',
@@ -114,6 +128,7 @@ async function main() {
       ],
       cadence: 'daily',
       credentialRequired: false,
+      vintageSeries: 'STABLECOIN',
       limitations: [
         'DeFiLlama historical stablecoin data can be revised/backfilled; use conservative one-day lag for point-in-time research.',
         'This cache uses aggregate stablecoin circulating supply in USD across all supported stablecoins.',
@@ -123,34 +138,21 @@ async function main() {
         stablecoinsApi: 'https://stablecoins.llama.fi/stablecoincharts/all',
       },
     },
-    rows,
+    rows: mergedRows,
   }, null, 2)}\n`);
 
   console.log([
     '[Stablecoin data] updated',
-    `rows=${rows.length}`,
-    `first=${rows[0]?.date ?? 'n/a'}`,
-    `last=${rows.at(-1)?.date ?? 'n/a'}`,
-    `latestSupplyUSD=${rows.at(-1)?.metrics.totalSupplyUSD ?? 'n/a'}`,
+    `rows=${mergedRows.length}`,
+    `incomingRows=${rows.length}`,
+    `first=${mergedRows[0]?.date ?? 'n/a'}`,
+    `last=${mergedRows.at(-1)?.date ?? 'n/a'}`,
+    `latestSupplyUSD=${mergedRows.at(-1)?.metrics.totalSupplyUSD ?? 'n/a'}`,
     `path=${OUT_PATH}`,
   ].join('  '));
 }
 
 main().catch(err => {
-  const fetchedAt = new Date().toISOString();
-  writeFileSync(OUT_PATH, `${JSON.stringify({
-    metadata: {
-      source: 'DeFiLlama Stablecoins API',
-      status: 'unavailable',
-      fetchedAt,
-      url: URL,
-      fields: ['totalSupplyUSD'],
-      cadence: 'daily',
-      credentialRequired: false,
-      note: `Fetch failed: ${err.message}`,
-    },
-    rows: [],
-  }, null, 2)}\n`);
   console.error(`[Stablecoin data] FAILED: ${err.message}`);
   process.exitCode = 1;
 });

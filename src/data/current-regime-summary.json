@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-16T04:51:12.178Z",
+  "generatedAt": "2026-08-02T22:10:49.190Z",
   "featureDate": "2026-07-15",
   "regime": {
     "probabilities": {
@@ -7,7 +7,8 @@
       "trend-expansion": 0.12087912087912087,
       "late-cycle-overheating": 0.0879120879120879,
       "deleveraging-bear": 0.3516483516483516,
-      "sideways-chop": 0.0879120879120879
+      "sideways-chop": 0.0879120879120879,
+      "insufficient-data": 0
     },
     "topState": "accumulation-value",
     "reasonCodes": [
@@ -15,7 +16,8 @@
       "drawdown-or-negative-momentum",
       "hashrate-available"
     ],
-    "contextOnly": true
+    "contextOnly": true,
+    "status": "available"
   },
   "tailRisk": {
     "riskFlag": "two-sided",

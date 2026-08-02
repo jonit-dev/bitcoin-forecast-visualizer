@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "source": "FRED CSV",
+    "source": "FRED CSV legacy cache (ALFRED recovery pending)",
     "status": "available",
     "fetchedAt": "2026-07-16T04:51:05.533Z",
     "series": {
@@ -11,14 +11,15 @@
       "M2SL": "M2 money stock"
     },
     "cadence": "mixed daily/weekly/monthly aligned to daily last-known values",
-    "credentialRequired": false,
+    "credentialRequired": true,
     "conservativeLagDays": 30,
     "limitations": [
-      "This uses latest FRED observations, not ALFRED vintages; revision-sensitive fields are context-only unless a future vintage-safe implementation validates them.",
-      "All macro rows use a conservative 30-day availableAfter lag before feature-table use."
+      "This checked-in cache predates ALFRED recovery and is not evidence of the requested 2010 coverage.",
+      "All macro rows use a conservative 30-day availableAfter lag before feature-table use.",
+      "The next real updater run requires FRED_API_KEY and will replace this legacy metadata with ALFRED observations metadata."
     ],
     "docs": {
-      "fredCsv": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SERIES_ID"
+      "observations": "https://api.stlouisfed.org/fred/series/observations"
     }
   },
   "rows": [

@@ -7,6 +7,8 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { mergeByKey } from './lib/mergeRows.mjs';
+import { appendVintageRecords } from './lib/vintageStore.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '../src/data/btc-history.json');
@@ -164,12 +166,16 @@ async function updateBTCData() {
       return;
     }
 
-    const preserved = existing.filter((row) => row.date < repairStart);
-    const updated = [...preserved, ...rebuiltTail];
+    const observedAt = new Date().toISOString();
+    const updated = mergeByKey(existing, rebuiltTail, 'date');
+    appendVintageRecords(
+      'BTC',
+      rebuiltTail.map(row => ({ asOfDate: row.date, observedAt, value: row }))
+    );
     writeFileSync(DATA_PATH, JSON.stringify(updated));
 
     const repairedDays = rebuiltTail.length;
-    const latest = updated[updated.length - 1].date;
+    const latest = updated.at(-1).date;
     console.log(
       `[BTC data] Rebuilt ${repairedDays} day(s) from market_chart hourly prices and daily volume. Latest: ${latest}. Missing-days delta vs previous tail: ${daysSince}`
     );
@@ -228,7 +234,12 @@ async function updateMVRVData() {
     }
 
     toAdd.sort((a, b) => a.date.localeCompare(b.date));
-    const updated = [...existing, ...toAdd];
+    const observedAt = new Date().toISOString();
+    const updated = mergeByKey(existing, toAdd, 'date');
+    appendVintageRecords(
+      'MVRV',
+      toAdd.map(row => ({ asOfDate: row.date, observedAt, value: row }))
+    );
     writeFileSync(MVRV_DATA_PATH, JSON.stringify(updated));
     console.log(`[MVRV data] Added ${toAdd.length} entries. Latest: ${updated[updated.length - 1].date}`);
   } catch (err) {

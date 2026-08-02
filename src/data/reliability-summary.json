@@ -1,34 +1,34 @@
 {
-  "generatedAt": "2026-07-16T04:51:12.110Z",
-  "reportPath": "docs/reports/results/backtest-2026-07-10T20-41-55-909Z.json",
+  "generatedAt": "2026-08-02T22:10:49.083Z",
+  "reportPath": "docs/reports/results/backtest-2026-08-02T22-00-14-848Z.json",
   "qualityGateStatus": "PASS",
   "reliabilityScore": 98,
   "horizonConfidence": {
     "14d": {
-      "powerlawError": 0.05258107791754381,
-      "naiveError": 0.05412267831095893,
+      "powerlawError": 0.05266441266724162,
+      "naiveError": 0.0544708303200436,
       "status": "beats-naive"
     },
     "30d": {
-      "powerlawError": 0.08441809624149581,
-      "naiveError": 0.08792416479016753,
+      "powerlawError": 0.08374708344248231,
+      "naiveError": 0.0877073670031958,
       "status": "beats-naive"
     },
     "60d": {
-      "powerlawError": 0.13965334679762115,
-      "naiveError": 0.14647391704543528,
+      "powerlawError": 0.139283603438968,
+      "naiveError": 0.14696313414022838,
       "status": "beats-naive"
     },
     "90d": {
-      "powerlawError": 0.15378136685983765,
-      "naiveError": 0.1843448861024815,
+      "powerlawError": 0.15347418855462794,
+      "naiveError": 0.1838375069020895,
       "status": "beats-naive"
     }
   },
   "ensembleEnabled": false,
   "ensembleReason": "Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample.",
   "coreAssumptions": {
-    "generatedAt": "2026-07-16T04:51:12.128Z",
+    "generatedAt": "2026-08-02T22:10:49.112Z",
     "longHorizonLabel": "Directional only",
     "reason": "coefficients=unstable; tau=watch; cycle=stable; residuals=stable",
     "coefficientStability": {

@@ -17,11 +17,16 @@
 | --- | --- | --- | --- |
 | `src/data/derivatives-history.json` | Optional available | Binance USD-M Futures public REST for BTCUSDT funding and open-interest snapshots. Funding is aggregated by UTC date; open-interest history is limited by Binance to recent history, so the features stay context-only until enough walk-forward history accumulates. | None |
 | `src/data/etf-flow-history.json` | Optional available | Farside Investors public Bitcoin ETF Flow - All Data HTML table, parsed into daily US$m/USD total flow, cumulative flow, and per-fund flow fields. Rows are conservatively joined into features only after the next UTC day. The source is public HTML rather than a versioned API; the ETF demand experiment must pass before these fields influence forecasts. | None |
-| `src/data/macro-history.json` | Optional available | Official FRED CSV series `WALCL`, `FEDFUNDS`, `DGS10`, `BAMLH0A0HYM2`, and `M2SL`, aligned by last-known observation date with a conservative 30-day feature availability lag. Latest-observation data is not ALFRED vintage-safe; the macro experiment rejected forecast influence, so fields are context-only. | None |
+| `src/data/macro-history.json` | Optional available | Official FRED/ALFRED observations API series `WALCL`, `FEDFUNDS`, `DGS10`, `BAMLH0A0HYM2`, and `M2SL`, aligned by last-known observation date with a conservative 30-day feature availability lag. `FRED_API_KEY` is required; raw observations append to `src/data/vintages/macro-*.ndjson`. The 2026-06-26 verdict is void pending the pre-registered recovered-history rerun, so fields remain context-only. | `FRED_API_KEY` |
 | `src/data/sentiment-history.json` | Optional available | Alternative.me Fear & Greed Index API. Rows are conservatively joined into features only after the next UTC day. Sentiment-extreme event study rejected forecast influence, so these fields are context-only. | None |
 | `src/data/cot-history.json` | Optional available | CFTC TFF Futures Only public reporting for CME Bitcoin (`133741`) and Micro Bitcoin (`133742`) futures, aggregated in BTC-equivalent contract exposure. Report dates are treated as available after Saturday 00:00 UTC. COT event study found context-only positioning labels, not forecast influence. | None |
 
 Optional sources are context-only until validators show coverage and a later ablation proves forecast value. The current derivatives context is shown in the Regime Context panel, but it does not alter the median forecast or interval calibration.
+
+All seven forecast-data updaters append point-in-time records to
+`src/data/vintages/<series>.ndjson`. Use
+`yarn reconstruct:vintage --series WALCL --as-of YYYY-MM-DD` to select the
+latest observation per as-of date that was known by the cutoff.
 
 ## BTC Market Data Quality Audit
 
