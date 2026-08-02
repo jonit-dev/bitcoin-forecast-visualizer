@@ -1338,8 +1338,9 @@ Run `yarn backtest:distribution-family`. Evaluate the real `powerlaw-current` mo
 
 ### Report artifacts
 
-- `docs/reports/results/distribution-family-2026-08-02T23-25-21-166Z.json`
-- `docs/reports/results/distribution-family-2026-08-02T23-25-21-166Z.md`
+- `docs/reports/results/distribution-family-2026-08-02T23-35-46-064Z.json`
+- `docs/reports/results/distribution-family-2026-08-02T23-35-46-064Z.md`
+- `docs/reports/results/p3-fat-tail-distribution-evidence-2026-08-02.md`
 
 ### Promotion gate (pre-registered verbatim)
 
