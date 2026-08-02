@@ -1243,7 +1243,7 @@ function renderMarkdown(report: BacktestReport): string {
   }
 
   lines.push('## Model Config Snapshot', '', '```json', JSON.stringify(report.metadata.modelConfig, null, 2), '```', '');
-  return `${lines.join('\n')}\n`;
+  return `${lines.join('\n').replace(/\n+$/, '')}\n`;
 }
 
 function highVolatilityCutoff(ohlcv: OHLCVData[]): number {
