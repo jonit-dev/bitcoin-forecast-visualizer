@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { OHLCVData } from '../api';
 import { purgeAndEmbargoResidualRows, purgeResidualRowsForEvaluation, type ResidualDatasetRow } from '../featureExperimentDataset';
-import { runPointInTimeBenchmark } from '../pointInTimeForecast';
+import { buildPitIntervalEvaluation, runPointInTimeBenchmark } from '../pointInTimeForecast';
 
 describe('point-in-time forecast', () => {
   it('should exclude labels unresolved at evaluation origin', () => {
@@ -18,6 +18,43 @@ describe('point-in-time forecast', () => {
     expect(purged.rows).toEqual([]);
     expect(purged.excludedByEmbargo).toBe(1);
     expect(() => purgeAndEmbargoResidualRows(rows, '2024-02-01', 7, 6)).toThrow(/at least horizonDays/);
+  });
+
+  it('should skip the interval when fewer than the minimum eligible rows remain', () => {
+    const data = syntheticRows(1900);
+    const result = runPointInTimeBenchmark({
+      ohlcv: data,
+      horizons: [14],
+      originStart: data[1460].date,
+      spacingDays: 30,
+    });
+
+    expect(result.origins[0].interval).toBeNull();
+    expect(result.origins[0].intervalSkipReason).toMatch(/minimum of 30/);
+  });
+
+  it('should report the shared embargo count as the number of rows withheld', () => {
+    const rows: ResidualDatasetRow[] = [
+      { originDate: '2024-01-25', targetDate: '2024-01-30', horizonDays: 5, actualClose: 1, baselineMedian: 1, targetResidualLog: 0, features: {} },
+      { originDate: '2024-01-20', targetDate: '2024-01-24', horizonDays: 5, actualClose: 1, baselineMedian: 1, targetResidualLog: 0, features: {} },
+    ];
+    const purged = purgeAndEmbargoResidualRows(rows, '2024-02-01', 7);
+
+    expect(purged.excludedByEmbargo).toBe(1);
+    expect(purged.rows).toHaveLength(1);
+  });
+
+  it('should exclude an in-window origin from interval quantiles', () => {
+    const errors = Array.from({ length: 45 }, (_, index): { originDate: string; targetDate: string; absLogError: number } => {
+      const date = new Date(Date.UTC(2024, 0, 1 + index)).toISOString().slice(0, 10);
+      return { originDate: date, targetDate: date, absLogError: index >= 38 ? 0 : index + 1 };
+    });
+    const evaluation = buildPitIntervalEvaluation(errors, '2024-02-15', 7);
+
+    expect(evaluation.excludedByEmbargo).toBe(7);
+    expect(evaluation.eligibleRows).toBe(38);
+    expect(evaluation.interval?.q90AbsLogError).toBe(34);
+    expect(evaluation.interval?.q90AbsLogError).not.toBe(33);
   });
 
   it('should ignore a future price mutation', () => {

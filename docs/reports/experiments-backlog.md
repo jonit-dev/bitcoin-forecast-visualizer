@@ -20,6 +20,10 @@ For each experiment, record:
 
 Skills may reference this file as the place to read/write experiment history, but should keep only reusable methodology and source patterns.
 
+### P1 metric supersession annotation — 2026-08-02
+
+Every pinball figure cited by an entry dated before 2026-08 is superseded by the P1 evaluation-integrity experiment below. Those historical figures remain for provenance only; current comparisons must use absolute-scale pinball rows carrying `pinballScale: absolute`.
+
 ---
 
 ## 2026-07-10 — Yellow forecast-path horizon prefix stability
@@ -1250,3 +1254,68 @@ Freeze this candidate prospectively and accumulate outcomes. If earlier audited 
 - **Result/verdict:** Worker tests, full unit/build/lint gates, BTC and market backtests, and the 8-case browser/accessibility suite passed. The production Worker was redeployed with D1 bound and Cloudflare confirmed the `15 23 * * *` trigger. Live API smoke checks passed for BTC, S&P 500, and gold with forecast agreement; BTC retained the validated 2026-07-09 row when the upstream shared edge returned 429. This is validated operational plumbing only and does not alter forecast signals.
 - **Rerun criteria:** CoinGecko response schema, volume semantics, retry policy, or source changes.
 - **Next better experiment:** Add an authenticated CoinGecko plan or separately validated same-instrument fallback only if bounded retries remain unreliable over seven scheduled production runs.
+
+## 2026-08-02 — P1 evaluation integrity and proper scoring
+
+Status: `completed — PARTIAL; scoring and embargo gates pass, disjoint calibration refuses promotion`
+
+### Hypothesis
+
+Replacing relative pinball loss with absolute proper pinball loss, adding CRPS/PIT/Winkler diagnostics, applying the existing point-in-time interval embargo, and fitting interval multipliers on a disjoint historical window will make evaluation metrics interpretable and prevent interval coverage from being self-confirming. Point-in-time interval coverage is expected to change after applying the embargo because in-window origin rows will be withheld.
+
+Every pinball figure produced before 2026-08 is superseded by this experiment and must not be compared with the corrected absolute-scale figures without the `pinballScale: absolute` discriminator.
+
+### Data/source changes
+
+No source-history or median-forecast changes are authorized. Use the checked-in BTC, VOO, and GLD histories. Change only evaluation code, proper-scoring diagnostics, point-in-time eligibility, report writers, calibration-window configuration, and committed interval multipliers if all required gates pass. P2 data-history/vintage work and P3 Student-t, long-horizon, and heatmap work are out of scope.
+
+### Validation setup
+
+- Run focused metric, proper-scoring, point-in-time, calibration, and script-guard tests, then `yarn test`, `yarn lint`, `yarn build`, `yarn backtest`, `yarn backtest:report-only`, `yarn backtest:pit-core`, and `yarn calibrate:intervals`.
+- Compare regenerated backtest and point-in-time artifacts with the cited pre-change reports, including absolute pinball deltas, CRPS, Winkler 80/90/95, PIT histograms, PIT-uniformity chi-square/df without p-values, and excluded embargo counts.
+- Fit interval multipliers on `2017-01-01` through `2021-12-31`; validate on `2022-01-01` onward, with the declared divergence tolerance and a minimum eligible interval-row count of 30 unless a harmless data boundary adjustment is documented.
+- Run the caller census, revert checks, incumbent-filter census, negative controls, `git diff --check`, and the complete acceptance-criterion audit. The known unrelated MVRV `yarn validate:data` failure remains recorded and out of scope.
+
+### Report artifacts
+
+Verified artifacts:
+
+- `docs/reports/results/backtest-2026-08-02T22-50-53-583Z.md`
+- `docs/reports/results/backtest-2026-08-02T22-50-53-583Z.json`
+- `docs/reports/results/backtest-2026-08-02T22-50-56-745Z.md` (report-only rerun)
+- `docs/reports/results/backtest-2026-08-02T22-50-56-745Z.json` (report-only rerun)
+- `docs/reports/results/point-in-time-core-2026-08-02T22-51-00-147Z.md`
+- `docs/reports/results/point-in-time-core-2026-08-02T22-51-00-147Z.json`
+- `docs/reports/results/interval-calibration-2026-08-02T22-51-16-892Z.md`
+- `docs/reports/results/interval-calibration-2026-08-02T22-51-16-892Z.json`
+
+### Result / verdict
+
+The implementation gates passed for scoring, report wiring, minimum-row interval skips, and shared embargo routing. The shipped interval table is the committed baseline (`90d=0.87`, `365d=0.59`, `aboveMaxMultiplier=0.59`); the rejected monotone-width experiment was reverted and no runtime multiplier is promoted from the divergent calibration. The corrected reports carry `pinballScale: absolute`, approximate CRPS with the full seven-quantile grid and endpoint-constant tails, Winkler 80/90/95, PIT histograms with expected counts, PIT chi-square/df without p-values, and excluded PIT counts. Verification: `yarn test` passed with 27 files and 124 tests; `yarn lint` passed; `yarn build` passed with the existing chunk-size warning; `yarn backtest` and `yarn backtest:report-only` both reported quality and robustness `PASS` at 14/30/60/90d; `yarn backtest:pit-core` produced 458 origin/horizon rows and 6 skips; `yarn calibrate:intervals` reported all six horizons `DIVERGENT` and refused a suggested config; `git diff --check` passed.
+
+The disjoint calibration fit window (`2017-01-01` through `2021-12-31`) and validation window (`2022-01-01` onward) each had ample rows, but all six horizons were `DIVERGENT` at the declared 0.05 tolerance. The script refused to emit a suggested config. Calibration metadata records the repaired source commit, working/source-tree state, and dataset SHA-256; the generated artifacts record `gitCommit=eeb1478aadb22bcc11ecfde1b6e0365683890435`, `sourceTreeDirty=false`, and the accurate generation state: the first backtest artifact has `workingTreeDirty=false`, while the report-only, PIT, and calibration artifacts have `workingTreeDirty=true` because earlier generated report files were present.
+
+The required manual `yarn dev` screenshot checkpoint for the changed chart band was not run in this lane, so the visual difference remains unverified.
+
+The PIT artifact contains 458 origin/horizon rows, 126 null intervals below the 30-row minimum, and `excludedByEmbargo=0` on the checked-in daily BTC history. A controlled dense-row test proves an in-window origin changes the unpurged quantile but not the shared-predicate interval quantile. The zero artifact count is a data-boundary result, not evidence that the embargo path is unused.
+
+`yarn validate:data` remains failed only at the known unrelated MVRV upstream drift check (`CoinMetrics mismatch count=5722`, first `2010-11-14`, local market cap `1281896`, upstream `1281924`); no data was changed.
+
+### Observed negative-control evidence
+
+Each mutation was applied with `apply_patch`, the named command was run, the exact source mutation was restored with the inverse `apply_patch`, and the restored command passed.
+
+1. **Pinball normalization:** Mutation in `src/lib/backtestMetrics.ts`: `pinballLoss(actual, predicted, quantile)` → `pinballLoss(actual, predicted, quantile) / actual`. Command: `yarn test src/lib/__tests__/backtestMetrics.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 2 failed | 6 passed`; `should score a perfect median... expected null to be +0`, and `should weight equal relative errors... expected 0.05 to be close to 2900`. Restoration: removed `/ actual`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
+2. **Proper-scoring wiring:** Mutation in `src/lib/backtestMetrics.ts`: replaced the CRPS input map/filter with `const crpsValues: number[] = []`. Command: `yarn test src/lib/__tests__/backtestMetrics.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should wire the full ForecastDistribution quantile grid... expected null to be close to 3.4750000000000014`. Restoration: restored the `inputs.map(({ actual, forecast }) => crpsFromQuantiles(actual, quantileSet(forecast)))` map/filter. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
+3. **Shared embargo:** Mutation in `src/lib/pointInTimeForecast.ts`: `intervalSnapshot(eligible.rows)` → `intervalSnapshot(errors)`. Command: `yarn test src/lib/__tests__/pointInTimeForecast.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should exclude an in-window origin... expected 33 to be 34`. Restoration: restored `intervalSnapshot(eligible.rows)`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
+4. **Minimum-row guard:** Mutation in `src/lib/pointInTimeForecast.ts`: `values.length < MIN_INTERVAL_ELIGIBLE_ROWS` → `values.length < 0`. Command: `yarn test src/lib/__tests__/pointInTimeForecast.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should skip the interval when fewer than the minimum eligible rows remain... expected { maturedErrors: 0, ... } to be null`. Restoration: restored `< MIN_INTERVAL_ELIGIBLE_ROWS`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
+5. **Divergence refusal:** Mutation in `scripts/calibrate-intervals.ts`: `if (rows.some(row => row.status !== 'VALIDATED' || row.multiplier === null)) return null` → `if (false) return null`. Command: `yarn test src/lib/__tests__/scriptGuards.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 6 passed`; `should refuse to emit a suggested multiplier... expected [ { horizonDays: 30, ... } ] to be null`. Restoration: restored the status/multiplier predicate. Restored green: `Test Files 1 passed (1)`, `Tests 7 passed (7)`.
+6. **Inflated-sigma PIT control:** Mutation in `src/lib/properScoring.ts`: PIT denominator `sigma` → `sigma * 2`. Command: `yarn test src/lib/__tests__/properScoring.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 2 failed | 7 passed`; calibrated sample chi-square was `462.91999999999996` instead of `< 21.666`, and the inflated-sigma control was `14.2` instead of `> 21.666`. Restoration: restored denominator `sigma`. Restored green: `Test Files 1 passed (1)`, `Tests 9 passed (9)`.
+
+### Rerun criteria
+
+Rerun if the checked-in histories, forecast quantile construction, scoring definitions, embargo predicate, calibration fit/validation windows, divergence tolerance, or report schema changes. Rerun before any promotion after a model, interval, data, or calibration change. Do not reinterpret pre-2026-08 pinball figures as current evidence. Do not promote the monotonicity-only multiplier adjustment until a future disjoint calibration run clears the divergence gate.
+
+### Next better experiment
+
+After this P1 is complete, use the corrected metrics on a prospectively frozen, point-in-time data-vintage evaluation with enough non-overlapping outcomes; only then consider P2 history/vintage work or a separately pre-registered distribution-family experiment.

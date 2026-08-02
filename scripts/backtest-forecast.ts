@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import btcHistory from '../src/data/btc-history.json';
@@ -6,6 +7,7 @@ import type { OHLCVData } from '../src/lib/api';
 import { aggregateForecastMetrics, type BacktestMetricRow, type MetricInput } from '../src/lib/backtestMetrics';
 import { getBacktestModels, type BacktestModelId } from '../src/lib/backtestModels';
 import { BACKTEST_CONFIG, CYCLE_EXPERIMENT_CONFIG, ENSEMBLE_CONFIG, INTERVAL_CONFIG, POWER_LAW_CONFIG, RESIDUAL_BOOTSTRAP_CONFIG, TAIL_RISK_CONFIG } from '../src/lib/modelConfig';
+import { CRPS_METHOD_METADATA } from '../src/lib/properScoring';
 import type { PowerLawFitCoefficients } from '../src/lib/powerLawFit';
 import { classifyRegime, type RegimeState } from '../src/lib/regimeModel';
 import { computeTailRisk } from '../src/lib/tailRisk';
@@ -20,7 +22,11 @@ interface BacktestReport {
       firstDate: string;
       lastDate: string;
       rowCount: number;
+      sha256: string;
     };
+    workingTreeDirty: boolean;
+    sourceTreeDirty: boolean;
+    crps: typeof CRPS_METHOD_METADATA;
     holdoutStartDate: string;
     rollingOriginSpacingDays: number;
     skippedWindowCount: number;
@@ -282,7 +288,11 @@ function main(): void {
         firstDate: ohlcv[0]?.date ?? '',
         lastDate: ohlcv[ohlcv.length - 1]?.date ?? '',
         rowCount: ohlcv.length,
+        sha256: createHash('sha256').update(JSON.stringify(ohlcv)).digest('hex'),
       },
+      workingTreeDirty: workingTreeDirty(),
+      sourceTreeDirty: sourceTreeDirty(),
+      crps: CRPS_METHOD_METADATA,
       holdoutStartDate: BACKTEST_CONFIG.holdoutStartDate,
       rollingOriginSpacingDays: BACKTEST_CONFIG.rollingOriginSpacingDays,
       skippedWindowCount,
@@ -990,7 +1000,10 @@ function renderMarkdown(report: BacktestReport): string {
     `Generated: ${report.metadata.generatedAt}`,
     `Command: \`${report.metadata.command}\``,
     `Git commit: \`${report.metadata.gitCommit}\``,
+    `Working tree dirty at generation start: ${report.metadata.workingTreeDirty ? 'yes' : 'no'}`,
+    `Source tree dirty at generation start: ${report.metadata.sourceTreeDirty ? 'yes' : 'no'}`,
     `Dataset: ${report.metadata.dataset.firstDate} to ${report.metadata.dataset.lastDate} (${report.metadata.dataset.rowCount} rows)`,
+    `Dataset SHA-256: \`${report.metadata.dataset.sha256}\``,
     `Horizon days: ${report.horizons.join(', ')}`,
     `Rolling-origin spacing: ${report.metadata.rollingOriginSpacingDays} days`,
     `Skipped windows: ${report.metadata.skippedWindowCount}`,
@@ -1023,12 +1036,17 @@ function renderMarkdown(report: BacktestReport): string {
     '',
     '## Metrics',
     '',
+    'Pinball loss is reported on the corrected `absolute` price scale (`pinballScale: absolute`); pre-2026-08 relative figures are superseded.',
+    `${report.metadata.crps.label}. Method: ${report.metadata.crps.method}. Grid: ${report.metadata.crps.quantileGrid.join(', ')}. Tail convention: ${report.metadata.crps.tailConvention}`,
+    `CRPS approximation error: ${report.metadata.crps.approximationErrorBoundStatement}`,
+    'PIT uniformity is reported as chi-square / degrees of freedom without a p-value because overlapping origins are serially dependent.',
+    '',
   ];
 
   for (const horizon of report.horizons) {
     lines.push(`### ${horizon} Day Horizon`, '');
-    lines.push('| Model | Samples | Median abs log error | Approx mult error | Bias log error | NLL | Pinball q05/q10/q50/q90/q95 | 80% / 90% / 95% coverage |');
-    lines.push('| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |');
+    lines.push('| Model | Samples | Median abs log error | Approx mult error | Bias log error | NLL | Pinball q05/q10/q50/q90/q95 | Pinball scale | Approx CRPS | Winkler 80/90/95 | 80% / 90% / 95% coverage | PIT chi-square / df | PIT histogram counts / expected | PIT excluded |');
+    lines.push('| --- | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: | --- | --- | --- | --- | ---: |');
 
     for (const model of report.models) {
       const metric = report.metrics[String(horizon)][model.id];
@@ -1046,7 +1064,13 @@ function renderMarkdown(report: BacktestReport): string {
           formatMetric(metric.pinballLoss.q90),
           formatMetric(metric.pinballLoss.q95),
         ].join(' / '),
+        metric.pinballScale,
+        formatMetric(metric.crps),
+        [formatMetric(metric.winkler80), formatMetric(metric.winkler90), formatMetric(metric.winkler95)].join(' / '),
         `${formatPercent(metric.coverage.interval80)} / ${formatPercent(metric.coverage.interval90)} / ${formatPercent(metric.coverage.interval95)}`,
+        formatPitUniformity(metric.pitUniformity),
+        formatPitHistogram(metric.pitHistogram),
+        metric.excludedFromPit,
         '|',
       ].join(' | '));
     }
@@ -1219,7 +1243,7 @@ function renderMarkdown(report: BacktestReport): string {
   }
 
   lines.push('## Model Config Snapshot', '', '```json', JSON.stringify(report.metadata.modelConfig, null, 2), '```', '');
-  return `${lines.join('\n')}\n`;
+  return `${lines.join('\n').replace(/\n+$/, '')}\n`;
 }
 
 function highVolatilityCutoff(ohlcv: OHLCVData[]): number {
@@ -1293,6 +1317,23 @@ function gitCommit(): string {
   }
 }
 
+function gitStatusEntries(): string[] {
+  try {
+    const output = execSync('git status --porcelain --untracked-files=all', { encoding: 'utf8' }).trim();
+    return output ? output.split('\n') : [];
+  } catch {
+    return ['git status unavailable'];
+  }
+}
+
+function workingTreeDirty(): boolean {
+  return gitStatusEntries().length > 0;
+}
+
+function sourceTreeDirty(): boolean {
+  return gitStatusEntries().some(entry => !entry.slice(3).startsWith('docs/reports/results/'));
+}
+
 function parseDate(date: string): Date {
   return new Date(`${date}T00:00:00Z`);
 }
@@ -1303,6 +1344,15 @@ function formatMetric(value: number | null): string {
 
 function formatPercent(value: number | null): string {
   return value === null || !Number.isFinite(value) ? 'n/a' : `${(value * 100).toFixed(1)}%`;
+}
+
+function formatPitUniformity(value: BacktestMetricRow['pitUniformity']): string {
+  return value === null ? 'n/a' : `${value.chiSquare.toFixed(2)} / ${value.degreesOfFreedom}`;
+}
+
+function formatPitHistogram(value: BacktestMetricRow['pitHistogram']): string {
+  if (value === null) return 'n/a';
+  return `${value.counts.join(',')} / ${value.expectedCounts.map(expected => expected.toFixed(1)).join(',')}`;
 }
 
 main();

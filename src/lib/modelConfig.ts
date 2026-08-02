@@ -45,6 +45,19 @@ export const INTERVAL_CONFIG = {
   },
 } as const;
 
+/**
+ * Disjoint calibration windows for interval multipliers. A row is only
+ * eligible for a suggested shipped multiplier when its validation coverage
+ * remains within the declared fit/validation and nominal-coverage tolerance.
+ */
+export const INTERVAL_CALIBRATION_CONFIG = {
+  fitStartDate: '2017-01-01',
+  fitEndDate: '2021-12-31',
+  validationStartDate: '2022-01-01',
+  divergenceTolerance: 0.05,
+  minimumEligibleRows: 30,
+} as const;
+
 export const BACKTEST_CONFIG = {
   horizons: [7, 14, 30, 60, 90, 180, 365],
   requiredGateHorizons: [14, 30, 60, 90],
