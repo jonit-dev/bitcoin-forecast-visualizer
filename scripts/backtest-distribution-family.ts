@@ -442,7 +442,7 @@ function writeReport(report: ReturnType<typeof buildReport>): void {
   const jsonPath = join(REPORT_DIR, `distribution-family-${stamp}.json`);
   const markdownPath = join(REPORT_DIR, `distribution-family-${stamp}.md`);
   writeFileSync(jsonPath, `${JSON.stringify(report, null, 2)}\n`);
-  writeFileSync(markdownPath, `${renderMarkdown(report)}\n`);
+  writeFileSync(markdownPath, renderMarkdown(report));
   const gate = report.promotionGate as { status: string; verdict: string };
   console.log(`Distribution-family promotion gate: ${gate.status}`);
   console.log(gate.verdict);
