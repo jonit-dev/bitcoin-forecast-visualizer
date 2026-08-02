@@ -1,0 +1,47 @@
+{
+  "status": "PARTIAL",
+  "date": "2026-08-02",
+  "liveData": false,
+  "fredApiKey": "absent",
+  "repositorySecrets": "gh secret list returned no rows",
+  "tests": {"files": 27, "passed": 116},
+  "commands": {
+    "yarn test": "PASS",
+    "yarn lint": "PASS",
+    "yarn build": "PASS",
+    "yarn build:features": "PASS",
+    "yarn validate:features": "FAIL: futuresOpenInterestUSD count=28 minimum=30",
+    "yarn check:freshness": "FAIL: required baseline sources exceed declared caps",
+    "yarn validate:data": "FAIL: known MVRV CoinMetrics mismatch count=5722",
+    "yarn backtest": "PASS",
+    "git diff --check": "PASS",
+    "caller census": "PASS: seven updaters merge/archive; macro requireEnv; reconstruct:vintage registered",
+    "obsolete-path search": "PASS: no fredgraph or blanket freshness constant"
+  },
+  "backtestArtifact": "docs/reports/results/backtest-2026-08-02T22-00-14-848Z.json",
+  "archiveEvidence": "fixture-only; no src/data/vintages records committed",
+  "workflow": {
+    "path": ".github/workflows/forecast-data-update.yml",
+    "fredSecretWired": true,
+    "deploymentStep": false
+  },
+  "negativeControls": [
+    "plain assignment failed omitted-key retention",
+    "old graph CSV URL failed observation_start assertion",
+    "old regime fallback failed insufficient-data assertion",
+    "wholesale archive rewrite failed prior-byte preservation"
+  ],
+  "negativeControlOutput": [
+    "AssertionError [ERR_ASSERTION]: omitted-key retention: plain assignment dropped an existing key",
+    "AssertionError [ERR_ASSERTION]: old graph CSV request omitted observation_start (actual null, expected 2010-07-17)",
+    "AssertionError [ERR_ASSERTION]: legacy undefined comparisons returned a confident state (actual sideways-chop, expected insufficient-data)",
+    "AssertionError [ERR_ASSERTION]: wholesale rewrite changed prior archive bytes"
+  ],
+  "blockedAcceptance": [
+    "real ALFRED five-series history from 2010",
+    "real committed vintage archives",
+    "real revised-series reconstruction",
+    "live CoinMetrics-behind visual proof",
+    "OI growth after real updater runs"
+  ]
+}

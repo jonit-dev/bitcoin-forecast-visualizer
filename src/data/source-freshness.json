@@ -1,64 +1,74 @@
 {
-  "generatedAt": "2026-07-16T04:51:12.158Z",
+  "generatedAt": "2026-08-02T22:10:49.156Z",
   "sources": {
     "btc": {
-      "status": "fresh",
+      "status": "stale",
       "latestDate": "2026-07-15",
-      "lagDays": 1,
+      "lagDays": 18,
+      "maxLagDays": 3,
       "required": true
     },
     "mvrv": {
-      "status": "fresh",
+      "status": "stale",
       "latestDate": "2026-07-15",
-      "lagDays": 1,
+      "lagDays": 18,
+      "maxLagDays": 3,
       "required": true
     },
     "onchain": {
-      "status": "fresh",
+      "status": "stale",
       "latestDate": "2026-07-15",
-      "lagDays": 1,
+      "lagDays": 18,
+      "maxLagDays": 3,
       "required": true
     },
     "features": {
-      "status": "fresh",
+      "status": "stale",
       "latestDate": "2026-07-15",
-      "lagDays": 1,
+      "lagDays": 18,
+      "maxLagDays": 3,
       "required": true
     },
     "derivatives": {
-      "status": "available",
+      "status": "stale",
       "latestDate": "2026-07-15",
-      "lagDays": 1,
+      "lagDays": 18,
+      "maxLagDays": 3,
       "required": false
     },
     "stablecoins": {
-      "status": "available",
+      "status": "stale",
       "latestDate": "2026-07-16",
-      "lagDays": 0,
+      "lagDays": 17,
+      "maxLagDays": 3,
       "required": false
     },
     "etf": {
-      "status": "available",
+      "status": "stale",
       "latestDate": "2026-07-06",
-      "lagDays": 10,
+      "lagDays": 27,
+      "maxLagDays": 5,
       "required": false
     },
     "macro": {
-      "status": "available",
+      "status": "fresh",
       "latestDate": "2026-07-14",
-      "lagDays": 2,
+      "lagDays": 19,
+      "maxLagDays": 45,
       "required": false
     },
     "sentiment": {
-      "status": "available",
+      "status": "stale",
       "latestDate": "2026-07-16",
-      "lagDays": 0,
+      "lagDays": 17,
+      "maxLagDays": 7,
       "required": false
     },
     "cot": {
-      "status": "available",
+      "status": "stale",
       "latestDate": "2026-07-07",
-      "lagDays": 9,
+      "lagDays": 26,
+      "maxLagDays": 10,
       "required": false
     }
   }

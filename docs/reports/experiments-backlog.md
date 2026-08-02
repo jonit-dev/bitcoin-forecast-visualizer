@@ -837,7 +837,7 @@ If COT fails, keep it as context-only institutional positioning. Do not combine 
 
 ## 2026-06-26 — Point-in-time macro liquidity regime
 
-Status: `completed — rejected`
+Status: `completed` — **void — decided on 3 years of a single regime, see D1**
 
 ### Hypothesis
 
@@ -882,7 +882,10 @@ Script: `scripts/backtest-macro-liquidity.ts`
 
 ### Result / verdict
 
-Verdict: `reject` for forecast influence; keep macro fields context-only.
+Verdict: `void — decided on 3 years of a single regime, see D1`; the earlier
+forecast-influence rejection is not a valid decision on the intended macro
+history. Keep macro fields context-only until the pre-registered rerun below
+is evaluated on recovered, point-in-time-safe data.
 
 The latest-observation FRED implementation was too sample-starved after conservative lagging and the available high-yield spread history:
 
@@ -904,6 +907,82 @@ Rerun if:
 ### Next better experiment
 
 If latest-observation FRED macro fails, do not tune macro score weights on the same holdout. Use ALFRED vintages or a different macro hypothesis before revisiting.
+
+---
+
+## 2026-08-02 — ALFRED macro-liquidity rerun after history recovery (not an appeal)
+
+Status: `planned — blocked pending real ALFRED recovery and FRED_API_KEY`
+
+### Hypothesis
+
+Recovering all five macro series from ALFRED from `2010-07-17`, preserving
+publication vintages, and evaluating the same pre-registered macro regime
+families on a broader multi-regime sample will provide enough independent
+origins to determine whether macro state improves interval/tail calibration.
+This is a new point-in-time experiment, not an appeal of the void 2026-06-26
+verdict.
+
+### Data/source changes
+
+- Replace the rolling graph CSV path with the ALFRED/FRED observations endpoint
+  for `WALCL`, `FEDFUNDS`, `DGS10`, `BAMLH0A0HYM2`, and `M2SL`.
+- Request `observation_start=2010-07-17`, record `realtime_start` as
+  `observedAt`, and append records to the committed vintage archive.
+- Merge recovered rows into `src/data/macro-history.json` without dropping
+  existing rows; retain the declared 30-day conservative lag for this rerun.
+- Do not add new macro series, forecast coefficients, or production routing.
+
+### Validation setup
+
+- PRD: `docs/PRDs/2026-08-02/DATA_HISTORY_RECOVERY_AND_VINTAGE_ARCHIVE.md`.
+- Reconstruct each macro series at each forecast-origin cutoff using the latest
+  archived observation whose `observedAt` is no later than that cutoff.
+- Baseline: current `powerlaw-current` median and sigma.
+- Candidates: the existing macro stress, credit stress, liquidity easing, and
+  tightening pressure score families; median remains unchanged.
+- Validation: rolling-origin point-in-time split with development history
+  spanning 2010 onward and a frozen forward holdout; use non-overlapping
+  origins at each 30/60/90/180d horizon.
+- Metrics: NLL, q05/q95 pinball loss, 90% coverage, median absolute log error,
+  event counts, and paired moving-block-bootstrap lower95 intervals.
+- Promotion gate: sufficient non-overlapping samples, positive holdout NLL or
+  tail-pinball improvement with positive lower95, sane coverage, no material
+  median error degradation, and `npm run backtest` passing with the candidate
+  explicitly enabled only after review.
+
+### Report artifacts
+
+- Planned report: `docs/reports/results/btc-macro-liquidity-alfred-rerun-2026-08-02.md`
+  and `.json`.
+- Implementation evidence: `docs/reports/results/p2-data-history-vintage-2026-08-02.md`
+  and `.json` (offline fixtures only until the real FRED credential is present).
+- Data evidence: updater output counts, first/last dates, ALFRED request
+  parameters, archive append byte-stability checks, and vintage reconstruction
+  examples for at least one revised series.
+- Required commands: `yarn update:macro` with a real key, the point-in-time
+  macro backtest command, `yarn validate:features`, `yarn backtest`, `yarn
+  test`, `yarn lint`, and `yarn build`.
+
+### Result / verdict
+
+Verdict: `pending / blocked`; no real ALFRED observations or forecast result may
+be claimed until `FRED_API_KEY` is supplied and the updater produces live
+records. The candidate remains context-only and production routing is unchanged.
+
+### Rerun criteria
+
+Run only after the real ALFRED archive contains the five requested series from
+the declared start (or each series' documented first available date), the
+point-in-time reconstruction passes, and the frozen validation/holdout setup
+has not been changed after outcomes are inspected.
+
+### Next better experiment
+
+Complete the credentialed ALFRED recovery and archive audit first. If the
+recovered-history rerun remains sample-starved or fails calibration, keep macro
+as context-only and pre-register a distinct, source-backed hypothesis rather
+than tuning the same score weights on the same origins.
 
 ---
 

@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import btcHistory from '../src/data/btc-history.json';
 import mvrvHistory from '../src/data/mvrv-history.json';
 import onchainHistory from '../src/data/onchain-history.json';
@@ -11,6 +12,7 @@ import macroHistory from '../src/data/macro-history.json';
 import etfFlowHistory from '../src/data/etf-flow-history.json';
 import type { OHLCVData, MVRVPoint } from '../src/lib/api';
 import { basePowerLawPrice, daysSinceGenesis } from '../src/lib/powerLaw';
+import { ONCHAIN_FORWARD_FILL_CAP_DAYS, SOURCE_FRESHNESS_CAP_DAYS } from './lib/sourceFreshness.mjs';
 
 const OUT_PATH = join(process.cwd(), 'src/data/feature-table.json');
 const MS_PER_DAY = 86400000;
@@ -20,6 +22,11 @@ interface FeatureRow {
   features: Record<string, number>;
   sourceDates: Record<string, string>;
   missingFeatureReasons: Record<string, string>;
+}
+
+interface SourceLookup {
+  row: any | null;
+  reason: string | null;
 }
 
 function main(): void {
@@ -40,6 +47,7 @@ function main(): void {
   const sentimentByDate = new Map(sentimentRows.map((row: any) => [row.date, row]));
   const rows: FeatureRow[] = [];
   const runningMvrvValues: number[] = [];
+  const seenMvrvSourceDates = new Set<string>();
 
   for (let index = 1; index < btcRows.length; index++) {
     const rowDate = btcRows[index].date;
@@ -47,16 +55,24 @@ function main(): void {
     const btc = btcByDate.get(sourceDate);
     if (!btc) continue;
 
-    const mvrv = mvrvByDate.get(sourceDate);
-    if (mvrv?.mvrv) runningMvrvValues.push(mvrv.mvrv);
+    const mvrvLookup = latestSourceRow(mvrvRows, sourceDate, rowDate, ONCHAIN_FORWARD_FILL_CAP_DAYS, 'MVRV');
+    const onchainLookup = latestSourceRow(onchainRows, sourceDate, rowDate, ONCHAIN_FORWARD_FILL_CAP_DAYS, 'on-chain');
+    const mvrv = mvrvLookup.row;
+    if (Number.isFinite(mvrv?.mvrv) && !seenMvrvSourceDates.has(mvrv.date)) {
+      runningMvrvValues.push(mvrv.mvrv);
+      seenMvrvSourceDates.add(mvrv.date);
+    }
 
-    const onchain = onchainByDate.get(sourceDate);
+    const onchain = onchainLookup.row;
     const derivatives = derivativesByDate.get(sourceDate) as any;
     const stablecoin = stablecoinByDate.get(sourceDate) as any;
     const sentiment = sentimentByDate.get(sourceDate) as any;
-    const cot = latestTimedRow(cotRows, sourceDate, rowDate) as any;
-    const macro = latestTimedRow(macroRows, sourceDate, rowDate) as any;
-    const etf = latestTimedRow(etfRows, sourceDate, rowDate) as any;
+    const cotLookup = latestTimedRow(cotRows, sourceDate, rowDate, SOURCE_FRESHNESS_CAP_DAYS.cot, 'COT');
+    const macroLookup = latestTimedRow(macroRows, sourceDate, rowDate, SOURCE_FRESHNESS_CAP_DAYS.macro, 'macro');
+    const etfLookup = latestTimedRow(etfRows, sourceDate, rowDate, SOURCE_FRESHNESS_CAP_DAYS.etf, 'ETF');
+    const cot = cotLookup.row as any;
+    const macro = macroLookup.row as any;
+    const etf = etfLookup.row as any;
     const features: Record<string, number> = {};
     const sourceDates: Record<string, string> = {};
     const missingFeatureReasons: Record<string, string> = {};
@@ -81,38 +97,65 @@ function main(): void {
       setFeature(`residualMomentum${lookback}d`, Math.log(btc.close / basePowerLawPrice(t)) - Math.log(prior.close / basePowerLawPrice(priorT)));
     }
 
-    setFeature('mvrvLevel', mvrv?.mvrv, sourceDate, 'missing MVRV row');
-    setFeature('mvrvPercentile', mvrv?.mvrv ? percentileRank(runningMvrvValues, mvrv.mvrv) : null, sourceDate, 'missing MVRV row');
-    setFeature('mvrvZScore', mvrv?.mvrv ? zScore(runningMvrvValues, mvrv.mvrv) : null, sourceDate, 'missing MVRV row');
+    const mvrvSourceDate = mvrv?.date ?? sourceDate;
+    const mvrvMissingReason = mvrvLookup.reason ?? 'missing MVRV row';
+    setFeature('mvrvLevel', mvrv?.mvrv, mvrvSourceDate, mvrvMissingReason);
+    setFeature(
+      'mvrvPercentile',
+      Number.isFinite(mvrv?.mvrv) ? percentileRank(runningMvrvValues, mvrv.mvrv) : null,
+      mvrvSourceDate,
+      mvrv ? 'insufficient MVRV history' : mvrvMissingReason
+    );
+    setFeature(
+      'mvrvZScore',
+      Number.isFinite(mvrv?.mvrv) ? zScore(runningMvrvValues, mvrv.mvrv) : null,
+      mvrvSourceDate,
+      mvrv ? 'insufficient MVRV history' : mvrvMissingReason
+    );
 
     const realizedPrice = onchain?.metrics?.realizedPriceUSD;
-    setFeature('realizedPriceDistance', realizedPrice ? btc.close / realizedPrice - 1 : null, sourceDate, 'missing realized price');
-    setFeature('activeAddresses', onchain?.metrics?.activeAddresses, sourceDate, 'missing active addresses');
-    setFeature('transactionCount', onchain?.metrics?.transactionCount, sourceDate, 'missing transaction count');
-    setFeature('transferCount', onchain?.metrics?.transferCount, sourceDate, 'missing transfer count');
-    setFeature('addressBalanceCount', onchain?.metrics?.addressBalanceCount, sourceDate, 'missing funded address count');
+    const onchainSourceDate = onchain?.date ?? sourceDate;
+    const onchainMissingReason = onchainLookup.reason ?? 'missing on-chain row';
+    setFeature('realizedPriceDistance', realizedPrice ? btc.close / realizedPrice - 1 : null, onchainSourceDate, onchainMissingReason === 'missing on-chain row' ? 'missing realized price' : onchainMissingReason);
+    setFeature('activeAddresses', onchain?.metrics?.activeAddresses, onchainSourceDate, onchainMissingReason === 'missing on-chain row' ? 'missing active addresses' : onchainMissingReason);
+    setFeature('transactionCount', onchain?.metrics?.transactionCount, onchainSourceDate, onchainMissingReason === 'missing on-chain row' ? 'missing transaction count' : onchainMissingReason);
+    setFeature('transferCount', onchain?.metrics?.transferCount, onchainSourceDate, onchainMissingReason === 'missing on-chain row' ? 'missing transfer count' : onchainMissingReason);
+    setFeature('addressBalanceCount', onchain?.metrics?.addressBalanceCount, onchainSourceDate, onchainMissingReason === 'missing on-chain row' ? 'missing funded address count' : onchainMissingReason);
     setFeature(
       'transfersPerTransaction',
       onchain?.metrics?.transferCount && onchain?.metrics?.transactionCount ? onchain.metrics.transferCount / onchain.metrics.transactionCount : null,
-      sourceDate,
-      'missing transfer or transaction count'
+      onchainSourceDate,
+      onchainMissingReason === 'missing on-chain row' ? 'missing transfer or transaction count' : onchainMissingReason
     );
     setFeature(
       'activeAddressShare',
       onchain?.metrics?.activeAddresses && onchain?.metrics?.addressBalanceCount ? onchain.metrics.activeAddresses / onchain.metrics.addressBalanceCount : null,
-      sourceDate,
-      'missing active or funded address count'
+      onchainSourceDate,
+      onchainMissingReason === 'missing on-chain row' ? 'missing active or funded address count' : onchainMissingReason
     );
-    setFeature('hashRate', onchain?.metrics?.hashRate, sourceDate, 'missing hash rate');
+    setFeature('hashRate', onchain?.metrics?.hashRate, onchainSourceDate, onchainMissingReason === 'missing on-chain row' ? 'missing hash rate' : onchainMissingReason);
     setFeature(
       'minerStressProxy',
       onchain?.metrics?.minerRevenueUSD && btc.close ? onchain.metrics.minerRevenueUSD / onchain.metrics.marketCapUSD : null,
-      sourceDate,
-      'missing miner revenue'
+      onchainSourceDate,
+      onchainMissingReason === 'missing on-chain row' ? 'missing miner revenue' : onchainMissingReason
     );
 
     setFeature('volatilityRegime30d', realizedVolatility(btcRows, index - 1, 30), sourceDate, 'insufficient volatility lookback');
     setFeature('drawdownFromCycleHigh', drawdownFromHigh(btcRows, index - 1), sourceDate, 'missing BTC history');
+    const derivativeFeatureNames = [
+      'futuresFundingRateDailyAvg',
+      'futuresFundingRateDailySum',
+      'futuresFundingRateSum7d',
+      'futuresFundingRateSum30d',
+      'futuresFundingRateSumZ90d',
+      'futuresFundingRateAvgZ90d',
+      'futuresPremiumClose',
+      'futuresPremiumCloseZ90d',
+      'futuresPremiumRange',
+      'futuresOpenInterestUSD',
+      'futuresOpenInterestToMarketCap',
+    ];
     if (isDerivativeRowAvailable(derivatives, rowDate)) {
       setFeature('futuresFundingRateDailyAvg', derivatives.metrics.fundingRateDailyAvg, sourceDate, 'missing derivatives funding');
       setFeature('futuresFundingRateDailySum', derivatives.metrics.fundingRateDailySum, sourceDate, 'missing derivatives funding');
@@ -127,9 +170,13 @@ function main(): void {
       setFeature(
         'futuresOpenInterestToMarketCap',
         derivatives.metrics.openInterestUSD && mvrv?.marketCap ? derivatives.metrics.openInterestUSD / mvrv.marketCap : null,
-        sourceDate,
+        mvrv ? [sourceDate, mvrvSourceDate].sort()[0] : sourceDate,
         'missing derivatives open interest or market cap'
       );
+    } else {
+      for (const feature of derivativeFeatureNames) {
+        missingFeatureReasons[feature] = 'missing derivatives row or unavailableAfter timing';
+      }
     }
 
     if (isTimedRowAvailable(stablecoin, rowDate)) {
@@ -164,6 +211,17 @@ function main(): void {
       );
     }
 
+    const cotFeatureNames = [
+      'cmeCotOpenInterestBtc',
+      'cmeCotLeveragedMoneyNetPctOi',
+      'cmeCotLeveragedMoneyNetPctRank',
+      'cmeCotAssetManagerNetPctOi',
+      'cmeCotAssetManagerNetPctRank',
+      'cmeCotDealerNetPctOi',
+      'cmeCotDealerNetPctRank',
+      'cmeCotOpenInterestChange4w',
+      'cmeCotOpenInterestPctRank',
+    ];
     if (cot?.metrics) {
       setFeature('cmeCotOpenInterestBtc', cot.metrics.openInterestBtc, cot.date, 'missing COT open interest');
       setFeature('cmeCotLeveragedMoneyNetPctOi', cot.metrics.leveragedMoneyNetPctOi, cot.date, 'missing COT leveraged-money net');
@@ -174,8 +232,24 @@ function main(): void {
       setFeature('cmeCotDealerNetPctRank', cot.metrics.dealerNetPctRank, cot.date, 'missing COT dealer percentile');
       setFeature('cmeCotOpenInterestChange4w', cot.metrics.openInterestChange4w, cot.date, 'missing COT OI change');
       setFeature('cmeCotOpenInterestPctRank', cot.metrics.openInterestPctRank, cot.date, 'missing COT OI percentile');
+    } else if (cotLookup.reason) {
+      for (const feature of cotFeatureNames) missingFeatureReasons[feature] = cotLookup.reason;
     }
 
+    const macroFeatureNames = [
+      'macroFedBalanceSheetChange13w',
+      'macroFedBalanceSheetChange26w',
+      'macroFedFundsRate',
+      'macroFedFundsChange13w',
+      'macroTreasury10yYield',
+      'macroTreasury10yChange30d',
+      'macroTreasury10yChange90d',
+      'macroHighYieldSpread',
+      'macroHighYieldSpreadZ252d',
+      'macroM2Change26w',
+      'macroLiquidityImpulseZ252d',
+      'macroRiskScore',
+    ];
     if (macro?.metrics) {
       setFeature('macroFedBalanceSheetChange13w', macro.metrics.fedBalanceSheetChange13w, macro.date, 'missing macro Fed balance sheet 13w change');
       setFeature('macroFedBalanceSheetChange26w', macro.metrics.fedBalanceSheetChange26w, macro.date, 'missing macro Fed balance sheet 26w change');
@@ -189,8 +263,20 @@ function main(): void {
       setFeature('macroM2Change26w', macro.metrics.m2Change26w, macro.date, 'missing macro M2 change');
       setFeature('macroLiquidityImpulseZ252d', macro.metrics.liquidityImpulseZ252d, macro.date, 'missing macro liquidity impulse');
       setFeature('macroRiskScore', macro.metrics.macroRiskScore, macro.date, 'missing macro risk score');
+    } else if (macroLookup.reason) {
+      for (const feature of macroFeatureNames) missingFeatureReasons[feature] = macroLookup.reason;
     }
 
+    const etfFeatureNames = [
+      'spotEtfFlowUSD',
+      'spotEtfFlow5dUSD',
+      'spotEtfFlow20dUSD',
+      'spotEtfCumulativeFlowUSD',
+      'spotEtfFlowToBtcMarketCap',
+      'spotEtfFlow20dToBtcMarketCap',
+      'spotEtfFlow5dToBtcMarketCap',
+      'spotEtfFlowShockZ90d',
+    ];
     if (etf?.metrics) {
       setFeature('spotEtfFlowUSD', etf.metrics.totalFlowUSD, etf.date, 'missing spot ETF daily flow');
       setFeature('spotEtfFlow5dUSD', trailingMetricSum(etfRows, etf.date, 5, 'totalFlowUSD'), etf.date, 'missing spot ETF 5d flow');
@@ -215,6 +301,8 @@ function main(): void {
         'missing spot ETF 5d flow or BTC market cap'
       );
       setFeature('spotEtfFlowShockZ90d', trailingMetricZScore(etfRows, etf.date, 90, 'totalFlowUSD'), etf.date, 'missing spot ETF flow z-score');
+    } else if (etfLookup.reason) {
+      for (const feature of etfFeatureNames) missingFeatureReasons[feature] = etfLookup.reason;
     }
 
     rows.push({ date: rowDate, features, sourceDates, missingFeatureReasons });
@@ -279,13 +367,51 @@ function isTimedRowAvailable(row: any, forecastDate: string): boolean {
   return Date.parse(row.availableAfter) <= Date.parse(`${forecastDate}T00:00:00Z`);
 }
 
-function latestTimedRow(rows: any[], sourceDate: string, forecastDate: string): any | null {
+function isAvailableSourceRow(row: any, forecastDate: string): boolean {
+  if (!row) return false;
+  if (!row.availableAfter) return true;
+  return Date.parse(row.availableAfter) <= Date.parse(`${forecastDate}T00:00:00Z`);
+}
+
+function daysBetween(fromDate: string, toDate: string): number {
+  return Math.round((Date.parse(`${toDate}T00:00:00Z`) - Date.parse(`${fromDate}T00:00:00Z`)) / MS_PER_DAY);
+}
+
+export function latestSourceRow(
+  rows: any[],
+  expectedSourceDate: string,
+  forecastDate: string,
+  maxAgeDays: number,
+  sourceName: string
+): SourceLookup {
   let latest: any | null = null;
   for (const row of rows) {
-    if (row.date > sourceDate) break;
-    if (isTimedRowAvailable(row, forecastDate)) latest = row;
+    if (row.date > expectedSourceDate) break;
+    if (isAvailableSourceRow(row, forecastDate)) latest = row;
   }
-  return latest;
+  if (!latest) return { row: null, reason: `${sourceName} source row unavailable by ${forecastDate}` };
+  const ageDays = daysBetween(latest.date, expectedSourceDate);
+  if (ageDays > maxAgeDays) {
+    return {
+      row: null,
+      reason: `${sourceName} source date ${latest.date} is ${ageDays} days behind expected ${expectedSourceDate}; exceeds ${maxAgeDays}-day forward-fill cap`,
+    };
+  }
+  return { row: latest, reason: null };
+}
+
+function latestTimedRow(
+  rows: any[],
+  sourceDate: string,
+  forecastDate: string,
+  maxAgeDays: number,
+  sourceName: string
+): SourceLookup {
+  const lookup = latestSourceRow(rows, sourceDate, forecastDate, maxAgeDays, sourceName);
+  if (lookup.row && !lookup.row.metrics) {
+    return { row: null, reason: `${sourceName} row has no metrics` };
+  }
+  return lookup;
 }
 
 function trailingMetricSum(rows: any[], date: string, lookback: number, metric: string): number | null {
@@ -309,4 +435,6 @@ function trailingMetricZScore(rows: any[], date: string, lookback: number, metri
   return sd > 0 ? (current - mean) / sd : null;
 }
 
-main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}

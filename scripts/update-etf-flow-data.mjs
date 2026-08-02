@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mergeByKey } from './lib/mergeRows.mjs';
+import { appendVintageRecords } from './lib/vintageStore.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(__dirname, '../src/data/etf-flow-history.json');
@@ -112,19 +114,7 @@ function parseRows(tableHtml) {
 }
 
 function writeUnavailable(fetchedAt, note) {
-  writeFileSync(OUT_PATH, `${JSON.stringify({
-    metadata: {
-      source: 'Farside Investors Bitcoin ETF Flow - All Data',
-      status: 'unavailable',
-      fetchedAt,
-      url: URL,
-      fields: ['totalFlowUSDm', 'cumulativeFlowUSDm', 'fundFlowsUSDm'],
-      cadence: 'daily business days',
-      credentialRequired: false,
-      note,
-    },
-    rows: [],
-  }, null, 2)}\n`);
+  console.warn(`[ETF flow data] preserving existing cache after ${fetchedAt}: ${note}`);
 }
 
 async function main() {
@@ -135,6 +125,18 @@ async function main() {
   const rows = parseRows(extractFlowTable(html));
   if (rows.length < 100) throw new Error(`ETF flow parse produced too few rows: ${rows.length}`);
 
+  const existing = existsSync(OUT_PATH)
+    ? (() => {
+        const cache = JSON.parse(readFileSync(OUT_PATH, 'utf8'));
+        return Array.isArray(cache) ? cache : cache.rows ?? [];
+      })()
+    : [];
+  const mergedRows = mergeByKey(existing, rows, 'date');
+  appendVintageRecords(
+    'ETF_FLOW',
+    rows.map(row => ({ asOfDate: row.date, observedAt: fetchedAt, value: row }))
+  );
+
   writeFileSync(OUT_PATH, `${JSON.stringify({
     metadata: {
       source: 'Farside Investors Bitcoin ETF Flow - All Data',
@@ -144,6 +146,7 @@ async function main() {
       fields: ['totalFlowUSDm', 'totalFlowUSD', 'cumulativeFlowUSDm', 'cumulativeFlowUSD', 'fundFlowsUSDm'],
       cadence: 'daily business days',
       credentialRequired: false,
+      vintageSeries: 'ETF_FLOW',
       limitations: [
         'Farside publishes a public HTML table, not a versioned API; parser failures should leave ETF features unavailable rather than silently changing methodology.',
         'Flows are reported in US$m by source methodology and are joined into features only after the next UTC day.',
@@ -153,15 +156,16 @@ async function main() {
         source: URL,
       },
     },
-    rows,
+    rows: mergedRows,
   }, null, 2)}\n`);
 
   console.log([
     '[ETF flow data] updated',
-    `rows=${rows.length}`,
-    `first=${rows[0]?.date ?? 'n/a'}`,
-    `last=${rows.at(-1)?.date ?? 'n/a'}`,
-    `latestFlowUSDm=${rows.at(-1)?.metrics.totalFlowUSDm ?? 'n/a'}`,
+    `rows=${mergedRows.length}`,
+    `incomingRows=${rows.length}`,
+    `first=${mergedRows[0]?.date ?? 'n/a'}`,
+    `last=${mergedRows.at(-1)?.date ?? 'n/a'}`,
+    `latestFlowUSDm=${mergedRows.at(-1)?.metrics.totalFlowUSDm ?? 'n/a'}`,
     `path=${OUT_PATH}`,
   ].join('  '));
 }

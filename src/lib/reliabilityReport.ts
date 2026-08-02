@@ -57,6 +57,7 @@ export interface CurrentRegimeSummary {
     probabilities: Record<string, number>;
     topState: string;
     reasonCodes: string[];
+    status?: 'available' | 'insufficient-data';
     contextOnly: true;
   };
   tailRisk: {

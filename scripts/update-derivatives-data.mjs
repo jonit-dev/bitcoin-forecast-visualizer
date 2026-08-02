@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mergeByKey } from './lib/mergeRows.mjs';
+import { appendVintageRecords } from './lib/vintageStore.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(__dirname, '../src/data/derivatives-history.json');
@@ -240,6 +242,18 @@ async function main() {
   addRollingSum(rows, 'fundingRateDailySum', 30, 'fundingRateSum30d');
   addRollingZ(rows, 'premiumClose', 90, 'premiumCloseZ90d');
 
+  const existing = existsSync(OUT_PATH)
+    ? (() => {
+        const cache = JSON.parse(readFileSync(OUT_PATH, 'utf8'));
+        return Array.isArray(cache) ? cache : cache.rows ?? [];
+      })()
+    : [];
+  const mergedRows = mergeByKey(existing, rows, 'date');
+  appendVintageRecords(
+    'DERIVATIVES',
+    rows.map(row => ({ asOfDate: row.date, observedAt: fetchedAt, value: row }))
+  );
+
   writeFileSync(OUT_PATH, `${JSON.stringify({
     metadata: {
       source: 'Binance USD-M Futures public REST',
@@ -261,6 +275,7 @@ async function main() {
       ],
       cadence: 'daily',
       credentialRequired: false,
+      vintageSeries: 'DERIVATIVES',
       limitations: [
         'Binance openInterestHist only exposes recent open-interest history, currently documented as latest 1 month.',
         'Funding is sampled every 8 hours for BTCUSDT perpetual futures and is aggregated by UTC date; history starts around 2019-09-10.',
@@ -274,14 +289,15 @@ async function main() {
         openInterest: 'https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Open-Interest-Statistics',
       },
     },
-    rows,
+    rows: mergedRows,
   }, null, 2)}\n`);
 
   console.log([
     '[Derivatives data] updated',
-    `rows=${rows.length}`,
-    `first=${rows[0]?.date ?? 'n/a'}`,
-    `last=${rows.at(-1)?.date ?? 'n/a'}`,
+    `rows=${mergedRows.length}`,
+    `incomingRows=${rows.length}`,
+    `first=${mergedRows[0]?.date ?? 'n/a'}`,
+    `last=${mergedRows.at(-1)?.date ?? 'n/a'}`,
     `fundingEvents=${fundingRows.length}`,
     `premiumRows=${premiumRows.length}`,
     `source=Binance USD-M Futures public REST`,
