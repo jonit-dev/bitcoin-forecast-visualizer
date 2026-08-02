@@ -54,6 +54,21 @@ describe('predictive distributions', () => {
     }
   });
 
+  it('should use deliberate CDF boundary behavior for both distribution families', () => {
+    const distributions = [
+      { kind: 'lognormal' as const },
+      { kind: 'student-t' as const, nu: 5 },
+    ];
+    const median = 100_000;
+    const sigma = 0.35;
+
+    for (const distribution of distributions) {
+      expect(cdfAt(distribution, median, sigma, Number.POSITIVE_INFINITY)).toBe(1);
+      expect(cdfAt(distribution, median, sigma, Number.NEGATIVE_INFINITY)).toBe(0);
+      expect(cdfAt(distribution, median, sigma, Number.NaN)).toBeNaN();
+    }
+  });
+
   it('should preserve the unit-variance sigma convention', () => {
     expect(standardizedStudentTScale(5)).toBeCloseTo(Math.sqrt(3 / 5), 14);
   });

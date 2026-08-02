@@ -30,7 +30,14 @@ export function quantileAt(
   return median * Math.exp(sigma * scale * studentTQuantile(probability, distribution.nu));
 }
 
-/** Return the CDF at a positive price for a distribution centred on `median`. */
+/**
+ * Return the CDF at a price for a distribution centred on `median`.
+ *
+ * Boundary convention: `F(+Infinity) = 1`, while `F(-Infinity) = 0` and
+ * `F(price) = 0` for every non-positive price. A `NaN` price returns `NaN`
+ * because the CDF is undefined at an unknown input; this is deliberate and
+ * applies identically to both supported distribution families.
+ */
 export function cdfAt(
   distribution: PredictiveDistribution,
   median: number,
@@ -38,7 +45,9 @@ export function cdfAt(
   price: number
 ): number {
   assertScaleInputs(median, sigma);
-  if (!Number.isFinite(price) || price <= 0) return 0;
+  if (Number.isNaN(price)) return Number.NaN;
+  if (price === Number.POSITIVE_INFINITY) return 1;
+  if (price === Number.NEGATIVE_INFINITY || price <= 0) return 0;
 
   const logValue = (Math.log(price) - Math.log(median)) / sigma;
   if (distribution.kind === 'lognormal' || distribution.kind === 'student-t' && distribution.nu === Number.POSITIVE_INFINITY) {
