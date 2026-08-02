@@ -1250,3 +1250,147 @@ Freeze this candidate prospectively and accumulate outcomes. If earlier audited 
 - **Result/verdict:** Worker tests, full unit/build/lint gates, BTC and market backtests, and the 8-case browser/accessibility suite passed. The production Worker was redeployed with D1 bound and Cloudflare confirmed the `15 23 * * *` trigger. Live API smoke checks passed for BTC, S&P 500, and gold with forecast agreement; BTC retained the validated 2026-07-09 row when the upstream shared edge returned 429. This is validated operational plumbing only and does not alter forecast signals.
 - **Rerun criteria:** CoinGecko response schema, volume semantics, retry policy, or source changes.
 - **Next better experiment:** Add an authenticated CoinGecko plan or separately validated same-instrument fallback only if bounded retries remain unreliable over seven scheduled production runs.
+
+---
+
+## 2026-07-13 — BTC moving-average crossover reversal event study
+
+Status: `completed — rejected; no statistically confirmed reversal signal`
+
+### Hypothesis
+
+A close-confirmed moving-average crossover can identify a BTC trend reversal early enough that the signed forward return after the signal exceeds the unconditional same-period return by a statistically and practically meaningful amount. The primary confirmatory endpoint is 30-calendar-day signed excess log return. Up-crosses are bullish (`+1`) and down-crosses are bearish (`-1`).
+
+The frozen primary family contains exactly seven signals: close/SMA50, close/EMA50, close/SMA200, close/EMA200, SMA50/SMA200, EMA50/EMA200, and the canonical close/SMA200 rule with a fixed 1% hysteresis band. The 1% rule was added from the Brock-Lakonishok-LeBaron literature review before any experiment outcome was calculated and is included in the multiplicity correction. No other threshold, confirmation-day, volatility, volume, RSI, or cycle filter will be selected from the final holdout.
+
+### Data/source changes
+
+No data-source or product change. Use the checked-in daily UTC BTC OHLCV history in `src/data/btc-history.json`, pinned by file hash. The pre-run data audit found 32 malformed legacy OHLC candles between 2013-10-22 and 2017-04-06, so rows before `2018-01-01` are indicator warm-up only and are excluded from scored returns. SMA and EMA values are calculated only from closes through signal date `t`. A signal is available only after the UTC close at `t`; the hypothetical trade enters at `open[t+1]` and exits at `open[t+h+1]`, with a frozen 20-basis-point round-trip cost deducted from signed log return. This checked-in aggregate history is latest-revised rather than vintage data, and recent opens are reconstructed from CoinGecko hourly observations rather than executable exchange quotes.
+
+Online research is context for the frozen hypotheses only. It does not authorize new runtime data, a parameter search, or a product/UI/forecast change.
+
+### Validation setup
+
+- Development audit: mature signals from `2018-01-01` through `2021-12-31`.
+- Frozen historical holdout: signals on or after `2022-01-01`, through the latest signal with a mature forward target. It is not used to add, drop, or tune candidates. Because 2022+ BTC prices have been inspected elsewhere in this repository, this is not a pristine prospective holdout and cannot by itself authorize production promotion.
+- Primary horizon: `30d`. Secondary robustness horizons: `7/14/60/90d`; secondary results cannot rescue a failed primary endpoint.
+- Event definition: the signed difference changes strictly from `<= 0` to `> 0` (up) or from `>= 0` to `< 0` (down). Equality does not create repeated events. EMA initialization is the first observed close and uses `alpha=2/(window+1)` recursively.
+- Primary statistic for signal `j`: `D_j = mean[s_i * (log(O[t+h+1]/O[t+1]) - mu_h) - cost]`, where `s_i` is `+1/-1`, `mu_h` is the unconditional mean entry-to-exit log return over every eligible date in the same evaluation period and horizon, and cost is `0.002`. This asks whether event timing adds information beyond BTC's period drift, rather than rewarding every bullish rule for BTC's positive historical drift.
+- Secondary metrics: raw signed net return, median signed excess return, win rate, up/down event counts and effects, maximum drawdown of non-overlapping event trades, and development/holdout sign consistency.
+- Dependence control: seeded circular moving-block bootstrap of the daily event/return series with block length at least the horizon for a 95% effect interval. A seeded circular-shift randomization test breaks signal/forward-return alignment while preserving crossover clustering and return dependence.
+- Multiple testing: Holm adjustment across the seven primary 30-day candidate p-values. Secondary horizons and direction splits are explicitly descriptive.
+- Promotion gate per candidate: at least 30 final-holdout events and at least 20 distinct 14-day crossing episodes, positive development and holdout mean effects, at least 1% mean signed excess log return after costs on the final holdout, positive 95% bootstrap lower bound, Holm-adjusted one-sided `p < 0.05`, and no sign reversal across `2022-2024` versus `2025+` when each subperiod has at least five events. Episode count is a power/dependence guardrail; raw alternating whipsaws are not treated as independent evidence.
+- Failure criteria: any future-price use in feature construction, signal execution before the confirming close, failure of any promotion gate, or a result dependent on changing a frozen window/horizon/cost/test after holdout inspection.
+
+### Report artifacts
+
+- Script: `scripts/backtest-trend-reversal.ts`.
+- Experiment reports: `docs/reports/results/trend-reversal-2026-07-13T17-57-48-796Z.md` and `.json`.
+- Forecast regression reports: `docs/reports/results/backtest-2026-07-13T17-54-26-044Z.md` and `.json`.
+
+### Result / verdict
+
+Verdict: `rejected-no-confirmed-signal`. No candidate cleared the pre-registered 30-day historical-holdout gate, so no product, UI, regime, or forecast behavior change is authorized.
+
+- Close/SMA50: 98 raw events and 33 distinct 14-day episodes; `+0.80%` mean net signed excess return; 95% moving-block interval `[-0.79%, +2.55%]`; Holm-adjusted circular-shift `p=0.51543`.
+- Close/EMA50: 106 events and 36 episodes; `+0.21%`; interval `[-1.21%, +1.75%]`; adjusted `p=0.99012`.
+- Close/SMA200: 32 events but only 11 episodes; `+2.13%`; interval `[-0.34%, +6.66%]`; exact all-shift raw `p=0.03889`, but Holm-adjusted `p=0.27222`. Its 2018-2021 development effect was `-2.37%`, so the apparent holdout effect reverses sign.
+- Close/EMA200: 54 events and 12 episodes; `-0.31%`; interval `[-2.09%, +1.68%]`; adjusted `p=1.00000`.
+- SMA50/SMA200 golden/death cross: only 9 events; `+1.13%`; interval `[-8.87%, +10.88%]`; adjusted `p=1.00000`.
+- EMA50/EMA200: only 5 events and 4 episodes; `+2.21%`; interval `[-8.52%, +13.83%]`; adjusted `p=1.00000`.
+- Close/SMA200 with the canonical 1% band: 20 events and 10 episodes; `+3.41%`; interval `[-0.84%, +9.86%]`; exact all-shift raw `p=0.03951`, but Holm-adjusted `p=0.27222`. Its development effect was `-2.83%`.
+
+The unadjusted SMA200 hints are not statistically confirmed: both dependence-aware confidence intervals include zero, both fail family-wise multiplicity correction, both have too few independent episodes, and both reverse sign versus the frozen development period. Up/down diagnostics also show horizon and regime instability. Golden/death crosses are too sparse to evaluate credibly on this history.
+
+Independent validation reproduced the seven primary event counts, up/down counts, point effects, maturity cutoff, episode counts, and Holm calculations. It also replaced an initially undocumented restricted-shift Monte Carlo diagnostic with exact enumeration of every nonzero circular shift; the corrected p-values are less favorable and leave the rejection unchanged. The final artifact records script and signal-library SHA-256 hashes because the experiment code is not represented by the reported HEAD commit. Moving-block and circular-shift inference remain approximate under BTC regime nonstationarity, which is an additional reason not to promote a historical hint.
+
+Validation commands:
+
+- `npm run backtest:trend-reversal` — deterministic verdict `rejected-no-confirmed-signal`.
+- `npm test -- --run` — 27 files and 104 tests passed; the final focused suite contains seven point-in-time crossover, execution-alignment, maturity, episode, and Holm tests.
+- `npm run lint` — passed.
+- `npm run backtest` — forecast quality gate and robustness audit passed; this experiment did not change runtime forecasts.
+
+### Rerun criteria
+
+Rerun this frozen family only when genuinely new daily observations mature, the checked-in BTC source/UTC candle convention changes, or an independently motivated signal family is separately pre-registered. Do not search neighboring windows or confirmation thresholds on the 2022+ holdout.
+
+### Next better experiment
+
+If no candidate clears the gate, retain crossovers as chart context only and prospectively accumulate events. If exactly one candidate clears every gate, independently reproduce its math and run `npm run backtest` before considering any separately scoped app integration.
+
+---
+
+## 2026-07-13 — BTC canonical technical-indicator reversal study
+
+Status: `completed — rejected; no statistically confirmed indicator reversal signal`
+
+### Hypothesis
+
+Canonical close-confirmed oscillator or band re-entry events may identify BTC trend reversals more reliably than the rejected moving-average crossover family. The primary confirmatory endpoint is 30-calendar-day signed excess log return after 20 basis points of round-trip cost.
+
+The frozen family contains exactly four bidirectional rules. Each rule is one primary hypothesis; bullish and bearish splits are diagnostics only:
+
+1. `rsi14-extreme-exit`: Wilder RSI(14) crosses above 30 after being at or below 30 (bullish), or below 70 after being at or above 70 (bearish). Average gain/loss is seeded with the simple mean of changes 1-14 and recursively smoothed as `(13 * previous + current) / 14`.
+2. `bollinger20x2-reentry`: after a close outside the trailing SMA20 plus/minus two population standard deviations, the close re-enters the band. Lower re-entry is bullish; upper re-entry is bearish.
+3. `stochastic14x3-extreme-cross`: `%K = 100 * (close - LL14) / (HH14 - LL14)` and `%D = SMA3(%K)`. A bullish K-over-D cross requires current K and D at or below 20; a bearish cross requires both at or above 80. A zero high-low range yields no signal.
+4. `macd12x26x9-opposite-zero-cross`: MACD is EMA12 minus EMA26 and its signal is EMA9(MACD), all recursively seeded by the first available value. A positive histogram cross is bullish only while current MACD is at or below zero; a negative histogram cross is bearish only while current MACD is at or above zero.
+
+No neighboring windows, thresholds, divergence definitions, candlestick patterns, confirmations, volume filters, or candidate combinations will be selected after outcomes are inspected.
+
+### Data/source changes
+
+No data-source or runtime change. Use the pinned checked-in daily UTC BTC OHLCV history in `src/data/btc-history.json`. Score only signals from `2018-01-01` onward; earlier data are indicator warm-up because the legacy history contains 32 malformed OHLC rows ending in 2017. The 2018+ slice has 3,112 consecutive daily rows, no missing/duplicate dates, zero nonpositive values, and no OHLC invariant violations.
+
+All features use data through completed UTC candle `t`; a signal is available only after that close. Hypothetical execution is `open[t+1]` to `open[t+h+1]`. The cache is latest-revised rather than vintage data, and recent CoinGecko-derived opens are aggregate sampled observations rather than executable exchange quotes. Volume rules are excluded because volume provenance is materially less stable across the history.
+
+### Validation setup
+
+- Development audit: mature signals from `2018-01-01` through `2021-12-31`. It is used only for implementation/sign robustness, not parameter selection.
+- Frozen historical holdout: mature signals from `2022-01-01` onward. The candidate family was frozen before inspecting its forward-return outcomes. Because this price period has been inspected by earlier repository studies, it is not a pristine prospective holdout and cannot alone authorize promotion.
+- Primary horizon: `30d`. Secondary descriptive horizons: `7/14/60/90d`; they cannot rescue a failed primary endpoint.
+- Primary statistic: `D_j = mean_i[s_i * (log(O[t+31]/O[t+1]) - mu_30) - 0.002]`, where `s_i` is `+1/-1` and `mu_30` is the mean eligible-date 30-day log return in the same evaluation period.
+- Secondary metrics: raw signed net return, median excess return, win rate, bullish/bearish counts and effects, 30-day transitive episode count, greedy non-overlapping trade drawdown, subperiod effects, and largest-event contribution.
+- Dependence: 5,000 circular moving-block bootstrap samples at frozen block lengths `30/60/90d`. All three 95% lower bounds must be positive for promotion.
+- Timing null: 50,000 fixed-seed randomizations that circularly shift the complete four-signal vector jointly within each calendar year, preserving within-year signal clustering/correlation while breaking signal/forward-return alignment. This reduces but does not remove regime-nonstationarity concerns.
+- Multiple testing: report Holm correction within the four new rules and a search-history Holm correction across all 11 primary rules: the seven previously tested MA rules plus these four. The 11-rule correction is the promotion p-value.
+- Promotion gate: at least 30 holdout events, at least 20 distinct transitive 30-day episodes, at least 10 bullish and 10 bearish events, positive development and holdout effects, at least 1% holdout mean net excess, positive 30/60/90 block-bootstrap lower bounds, search-history Holm `p < 0.05`, no materially negative direction, positive `2022-2024` and `2025+` effects when each has at least five events, and no single event above 20% of absolute effect contribution.
+- Failure criteria: future data in an indicator, same-close execution, a target crossing a split boundary, failure of any gate, or changing a frozen definition after seeing the holdout.
+
+### Report artifacts
+
+- Script: `scripts/backtest-indicator-reversal.ts`.
+- Pure indicator library/tests: `src/lib/technicalReversal.ts` and `src/lib/__tests__/technicalReversal.test.ts`.
+- Results: `docs/reports/results/indicator-reversal-2026-07-13T18-13-05-322Z.md` and `.json`.
+- Forecast regression reports: `docs/reports/results/backtest-2026-07-13T18-10-43-134Z.md` and `.json`.
+
+### Result / verdict
+
+Verdict: `rejected-no-confirmed-signal`. No rule cleared the pre-registered 30-day historical-holdout gate, so no product, UI, regime, or forecast behavior change is authorized.
+
+- Wilder RSI(14) extreme exit: 47 mature events and 21 distinct 30-day episodes; `-1.34%` mean signed net excess; 30/60/90-day block intervals `[-5.57%, +2.51%]`, `[-5.62%, +2.71%]`, and `[-5.69%, +2.79%]`; raw year-stratified shift `p=0.27421`; four-rule Holm `p=0.82264`; 11-rule search-history Holm `p=1.0`; development effect `-6.14%`.
+- Bollinger(20,2) re-entry: 98 events but only 15 episodes; `-0.69%`; block intervals `[-4.06%, +2.67%]`, `[-3.83%, +2.74%]`, and `[-3.54%, +2.42%]`; raw `p=0.45365`; four-rule Holm `p=0.89234`; search-history Holm `p=1.0`; development effect `-5.07%`.
+- Stochastic(14,3) extreme K/D cross: 131 events but only 15 episodes; `-1.47%`; block intervals `[-4.93%, +2.11%]`, `[-4.78%, +2.14%]`, and `[-4.36%, +1.87%]`; raw `p=0.44617`; four-rule Holm `p=0.89234`; search-history Holm `p=1.0`; development effect `-3.24%`.
+- MACD(12,26,9) opposite-zero signal cross: 76 events but only 15 episodes; `+0.36%`; block intervals `[-3.62%, +4.17%]`, `[-3.76%, +4.50%]`, and `[-3.84%, +4.32%]`; raw `p=0.18178`; four-rule Holm `p=0.72711`; search-history Holm `p=1.0`; development effect `+1.39%`.
+
+The three canonical contrarian/re-entry indicators had negative primary point estimates. MACD was the least-bad candidate, but its effect was below the 1% practical threshold, every confidence interval crossed zero, its bearish direction was `-0.96%`, and its effect changed from `-0.72%` in `2022-2024` to `+2.11%` in `2025+`. Secondary horizons do not supply a stable alternative: MACD was `+0.38%` at 14 days but negative at 7/60/90 days; RSI was `+0.85%` at 60 days but negative at 7/14/30/90 days and strongly negative in development. These are diagnostics, not candidate rescues.
+
+The outcome is consistent with the online evidence: large BTC technical-rule studies find time-varying, selection-sensitive results, and pure out-of-sample Bitcoin profitability often disappears. OBV was not tested because the repository audit found materially less stable aggregate-volume provenance; CCI, ATR, divergence, and parameter variants were excluded before outcomes to avoid an open-ended search.
+
+Independent validation used a separate Python implementation and exactly reproduced all development/holdout eligible-day counts, event/up/down counts, 30-day episode counts, unconditional drift, and primary effects. It confirmed the Wilder RSI, Bollinger, stochastic, and MACD formulas; prefix safety; next-open alignment; target maturity; block bootstrap; joint within-year shifts; 11-rule Holm correction; and gates. Verdict: keep the rejection. The final JSON pins the prior MA artifact SHA-256 used in the global correction and the implementation file hashes. It also discloses that the reported HEAD does not contain uncommitted experiment files and that the stratified-shift p-value is an approximate alignment rank test, not a directly centered test of `D=0`.
+
+Validation commands:
+
+- `npm run backtest:indicator-reversal` — deterministic verdict `rejected-no-confirmed-signal`.
+- `npm test -- --run src/lib/__tests__/technicalReversal.test.ts src/lib/__tests__/trendReversal.test.ts` — 13 focused tests passed, including direct threshold/equality event fixtures.
+- `npm test -- --run` — 28 files and 110 tests passed after the final amendment.
+- `npm run lint` — passed after the final amendment.
+- `npm run backtest` — forecast quality gate and robustness audit passed; this experiment did not change runtime forecasts.
+
+### Rerun criteria
+
+Rerun the frozen family only after genuinely new observations mature, an independent exchange-grade candle dataset is pre-registered, or source/candle semantics change. Do not search adjacent RSI, band, stochastic, or MACD parameters on the 2022+ outcomes.
+
+### Next better experiment
+
+If every rule fails, keep these indicators as chart context only and prospectively accumulate observations. If one rule clears all gates, independently reproduce it on exchange candles and run the forecast regression gates before considering a separately scoped integration.
