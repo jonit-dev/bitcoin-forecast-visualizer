@@ -1,6 +1,9 @@
 import type { OHLCVData } from './api';
-import { INTERVAL_CONFIG, RESIDUAL_BOOTSTRAP_CONFIG } from './modelConfig';
+import { DISTRIBUTION_CONFIG, INTERVAL_CONFIG, RESIDUAL_BOOTSTRAP_CONFIG, validateDistributionConfig } from './modelConfig';
+import { cdfAt, quantileAt, type PredictiveDistribution } from './predictiveDistribution';
 import { POWER_LAW_MEAN_REVERSION_TAU_DAYS, powerLawForecast } from './powerLaw';
+
+export { normalCdf, normalQuantile } from './predictiveDistribution';
 
 export type ResidualBootstrapPolicyId = 'recent-730d' | 'full-history' | 'vol-regime-stratified';
 
@@ -15,6 +18,7 @@ export interface PowerLawIntervalInput {
   horizonDays: number;
   median: number;
   currentPrice: number;
+  distribution?: PredictiveDistribution;
 }
 
 export interface PowerLawInterval {
@@ -47,23 +51,33 @@ export function computePowerLawInterval(input: PowerLawIntervalInput): PowerLawI
 
   const dailyVol = blendedPowerLawHeatmapVol(ohlcv);
   const multiplier = intervalMultiplierForHorizon(horizonDays);
-  const sigma = multiplier * Math.sqrt(powerLawResidualVariance(horizonDays, dailyVol));
-  const quantilePrice = (p: number) => median * Math.exp(sigma * normalQuantile(p));
+  const sigma = dailyVol * effectiveSigmaScaleForHorizon(horizonDays);
+  const distribution = input.distribution ?? distributionForHorizon(horizonDays);
 
   return {
     sigma,
     multiplier,
-    probabilityUp: 1 - normalCdf((Math.log(currentPrice) - Math.log(median)) / sigma),
-    q025: quantilePrice(0.025),
-    q05: quantilePrice(0.05),
-    q10: quantilePrice(0.10),
+    probabilityUp: 1 - cdfAt(distribution, median, sigma, currentPrice),
+    q025: quantileAt(distribution, median, sigma, 0.025),
+    q05: quantileAt(distribution, median, sigma, 0.05),
+    q10: quantileAt(distribution, median, sigma, 0.10),
     q50: median,
-    q90: quantilePrice(0.90),
-    q95: quantilePrice(0.95),
-    q975: quantilePrice(0.975),
+    q90: quantileAt(distribution, median, sigma, 0.90),
+    q95: quantileAt(distribution, median, sigma, 0.95),
+    q975: quantileAt(distribution, median, sigma, 0.975),
     calibrationLabel: calibrationLabel(horizonDays),
     coverageStatus: coverageStatus(horizonDays),
   };
+}
+
+export function distributionForHorizon(horizonDays: number): PredictiveDistribution {
+  validateDistributionConfig(DISTRIBUTION_CONFIG);
+  if (!DISTRIBUTION_CONFIG.defaultEnabled || DISTRIBUTION_CONFIG.kind === 'lognormal') {
+    return { kind: 'lognormal' };
+  }
+
+  const nu = DISTRIBUTION_CONFIG.nuByHorizon?.[String(horizonDays)];
+  return Number.isFinite(nu) && nu > 2 ? { kind: 'student-t', nu } : { kind: 'lognormal' };
 }
 
 export function computeResidualBootstrapSigmaMultiplier(
@@ -136,7 +150,13 @@ export function intervalMultiplierForHorizon(horizonDays: number): number {
 
   if (horizonDays < table[0].horizonDays) return table[0].multiplier;
   const last = table[table.length - 1];
-  if (horizonDays > last.horizonDays) return INTERVAL_CONFIG.scenarioPolicy.aboveMaxMultiplier;
+  if (horizonDays > last.horizonDays) {
+    // The residual-process variance converges to ~105.5 for tau=210 days.
+    // Above the fitted maximum, trend-estimation uncertainty is extrapolated
+    // explicitly so the displayed scenario band does not saturate.
+    const maxFittedHorizon = INTERVAL_CONFIG.scenarioPolicy.maxFittedHorizonDays;
+    return last.multiplier * Math.sqrt(horizonDays / maxFittedHorizon);
+  }
 
   for (let i = 1; i < table.length; i++) {
     const left = table[i - 1];
@@ -148,6 +168,43 @@ export function intervalMultiplierForHorizon(horizonDays: number): number {
   }
 
   return last.multiplier;
+}
+
+function effectiveSigmaScaleForHorizon(horizonDays: number): number {
+  const table = [...INTERVAL_CONFIG.fittedMultipliers].sort((a, b) => a.horizonDays - b.horizonDays);
+  const fittedScales = table.map(row => row.multiplier * Math.sqrt(powerLawResidualVariance(row.horizonDays, 1)));
+  const monotoneScales = fittedScales.map((scale, index) =>
+    index === 0 ? scale : Math.max(scale, fittedScales.slice(0, index).reduce((max, previous) => Math.max(max, previous), 0))
+  );
+
+  if (horizonDays < table[0].horizonDays) {
+    return table[0].multiplier * Math.sqrt(powerLawResidualVariance(horizonDays, 1));
+  }
+
+  const last = table[table.length - 1];
+  if (horizonDays > last.horizonDays) {
+    // The fitted 180d and 365d multipliers are retained as published inputs,
+    // but their raw sigma values are not monotone. Continue the monotone
+    // effective scale from the largest fitted sigma with sqrt(h / 365).
+    return monotoneScales[monotoneScales.length - 1]
+      * Math.sqrt(horizonDays / INTERVAL_CONFIG.scenarioPolicy.maxFittedHorizonDays);
+  }
+
+  const direct = table.findIndex(row => row.horizonDays === horizonDays);
+  if (direct >= 0) return monotoneScales[direct];
+
+  for (let index = 1; index < table.length; index++) {
+    const left = table[index - 1];
+    const right = table[index];
+    if (horizonDays < right.horizonDays) {
+      if (monotoneScales[index] === monotoneScales[index - 1]) return monotoneScales[index - 1];
+      const t = (Math.log(horizonDays) - Math.log(left.horizonDays)) /
+        (Math.log(right.horizonDays) - Math.log(left.horizonDays));
+      return Math.exp(Math.log(monotoneScales[index - 1]) + t * (Math.log(monotoneScales[index]) - Math.log(monotoneScales[index - 1])));
+    }
+  }
+
+  return monotoneScales[monotoneScales.length - 1];
 }
 
 export function blendedPowerLawHeatmapVol(ohlcv: OHLCVData[]) {
@@ -173,42 +230,14 @@ export function powerLawResidualVariance(days: number, dailyVol: number): number
   return dailyVol * dailyVol * varianceMultiplier;
 }
 
-export function normalCdf(value: number): number {
-  return 0.5 * (1 + erf(value / Math.SQRT2));
-}
-
-export function normalQuantile(probability: number): number {
-  const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.38357751867269e2, -3.066479806614716e1, 2.506628277459239];
-  const b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1];
-  const c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
-  const d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996, 3.754408661907416];
-  const pLow = 0.02425;
-  const pHigh = 1 - pLow;
-  const p = Math.min(Math.max(probability, 1e-9), 1 - 1e-9);
-
-  if (p < pLow) {
-    const q = Math.sqrt(-2 * Math.log(p));
-    return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
-      ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
-  }
-  if (p > pHigh) {
-    const q = Math.sqrt(-2 * Math.log(1 - p));
-    return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
-      ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
-  }
-
-  const q = p - 0.5;
-  const r = q * q;
-  return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
-    (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
-}
-
 function computeLogReturnStats(ohlcv: OHLCVData[], lookback: number) {
   const cappedLookback = Math.min(Math.max(1, lookback), ohlcv.length - 1);
   const recent = ohlcv.slice(-cappedLookback - 1);
   const logReturns = recent.slice(1).map((d, i) => Math.log(d.close / recent[i].close));
   const meanReturn = logReturns.reduce((sum, value) => sum + value, 0) / logReturns.length;
-  const variance = logReturns.reduce((sum, value) => sum + (value - meanReturn) ** 2, 0) / logReturns.length;
+  const variance = logReturns.length < 2
+    ? 0
+    : logReturns.reduce((sum, value) => sum + (value - meanReturn) ** 2, 0) / (logReturns.length - 1);
 
   return {
     meanReturn,
@@ -331,18 +360,4 @@ function coverageStatus(horizonDays: number): string {
     Math.abs(row.horizonDays - horizonDays) < Math.abs(best.horizonDays - horizonDays) ? row : best
   );
   return nearest.coverageStatus;
-}
-
-function erf(value: number) {
-  const sign = value < 0 ? -1 : 1;
-  const x = Math.abs(value);
-  const a1 = 0.254829592;
-  const a2 = -0.284496736;
-  const a3 = 1.421413741;
-  const a4 = -1.453152027;
-  const a5 = 1.061405429;
-  const p = 0.3275911;
-  const t = 1 / (1 + p * x);
-  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-  return sign * y;
 }

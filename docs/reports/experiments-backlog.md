@@ -1319,3 +1319,56 @@ Rerun if the checked-in histories, forecast quantile construction, scoring defin
 ### Next better experiment
 
 After this P1 is complete, use the corrected metrics on a prospectively frozen, point-in-time data-vintage evaluation with enough non-overlapping outcomes; only then consider P2 history/vintage work or a separately pre-registered distribution-family experiment.
+
+## 2026-08-02 — P3 standardized Student-t predictive distribution
+
+Status: `completed — report-only; rejected for promotion`
+
+### Hypothesis
+
+A standardized Student-t family on the log-price scale, with `nu > 2` selected per horizon by fit-window CRPS, will improve the real `powerlaw-current` validation distribution relative to the log-normal baseline without changing the median or weakening interval calibration. The candidate remains disabled unless the exact five-point gate below passes at every gated horizon.
+
+### Data/source changes
+
+No source-history or external-data changes. Use the checked-in daily BTC close history in `src/data/btc-history.json`, the production power-law median, the shipped interval construction, and `INTERVAL_CALIBRATION_CONFIG` (`2017-01-01` through `2021-12-31` fit; `2022-01-01` onward validation). Fit rows require the observed target to remain inside the fit window; validation rows begin at the validation window and use only origin-available history. The Student-t candidate is report-only and `DISTRIBUTION_CONFIG.defaultEnabled` remains `false`.
+
+### Validation setup
+
+Run `yarn backtest:distribution-family`. Evaluate the real `powerlaw-current` model at `14/30/60/90d` on disjoint fit and validation rows. Score the exact grid `{3, 4, 5, 6, 8, 10, 15, 20, 30, Infinity}`, where `Infinity` is the log-normal baseline through the same predictive-distribution seam. Select `nu` on fit-window CRPS, then score the selected fit value on validation. Report CRPS, Winkler 80/90/95, PIT histograms and chi-square, 80/90/95 coverage, and median absolute log error. Bootstrap paired validation CRPS differences with moving blocks of length equal to the forecast horizon and apply Holm correction across the four gated horizons.
+
+### Report artifacts
+
+- `docs/reports/results/distribution-family-2026-08-02T23-35-46-064Z.json`
+- `docs/reports/results/distribution-family-2026-08-02T23-35-46-064Z.md`
+- `docs/reports/results/p3-fat-tail-distribution-evidence-2026-08-02.md`
+
+### Promotion gate (pre-registered verbatim)
+
+`DISTRIBUTION_CONFIG.defaultEnabled` may flip to `true` only if, at **every** one of 14/30/60/90d:
+
+1. Validation CRPS improves versus log-normal, with a positive block-bootstrap 5% lower bound after Holm correction across the four horizons;
+2. 80% coverage moves toward nominal and 95% coverage does not move away from it;
+3. PIT uniformity improves (lower chi-square statistic);
+4. Median absolute log error is **identical** to the baseline — any movement means the median was touched, which is out of scope and voids the run;
+5. The selected `nu` is within a factor of two between the fit and validation windows. Instability here is the ledger's most common failure signature (tau=120, close-sma200, MACD all reversed sign across subperiods) and must block promotion rather than be argued around.
+
+### Result / verdict
+
+Verdict: `report-only; rejected for promotion`. The exact Infinity self-check passed at all four horizons with CRPS difference `0` and exact metric equality. `DISTRIBUTION_CONFIG.defaultEnabled` remains `false`, `kind` remains `lognormal`, and no promotion evidence or per-horizon runtime `nu` values were populated.
+
+| Horizon | Fit n | Validation n | Fit-selected nu | Validation-selected nu | Validation CRPS baseline / selected fit nu | CRPS improvement | Holm-adjusted p | Corrected 5% lower bound | 80% coverage baseline / candidate | 95% coverage baseline / candidate | PIT chi-square baseline / candidate | Median abs-log baseline / candidate | Gate result |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- | --- |
+| 14d | 1812 | 1643 | 10 | 4 | 2533.40793 / 2524.99604 | 8.41190 | 0.023994 | 0.84638 | 83.99% / 83.44% | 93.37% / 93.79% | 73.77 / 37.31 | 0.05266441 / 0.05266441 | FAIL: fit/validation nu instability |
+| 30d | 1796 | 1627 | Infinity | 10 | 3622.57329 / 3622.57329 | 0 | 1.000000 | 0 | 79.59% / 79.59% | 94.65% / 94.65% | 37.43 / 37.43 | 0.08374708 / 0.08374708 | FAIL: no CRPS/PIT improvement |
+| 60d | 1766 | 1597 | Infinity | 10 | 4858.52263 / 4858.52263 | 0 | 1.000000 | 0 | 79.84% / 79.84% | 98.00% / 98.00% | 42.69 / 42.69 | 0.13928360 / 0.13928360 | FAIL: no CRPS/PIT improvement |
+| 90d | 1736 | 1567 | Infinity | Infinity | 5420.69421 / 5420.69421 | 0 | 1.000000 | 0 | 76.96% / 76.96% | 95.85% / 95.85% | 126.36 / 126.36 | 0.15347419 / 0.15347419 | FAIL: no CRPS/PIT improvement |
+
+The 14d candidate passed CRPS, coverage, PIT, and exact median invariance but failed the fifth gate because `nu=10` in fit versus `nu=4` in validation. Every 30/60/90d fit selected the `Infinity` baseline, so no candidate improvement exists there. The real-data report used `2017-01-01` through `2021-12-31` fit origins with targets ending by fit end and `2022-01-01` onward validation origins; the dataset had 5,843 rows from `2010-07-17` through `2026-07-15`, SHA-256 `c347fddeffe98b42864ae6b5f9676c7c04d2b3be9de7cab317b366f7381c1ae0`.
+
+### Rerun criteria
+
+Rerun if the checked-in BTC history, interval construction, distribution implementation, scoring definitions, fit/validation windows, exact grid, bootstrap block length, or Holm family changes. A promotion claim additionally requires a fresh artifact from the unchanged registered protocol and a passing `yarn backtest` regression gate.
+
+### Next better experiment
+
+If the Student-t candidate is report-only, pre-register an empirical-shape residual distribution with origin-safe fit/validation selection, the same proper-scoring metrics, horizon blocks, and multiplicity correction. Do not enable either shape candidate without the exact gate and a committed evidence artifact.

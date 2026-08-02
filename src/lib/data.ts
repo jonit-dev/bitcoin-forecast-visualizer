@@ -13,7 +13,6 @@ import {
   CONFIDENCE_Z_SCORES,
 } from './forecastInterval';
 import {
-  INTERVAL_CONFIG,
   RESIDUAL_BOOTSTRAP_CONFIG,
   YELLOW_LINE_FORECAST_CONFIG,
   validateYellowLineForecastConfig,
@@ -26,6 +25,12 @@ export interface HeatmapCell {
   priceLow: number;
   priceHigh: number;
   density: number; // 0-1 normalized per column
+}
+
+export interface HeatmapSimulation {
+  sampledDays: number[];
+  numSimulations: number;
+  prices: Float64Array;
 }
 
 export interface ProbabilityForecast {
@@ -333,9 +338,8 @@ export function processRealData(
     const high = Math.max(open, close) * (1 + rng() * dailyVol * 0.3);
     const low = Math.min(open, close) * (1 - rng() * dailyVol * 0.3);
 
-    // Forecast interval: the power-law path uses residual-process variance plus
-    // a fat-tail stress multiplier. No visual cap — long-horizon bands should
-    // widen when Bitcoin's historical residual errors say they should.
+    // Forecast interval: the power-law path uses residual-process variance.
+    // Long-horizon bands widen through the explicit interval extrapolation rule.
     const interval = computePowerLawInterval({ ohlcv, horizonDays: i, median: close, currentPrice: lastReal.close });
     const ciHalf = interval ? confidenceZ * interval.sigma : confidenceZ * dailyVol * Math.sqrt(i);
 
@@ -372,50 +376,12 @@ export function generateHeatmapData(
 ): HeatmapCell[] {
   if (horizon < 1 || ohlcv.length < 30) return [];
 
-  const lastPrice = ohlcv[ohlcv.length - 1].close;
   const lastDateMs = new Date(ohlcv[ohlcv.length - 1].date + 'T00:00:00Z').getTime();
   const lastDate = new Date(lastDateMs);
-  const rng = mulberry32(hashStringSeed(`btc-forecast-heatmap:${ohlcv[ohlcv.length - 1].date}:${horizon}:${numSimulations}:${numPriceBands}`));
-  const dailyVol = blendedPowerLawHeatmapVol(ohlcv);
-
-  const futureBasePrices = new Float64Array(horizon + 1);
-  const lastBasePrice = basePowerLawPrice(daysSinceGenesis(lastDate));
-  const tNow = daysSinceGenesis(lastDate);
-  futureBasePrices[0] = lastBasePrice;
-  for (let d = 1; d <= horizon; d++) futureBasePrices[d] = basePowerLawPrice(tNow + d);
-  const residualDecay = Math.exp(-1 / POWER_LAW_MEAN_REVERSION_TAU_DAYS);
-  const powerLawShockDrift = -INTERVAL_CONFIG.logDriftScale * dailyVol * dailyVol;
-
-  // Sample output dates for long horizons (sim still runs every day for accuracy)
-  const sampleStep = horizon <= 90 ? 1 : horizon <= 365 ? 2 : horizon <= 1825 ? 5 : 10;
-  const sampledDays: number[] = [];
-  for (let d = 1; d <= horizon; d++) {
-    if (d % sampleStep === 0 || d === 1 || d === horizon) sampledDays.push(d);
-  }
-  const sampledSet = new Set(sampledDays);
+  const simulation = simulateHeatmapPrices(ohlcv, horizon, numSimulations, numPriceBands);
+  if (!simulation) return [];
+  const { sampledDays, prices: results } = simulation;
   const sampledCount = sampledDays.length;
-
-  const residualShocks = buildSelectedResidualPolicyShocks(ohlcv, horizon, numSimulations, dailyVol, rng);
-  const useResidualShocks = residualShocks.length === numSimulations * horizon;
-
-  // Run Monte Carlo — store only sampled days in flat typed array
-  const results = new Float64Array(numSimulations * sampledCount);
-
-  for (let s = 0; s < numSimulations; s++) {
-    let sIdx = 0;
-    const rOff = s * horizon;
-    let residual = Math.log(lastPrice / lastBasePrice);
-
-    for (let d = 1; d <= horizon; d++) {
-      const shock = useResidualShocks ? residualShocks[rOff + d - 1] : dailyVol * normalFromRng(rng);
-      residual = residual * residualDecay + powerLawShockDrift + shock;
-      const price = futureBasePrices[d] * Math.exp(residual);
-
-      if (sampledSet.has(d)) {
-        results[s * sampledCount + sIdx++] = price;
-      }
-    }
-  }
 
   // Find price range from flat array (0.5–99.5 percentile)
   const sortBuf = new Float64Array(results);
@@ -461,6 +427,54 @@ export function generateHeatmapData(
   }
 
   return cells;
+}
+
+/** Generate the same terminal samples used by the rendered BTC heatmap. */
+export function simulateHeatmapPrices(
+  ohlcv: OHLCVData[],
+  horizon: number,
+  numSimulations = 500,
+  numPriceBands = 80
+): HeatmapSimulation | null {
+  if (horizon < 1 || ohlcv.length < 30 || numSimulations < 1) return null;
+
+  const lastPrice = ohlcv[ohlcv.length - 1].close;
+  const lastDate = new Date(ohlcv[ohlcv.length - 1].date + 'T00:00:00Z');
+  const rng = mulberry32(hashStringSeed(`btc-forecast-heatmap:${ohlcv[ohlcv.length - 1].date}:${horizon}:${numSimulations}:${numPriceBands}`));
+  const dailyVol = blendedPowerLawHeatmapVol(ohlcv);
+  const lastBasePrice = basePowerLawPrice(daysSinceGenesis(lastDate));
+  const tNow = daysSinceGenesis(lastDate);
+  const futureBasePrices = new Float64Array(horizon + 1);
+  futureBasePrices[0] = lastBasePrice;
+  for (let d = 1; d <= horizon; d++) futureBasePrices[d] = basePowerLawPrice(tNow + d);
+  const residualDecay = Math.exp(-1 / POWER_LAW_MEAN_REVERSION_TAU_DAYS);
+
+  // Sample output dates for long horizons (sim still runs every day for accuracy).
+  const sampleStep = horizon <= 90 ? 1 : horizon <= 365 ? 2 : horizon <= 1825 ? 5 : 10;
+  const sampledDays: number[] = [];
+  for (let d = 1; d <= horizon; d++) {
+    if (d % sampleStep === 0 || d === 1 || d === horizon) sampledDays.push(d);
+  }
+  const sampledSet = new Set(sampledDays);
+  const sampledCount = sampledDays.length;
+  const residualShocks = buildSelectedResidualPolicyShocks(ohlcv, horizon, numSimulations, dailyVol, rng);
+  const useResidualShocks = residualShocks.length === numSimulations * horizon;
+  const prices = new Float64Array(numSimulations * sampledCount);
+
+  for (let simulation = 0; simulation < numSimulations; simulation++) {
+    let sampleIndex = 0;
+    const shockOffset = simulation * horizon;
+    let residual = Math.log(lastPrice / lastBasePrice);
+    for (let day = 1; day <= horizon; day++) {
+      const shock = useResidualShocks ? residualShocks[shockOffset + day - 1] : dailyVol * normalFromRng(rng);
+      // The heatmap is the distribution of the median-consistent log process:
+      // shocks are centred and no unexplained price-drift correction is added.
+      residual = residual * residualDecay + shock;
+      if (sampledSet.has(day)) prices[simulation * sampledCount + sampleIndex++] = futureBasePrices[day] * Math.exp(residual);
+    }
+  }
+
+  return { sampledDays, numSimulations, prices };
 }
 
 function buildSelectedResidualPolicyShocks(

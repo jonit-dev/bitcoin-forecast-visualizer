@@ -2,7 +2,6 @@ import type { OHLCVData } from './api';
 import {
   computePowerLawInterval,
   computeResidualBootstrapSigmaMultiplier,
-  normalQuantile,
   type ResidualBootstrapPolicyId,
 } from './forecastInterval';
 import { cycleAdjustedPowerLawForecast, cycleIntervalSigmaMultiplier, type CycleStrategyId } from './cycle';
@@ -11,6 +10,7 @@ import { powerLawForecast, POWER_LAW_MEAN_REVERSION_TAU_DAYS, powerLawForecastWi
 import { forecastWithPowerLawCoefficients, type PowerLawFitCoefficients } from './powerLawFit';
 import type { ForecastDistribution } from './backtestMetrics';
 import { blendForecastDistributions } from './ensembleForecast';
+import { quantileAt, type PredictiveDistribution } from './predictiveDistribution';
 
 export type BacktestModelId =
   | 'naive-current-price'
@@ -322,17 +322,19 @@ function movingAverage(ohlcv: OHLCVData[], endIndex: number, windowDays: number)
 }
 
 function withLogNormalQuantiles(median: number, sigma: number): ForecastDistribution {
+  const distribution: PredictiveDistribution = { kind: 'lognormal' };
   return {
     median,
     sigma,
+    distribution,
     quantiles: {
-      q025: median * Math.exp(sigma * normalQuantile(0.025)),
-      q05: median * Math.exp(sigma * normalQuantile(0.05)),
-      q10: median * Math.exp(sigma * normalQuantile(0.10)),
+      q025: quantileAt(distribution, median, sigma, 0.025),
+      q05: quantileAt(distribution, median, sigma, 0.05),
+      q10: quantileAt(distribution, median, sigma, 0.10),
       q50: median,
-      q90: median * Math.exp(sigma * normalQuantile(0.90)),
-      q95: median * Math.exp(sigma * normalQuantile(0.95)),
-      q975: median * Math.exp(sigma * normalQuantile(0.975)),
+      q90: quantileAt(distribution, median, sigma, 0.90),
+      q95: quantileAt(distribution, median, sigma, 0.95),
+      q975: quantileAt(distribution, median, sigma, 0.975),
     },
   };
 }

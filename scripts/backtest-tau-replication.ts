@@ -5,8 +5,9 @@ import { join } from 'node:path';
 import btcHistory from '../src/data/btc-history.json';
 import type { OHLCVData } from '../src/lib/api';
 import { aggregateForecastMetrics, type BacktestMetricRow, type ForecastDistribution } from '../src/lib/backtestMetrics';
-import { computePowerLawInterval, normalQuantile } from '../src/lib/forecastInterval';
+import { computePowerLawInterval } from '../src/lib/forecastInterval';
 import { powerLawForecastWithTau } from '../src/lib/powerLaw';
+import { quantileAt } from '../src/lib/predictiveDistribution';
 
 const BASELINE_TAU = 210;
 const CANDIDATE_TAU = 120;
@@ -194,17 +195,19 @@ function forecast(originIndex: number, horizonDays: number, tauDays: number): Fo
     currentPrice: origin.close,
   });
   if (!interval) return null;
+  const distribution = { kind: 'lognormal' as const };
   return {
     median,
     sigma: interval.sigma,
+    distribution,
     quantiles: {
-      q025: median * Math.exp(interval.sigma * normalQuantile(0.025)),
-      q05: median * Math.exp(interval.sigma * normalQuantile(0.05)),
-      q10: median * Math.exp(interval.sigma * normalQuantile(0.10)),
+      q025: quantileAt(distribution, median, interval.sigma, 0.025),
+      q05: quantileAt(distribution, median, interval.sigma, 0.05),
+      q10: quantileAt(distribution, median, interval.sigma, 0.10),
       q50: median,
-      q90: median * Math.exp(interval.sigma * normalQuantile(0.90)),
-      q95: median * Math.exp(interval.sigma * normalQuantile(0.95)),
-      q975: median * Math.exp(interval.sigma * normalQuantile(0.975)),
+      q90: quantileAt(distribution, median, interval.sigma, 0.90),
+      q95: quantileAt(distribution, median, interval.sigma, 0.95),
+      q975: quantileAt(distribution, median, interval.sigma, 0.975),
     },
   };
 }

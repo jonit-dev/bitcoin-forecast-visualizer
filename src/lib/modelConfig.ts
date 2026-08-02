@@ -24,12 +24,6 @@ export const POWER_LAW_CONFIG = {
 
 export const INTERVAL_CONFIG = {
   recentVolWeight: 0.55,
-  logDriftScale: 0.3,
-  stressMultiplier: {
-    base: 1,
-    amplitude: 1.85,
-    tauDays: 150,
-  },
   fittedMultipliers: [
     { horizonDays: 14, multiplier: 1.01, coverageStatus: 'calibrated', label: 'Calibrated' },
     { horizonDays: 30, multiplier: 0.98, coverageStatus: 'calibrated', label: 'Calibrated' },
@@ -40,10 +34,41 @@ export const INTERVAL_CONFIG = {
   ],
   scenarioPolicy: {
     maxFittedHorizonDays: 365,
-    aboveMaxMultiplier: 0.59,
     label: 'Scenario range',
   },
 } as const;
+
+export interface DistributionCandidateConfig {
+  defaultEnabled: boolean;
+  kind: 'lognormal' | 'student-t';
+  nuByHorizon: Record<string, number> | null;
+  evidenceArtifact: string | null;
+  promotionPolicy: string;
+}
+
+/** Student-t remains report-only until the exact five-point gate is met. */
+export const DISTRIBUTION_CONFIG: DistributionCandidateConfig = Object.freeze({
+  defaultEnabled: false,
+  kind: 'lognormal',
+  nuByHorizon: null,
+  evidenceArtifact: null,
+  promotionPolicy: 'Report-only. Enable the standardized Student-t candidate only when every gated horizon clears the pre-registered CRPS, coverage, PIT, median-invariance, and fit/validation-stability gate with a committed evidence artifact.',
+});
+
+const DISTRIBUTION_GATE_HORIZONS = [14, 30, 60, 90] as const;
+
+export function validateDistributionConfig(config: DistributionCandidateConfig): void {
+  if (!config.defaultEnabled) return;
+  if (config.kind !== 'student-t' || !config.nuByHorizon || !config.evidenceArtifact?.startsWith('docs/reports/results/')) {
+    throw new Error('enabled Student-t distribution requires per-horizon nu values and an exact results artifact');
+  }
+  for (const horizon of DISTRIBUTION_GATE_HORIZONS) {
+    const nu = config.nuByHorizon[String(horizon)];
+    if (!Number.isFinite(nu) || nu <= 2) {
+      throw new Error(`enabled Student-t distribution requires nu > 2 at ${horizon}d`);
+    }
+  }
+}
 
 /**
  * Disjoint calibration windows for interval multipliers. A row is only

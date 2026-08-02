@@ -1,8 +1,10 @@
 import { crpsFromQuantiles, pitHistogram, pitUniformityStatistic, pitValue, winklerScore, type PitHistogram, type PitUniformityStatistic } from './properScoring';
+import type { PredictiveDistribution } from './predictiveDistribution';
 
 export interface ForecastDistribution {
   median: number;
   sigma?: number | null;
+  distribution?: PredictiveDistribution;
   quantiles?: Partial<Record<'q025' | 'q05' | 'q10' | 'q50' | 'q90' | 'q95' | 'q975', number>>;
 }
 
@@ -133,7 +135,7 @@ export function aggregateForecastMetrics(inputs: MetricInput[]): BacktestMetricR
     interval95: inputs.map(({ actual, forecast }) => winklerScore(actual, forecast.quantiles?.q025 ?? Number.NaN, forecast.quantiles?.q975 ?? Number.NaN, 0.05)),
   };
   const pitValues = inputs
-    .map(({ actual, forecast }) => pitValue(actual, forecast.median, forecast.sigma))
+    .map(({ actual, forecast }) => pitValue(actual, forecast.median, forecast.sigma, forecast.distribution))
     .filter((value): value is number => value !== null && Number.isFinite(value));
 
   return {
