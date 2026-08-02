@@ -34,13 +34,13 @@ export const INTERVAL_CONFIG = {
     { horizonDays: 14, multiplier: 1.01, coverageStatus: 'calibrated', label: 'Calibrated' },
     { horizonDays: 30, multiplier: 0.98, coverageStatus: 'calibrated', label: 'Calibrated' },
     { horizonDays: 60, multiplier: 0.99, coverageStatus: 'conservative', label: 'Conservative' },
-    { horizonDays: 90, multiplier: 0.88, coverageStatus: 'calibrated', label: 'Calibrated' },
+    { horizonDays: 90, multiplier: 0.87, coverageStatus: 'calibrated', label: 'Calibrated' },
     { horizonDays: 180, multiplier: 0.86, coverageStatus: 'scenario', label: 'Scenario range' },
-    { horizonDays: 365, multiplier: 0.85, coverageStatus: 'scenario', label: 'Scenario range' },
+    { horizonDays: 365, multiplier: 0.59, coverageStatus: 'scenario', label: 'Scenario range' },
   ],
   scenarioPolicy: {
     maxFittedHorizonDays: 365,
-    aboveMaxMultiplier: 0.85,
+    aboveMaxMultiplier: 0.59,
     label: 'Scenario range',
   },
 } as const;

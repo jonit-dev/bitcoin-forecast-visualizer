@@ -12,6 +12,10 @@ describe('proper scoring', () => {
     expect(sharp!).toBeLessThan(wide!);
   });
 
+  it('should integrate endpoint-constant tails across the full probability domain', () => {
+    expect(crpsFromQuantiles(0, [[0.25, 1], [0.5, 1], [0.75, 1]])).toBeCloseTo(1);
+  });
+
   it('should return a PIT value near 0.5 when the actual equals the median', () => {
     expect(Math.abs(pitValue(100, 100, 0.2)! - 0.5)).toBeLessThan(1e-9);
   });
@@ -52,6 +56,12 @@ describe('proper scoring', () => {
     expect(pitValue(100, 100, 0)).toBeNull();
     expect(pitValue(100, 100, -0.2)).toBeNull();
     expect(pitValue(100, 100, 0.2)).not.toBeNull();
+  });
+
+  it('should return null for an empty or invalid PIT sample set', () => {
+    expect(pitHistogram([])).toBeNull();
+    expect(pitHistogram([Number.NaN, Number.POSITIVE_INFINITY])).toBeNull();
+    expect(pitUniformityStatistic([])).toBeNull();
   });
 
   it('should return null when fewer than three valid quantiles are present', () => {

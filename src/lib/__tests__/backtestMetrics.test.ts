@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { aggregateForecastMetrics, pinballLosses } from '../backtestMetrics';
+import { crpsFromQuantiles } from '../properScoring';
 
 describe('backtest metrics', () => {
   it('should compute pinball loss for multiple quantiles', () => {
@@ -55,5 +56,26 @@ describe('backtest metrics', () => {
 
     expect(row.excludedFromPit).toBe(1);
     expect(row.pitHistogram?.samples).toBe(1);
+  });
+
+  it('should wire the full ForecastDistribution quantile grid into approximate CRPS', () => {
+    const forecast = {
+      median: 100,
+      quantiles: { q025: 20, q05: 40, q10: 80, q50: 100, q90: 120, q95: 160, q975: 1_000 },
+    };
+    const row = aggregateForecastMetrics([{ actual: 100, forecast }]);
+    const fullGridScore = crpsFromQuantiles(100, forecast.quantiles)!;
+    const fivePointScore = crpsFromQuantiles(100, { q05: 40, q10: 80, q50: 100, q90: 120, q95: 160 })!;
+
+    expect(row.crps).toBeCloseTo(fullGridScore);
+    expect(row.crps).not.toBeCloseTo(fivePointScore);
+  });
+
+  it('should keep PIT histogram and uniformity null when every PIT sample is excluded', () => {
+    const row = aggregateForecastMetrics([{ actual: 100, forecast: { median: 100 } }]);
+
+    expect(row.pitHistogram).toBeNull();
+    expect(row.pitUniformity).toBeNull();
+    expect(row.excludedFromPit).toBe(row.samples);
   });
 });

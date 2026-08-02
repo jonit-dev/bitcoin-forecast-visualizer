@@ -158,12 +158,15 @@ export function aggregateForecastMetrics(inputs: MetricInput[]): BacktestMetricR
 }
 
 function quantileSet(forecast: ForecastDistribution): Record<string, number | null | undefined> {
+  const q50 = forecast.quantiles?.q50;
   return {
+    q025: forecast.quantiles?.q025,
     q05: forecast.quantiles?.q05,
     q10: forecast.quantiles?.q10,
-    q50: forecast.median,
+    q50: Number.isFinite(q50) ? q50 : forecast.median,
     q90: forecast.quantiles?.q90,
     q95: forecast.quantiles?.q95,
+    q975: forecast.quantiles?.q975,
   };
 }
 

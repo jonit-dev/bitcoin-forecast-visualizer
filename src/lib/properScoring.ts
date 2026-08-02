@@ -31,24 +31,42 @@ const NAMED_QUANTILES: Record<string, number> = {
   q975: 0.975,
 };
 
+export const CRPS_METHOD_METADATA = {
+  method: 'quantile pinball integral identity with trapezoidal quadrature',
+  quantileGrid: ['q025', 'q05', 'q10', 'q50', 'q90', 'q95', 'q975'],
+  tailConvention: 'Endpoint-constant extension over the full probability domain: Q(p) equals the first supplied quantile below the first grid probability and the last supplied quantile above the last grid probability.',
+  approximationErrorBound: null,
+  approximationErrorBoundStatement: 'A numeric approximation-error bound is not estimable from this sparse quantile grid and endpoint-tail assumption.',
+  label: 'Approximate CRPS (sparse quantile grid; endpoint-constant tails)',
+} as const;
+
 /**
- * Approximate CRPS from the supplied quantile grid using
- * CRPS(F, y) = 2 * integral rho_p(y - Q(p)) dp and trapezoidal integration.
+ * Approximate CRPS from the supplied quantile grid using the full-domain
+ * identity CRPS(F, y) = 2 * integral rho_p(y - Q(p)) dp and trapezoidal
+ * integration. Outside the supplied probabilities, Q(p) is held constant at
+ * the nearest endpoint quantile. Those endpoint-tail segments are included
+ * in the [0, 1] integral and are exact for the fixed endpoint quantile because
+ * pinball loss is linear in p.
  *
- * The result inherits discretisation error from the grid, especially in the
- * unobserved tails outside the first and last supplied probabilities. A
- * denser grid is required for a tighter approximation; this function does
- * not invent tail quantiles. Fewer than three valid quantiles returns null.
+ * The result still inherits discretisation error from the sparse interior
+ * grid; a numeric error bound is not estimable without stronger assumptions
+ * about the unknown quantile function. Fewer than three valid quantiles
+ * returns null.
  */
 export function crpsFromQuantiles(actual: number, quantiles: QuantileInput): number | null {
   if (!Number.isFinite(actual)) return null;
   const points = normalizeQuantiles(quantiles);
   if (points.length < 3) return null;
 
+  const extendedPoints = [
+    { probability: 0, value: points[0].value },
+    ...points,
+    { probability: 1, value: points[points.length - 1].value },
+  ];
   let integral = 0;
-  for (let index = 1; index < points.length; index++) {
-    const left = points[index - 1];
-    const right = points[index];
+  for (let index = 1; index < extendedPoints.length; index++) {
+    const left = extendedPoints[index - 1];
+    const right = extendedPoints[index];
     const spacing = right.probability - left.probability;
     if (spacing <= 0) continue;
     const leftLoss = quantilePinballLoss(actual, left.value, left.probability);
@@ -72,10 +90,11 @@ export function pitValue(actual: number, median: number, sigma: number | null | 
   return normalCdf((Math.log(actual) - Math.log(median)) / sigma);
 }
 
-/** Return PIT counts and the uniform expected count in each equally sized bin. */
+/** Return PIT counts and the uniform expected count, or null with no valid samples. */
 export function pitHistogram(values: readonly number[], bins = 10): PitHistogram | null {
   if (!Number.isInteger(bins) || bins < 2) return null;
   const validValues = values.filter(value => Number.isFinite(value) && value >= 0 && value <= 1);
+  if (validValues.length === 0) return null;
   const counts = Array.from({ length: bins }, () => 0);
   for (const value of validValues) {
     const index = value === 1 ? bins - 1 : Math.floor(value * bins);
