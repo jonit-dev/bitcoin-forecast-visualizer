@@ -241,7 +241,7 @@ function main(): void {
   console.log(`Validation window: ${INTERVAL_CALIBRATION_CONFIG.validationStartDate} onward`);
   console.log(`Divergence tolerance: ${INTERVAL_CALIBRATION_CONFIG.divergenceTolerance}`);
   console.log('');
-  console.log('| Horizon | Status | Multiplier | Fit n | Validation n | Fit 80/90/95 | Validation 80/90/95 | Fit CRPS | Validation CRPS | Fit Winkler 80/90/95 | Validation Winkler 80/90/95 |');
+  console.log('| Horizon | Status | Multiplier | Fit n | Validation n | Fit 80/90/95 | Validation 80/90/95 | Fit Approx CRPS | Validation Approx CRPS | Fit Winkler 80/90/95 | Validation Winkler 80/90/95 |');
   console.log('| ---: | --- | ---: | ---: | ---: | --- | --- | ---: | ---: | --- | --- |');
   for (const row of rows) console.log(renderRow(row));
   console.log('');
