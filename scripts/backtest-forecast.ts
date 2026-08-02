@@ -1023,12 +1023,15 @@ function renderMarkdown(report: BacktestReport): string {
     '',
     '## Metrics',
     '',
+    'Pinball loss is reported on the corrected `absolute` price scale (`pinballScale: absolute`); pre-2026-08 relative figures are superseded.',
+    'PIT uniformity is reported as chi-square / degrees of freedom without a p-value because overlapping origins are serially dependent.',
+    '',
   ];
 
   for (const horizon of report.horizons) {
     lines.push(`### ${horizon} Day Horizon`, '');
-    lines.push('| Model | Samples | Median abs log error | Approx mult error | Bias log error | NLL | Pinball q05/q10/q50/q90/q95 | 80% / 90% / 95% coverage |');
-    lines.push('| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |');
+    lines.push('| Model | Samples | Median abs log error | Approx mult error | Bias log error | NLL | Pinball q05/q10/q50/q90/q95 | Pinball scale | CRPS | Winkler 80/90/95 | 80% / 90% / 95% coverage | PIT chi-square / df | PIT histogram counts / expected | PIT excluded |');
+    lines.push('| --- | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: | --- | --- | --- | --- | ---: |');
 
     for (const model of report.models) {
       const metric = report.metrics[String(horizon)][model.id];
@@ -1046,7 +1049,13 @@ function renderMarkdown(report: BacktestReport): string {
           formatMetric(metric.pinballLoss.q90),
           formatMetric(metric.pinballLoss.q95),
         ].join(' / '),
+        metric.pinballScale,
+        formatMetric(metric.crps),
+        [formatMetric(metric.winkler80), formatMetric(metric.winkler90), formatMetric(metric.winkler95)].join(' / '),
         `${formatPercent(metric.coverage.interval80)} / ${formatPercent(metric.coverage.interval90)} / ${formatPercent(metric.coverage.interval95)}`,
+        formatPitUniformity(metric.pitUniformity),
+        formatPitHistogram(metric.pitHistogram),
+        metric.excludedFromPit,
         '|',
       ].join(' | '));
     }
@@ -1303,6 +1312,15 @@ function formatMetric(value: number | null): string {
 
 function formatPercent(value: number | null): string {
   return value === null || !Number.isFinite(value) ? 'n/a' : `${(value * 100).toFixed(1)}%`;
+}
+
+function formatPitUniformity(value: BacktestMetricRow['pitUniformity']): string {
+  return value === null ? 'n/a' : `${value.chiSquare.toFixed(2)} / ${value.degreesOfFreedom}`;
+}
+
+function formatPitHistogram(value: BacktestMetricRow['pitHistogram']): string {
+  if (value === null) return 'n/a';
+  return `${value.counts.join(',')} / ${value.expectedCounts.map(expected => expected.toFixed(1)).join(',')}`;
 }
 
 main();

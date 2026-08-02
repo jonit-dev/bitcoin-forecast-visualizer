@@ -20,6 +20,7 @@ const BOOTSTRAP_ITERATIONS = 2000;
 
 interface ScoreRow {
   asset: string; originDate: string; targetDate: string; lead: number; seed: number; sourceDataHash: string;
+  pinballScale: 'absolute';
   baselineLower: number; baselineUpper: number; candidateLower: number; candidateUpper: number; actual: number;
   baselineLowerPinball: number; baselineUpperPinball: number; candidateLowerPinball: number; candidateUpperPinball: number;
   baselineIntervalScore: number; candidateIntervalScore: number; baselineLogWidth: number; candidateLogWidth: number;
@@ -92,7 +93,7 @@ function evaluateAsset(asset: string, rows: OHLCVData[], baselineOnly: boolean) 
     for (const lead of LEADS) {
       const actualRow = rows[originIndex + lead]; const base = baseline.points[lead - 1]; const cand = candidate.points[lead - 1];
       if (!actualRow || base.date !== actualRow.date || cand.date !== actualRow.date || actualRow.date <= rows[originIndex].date) { continuityFailures++; continue; }
-      scored.push({ asset, originDate: rows[originIndex].date, targetDate: actualRow.date, lead, seed: baseOptions.seed, sourceDataHash,
+      scored.push({ asset, originDate: rows[originIndex].date, targetDate: actualRow.date, lead, seed: baseOptions.seed, sourceDataHash, pinballScale: 'absolute',
         baselineLower: base.lower, baselineUpper: base.upper, candidateLower: cand.lower, candidateUpper: cand.upper, actual: actualRow.close,
         baselineLowerPinball: pinball(actualRow.close, base.lower, 0.05), baselineUpperPinball: pinball(actualRow.close, base.upper, 0.95),
         candidateLowerPinball: pinball(actualRow.close, cand.lower, 0.05), candidateUpperPinball: pinball(actualRow.close, cand.upper, 0.95),
@@ -137,7 +138,7 @@ export function runMarketChannelPathBacktest(mode: 'baseline' | 'candidates') {
   const baselineOnly = mode === 'baseline';
   const assets = [evaluateAsset('sp500', vooHistory as OHLCVData[], baselineOnly), evaluateAsset('gold', gldHistory as OHLCVData[], baselineOnly)];
   const gitCommit = (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch { return 'unknown'; } })();
-  const artifact = { schemaVersion: 1, generatedAt: new Date().toISOString(), mode, gitCommit,
+  const artifact = { schemaVersion: 1, generatedAt: new Date().toISOString(), mode, gitCommit, pinballScale: 'absolute',
     configuration: { minimumTrainingRows: MIN_TRAINING_ROWS, leads: LEADS, gatedLeads: GATED_LEADS, outerOriginStep: OUTER_STEP,
       outerSplit: 'final 40% of rows', innerSelection: 'pre-registered primary config frozen; neighboring configurations are deferred because the minimum sample gate is impossible',
       candidate: MARKET_CHANNEL_CANDIDATE_CONFIG, bootstrap: { type: 'paired-moving-block', iterations: BOOTSTRAP_ITERATIONS, multiplicity: 'Bonferroni across 2 assets x 3 horizons' },
@@ -146,7 +147,8 @@ export function runMarketChannelPathBacktest(mode: 'baseline' | 'candidates') {
   const stem = `docs/reports/results/market-channel-path-${baselineOnly ? 'baseline' : 'candidates'}-${DATE}`;
   writeFileSync(`${stem}.json`, `${JSON.stringify(artifact, null, 2)}\n`);
   const lines = [`# Market channel path ${baselineOnly ? 'baseline' : 'candidate'} report — ${DATE}`, '',
-    baselineOnly ? 'The frozen-residual baseline has affine log bounds, so its second differences are numerically zero. Curvature is diagnostic only.' : 'This report applies the pre-registered statistical gate. Visual curvature is not a promotion condition.', '',
+    baselineOnly ? 'The frozen-residual baseline has affine log bounds, so its second differences are numerically zero. Curvature is diagnostic only.' : 'This report applies the pre-registered statistical gate. Visual curvature is not a promotion condition.',
+    'Pinball loss uses the corrected absolute price scale (`pinballScale: absolute`); pre-2026-08 relative figures are superseded.', '',
     `Git commit: \`${gitCommit}\``, `Configuration version: \`${MARKET_CHANNEL_CANDIDATE_CONFIG.configurationVersion}\``, ''];
   for (const asset of assets) {
     lines.push(`## ${asset.asset}`, '', `Verdict: **${asset.verdict}**`, '', '| Lead | N | Non-overlap eq. | Baseline score | Candidate score | Improvement | Baseline cov. | Candidate cov. | Corrected p |', '|---:|---:|---:|---:|---:|---:|---:|---:|---:|');

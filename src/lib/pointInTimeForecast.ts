@@ -4,12 +4,14 @@ import { fitPowerLawCoefficients, forecastWithPowerLawCoefficients, type PowerLa
 import { daysSinceGenesis } from './powerLaw';
 import { fittedBasePowerLawPrice } from './powerLawFit';
 import { STATE_SPACE_PARAMETER_GRID, computePathDiagnostics, fitLocalLevelResidualModel, forecastStateSpaceResidual, generateOriginSafeInnovations, type PathDiagnostics } from './stateSpaceResidual';
+import { purgeAndEmbargoResidualRows } from './featureExperimentDataset';
 
 export const PIT_HORIZONS = [14, 30, 60, 90] as const;
 export const PIT_SEED = 0x594c0000;
 export const STRUCTURAL_SHRINKAGE_GRID = Object.freeze([0.25, 0.5, 0.75] as const);
 export const INNER_WALK_FORWARD_FOLDS = 6;
 export const INNER_MIN_TRAINING_ROWS = 1460;
+export const MIN_INTERVAL_ELIGIBLE_ROWS = 30;
 export type PitCandidateId = 'structural-shrinkage' | 'state-space-residual' | 'calibrated-jagged-path';
 
 export type PitBenchmarkId = 'reconstructed-current-policy' | 'naive-current-price' | 'gbm-driftless' | 'gbm-recent-drift' | 'ma-trend-20-50-200';
@@ -38,7 +40,8 @@ export interface PitOriginRecord {
   trainingRows: number;
   lastKnownTargetDate: string | null;
   coefficients: PowerLawFitCoefficients;
-  interval: PitIntervalSnapshot;
+  interval: PitIntervalSnapshot | null;
+  intervalSkipReason: string | null;
   dataHash: string;
   seed: number;
   benchmarks: PitBenchmarkRow[];
@@ -57,7 +60,34 @@ export interface PitOriginRecord {
 export interface PitSkipRecord { originDate: string; horizonDays: number; reason: string }
 export interface PointInTimeResult { origins: PitOriginRecord[]; skips: PitSkipRecord[] }
 
-interface MaturedError { originDate: string; targetDate: string; absLogError: number }
+export interface MaturedError { originDate: string; targetDate: string; absLogError: number }
+
+export interface PitIntervalEvaluation {
+  interval: PitIntervalSnapshot | null;
+  intervalSkipReason: string | null;
+  lastKnownTargetDate: string | null;
+  eligibleRows: number;
+  excludedUnresolvedTargets: number;
+  excludedByEmbargo: number;
+}
+
+/** Apply the shared point-in-time predicate before constructing interval quantiles. */
+export function buildPitIntervalEvaluation(
+  errors: MaturedError[],
+  evaluationOriginDate: string,
+  horizonDays: number
+): PitIntervalEvaluation {
+  const eligible = purgeAndEmbargoResidualRows(errors, evaluationOriginDate, horizonDays);
+  const intervalResult = intervalSnapshot(eligible.rows);
+  return {
+    interval: intervalResult.snapshot,
+    intervalSkipReason: intervalResult.skipReason,
+    lastKnownTargetDate: eligible.lastKnownTargetDate,
+    eligibleRows: eligible.rows.length,
+    excludedUnresolvedTargets: eligible.excludedUnresolvedTargets,
+    excludedByEmbargo: eligible.excludedByEmbargo,
+  };
+}
 
 /** Daily closes are treated as observable after their UTC date closes. Thus a
  * forecast made after the origin close may fit through that origin, but never
@@ -88,12 +118,9 @@ export function runPointInTimeBenchmark(input: {
       const target = rows[originIndex + horizonDays];
       if (!target) { skips.push({ originDate: origin.date, horizonDays, reason: 'target-not-yet-observed' }); continue; }
       if (!coefficients) { skips.push({ originDate: origin.date, horizonDays, reason: 'insufficient-structural-training' }); continue; }
-      const matured = (errorsByHorizon.get(horizonDays) ?? []).filter(error => error.targetDate < origin.date);
       const allPriorExamples = errorsByHorizon.get(horizonDays) ?? [];
-      const embargoBoundary = new Date(utcDate(origin.date).getTime() - horizonDays * 86_400_000).toISOString().slice(0, 10);
-      const embargoed = matured.filter(error => error.originDate >= embargoBoundary);
-      const supervisedPolicy = { targetBoundary: 'strictly-before-origin' as const, embargoDays: horizonDays, eligibleRows: matured.length - embargoed.length, excludedUnresolvedTargets: allPriorExamples.length - matured.length, excludedByEmbargo: embargoed.length };
-      const interval = intervalSnapshot(matured);
+      const intervalEvaluation = buildPitIntervalEvaluation(allPriorExamples, origin.date, horizonDays);
+      const supervisedPolicy = { targetBoundary: 'strictly-before-origin' as const, embargoDays: horizonDays, eligibleRows: intervalEvaluation.eligibleRows, excludedUnresolvedTargets: intervalEvaluation.excludedUnresolvedTargets, excludedByEmbargo: intervalEvaluation.excludedByEmbargo };
       const reconstructed = forecastWithPowerLawCoefficients(coefficients, utcDate(target.date), origin.close, utcDate(origin.date));
       const forecasts: [PitBenchmarkId, number][] = [
         ['reconstructed-current-policy', reconstructed],
@@ -111,7 +138,7 @@ export function runPointInTimeBenchmark(input: {
       origins.push({
         originDate: origin.date, targetDate: target.date, horizonDays,
         trainingStart: training[0].date, trainingEnd: training.at(-1)!.date, trainingRows: training.length,
-        lastKnownTargetDate: interval.lastKnownTargetDate, coefficients, interval,
+        lastKnownTargetDate: intervalEvaluation.lastKnownTargetDate, coefficients, interval: intervalEvaluation.interval, intervalSkipReason: intervalEvaluation.intervalSkipReason,
         dataHash: hashRows(training), seed, benchmarks, candidate, supervisedPolicy,
       });
     }
@@ -175,10 +202,23 @@ function mapTerminal(value:number,from:ReturnType<typeof fiveQuantiles>,to:Retur
 
 function blendCoefficients(anchor: PowerLawFitCoefficients, refit: PowerLawFitCoefficients, weight: number): PowerLawFitCoefficients { return { coefficient: Math.exp((1-weight)*Math.log(anchor.coefficient)+weight*Math.log(refit.coefficient)), exponent:(1-weight)*anchor.exponent+weight*refit.exponent, sinAmplitude:(1-weight)*anchor.sinAmplitude+weight*refit.sinAmplitude, cosAmplitude:(1-weight)*anchor.cosAmplitude+weight*refit.cosAmplitude, cycleDays:refit.cycleDays }; }
 
-function intervalSnapshot(errors: MaturedError[]): PitIntervalSnapshot {
+function intervalSnapshot(errors: MaturedError[]): { snapshot: PitIntervalSnapshot | null; skipReason: string | null } {
   const values = errors.map(row => row.absLogError).sort((a, b) => a - b);
-  return { maturedErrors: values.length, lastKnownTargetDate: errors.map(e => e.targetDate).sort().at(-1) ?? null,
-    q80AbsLogError: quantile(values, .8), q90AbsLogError: quantile(values, .9), q95AbsLogError: quantile(values, .95) };
+  const lastKnownTargetDate = errors.map(e => e.targetDate).sort().at(-1) ?? null;
+  if (values.length < MIN_INTERVAL_ELIGIBLE_ROWS) {
+    return {
+      snapshot: null,
+      skipReason: `interval skipped: ${values.length} eligible rows is below the minimum of ${MIN_INTERVAL_ELIGIBLE_ROWS}`,
+    };
+  }
+  return {
+    snapshot: {
+      maturedErrors: values.length,
+      lastKnownTargetDate,
+      q80AbsLogError: quantile(values, .8), q90AbsLogError: quantile(values, .9), q95AbsLogError: quantile(values, .95),
+    },
+    skipReason: null,
+  };
 }
 function quantile(xs: number[], q: number): number | null { if (!xs.length) return null; return xs[Math.floor((xs.length - 1) * q)]; }
 function hashRows(rows: OHLCVData[]): string { return createHash('sha256').update(JSON.stringify(rows.map(r => [r.date,r.open,r.high,r.low,r.close,r.volume]))).digest('hex'); }

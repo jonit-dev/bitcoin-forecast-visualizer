@@ -1,0 +1,291 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-02T22:07:30.669Z",
+    "command": "yarn calibrate:intervals",
+    "dataset": {
+      "firstDate": "2010-07-17",
+      "lastDate": "2026-07-15",
+      "rowCount": 5843
+    },
+    "calibration": {
+      "fitStartDate": "2017-01-01",
+      "fitEndDate": "2021-12-31",
+      "validationStartDate": "2022-01-01",
+      "divergenceTolerance": 0.05,
+      "minimumEligibleRows": 30
+    },
+    "horizons": [
+      14,
+      30,
+      60,
+      90,
+      180,
+      365
+    ]
+  },
+  "status": "DIVERGENT",
+  "suggestedConfig": null,
+  "rows": [
+    {
+      "horizonDays": 14,
+      "status": "DIVERGENT",
+      "multiplier": 1.11,
+      "fitSamples": 1826,
+      "validationSamples": 1643,
+      "fitSkippedWindows": 0,
+      "validationSkippedWindows": 0,
+      "fitCoverage": {
+        "interval80": 0.8329682365826944,
+        "interval90": 0.9003285870755751,
+        "interval95": 0.9381161007667032
+      },
+      "validationCoverage": {
+        "interval80": 0.8606208155812538,
+        "interval90": 0.9227023737066342,
+        "interval95": 0.953134510042605
+      },
+      "fitCrps": 1198.942709154978,
+      "validationCrps": 2488.964890712415,
+      "fitWinkler80": 9370.109746685874,
+      "fitWinkler90": 11548.802440150315,
+      "fitWinkler95": 13632.249819276352,
+      "validationWinkler80": 19535.644109309185,
+      "validationWinkler90": 23966.657581417876,
+      "validationWinkler95": 27817.257882425063,
+      "fitValidationDivergence": {
+        "interval80": 0.02765257899855944,
+        "interval90": 0.022373786631059156,
+        "interval95": 0.015018409275901812
+      },
+      "validationNominalDivergence": {
+        "interval80": 0.06062081558125376,
+        "interval90": 0.022702373706634194,
+        "interval95": 0.00313451004260501
+      },
+      "reasons": [
+        "interval80 validation/nominal divergence 0.0606 > 0.0500"
+      ]
+    },
+    {
+      "horizonDays": 30,
+      "status": "DIVERGENT",
+      "multiplier": 1.17,
+      "fitSamples": 1826,
+      "validationSamples": 1627,
+      "fitSkippedWindows": 0,
+      "validationSkippedWindows": 0,
+      "fitCoverage": {
+        "interval80": 0.8077765607886089,
+        "interval90": 0.8975903614457831,
+        "interval95": 0.9331872946330778
+      },
+      "validationCoverage": {
+        "interval80": 0.869698832206515,
+        "interval90": 0.9465273509526736,
+        "interval95": 0.9772587584511371
+      },
+      "fitCrps": 1795.2319397159622,
+      "validationCrps": 3585.126332202531,
+      "fitWinkler80": 13632.046227914723,
+      "fitWinkler90": 16779.438202570214,
+      "fitWinkler95": 20200.354330582588,
+      "validationWinkler80": 27579.69300494172,
+      "validationWinkler90": 33250.02472759407,
+      "validationWinkler95": 38282.124120288194,
+      "fitValidationDivergence": {
+        "interval80": 0.06192227141790607,
+        "interval90": 0.048936989506890516,
+        "interval95": 0.044071463818059264
+      },
+      "validationNominalDivergence": {
+        "interval80": 0.06969883220651496,
+        "interval90": 0.046527350952673574,
+        "interval95": 0.02725875845113712
+      },
+      "reasons": [
+        "interval80 fit/validation divergence 0.0619 > 0.0500",
+        "interval80 validation/nominal divergence 0.0697 > 0.0500"
+      ]
+    },
+    {
+      "horizonDays": 60,
+      "status": "DIVERGENT",
+      "multiplier": 1.34,
+      "fitSamples": 1826,
+      "validationSamples": 1597,
+      "fitSkippedWindows": 0,
+      "validationSkippedWindows": 0,
+      "fitCoverage": {
+        "interval80": 0.8176341730558598,
+        "interval90": 0.8992332968236583,
+        "interval95": 0.9452354874041621
+      },
+      "validationCoverage": {
+        "interval80": 0.947401377582968,
+        "interval90": 0.9949906073888541,
+        "interval95": 1
+      },
+      "fitCrps": 2740.985134490739,
+      "validationCrps": 5014.191415612545,
+      "fitWinkler80": 19906.52061146798,
+      "fitWinkler90": 24928.334249612093,
+      "fitWinkler95": 28950.007394340802,
+      "validationWinkler80": 37342.49904622387,
+      "validationWinkler90": 47333.920979838316,
+      "validationWinkler95": 56979.62008551196,
+      "fitValidationDivergence": {
+        "interval80": 0.12976720452710822,
+        "interval90": 0.09575731056519587,
+        "interval95": 0.05476451259583792
+      },
+      "validationNominalDivergence": {
+        "interval80": 0.147401377582968,
+        "interval90": 0.09499060738885412,
+        "interval95": 0.050000000000000044
+      },
+      "reasons": [
+        "interval80 fit/validation divergence 0.1298 > 0.0500",
+        "interval80 validation/nominal divergence 0.1474 > 0.0500",
+        "interval90 fit/validation divergence 0.0958 > 0.0500",
+        "interval90 validation/nominal divergence 0.0950 > 0.0500",
+        "interval95 fit/validation divergence 0.0548 > 0.0500",
+        "interval95 validation/nominal divergence 0.0500 > 0.0500"
+      ]
+    },
+    {
+      "horizonDays": 90,
+      "status": "DIVERGENT",
+      "multiplier": 1.34,
+      "fitSamples": 1826,
+      "validationSamples": 1567,
+      "fitSkippedWindows": 0,
+      "validationSkippedWindows": 0,
+      "fitCoverage": {
+        "interval80": 0.80065717415115,
+        "interval90": 0.8997809419496167,
+        "interval95": 0.9545454545454546
+      },
+      "validationCoverage": {
+        "interval80": 0.9591576260370134,
+        "interval90": 0.998085513720485,
+        "interval95": 1
+      },
+      "fitCrps": 3391.4087519301706,
+      "validationCrps": 5739.277235741515,
+      "fitWinkler80": 25270.89062496666,
+      "fitWinkler90": 31064.982645611486,
+      "fitWinkler95": 35376.755943525284,
+      "validationWinkler80": 43098.42469174694,
+      "validationWinkler90": 55381.11485772162,
+      "validationWinkler95": 66939.14295918855,
+      "fitValidationDivergence": {
+        "interval80": 0.15850045188586337,
+        "interval90": 0.09830457177086838,
+        "interval95": 0.045454545454545414
+      },
+      "validationNominalDivergence": {
+        "interval80": 0.15915762603701333,
+        "interval90": 0.09808551372048502,
+        "interval95": 0.050000000000000044
+      },
+      "reasons": [
+        "interval80 fit/validation divergence 0.1585 > 0.0500",
+        "interval80 validation/nominal divergence 0.1592 > 0.0500",
+        "interval90 fit/validation divergence 0.0983 > 0.0500",
+        "interval90 validation/nominal divergence 0.0981 > 0.0500",
+        "interval95 validation/nominal divergence 0.0500 > 0.0500"
+      ]
+    },
+    {
+      "horizonDays": 180,
+      "status": "DIVERGENT",
+      "multiplier": 1.33,
+      "fitSamples": 1826,
+      "validationSamples": 1477,
+      "fitSkippedWindows": 0,
+      "validationSkippedWindows": 0,
+      "fitCoverage": {
+        "interval80": 0.8001095290251917,
+        "interval90": 0.8992332968236583,
+        "interval95": 0.9496166484118291
+      },
+      "validationCoverage": {
+        "interval80": 0.9485443466486121,
+        "interval90": 0.997968855788761,
+        "interval95": 1
+      },
+      "fitCrps": 4061.0067234446346,
+      "validationCrps": 6193.162631745455,
+      "fitWinkler80": 33237.73564842692,
+      "fitWinkler90": 41051.92223659401,
+      "fitWinkler95": 46640.43598704351,
+      "validationWinkler80": 54004.85118856673,
+      "validationWinkler90": 68934.52406204835,
+      "validationWinkler95": 83800.37161986309,
+      "fitValidationDivergence": {
+        "interval80": 0.14843481762342037,
+        "interval90": 0.09873555896510278,
+        "interval95": 0.050383351588170866
+      },
+      "validationNominalDivergence": {
+        "interval80": 0.14854434664861205,
+        "interval90": 0.09796885578876102,
+        "interval95": 0.050000000000000044
+      },
+      "reasons": [
+        "interval80 fit/validation divergence 0.1484 > 0.0500",
+        "interval80 validation/nominal divergence 0.1485 > 0.0500",
+        "interval90 fit/validation divergence 0.0987 > 0.0500",
+        "interval90 validation/nominal divergence 0.0980 > 0.0500",
+        "interval95 fit/validation divergence 0.0504 > 0.0500",
+        "interval95 validation/nominal divergence 0.0500 > 0.0500"
+      ]
+    },
+    {
+      "horizonDays": 365,
+      "status": "DIVERGENT",
+      "multiplier": 1.18,
+      "fitSamples": 1826,
+      "validationSamples": 1292,
+      "fitSkippedWindows": 0,
+      "validationSkippedWindows": 0,
+      "fitCoverage": {
+        "interval80": 0.8055859802847755,
+        "interval90": 0.8806133625410734,
+        "interval95": 0.9496166484118291
+      },
+      "validationCoverage": {
+        "interval80": 1,
+        "interval90": 1,
+        "interval95": 1
+      },
+      "fitCrps": 4349.933540714042,
+      "validationCrps": 6249.742688298149,
+      "fitWinkler80": 31816.72482069843,
+      "fitWinkler90": 38344.38899932599,
+      "fitWinkler95": 45691.91913418701,
+      "validationWinkler80": 56733.66313945179,
+      "validationWinkler90": 74218.05855096775,
+      "validationWinkler95": 90243.63235024516,
+      "fitValidationDivergence": {
+        "interval80": 0.19441401971522454,
+        "interval90": 0.11938663745892664,
+        "interval95": 0.050383351588170866
+      },
+      "validationNominalDivergence": {
+        "interval80": 0.19999999999999996,
+        "interval90": 0.09999999999999998,
+        "interval95": 0.050000000000000044
+      },
+      "reasons": [
+        "interval80 fit/validation divergence 0.1944 > 0.0500",
+        "interval80 validation/nominal divergence 0.2000 > 0.0500",
+        "interval90 fit/validation divergence 0.1194 > 0.0500",
+        "interval90 validation/nominal divergence 0.1000 > 0.0500",
+        "interval95 fit/validation divergence 0.0504 > 0.0500",
+        "interval95 validation/nominal divergence 0.0500 > 0.0500"
+      ]
+    }
+  ],
+  "note": "Validation coverage is scored on a disjoint window. DIVERGENT rows never contribute a suggested shipped multiplier. CRPS and Winkler are absolute price-scale scores; PIT is not used for multiplier fitting."
+}

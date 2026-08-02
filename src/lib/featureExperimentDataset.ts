@@ -46,8 +46,13 @@ export interface ResidualDatasetResult {
   summary: ResidualDatasetSummary;
 }
 
-export interface PurgedResidualDataset {
-  rows: ResidualDatasetRow[];
+export interface EvaluationDateRow {
+  originDate: string;
+  targetDate: string;
+}
+
+export interface PurgedResidualDataset<T extends EvaluationDateRow = ResidualDatasetRow> {
+  rows: T[];
   excludedUnresolvedTargets: number;
   excludedByEmbargo: number;
   lastKnownTargetDate: string | null;
@@ -61,11 +66,11 @@ export interface PurgedResidualDataset {
  * origins fall within `embargoDays` calendar days before evaluation. This is
  * intended for fold boundaries where adjacent examples share price paths.
  */
-export function purgeResidualRowsForEvaluation(
-  rows: ResidualDatasetRow[],
+export function purgeResidualRowsForEvaluation<T extends EvaluationDateRow>(
+  rows: T[],
   evaluationOriginDate: string,
   embargoDays = 0
-): PurgedResidualDataset {
+): PurgedResidualDataset<T> {
   if (!Number.isInteger(embargoDays) || embargoDays < 0) {
     throw new Error(`embargoDays must be a non-negative integer, received ${embargoDays}`);
   }
@@ -95,12 +100,12 @@ export function purgeResidualRowsForEvaluation(
 
 /** Phase-2 fold policy: use an embargo at least as long as the evaluated
  * horizon, preventing adjacent origin paths from straddling the fold. */
-export function purgeAndEmbargoResidualRows(
-  rows: ResidualDatasetRow[],
+export function purgeAndEmbargoResidualRows<T extends EvaluationDateRow>(
+  rows: T[],
   evaluationOriginDate: string,
   horizonDays: number,
   embargoDays = horizonDays
-): PurgedResidualDataset {
+): PurgedResidualDataset<T> {
   if (embargoDays < horizonDays) {
     throw new Error(`embargoDays (${embargoDays}) must be at least horizonDays (${horizonDays})`);
   }

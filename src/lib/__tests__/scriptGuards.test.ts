@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
+import { evaluateCalibrationRow, suggestedConfig, type CalibrationPoint } from '../../../scripts/calibrate-intervals';
 
 describe('script guardrails', () => {
   it('should reject negative stablecoin supply', () => {
@@ -72,4 +73,27 @@ describe('script guardrails', () => {
     expect(restored).toBe('{"rows":[{"date":"2026-07-01"}]}\n');
     expect(`${result.stderr}${result.stdout}`).toContain('preserved previous cache');
   });
+
+  it('should refuse to emit a suggested multiplier when validation coverage diverges', () => {
+    const fitPoints = calibrationPoints(100);
+    const validationPoints = calibrationPoints(1_000);
+    const row = evaluateCalibrationRow({
+      horizonDays: 30,
+      multiplier: 1,
+      fit: { points: fitPoints, skippedWindows: 0 },
+      validation: { points: validationPoints, skippedWindows: 0 },
+    });
+
+    expect(row.status).toBe('DIVERGENT');
+    expect(suggestedConfig([row])).toBeNull();
+  });
 });
+
+function calibrationPoints(actual: number): CalibrationPoint[] {
+  return Array.from({ length: 30 }, (_, index) => ({
+    originDate: `2020-01-${String(index + 1).padStart(2, '0')}`,
+    actual,
+    median: 100,
+    baseSigma: 1,
+  }));
+}

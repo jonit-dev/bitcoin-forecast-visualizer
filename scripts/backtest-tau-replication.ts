@@ -283,6 +283,7 @@ function renderMarkdown(report: any): string {
     '- Gate: ≥30 nominal non-overlapping equivalents, positive lower95, adjusted p<0.05, ≥1% improvement, coverage loss ≤2pp, and no negative reported origin subperiod.',
     '- `lower95` is the uncentered one-sided confidence bound against zero; the Holm p-value tests the stricter 1% practical-improvement null.',
     '- Claim status is capped at research-only because no untouched final holdout exists.',
+    '- Pinball scale in embedded aggregate metric rows: absolute; pre-2026-08 pinball figures are superseded.',
     '',
     '## Results',
     '',

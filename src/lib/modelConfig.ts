@@ -34,15 +34,28 @@ export const INTERVAL_CONFIG = {
     { horizonDays: 14, multiplier: 1.01, coverageStatus: 'calibrated', label: 'Calibrated' },
     { horizonDays: 30, multiplier: 0.98, coverageStatus: 'calibrated', label: 'Calibrated' },
     { horizonDays: 60, multiplier: 0.99, coverageStatus: 'conservative', label: 'Conservative' },
-    { horizonDays: 90, multiplier: 0.87, coverageStatus: 'calibrated', label: 'Calibrated' },
+    { horizonDays: 90, multiplier: 0.88, coverageStatus: 'calibrated', label: 'Calibrated' },
     { horizonDays: 180, multiplier: 0.86, coverageStatus: 'scenario', label: 'Scenario range' },
-    { horizonDays: 365, multiplier: 0.59, coverageStatus: 'scenario', label: 'Scenario range' },
+    { horizonDays: 365, multiplier: 0.85, coverageStatus: 'scenario', label: 'Scenario range' },
   ],
   scenarioPolicy: {
     maxFittedHorizonDays: 365,
-    aboveMaxMultiplier: 0.59,
+    aboveMaxMultiplier: 0.85,
     label: 'Scenario range',
   },
+} as const;
+
+/**
+ * Disjoint calibration windows for interval multipliers. A row is only
+ * eligible for a suggested shipped multiplier when its validation coverage
+ * remains within the declared fit/validation and nominal-coverage tolerance.
+ */
+export const INTERVAL_CALIBRATION_CONFIG = {
+  fitStartDate: '2017-01-01',
+  fitEndDate: '2021-12-31',
+  validationStartDate: '2022-01-01',
+  divergenceTolerance: 0.05,
+  minimumEligibleRows: 30,
 } as const;
 
 export const BACKTEST_CONFIG = {

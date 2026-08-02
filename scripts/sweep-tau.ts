@@ -246,6 +246,7 @@ function renderMarkdown(report: TauSweepReport): string {
     report.verdict.reason,
     '',
     `Promotion policy: ${report.metadata.promotionPolicy}`,
+    'Pinball scale in embedded aggregate metric rows: `absolute`; pre-2026-08 pinball figures are superseded.',
     '',
     '## Ranked Candidates',
     '',
