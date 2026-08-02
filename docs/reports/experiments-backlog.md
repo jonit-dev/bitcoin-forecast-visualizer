@@ -1271,7 +1271,7 @@ No source-history or median-forecast changes are authorized. Use the checked-in 
 
 ### Validation setup
 
-- Run focused metric, proper-scoring, point-in-time, calibration, and script-guard tests, then `yarn test`, `yarn lint`, `yarn build`, `yarn backtest`, `yarn backtest:report-only`, and `yarn backtest:pit-core`.
+- Run focused metric, proper-scoring, point-in-time, calibration, and script-guard tests, then `yarn test`, `yarn lint`, `yarn build`, `yarn backtest`, `yarn backtest:report-only`, `yarn backtest:pit-core`, and `yarn calibrate:intervals`.
 - Compare regenerated backtest and point-in-time artifacts with the cited pre-change reports, including absolute pinball deltas, CRPS, Winkler 80/90/95, PIT histograms, PIT-uniformity chi-square/df without p-values, and excluded embargo counts.
 - Fit interval multipliers on `2017-01-01` through `2021-12-31`; validate on `2022-01-01` onward, with the declared divergence tolerance and a minimum eligible interval-row count of 30 unless a harmless data boundary adjustment is documented.
 - Run the caller census, revert checks, incumbent-filter census, negative controls, `git diff --check`, and the complete acceptance-criterion audit. The known unrelated MVRV `yarn validate:data` failure remains recorded and out of scope.
@@ -1280,26 +1280,37 @@ No source-history or median-forecast changes are authorized. Use the checked-in 
 
 Verified artifacts:
 
-- `docs/reports/results/backtest-2026-08-02T22-06-57-516Z.md`
-- `docs/reports/results/backtest-2026-08-02T22-06-57-516Z.json`
-- `docs/reports/results/backtest-2026-08-02T22-07-03-417Z.md` (report-only rerun)
-- `docs/reports/results/backtest-2026-08-02T22-07-03-417Z.json` (report-only rerun)
-- `docs/reports/results/point-in-time-core-2026-08-02T22-07-11-667Z.md`
-- `docs/reports/results/point-in-time-core-2026-08-02T22-07-11-667Z.json`
-- `docs/reports/results/interval-calibration-2026-08-02T22-07-30-669Z.md`
-- `docs/reports/results/interval-calibration-2026-08-02T22-07-30-669Z.json`
+- `docs/reports/results/backtest-2026-08-02T22-50-53-583Z.md`
+- `docs/reports/results/backtest-2026-08-02T22-50-53-583Z.json`
+- `docs/reports/results/backtest-2026-08-02T22-50-56-745Z.md` (report-only rerun)
+- `docs/reports/results/backtest-2026-08-02T22-50-56-745Z.json` (report-only rerun)
+- `docs/reports/results/point-in-time-core-2026-08-02T22-51-00-147Z.md`
+- `docs/reports/results/point-in-time-core-2026-08-02T22-51-00-147Z.json`
+- `docs/reports/results/interval-calibration-2026-08-02T22-51-16-892Z.md`
+- `docs/reports/results/interval-calibration-2026-08-02T22-51-16-892Z.json`
 
 ### Result / verdict
 
-The implementation gates passed for scoring, report wiring, minimum-row interval skips, shared embargo routing, and monotone interval widths. `yarn test` passed with 27 files and 120 tests; `yarn lint`, `yarn build`, `yarn backtest`, `yarn backtest:report-only`, and `yarn backtest:pit-core` passed. The backtest quality and robustness artifacts both report `PASS` at 14/30/60/90d. The corrected report carries `pinballScale: absolute`, CRPS, Winkler 80/90/95, PIT histograms with expected counts, PIT chi-square/df without p-values, and excluded PIT counts.
+The implementation gates passed for scoring, report wiring, minimum-row interval skips, and shared embargo routing. The shipped interval table is the committed baseline (`90d=0.87`, `365d=0.59`, `aboveMaxMultiplier=0.59`); the rejected monotone-width experiment was reverted and no runtime multiplier is promoted from the divergent calibration. The corrected reports carry `pinballScale: absolute`, approximate CRPS with the full seven-quantile grid and endpoint-constant tails, Winkler 80/90/95, PIT histograms with expected counts, PIT chi-square/df without p-values, and excluded PIT counts. Verification: `yarn test` passed with 27 files and 124 tests; `yarn lint` passed; `yarn build` passed with the existing chunk-size warning; `yarn backtest` and `yarn backtest:report-only` both reported quality and robustness `PASS` at 14/30/60/90d; `yarn backtest:pit-core` produced 458 origin/horizon rows and 6 skips; `yarn calibrate:intervals` reported all six horizons `DIVERGENT` and refused a suggested config; `git diff --check` passed.
 
-The disjoint calibration fit window (`2017-01-01` through `2021-12-31`) and validation window (`2022-01-01` onward) each had ample rows, but all six horizons were `DIVERGENT` at the declared 0.05 tolerance. The script refused to emit a suggested config. The committed 90d/365d multipliers were adjusted only for the required monotone-width safety invariant (`0.87 → 0.88`, `0.59 → 0.85`), and the post-adjustment backtest quality/robustness gates passed; they are not claimed as disjointly calibrated multipliers.
+The disjoint calibration fit window (`2017-01-01` through `2021-12-31`) and validation window (`2022-01-01` onward) each had ample rows, but all six horizons were `DIVERGENT` at the declared 0.05 tolerance. The script refused to emit a suggested config. Calibration metadata records the repaired source commit, working/source-tree state, and dataset SHA-256; the generated artifacts record `gitCommit=eeb1478aadb22bcc11ecfde1b6e0365683890435`, `sourceTreeDirty=false`, and the accurate generation state: the first backtest artifact has `workingTreeDirty=false`, while the report-only, PIT, and calibration artifacts have `workingTreeDirty=true` because earlier generated report files were present.
 
 The required manual `yarn dev` screenshot checkpoint for the changed chart band was not run in this lane, so the visual difference remains unverified.
 
 The PIT artifact contains 458 origin/horizon rows, 126 null intervals below the 30-row minimum, and `excludedByEmbargo=0` on the checked-in daily BTC history. A controlled dense-row test proves an in-window origin changes the unpurged quantile but not the shared-predicate interval quantile. The zero artifact count is a data-boundary result, not evidence that the embargo path is unused.
 
 `yarn validate:data` remains failed only at the known unrelated MVRV upstream drift check (`CoinMetrics mismatch count=5722`, first `2010-11-14`, local market cap `1281896`, upstream `1281924`); no data was changed.
+
+### Observed negative-control evidence
+
+Each mutation was applied with `apply_patch`, the named command was run, the exact source mutation was restored with the inverse `apply_patch`, and the restored command passed.
+
+1. **Pinball normalization:** Mutation in `src/lib/backtestMetrics.ts`: `pinballLoss(actual, predicted, quantile)` → `pinballLoss(actual, predicted, quantile) / actual`. Command: `yarn test src/lib/__tests__/backtestMetrics.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 2 failed | 6 passed`; `should score a perfect median... expected null to be +0`, and `should weight equal relative errors... expected 0.05 to be close to 2900`. Restoration: removed `/ actual`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
+2. **Proper-scoring wiring:** Mutation in `src/lib/backtestMetrics.ts`: replaced the CRPS input map/filter with `const crpsValues: number[] = []`. Command: `yarn test src/lib/__tests__/backtestMetrics.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should wire the full ForecastDistribution quantile grid... expected null to be close to 3.4750000000000014`. Restoration: restored the `inputs.map(({ actual, forecast }) => crpsFromQuantiles(actual, quantileSet(forecast)))` map/filter. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
+3. **Shared embargo:** Mutation in `src/lib/pointInTimeForecast.ts`: `intervalSnapshot(eligible.rows)` → `intervalSnapshot(errors)`. Command: `yarn test src/lib/__tests__/pointInTimeForecast.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should exclude an in-window origin... expected 33 to be 34`. Restoration: restored `intervalSnapshot(eligible.rows)`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
+4. **Minimum-row guard:** Mutation in `src/lib/pointInTimeForecast.ts`: `values.length < MIN_INTERVAL_ELIGIBLE_ROWS` → `values.length < 0`. Command: `yarn test src/lib/__tests__/pointInTimeForecast.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should skip the interval when fewer than the minimum eligible rows remain... expected { maturedErrors: 0, ... } to be null`. Restoration: restored `< MIN_INTERVAL_ELIGIBLE_ROWS`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
+5. **Divergence refusal:** Mutation in `scripts/calibrate-intervals.ts`: `if (rows.some(row => row.status !== 'VALIDATED' || row.multiplier === null)) return null` → `if (false) return null`. Command: `yarn test src/lib/__tests__/scriptGuards.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 6 passed`; `should refuse to emit a suggested multiplier... expected [ { horizonDays: 30, ... } ] to be null`. Restoration: restored the status/multiplier predicate. Restored green: `Test Files 1 passed (1)`, `Tests 7 passed (7)`.
+6. **Inflated-sigma PIT control:** Mutation in `src/lib/properScoring.ts`: PIT denominator `sigma` → `sigma * 2`. Command: `yarn test src/lib/__tests__/properScoring.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 2 failed | 7 passed`; calibrated sample chi-square was `462.91999999999996` instead of `< 21.666`, and the inflated-sigma control was `14.2` instead of `> 21.666`. Restoration: restored denominator `sigma`. Restored green: `Test Files 1 passed (1)`, `Tests 9 passed (9)`.
 
 ### Rerun criteria
 

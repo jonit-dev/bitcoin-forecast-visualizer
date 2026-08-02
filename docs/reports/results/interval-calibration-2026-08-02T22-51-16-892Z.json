@@ -1,11 +1,15 @@
 {
   "metadata": {
-    "generatedAt": "2026-08-02T22:07:30.669Z",
+    "generatedAt": "2026-08-02T22:51:16.892Z",
     "command": "yarn calibrate:intervals",
+    "gitCommit": "eeb1478aadb22bcc11ecfde1b6e0365683890435",
+    "workingTreeDirty": true,
+    "sourceTreeDirty": false,
     "dataset": {
       "firstDate": "2010-07-17",
       "lastDate": "2026-07-15",
-      "rowCount": 5843
+      "rowCount": 5843,
+      "sha256": "c347fddeffe98b42864ae6b5f9676c7c04d2b3be9de7cab317b366f7381c1ae0"
     },
     "calibration": {
       "fitStartDate": "2017-01-01",
@@ -21,7 +25,23 @@
       90,
       180,
       365
-    ]
+    ],
+    "crps": {
+      "method": "quantile pinball integral identity with trapezoidal quadrature",
+      "quantileGrid": [
+        "q025",
+        "q05",
+        "q10",
+        "q50",
+        "q90",
+        "q95",
+        "q975"
+      ],
+      "tailConvention": "Endpoint-constant extension over the full probability domain: Q(p) equals the first supplied quantile below the first grid probability and the last supplied quantile above the last grid probability.",
+      "approximationErrorBound": null,
+      "approximationErrorBoundStatement": "A numeric approximation-error bound is not estimable from this sparse quantile grid and endpoint-tail assumption.",
+      "label": "Approximate CRPS (sparse quantile grid; endpoint-constant tails)"
+    }
   },
   "status": "DIVERGENT",
   "suggestedConfig": null,
@@ -44,8 +64,8 @@
         "interval90": 0.9227023737066342,
         "interval95": 0.953134510042605
       },
-      "fitCrps": 1198.942709154978,
-      "validationCrps": 2488.964890712415,
+      "fitCrps": 1232.4335553819114,
+      "validationCrps": 2556.086641557997,
       "fitWinkler80": 9370.109746685874,
       "fitWinkler90": 11548.802440150315,
       "fitWinkler95": 13632.249819276352,
@@ -84,8 +104,8 @@
         "interval90": 0.9465273509526736,
         "interval95": 0.9772587584511371
       },
-      "fitCrps": 1795.2319397159622,
-      "validationCrps": 3585.126332202531,
+      "fitCrps": 1844.1113311518802,
+      "validationCrps": 3675.7794851246827,
       "fitWinkler80": 13632.046227914723,
       "fitWinkler90": 16779.438202570214,
       "fitWinkler95": 20200.354330582588,
@@ -125,8 +145,8 @@
         "interval90": 0.9949906073888541,
         "interval95": 1
       },
-      "fitCrps": 2740.985134490739,
-      "validationCrps": 5014.191415612545,
+      "fitCrps": 2810.230359345558,
+      "validationCrps": 5144.583341944224,
       "fitWinkler80": 19906.52061146798,
       "fitWinkler90": 24928.334249612093,
       "fitWinkler95": 28950.007394340802,
@@ -170,8 +190,8 @@
         "interval90": 0.998085513720485,
         "interval95": 1
       },
-      "fitCrps": 3391.4087519301706,
-      "validationCrps": 5739.277235741515,
+      "fitCrps": 3477.033483896944,
+      "validationCrps": 5892.177558012656,
       "fitWinkler80": 25270.89062496666,
       "fitWinkler90": 31064.982645611486,
       "fitWinkler95": 35376.755943525284,
@@ -214,8 +234,8 @@
         "interval90": 0.997968855788761,
         "interval95": 1
       },
-      "fitCrps": 4061.0067234446346,
-      "validationCrps": 6193.162631745455,
+      "fitCrps": 4174.018208284971,
+      "validationCrps": 6384.081251347839,
       "fitWinkler80": 33237.73564842692,
       "fitWinkler90": 41051.92223659401,
       "fitWinkler95": 46640.43598704351,
@@ -259,8 +279,8 @@
         "interval90": 1,
         "interval95": 1
       },
-      "fitCrps": 4349.933540714042,
-      "validationCrps": 6249.742688298149,
+      "fitCrps": 4456.269235050122,
+      "validationCrps": 6455.319801924662,
       "fitWinkler80": 31816.72482069843,
       "fitWinkler90": 38344.38899932599,
       "fitWinkler95": 45691.91913418701,
@@ -287,5 +307,5 @@
       ]
     }
   ],
-  "note": "Validation coverage is scored on a disjoint window. DIVERGENT rows never contribute a suggested shipped multiplier. CRPS and Winkler are absolute price-scale scores; PIT is not used for multiplier fitting."
+  "note": "Validation coverage is scored on a disjoint window. DIVERGENT rows never contribute a suggested shipped multiplier. Approximate CRPS uses the sparse quantile grid and endpoint-constant tails described in metadata; Winkler is an absolute price-scale score. PIT is not used for multiplier fitting."
 }
