@@ -18,6 +18,7 @@
     "backtest:pit-core": "tsx scripts/backtest-point-in-time-core.ts",
     "evaluate:prospective-forecast": "tsx scripts/evaluate-prospective-forecast.ts",
     "backtest:report-only": "tsx scripts/backtest-forecast.ts --report-only",
+    "backtest:distribution-family": "tsx scripts/backtest-distribution-family.ts",
     "backtest:ensemble-suite": "tsx scripts/backtest-forecast.ts --ensemble-suite",
     "backtest:tail-risk-suite": "tsx scripts/backtest-forecast.ts --tail-risk-suite",
     "refit:powerlaw": "tsx scripts/refit-power-law.ts",

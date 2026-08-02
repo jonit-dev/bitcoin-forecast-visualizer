@@ -4,8 +4,9 @@ import btcHistory from '../src/data/btc-history.json';
 import featureTable from '../src/data/feature-table.json';
 import type { OHLCVData } from '../src/lib/api';
 import type { FeatureRow } from '../src/lib/features';
-import { computePowerLawInterval, normalQuantile } from '../src/lib/forecastInterval';
+import { computePowerLawInterval } from '../src/lib/forecastInterval';
 import { POWER_LAW_CONFIG } from '../src/lib/modelConfig';
+import { quantileAt } from '../src/lib/predictiveDistribution';
 
 type AdjustmentRule = (features: FeatureRow['features'] | null, horizonDays: number) => number;
 
@@ -282,13 +283,14 @@ function evaluateIntervalMetric(
     currentNlls.push(currentNll);
     nllImprovements.push(currentNll - candidateNll);
 
-    const q05 = medianForecast * Math.exp(sigma * normalQuantile(0.05));
-    const q10 = medianForecast * Math.exp(sigma * normalQuantile(0.10));
+    const distribution = { kind: 'lognormal' as const };
+    const q05 = quantileAt(distribution, medianForecast, sigma, 0.05);
+    const q10 = quantileAt(distribution, medianForecast, sigma, 0.10);
     const q50 = medianForecast;
-    const q90 = medianForecast * Math.exp(sigma * normalQuantile(0.90));
-    const q95 = medianForecast * Math.exp(sigma * normalQuantile(0.95));
-    const q025 = medianForecast * Math.exp(sigma * normalQuantile(0.025));
-    const q975 = medianForecast * Math.exp(sigma * normalQuantile(0.975));
+    const q90 = quantileAt(distribution, medianForecast, sigma, 0.90);
+    const q95 = quantileAt(distribution, medianForecast, sigma, 0.95);
+    const q025 = quantileAt(distribution, medianForecast, sigma, 0.025);
+    const q975 = quantileAt(distribution, medianForecast, sigma, 0.975);
 
     pinballValues.q05.push(pinballLoss(actual, q05, 0.05) / actual);
     pinballValues.q10.push(pinballLoss(actual, q10, 0.10) / actual);

@@ -4,8 +4,22 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 import { evaluateCalibrationRow, suggestedConfig, type CalibrationPoint } from '../../../scripts/calibrate-intervals';
+import { scoreDistribution, scoreLognormalBaseline, type DistributionObservation } from '../../../scripts/backtest-distribution-family';
 
 describe('script guardrails', () => {
+  it('should score the infinite-degrees-of-freedom candidate identically to the lognormal baseline', () => {
+    const observations: DistributionObservation[] = [
+      { originDate: '2022-01-01', targetDate: '2022-01-15', actual: 105, median: 100, sigma: 0.2 },
+      { originDate: '2022-02-01', targetDate: '2022-03-03', actual: 92, median: 100, sigma: 0.25 },
+      { originDate: '2022-03-01', targetDate: '2022-04-30', actual: 118, median: 100, sigma: 0.3 },
+    ];
+    const baseline = scoreLognormalBaseline(observations);
+    const infinity = scoreDistribution(observations, Number.POSITIVE_INFINITY);
+    expect(infinity.metrics.crps).toBe(baseline.metrics.crps);
+    expect(infinity.crpsValues).toEqual(baseline.crpsValues);
+    expect(infinity.metrics.pitUniformity).toEqual(baseline.metrics.pitUniformity);
+  });
+
   it('should reject negative stablecoin supply', () => {
     const dir = mkdtempSync(join(tmpdir(), 'stablecoin-validator-'));
     const path = join(dir, 'stablecoin-history.json');

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { loadMarketData, type MarketAssetId } from '../api';
-import { CONFIDENCE_Z_SCORES } from '../data';
+import { CONFIDENCE_Z_SCORES, simulateHeatmapPrices } from '../data';
 import { forecastDataVersion, forecastPathSeed, FORECAST_PATH_GENERATOR_VERSION } from '../forecastPathSeed';
 import { buildMarketForecast } from '../marketForecast';
+import { powerLawForecast } from '../powerLaw';
 
 const assets: MarketAssetId[] = ['btc', 'sp500', 'gold'];
 const pairs = [[30, 90], [90, 180], [180, 365]] as const;
@@ -68,4 +69,22 @@ describe('forecast path horizon-prefix contract', () => {
   it('should select the same gold primary trace for all requested horizons', () => {
     for (const [short, long] of pairs) expect(mismatchCount(primary('gold', short, 'prefix-stable-v1'), primary('gold', long, 'prefix-stable-v1'))).toBe(0);
   });
+
+  it('should place the Monte Carlo median within a declared tolerance of the forecast median at every horizon', () => {
+    const data = fixtures.btc.ohlcv;
+    const last = data.at(-1)!;
+    const lastDate = new Date(`${last.date}T00:00:00Z`);
+    for (const horizon of [30, 90, 180, 365]) {
+      const simulation = simulateHeatmapPrices(data, horizon, 5_000, 120)!;
+      const sampleIndex = simulation.sampledDays.indexOf(horizon);
+      const terminalPrices = Array.from({ length: simulation.numSimulations }, (_, index) =>
+        simulation.prices[index * simulation.sampledDays.length + sampleIndex]
+      ).sort((left, right) => left - right);
+      const monteCarloMedian = terminalPrices[Math.floor(terminalPrices.length / 2)];
+      const targetDate = new Date(lastDate);
+      targetDate.setUTCDate(targetDate.getUTCDate() + horizon);
+      const forecastMedian = powerLawForecast(targetDate, last.close, lastDate);
+      expect(Math.abs(Math.log(monteCarloMedian / forecastMedian))).toBeLessThan(0.01);
+    }
+  }, 30_000);
 });

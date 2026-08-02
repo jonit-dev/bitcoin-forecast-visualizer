@@ -6,8 +6,9 @@ import { pathToFileURL } from 'node:url';
 import btcHistory from '../src/data/btc-history.json';
 import { aggregateForecastMetrics, type BacktestMetricRow, type ForecastDistribution } from '../src/lib/backtestMetrics';
 import type { OHLCVData } from '../src/lib/api';
-import { blendedPowerLawHeatmapVol, normalQuantile, powerLawResidualVariance } from '../src/lib/forecastInterval';
+import { blendedPowerLawHeatmapVol, powerLawResidualVariance } from '../src/lib/forecastInterval';
 import { BACKTEST_CONFIG, INTERVAL_CALIBRATION_CONFIG } from '../src/lib/modelConfig';
+import { quantileAt } from '../src/lib/predictiveDistribution';
 import { CRPS_METHOD_METADATA } from '../src/lib/properScoring';
 import { powerLawForecast } from '../src/lib/powerLaw';
 
@@ -268,10 +269,12 @@ function metricsForPoints(points: CalibrationPoint[], multiplier: number): Backt
 
 function forecastForPoint(point: CalibrationPoint, multiplier: number): ForecastDistribution {
   const sigma = multiplier * point.baseSigma;
-  const quantilePrice = (probability: number) => point.median * Math.exp(sigma * normalQuantile(probability));
+  const distribution = { kind: 'lognormal' as const };
+  const quantilePrice = (probability: number) => quantileAt(distribution, point.median, sigma, probability);
   return {
     median: point.median,
     sigma,
+    distribution,
     quantiles: {
       q025: quantilePrice(0.025),
       q05: quantilePrice(0.05),

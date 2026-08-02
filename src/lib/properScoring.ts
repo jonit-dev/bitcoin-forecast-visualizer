@@ -1,4 +1,4 @@
-import { normalCdf } from './forecastInterval';
+import { cdfAt, type PredictiveDistribution } from './predictiveDistribution';
 
 export interface PitHistogram {
   bins: number;
@@ -83,11 +83,16 @@ export function crpsFromQuantiles(actual: number, quantiles: QuantileInput): num
  * Evaluate the PIT for a log-normal forecast. Invalid or non-positive actual,
  * median, or sigma values are excluded rather than replaced with defaults.
  */
-export function pitValue(actual: number, median: number, sigma: number | null | undefined): number | null {
+export function pitValue(
+  actual: number,
+  median: number,
+  sigma: number | null | undefined,
+  distribution: PredictiveDistribution = { kind: 'lognormal' }
+): number | null {
   if (!Number.isFinite(actual) || actual <= 0) return null;
   if (!Number.isFinite(median) || median <= 0) return null;
   if (!Number.isFinite(sigma) || sigma <= 0) return null;
-  return normalCdf((Math.log(actual) - Math.log(median)) / sigma);
+  return cdfAt(distribution, median, sigma, actual);
 }
 
 /** Return PIT counts and the uniform expected count, or null with no valid samples. */

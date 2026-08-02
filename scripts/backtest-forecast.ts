@@ -11,7 +11,7 @@ import { CRPS_METHOD_METADATA } from '../src/lib/properScoring';
 import type { PowerLawFitCoefficients } from '../src/lib/powerLawFit';
 import { classifyRegime, type RegimeState } from '../src/lib/regimeModel';
 import { computeTailRisk } from '../src/lib/tailRisk';
-import { normalQuantile } from '../src/lib/forecastInterval';
+import { quantileAt } from '../src/lib/predictiveDistribution';
 
 interface BacktestReport {
   metadata: {
@@ -682,18 +682,19 @@ function evaluateTailRiskComparison(ohlcv: OHLCVData[]): BacktestReport['tailRis
 
 function scaleForecastSigma(forecast: NonNullable<MetricInput['forecast']>, multiplier: number): NonNullable<MetricInput['forecast']> {
   const sigma = (forecast.sigma ?? 0) * multiplier;
-  const quantilePrice = (p: number) => forecast.median * Math.exp(sigma * normalQuantile(p));
+  const distribution = forecast.distribution ?? { kind: 'lognormal' as const };
   return {
     median: forecast.median,
     sigma,
+    distribution,
     quantiles: {
-      q025: quantilePrice(0.025),
-      q05: quantilePrice(0.05),
-      q10: quantilePrice(0.10),
+      q025: quantileAt(distribution, forecast.median, sigma, 0.025),
+      q05: quantileAt(distribution, forecast.median, sigma, 0.05),
+      q10: quantileAt(distribution, forecast.median, sigma, 0.10),
       q50: forecast.median,
-      q90: quantilePrice(0.90),
-      q95: quantilePrice(0.95),
-      q975: quantilePrice(0.975),
+      q90: quantileAt(distribution, forecast.median, sigma, 0.90),
+      q95: quantileAt(distribution, forecast.median, sigma, 0.95),
+      q975: quantileAt(distribution, forecast.median, sigma, 0.975),
     },
   };
 }
