@@ -9,7 +9,8 @@ import { appendVintageRecords } from './lib/vintageStore.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(__dirname, '../src/data/macro-history.json');
-const ALFRED_OBSERVATIONS_URL = 'https://api.stlouisfed.org/fred/series/observations';
+export const ALFRED_OBSERVATIONS_URL = 'https://api.stlouisfed.org/fred/series/observations';
+export const ALFRED_VINTAGE_DATES_URL = 'https://api.stlouisfed.org/fred/series/vintagedates';
 export const MACRO_SERIES = [
   ['WALCL', 'Fed balance sheet assets'],
   ['FEDFUNDS', 'Effective federal funds rate'],
@@ -19,6 +20,7 @@ export const MACRO_SERIES = [
 ];
 export const START_DATE = '2010-07-17';
 export const CONSERVATIVE_LAG_DAYS = 30;
+export const MAX_VINTAGE_REQUESTS_PER_SERIES = 48;
 const MS_PER_DAY = 86400000;
 
 function startOfUtcDay(date) {
@@ -37,13 +39,38 @@ function isoAfterLag(date) {
   return new Date(startOfUtcDay(addUtcDays(date, CONSERVATIVE_LAG_DAYS))).toISOString();
 }
 
-export function buildObservationsUrl(seriesId, apiKey, realtimeStart = dateKey(Date.now())) {
+export function buildObservationsUrl(
+  seriesId,
+  apiKey,
+  realtimeStart = dateKey(Date.now()),
+  realtimeEnd = realtimeStart
+) {
   const url = new URL(ALFRED_OBSERVATIONS_URL);
   url.searchParams.set('series_id', seriesId);
   url.searchParams.set('observation_start', START_DATE);
   url.searchParams.set('realtime_start', realtimeStart);
+  url.searchParams.set('realtime_end', realtimeEnd);
   url.searchParams.set('api_key', apiKey);
   url.searchParams.set('file_type', 'json');
+  url.searchParams.set('output_type', '1');
+  url.searchParams.set('sort_order', 'asc');
+  return url;
+}
+
+export function buildVintageDatesUrl(
+  seriesId,
+  apiKey,
+  realtimeStart = START_DATE,
+  realtimeEnd = dateKey(Date.now())
+) {
+  const url = new URL(ALFRED_VINTAGE_DATES_URL);
+  url.searchParams.set('series_id', seriesId);
+  url.searchParams.set('realtime_start', realtimeStart);
+  url.searchParams.set('realtime_end', realtimeEnd);
+  url.searchParams.set('api_key', apiKey);
+  url.searchParams.set('file_type', 'json');
+  url.searchParams.set('limit', '10000');
+  url.searchParams.set('sort_order', 'asc');
   return url;
 }
 
@@ -63,11 +90,82 @@ export function parseObservations(payload, seriesId) {
   return observations;
 }
 
-async function fetchSeries(seriesId, apiKey, realtimeStart) {
-  const url = buildObservationsUrl(seriesId, apiKey, realtimeStart);
+export function parseVintageDates(payload, seriesId) {
+  if (!payload || !Array.isArray(payload.vintage_dates)) {
+    throw new Error(`ALFRED ${seriesId} vintage-date response did not contain vintage_dates`);
+  }
+  return [...new Set(payload.vintage_dates)]
+    .filter(date => typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date))
+    .sort();
+}
+
+export function selectVintageDates(
+  vintageDates,
+  {
+    startDate = START_DATE,
+    endDate = dateKey(Date.now()),
+    maxDates = MAX_VINTAGE_REQUESTS_PER_SERIES,
+  } = {}
+) {
+  if (!Array.isArray(vintageDates)) throw new TypeError('selectVintageDates expects an array');
+  if (!Number.isInteger(maxDates) || maxDates < 2) {
+    throw new RangeError('selectVintageDates requires maxDates >= 2');
+  }
+
+  const candidates = [...new Set([startDate, ...vintageDates, endDate])]
+    .filter(date => typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date))
+    .filter(date => date >= startDate && date <= endDate)
+    .sort();
+  if (candidates.length <= maxDates) return candidates;
+
+  // Keep the first and latest available snapshots, then sample the discovered
+  // dates at deterministic evenly spaced positions. This bounds a first run
+  // while retaining historical values from across the requested period.
+  const selected = new Set();
+  for (let index = 0; index < maxDates; index += 1) {
+    const position = Math.round((index * (candidates.length - 1)) / (maxDates - 1));
+    selected.add(candidates[position]);
+  }
+  return [...selected].sort();
+}
+
+async function fetchJson(url, label) {
   const res = await fetch(url, { headers: { 'User-Agent': 'bitcoin-forecast-visualizer' } });
-  if (!res.ok) throw new Error(`ALFRED ${seriesId} failed: ${res.status} ${res.statusText}`);
-  return parseObservations(await res.json(), seriesId);
+  if (!res.ok) throw new Error(`${label} failed: ${res.status} ${res.statusText}`);
+  return res.json();
+}
+
+async function fetchSeries(seriesId, apiKey, realtimeStart, realtimeEnd = realtimeStart) {
+  const url = buildObservationsUrl(seriesId, apiKey, realtimeStart, realtimeEnd);
+  return parseObservations(await fetchJson(url, `ALFRED ${seriesId} observations`), seriesId);
+}
+
+async function fetchVintageDates(seriesId, apiKey, asOfDate) {
+  const url = buildVintageDatesUrl(seriesId, apiKey, START_DATE, asOfDate);
+  return parseVintageDates(await fetchJson(url, `ALFRED ${seriesId} vintage-date discovery`), seriesId);
+}
+
+export async function fetchHistoricalSeries(seriesId, apiKey, asOfDate = dateKey(Date.now())) {
+  const discoveredVintageDates = await fetchVintageDates(seriesId, apiKey, asOfDate);
+  const vintageDates = selectVintageDates(discoveredVintageDates, { endDate: asOfDate });
+  const snapshots = [];
+
+  // Sequential requests keep the external request rate bounded and make the
+  // archive's observedAt order deterministic across repeated runs.
+  for (const vintageDate of vintageDates) {
+    const observations = await fetchSeries(seriesId, apiKey, vintageDate, vintageDate);
+    if (observations.length > 0) snapshots.push({ vintageDate, observations });
+  }
+
+  const latest = snapshots.at(-1)?.observations ?? [];
+  if (latest.length === 0) throw new Error(`ALFRED ${seriesId} returned no observations through ${asOfDate}`);
+  return {
+    latest,
+    observations: snapshots.flatMap(snapshot => snapshot.observations),
+    discoveredVintageDates,
+    requestedVintageDates: vintageDates,
+    successfulVintageDates: snapshots.map(snapshot => snapshot.vintageDate),
+  };
 }
 
 function valueOnOrBefore(rows, date) {
@@ -112,9 +210,11 @@ export async function main() {
   const apiKey = requireEnv('FRED_API_KEY');
   const observedAt = dateKey(Date.now());
   const fetchedAt = new Date().toISOString();
-  const entries = await Promise.all(
-    MACRO_SERIES.map(async ([seriesId]) => [seriesId, await fetchSeries(seriesId, apiKey, observedAt)])
-  );
+  const histories = [];
+  for (const [seriesId] of MACRO_SERIES) {
+    histories.push({ seriesId, ...(await fetchHistoricalSeries(seriesId, apiKey, observedAt)) });
+  }
+  const entries = histories.map(history => [history.seriesId, history.latest]);
   const bySeries = Object.fromEntries(entries);
   const allDates = [...new Set(Object.values(bySeries).flat().map(row => row.asOfDate))]
     .filter(date => date >= START_DATE)
@@ -189,8 +289,8 @@ export async function main() {
 
   const existingRows = readExistingRows();
   const mergedRows = mergeByKey(existingRows, rows, 'date');
-  for (const [seriesId, observations] of entries) {
-    appendVintageRecords(`macro-${seriesId}`, observations);
+  for (const history of histories) {
+    appendVintageRecords(`macro-${history.seriesId}`, history.observations);
   }
 
   writeFileSync(OUT_PATH, `${JSON.stringify({
@@ -205,8 +305,17 @@ export async function main() {
       freshnessCapDays: SOURCE_FRESHNESS_CAP_DAYS.macro,
       vintageSeries: MACRO_SERIES.map(([seriesId]) => `macro-${seriesId}`),
       vintageObservedAt: 'ALFRED observation realtime_start',
+      vintageAcquisition: {
+        discovery: 'ALFRED fred/series/vintagedates',
+        request: 'ALFRED fred/series/observations with observation_start and realtime_start=realtime_end for each selected vintage date',
+        maxRequestsPerSeries: MAX_VINTAGE_REQUESTS_PER_SERIES,
+        discoveredVintageDates: Object.fromEntries(histories.map(history => [history.seriesId, history.discoveredVintageDates.length])),
+        requestedVintageDates: Object.fromEntries(histories.map(history => [history.seriesId, history.requestedVintageDates])),
+        successfulVintageDates: Object.fromEntries(histories.map(history => [history.seriesId, history.successfulVintageDates])),
+      },
       limitations: [
-        'The API response is requested at the current realtime_start and each raw observation is retained in an append-only vintage archive.',
+        'The first credentialed run discovers official ALFRED vintage dates from 2010-07-17 through today and requests a deterministic bounded set of historical realtime windows per series.',
+        'At most 48 snapshots per series are requested on one run; repeated runs append newly observed records and improve coverage without rewriting prior archive bytes.',
         'All macro rows use a conservative 30-day availableAfter lag before feature-table use.',
         'Macro fields remain context-only until the pre-registered recovered-history experiment passes its out-of-sample gate.',
       ],
@@ -224,6 +333,7 @@ export async function main() {
     `first=${mergedRows[0]?.date ?? 'n/a'}`,
     `last=${mergedRows.at(-1)?.date ?? 'n/a'}`,
     `series=${MACRO_SERIES.map(([seriesId]) => seriesId).join(',')}`,
+    `vintageRequests=${histories.reduce((sum, history) => sum + history.successfulVintageDates.length, 0)}`,
     `source=FRED ALFRED observations API`,
     `path=${OUT_PATH}`,
   ].join('  '));

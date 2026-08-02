@@ -5,7 +5,15 @@ import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 import { evaluateFreshness } from '../../../scripts/check-data-freshness';
 import { latestSourceRow } from '../../../scripts/build-feature-table';
-import { MACRO_SERIES, buildObservationsUrl } from '../../../scripts/update-macro-data.mjs';
+import {
+  MACRO_SERIES,
+  buildObservationsUrl,
+  buildVintageDatesUrl,
+  fetchHistoricalSeries,
+  parseObservations,
+  parseVintageDates,
+  selectVintageDates,
+} from '../../../scripts/update-macro-data.mjs';
 import { assertMinimumFeatureCoverage } from '../../../scripts/validate-feature-table';
 import { reconstructVintage } from '../../../scripts/reconstruct-vintage.mjs';
 import { requireEnv } from '../../../scripts/lib/env.mjs';
@@ -133,7 +141,95 @@ describe('script guardrails', () => {
       expect(url.searchParams.get('observation_start')).toBe('2010-07-17');
       expect(url.searchParams.get('api_key')).toBe('fixture-key');
       expect(url.searchParams.get('realtime_start')).toBe('2026-08-02');
+      expect(url.searchParams.get('realtime_end')).toBe('2026-08-02');
     }
+  });
+
+  it('should discover and deterministically bound historical ALFRED vintage dates', () => {
+    const discovered = parseVintageDates({
+      vintage_dates: ['2024-03-01', '2018-01-02', '2024-03-01', 'not-a-date'],
+    }, 'WALCL');
+    expect(discovered).toEqual(['2018-01-02', '2024-03-01']);
+
+    const selected = selectVintageDates(discovered, {
+      startDate: '2010-07-17',
+      endDate: '2026-08-02',
+      maxDates: 3,
+    });
+    expect(selected).toEqual(['2010-07-17', '2024-03-01', '2026-08-02']);
+    expect(selectVintageDates(discovered, {
+      startDate: '2010-07-17',
+      endDate: '2026-08-02',
+      maxDates: 3,
+    })).toEqual(selected);
+  });
+
+  it('should request each historical vintage with an explicit realtime window', () => {
+    const url = buildObservationsUrl('WALCL', 'fixture-key', '2024-03-01', '2024-03-01');
+    const discoveryUrl = buildVintageDatesUrl('WALCL', 'fixture-key', '2010-07-17', '2026-08-02');
+
+    expect(url.searchParams.get('observation_start')).toBe('2010-07-17');
+    expect(url.searchParams.get('realtime_start')).toBe('2024-03-01');
+    expect(url.searchParams.get('realtime_end')).toBe('2024-03-01');
+    expect(url.searchParams.get('output_type')).toBe('1');
+    expect(discoveryUrl.pathname).toBe('/fred/series/vintagedates');
+    expect(discoveryUrl.searchParams.get('realtime_start')).toBe('2010-07-17');
+    expect(discoveryUrl.searchParams.get('realtime_end')).toBe('2026-08-02');
+  });
+
+  it('should iterate the discovered vintage dates without network access in the fixture', async () => {
+    const originalFetch = globalThis.fetch;
+    const requests: URL[] = [];
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      requests.push(url);
+      if (url.pathname.endsWith('/vintagedates')) {
+        return {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          json: async () => ({ vintage_dates: ['2018-01-02', '2024-03-01'] }),
+        } as Response;
+      }
+      const observedAt = url.searchParams.get('realtime_start');
+      return {
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => ({
+          observations: [{ date: '2010-07-17', realtime_start: observedAt, value: '123.4' }],
+        }),
+      } as Response;
+    }) as typeof fetch;
+
+    try {
+      const result = await fetchHistoricalSeries('WALCL', 'fixture-key', '2026-08-02');
+      const observationRequests = requests.filter(url => url.pathname.endsWith('/observations'));
+
+      expect(requests).toHaveLength(5);
+      expect(result.successfulVintageDates).toEqual([
+        '2010-07-17',
+        '2018-01-02',
+        '2024-03-01',
+        '2026-08-02',
+      ]);
+      expect(observationRequests.every(url => url.searchParams.get('realtime_start') === url.searchParams.get('realtime_end'))).toBe(true);
+      expect(result.observations.map(observation => observation.observedAt)).toEqual(result.successfulVintageDates);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it('should preserve ALFRED realtime_start as the vintage observedAt', () => {
+    const observations = parseObservations({
+      observations: [{ date: '2010-07-17', realtime_start: '2010-07-18', value: '123.4' }],
+    }, 'WALCL');
+
+    expect(observations).toEqual([{
+      asOfDate: '2010-07-17',
+      observedAt: '2010-07-18',
+      value: 123.4,
+    }]);
   });
 
   it('should wire the FRED secret into the data-only daily workflow', () => {

@@ -4,26 +4,34 @@
   "liveData": false,
   "fredApiKey": "absent",
   "repositorySecrets": "gh secret list returned no rows",
-  "tests": {"files": 27, "passed": 116},
+  "tests": {"files": 27, "passed": 121},
   "commands": {
     "yarn test": "PASS",
     "yarn lint": "PASS",
     "yarn build": "PASS",
     "yarn build:features": "PASS",
-    "yarn validate:features": "FAIL: futuresOpenInterestUSD count=28 minimum=30",
-    "yarn check:freshness": "FAIL: required baseline sources exceed declared caps",
-    "yarn validate:data": "FAIL: known MVRV CoinMetrics mismatch count=5722",
+    "yarn validate:features": "FAIL: feature coverage below minimum: feature=futuresOpenInterestUSD count=28 minimum=30",
+    "yarn check:freshness": "FAIL: btc/mvrv/onchain/features lag=18 cap=3d; voo lag=18 cap=7d status=fresh",
+    "yarn validate:data": "FAIL: CoinMetrics mismatch count=5722; first date=2010-11-14; marketCap relative diff=0.000021842168490487735",
     "yarn backtest": "PASS",
+    "env -u FRED_API_KEY yarn update:macro": "BLOCKED: Missing required environment variable FRED_API_KEY for update:macro",
+    "yarn reconstruct:vintage --series WALCL --as-of 2024-03-01": "BLOCKED: no WALCL vintage archive exists",
     "git diff --check": "PASS",
+    "vintage fixture tests": "PASS: discovery/date selection/URL bounds/source realtime_start/append-only/reconstruction",
     "caller census": "PASS: seven updaters merge/archive; macro requireEnv; reconstruct:vintage registered",
+    "workflow/secret scan": "PASS wiring/no deployment/no diff credentials; BLOCKED local FRED_API_KEY absent and gh secret list empty",
     "obsolete-path search": "PASS: no fredgraph or blanket freshness constant"
   },
-  "backtestArtifact": "docs/reports/results/backtest-2026-08-02T22-00-14-848Z.json",
+  "backtestArtifact": "docs/reports/results/backtest-2026-08-02T22-41-25-326Z.json",
   "archiveEvidence": "fixture-only; no src/data/vintages records committed",
   "workflow": {
     "path": ".github/workflows/forecast-data-update.yml",
     "fredSecretWired": true,
     "deploymentStep": false
+  },
+  "solFindings": {
+    "historicalAlfred": "repaired: vintage-date discovery plus bounded explicit realtime_start/realtime_end requests; live rows remain unproved without FRED_API_KEY",
+    "exactRegimeBoundary": "repaired: >= 0.4 and focused 4-of-10 CoinMetrics-backed missing-input test returns probability-one insufficient-data"
   },
   "negativeControls": [
     "plain assignment failed omitted-key retention",

@@ -927,8 +927,12 @@ verdict.
 
 - Replace the rolling graph CSV path with the ALFRED/FRED observations endpoint
   for `WALCL`, `FEDFUNDS`, `DGS10`, `BAMLH0A0HYM2`, and `M2SL`.
-- Request `observation_start=2010-07-17`, record `realtime_start` as
-  `observedAt`, and append records to the committed vintage archive.
+- Discover official `vintage_dates` from `2010-07-17` through the current date,
+  select a deterministic bounded set of at most 48 snapshots per series, and
+  request each with `observation_start=2010-07-17` and equal historical
+  `realtime_start`/`realtime_end` parameters.
+- Record the API response's source `realtime_start` as `observedAt` and append
+  records to the committed vintage archive.
 - Merge recovered rows into `src/data/macro-history.json` without dropping
   existing rows; retain the declared 30-day conservative lag for this rerun.
 - Do not add new macro series, forecast coefficients, or production routing.
@@ -968,7 +972,10 @@ verdict.
 
 Verdict: `pending / blocked`; no real ALFRED observations or forecast result may
 be claimed until `FRED_API_KEY` is supplied and the updater produces live
-records. The candidate remains context-only and production routing is unchanged.
+records. Offline repair fixtures directly prove vintage-date discovery,
+bounded selection, historical URL construction, source timestamp preservation,
+and append-only archive behavior. The candidate remains context-only and
+production routing is unchanged.
 
 ### Rerun criteria
 

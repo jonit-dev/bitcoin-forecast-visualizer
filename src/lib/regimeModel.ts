@@ -75,7 +75,7 @@ export function classifyRegime(row: FeatureRow | null | undefined): RegimeClassi
   ) as Record<(typeof REGIME_INPUT_FEATURES)[number], number | null>;
   const unavailable = REGIME_INPUT_FEATURES.filter(name => values[name] === null);
   const unavailableReasons = unavailable.map(name => `unavailable:${name}`);
-  if (unavailable.length / REGIME_INPUT_FEATURES.length > MAX_UNAVAILABLE_FEATURE_FRACTION) {
+  if (unavailable.length / REGIME_INPUT_FEATURES.length >= MAX_UNAVAILABLE_FEATURE_FRACTION) {
     return insufficientDataClassification(unavailableReasons, unavailable.length, REGIME_INPUT_FEATURES.length);
   }
 

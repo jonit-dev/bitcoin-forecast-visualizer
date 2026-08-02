@@ -36,6 +36,27 @@ describe('regime missing-data handling', () => {
     expect(result.reasonCodes.some(reason => reason.startsWith('insufficient-data:'))).toBe(true);
   });
 
+  it('should return probability-one insufficient-data at exactly 40% unavailable inputs', () => {
+    const features = { ...completeFeatures };
+    delete features.mvrvPercentile;
+    delete features.mvrvLevel;
+    delete features.realizedPriceDistance;
+    delete features.hashRate;
+
+    const result = classifyRegime(row(features));
+
+    expect(result.topState).toBe('insufficient-data');
+    expect(result.probabilities['insufficient-data']).toBe(1);
+    expect(result.probabilities['sideways-chop']).toBe(0);
+    expect(result.reasonCodes).toEqual(expect.arrayContaining([
+      'unavailable:mvrvPercentile',
+      'unavailable:mvrvLevel',
+      'unavailable:realizedPriceDistance',
+      'unavailable:hashRate',
+      'insufficient-data:4/10-inputs-unavailable',
+    ]));
+  });
+
   it('should not count an absent feature toward the regime score', () => {
     const withNeutralHashRate = classifyRegime(row(completeFeatures));
     const withoutHashRate = { ...completeFeatures };
