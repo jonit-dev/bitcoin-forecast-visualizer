@@ -1,6 +1,6 @@
 # BTC FRED Macro Forecast Experiments
 
-Status: `needs-rerun`; no production forecast, feature-table, interval, median, or UI behavior changed.
+Status: `context-only`; no production forecast, feature-table, interval, median, or UI behavior changed.
 
 ## Pre-registration
 
@@ -12,9 +12,10 @@ Status: `needs-rerun`; no production forecast, feature-table, interval, median, 
 
 ## Data audit
 
-- Source: FRED CSV; vintage: unspecified; fetched: 2026-07-07T00:12:56.962Z.
-- Macro cache: 1093 rows, 2023-07-07 → 2026-07-03; signal rows: 1093.
-- Required regime years: 2018=0, 2020=0, 2022=0.
+- Source: FRED observations API; vintage: latest-revised observations; not an ALFRED vintage; fetched: 2026-08-03T08:18:05.487Z.
+- Macro cache: 5844 rows, 2010-08-01 → 2026-07-31; signal rows: 5844.
+- Required regime years: 2018=365, 2020=366, 2022=365.
+- Credit-spread source: BAAFF (Moody's Baa-minus-fed-funds historical credit-spread proxy); limitation: BAAFF is a historical Moody's Baa-minus-fed-funds proxy; it is not equivalent to the ICE/BofA high-yield option-adjusted spread BAMLH0A0HYM2.
 - Target split: validation target leakage=0; late-2022 origins excluded because their targets cross the cutoff=194; holdout targets before cutoff=0.
 - Revised FRED data research-only: yes.
 
@@ -33,26 +34,26 @@ Status: `needs-rerun`; no production forecast, feature-table, interval, median, 
 
 | Arm | Horizon | Parameter | Holdout NLL improvement | One-sided lower95 | Holm p | Coverage Δ | MALE Δ | Horizon-spaced one-sided lower95 | Verdict |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| stress-interval | 14d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| stress-interval | 30d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| stress-interval | 60d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| stress-interval | 90d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| liquidity-median | 14d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| liquidity-median | 30d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| liquidity-median | 60d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| liquidity-median | 90d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| shock-interval | 14d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| shock-interval | 30d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| shock-interval | 60d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
-| shock-interval | 90d | n/a | n/a | n/a | n/a | n/a | n/a | n/a | needs-rerun |
+| stress-interval | 14d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| stress-interval | 30d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| stress-interval | 60d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| stress-interval | 90d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| liquidity-median | 14d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| liquidity-median | 30d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| liquidity-median | 60d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| liquidity-median | 90d | -0.050000 | -0.030257 | -0.109442 | 1.000000 | -0.018395 | 0.000236 | 0.007005 | context-only |
+| shock-interval | 14d | 0.100000 | -0.002779 | -0.008821 | 1.000000 | 0.001572 | 0.000000 | -0.004456 | context-only |
+| shock-interval | 30d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| shock-interval | 60d | 0.000000 | 0.000000 | 0.000000 | 1.000000 | 0.000000 | 0.000000 | 0.000000 | context-only |
+| shock-interval | 90d | 0.100000 | -0.003102 | -0.008560 | 1.000000 | 0.006689 | 0.000000 | -0.006073 | context-only |
 
 ## Validation-selected parameters
 
 | Arm | 14d | 30d | 60d | 90d |
 |---|---:|---:|---:|---:|
-| stress-interval | n/a | n/a | n/a | n/a |
-| liquidity-median | n/a | n/a | n/a | n/a |
-| shock-interval | n/a | n/a | n/a | n/a |
+| stress-interval | 0.000000 | 0.000000 | 0.000000 | 0.000000 |
+| liquidity-median | 0.000000 | 0.000000 | 0.000000 | -0.050000 |
+| shock-interval | 0.100000 | 0.000000 | 0.000000 | 0.100000 |
 
 ## Mathematical leakage proof
 
@@ -61,6 +62,7 @@ Status: `needs-rerun`; no production forecast, feature-table, interval, median, 
 - Target isolation: The target close at origin + horizonDays is read only after the forecast is constructed and is never used for signal construction or parameter selection.
 - Selection isolation: Each arm and horizon selects its parameter by validation NLL only; holdout scores are computed after selection and cannot alter the parameter.
 - Vintage limitation: The cache contains latest-revised FRED observations rather than ALFRED vintages. This proof prevents timestamp lookahead but cannot claim vintage safety; all results remain research-only.
+- Credit proxy limitation: BAAFF is a historical Moody's Baa-minus-fed-funds proxy; it is not equivalent to the ICE/BofA high-yield option-adjusted spread BAMLH0A0HYM2.
 
 ## Arm verdicts and rerun policy
 
@@ -70,7 +72,7 @@ Hypothesis: A point-in-time stress composite widens the current power-law interv
 
 Formula: `sigma_candidate = sigma_powerlaw * (1 + scale * I(stressComposite >= 1)); median unchanged.`
 
-Verdict: `needs-rerun` — needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available.
+Verdict: `context-only` — The numerical promotion gate failed: 14d mean NLL improvement is not positive; 14d daily block-bootstrap one-sided lower95 is not positive; 14d Holm-adjusted p-value is not below 0.05; 14d horizon-spaced robustness failed; 14d candidate forecast outputs are identical to baseline; 30d mean NLL improvement is not positive; 30d daily block-bootstrap one-sided lower95 is not positive; 30d Holm-adjusted p-value is not below 0.05; 30d horizon-spaced robustness failed; 30d candidate forecast outputs are identical to baseline; 60d mean NLL improvement is not positive; 60d daily block-bootstrap one-sided lower95 is not positive; 60d Holm-adjusted p-value is not below 0.05; 60d horizon-spaced robustness failed; 60d candidate forecast outputs are identical to baseline; 90d mean NLL improvement is not positive; 90d daily block-bootstrap one-sided lower95 is not positive; 90d Holm-adjusted p-value is not below 0.05; 90d horizon-spaced robustness failed; 90d candidate forecast outputs are identical to baseline. Keep the signal context-only.
 
 - Rerun only after an ALFRED/vintage-safe cache, a pre-registered split, and the same untouched-holdout gate.
 - Next better experiment: rerun this arm with historical vintages and a publication-date field, then validate on a newly accumulated holdout.
@@ -81,7 +83,7 @@ Hypothesis: A point-in-time liquidity composite shifts the log median while leav
 
 Formula: `log(median_candidate) = log(median_powerlaw) + coefficient * liquidityComposite.`
 
-Verdict: `needs-rerun` — needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available.
+Verdict: `context-only` — The numerical promotion gate failed: 14d mean NLL improvement is not positive; 14d daily block-bootstrap one-sided lower95 is not positive; 14d Holm-adjusted p-value is not below 0.05; 14d horizon-spaced robustness failed; 14d candidate forecast outputs are identical to baseline; 30d mean NLL improvement is not positive; 30d daily block-bootstrap one-sided lower95 is not positive; 30d Holm-adjusted p-value is not below 0.05; 30d horizon-spaced robustness failed; 30d candidate forecast outputs are identical to baseline; 60d mean NLL improvement is not positive; 60d daily block-bootstrap one-sided lower95 is not positive; 60d Holm-adjusted p-value is not below 0.05; 60d horizon-spaced robustness failed; 60d candidate forecast outputs are identical to baseline; 90d mean NLL improvement is not positive; 90d daily block-bootstrap one-sided lower95 is not positive; 90d Holm-adjusted p-value is not below 0.05. Keep the signal context-only.
 
 - Rerun only after an ALFRED/vintage-safe cache, a pre-registered split, and the same untouched-holdout gate.
 - Next better experiment: rerun this arm with historical vintages and a publication-date field, then validate on a newly accumulated holdout.
@@ -92,7 +94,7 @@ Hypothesis: A positive 30-day shock in the point-in-time stress composite widens
 
 Formula: `sigma_candidate = sigma_powerlaw * (1 + multiplier * I(stressShockZ30d >= 1)); median unchanged.`
 
-Verdict: `needs-rerun` — needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available.
+Verdict: `context-only` — The numerical promotion gate failed: 14d mean NLL improvement is not positive; 14d daily block-bootstrap one-sided lower95 is not positive; 14d Holm-adjusted p-value is not below 0.05; 14d horizon-spaced robustness failed; 30d mean NLL improvement is not positive; 30d daily block-bootstrap one-sided lower95 is not positive; 30d Holm-adjusted p-value is not below 0.05; 30d horizon-spaced robustness failed; 30d candidate forecast outputs are identical to baseline; 60d mean NLL improvement is not positive; 60d daily block-bootstrap one-sided lower95 is not positive; 60d Holm-adjusted p-value is not below 0.05; 60d horizon-spaced robustness failed; 60d candidate forecast outputs are identical to baseline; 90d mean NLL improvement is not positive; 90d daily block-bootstrap one-sided lower95 is not positive; 90d Holm-adjusted p-value is not below 0.05; 90d horizon-spaced robustness failed. Keep the signal context-only.
 
 - Rerun only after an ALFRED/vintage-safe cache, a pre-registered split, and the same untouched-holdout gate.
 - Next better experiment: rerun this arm with historical vintages and a publication-date field, then validate on a newly accumulated holdout.

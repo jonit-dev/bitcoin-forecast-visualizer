@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generatedAt": "2026-08-03T07:57:43.650Z",
+    "generatedAt": "2026-08-03T08:25:34.831Z",
     "command": "yarn backtest:fred-macro",
     "asset": "BTC",
     "artifactPaths": [
@@ -38,37 +38,53 @@
     "noAppChange": "All candidate signals remain outside the production feature table, median, interval, model, and UI paths."
   },
   "dataAudit": {
-    "source": "FRED CSV",
-    "vintage": "unspecified",
-    "fetchedAt": "2026-07-07T00:12:56.962Z",
-    "observationStart": null,
+    "source": "FRED observations API",
+    "vintage": "latest-revised observations; not an ALFRED vintage",
+    "fetchedAt": "2026-08-03T08:18:05.487Z",
+    "observationStart": "2010-07-17",
     "series": {
       "WALCL": "Fed balance sheet assets",
       "FEDFUNDS": "Effective federal funds rate",
       "DGS10": "10-year Treasury yield",
-      "BAMLH0A0HYM2": "US high-yield option-adjusted spread",
-      "M2SL": "M2 money stock"
+      "BAAFF": "Moody's Baa-minus-fed-funds historical credit-spread proxy",
+      "M2SL": "M2 money stock",
+      "T10Y2Y": "10-year minus 2-year Treasury yield spread",
+      "NFCI": "Chicago Fed National Financial Conditions Index",
+      "VIXCLS": "CBOE volatility index",
+      "BAA10Y": "Moody's Baa corporate bond spread",
+      "DTWEXBGS": "Nominal broad US dollar index"
     },
+    "creditSpreadProxy": {
+      "seriesId": "BAAFF",
+      "metric": "baaMinusFedFundsCreditSpread",
+      "label": "Moody's Baa-minus-fed-funds historical credit-spread proxy",
+      "limitation": "BAAFF is a historical Moody's Baa-minus-fed-funds proxy; it is not equivalent to the ICE/BofA high-yield option-adjusted spread BAMLH0A0HYM2."
+    },
+    "sourceLimitations": [
+      "FRED observations are latest revisions rather than point-in-time ALFRED vintages; all experiment results remain research-only.",
+      "Each aligned row is available only after the latest contributing observation plus a conservative 30-day lag.",
+      "BAAFF is a historical Moody's Baa-minus-fed-funds proxy; it is not equivalent to the ICE/BofA high-yield option-adjusted spread BAMLH0A0HYM2."
+    ],
     "conservativeLagDays": 30,
-    "macroRows": 1093,
-    "macroFirstDate": "2023-07-07",
-    "macroLastDate": "2026-07-03",
+    "macroRows": 5844,
+    "macroFirstDate": "2010-08-01",
+    "macroLastDate": "2026-07-31",
     "regimeYearCoverage": [
       {
         "year": "2018",
-        "rows": 0
+        "rows": 365
       },
       {
         "year": "2020",
-        "rows": 0
+        "rows": 366
       },
       {
         "year": "2022",
-        "rows": 0
+        "rows": 365
       }
     ],
-    "signalRows": 1093,
-    "usedSignalRows": 1055,
+    "signalRows": 5844,
+    "usedSignalRows": 2212,
     "validationOrigins": 7110,
     "holdoutOrigins": 4950,
     "validationTargetLeakageCount": 0,
@@ -286,24 +302,30 @@
       ],
       "threshold": 1,
       "selectedParameterByHorizon": {
-        "14": null,
-        "30": null,
-        "60": null,
-        "90": null
+        "14": 0,
+        "30": 0,
+        "60": 0,
+        "90": 0
       },
       "selectionStatusByHorizon": {
-        "14": "insufficient-data",
-        "30": "insufficient-data",
-        "60": "insufficient-data",
-        "90": "insufficient-data"
+        "14": "selected",
+        "30": "selected",
+        "60": "selected",
+        "90": "selected"
       },
       "validation": {
         "14": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",13062.137132236341],[\"sigma\",0.19706288081800455],[\"q025\",8877.159241477513],[\"q05\",9445.875168365601],[\"q10\",10146.933147173673],[\"q50\",13062.137132236341],[\"q90\",16814.876375614218],[\"q95\",18062.850018678568],[\"q975\",19220.04797031776]]",
+            "candidateOutput": "[[\"median\",13062.137132236341],[\"sigma\",0.19706288081800455],[\"q025\",8877.159241477513],[\"q05\",9445.875168365601],[\"q10\",10146.933147173673],[\"q50\",13062.137132236341],[\"q90\",16814.876375614218],[\"q95\",18062.850018678568],[\"q975\",19220.04797031776]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1812,
+            "differingSamples": 0
+          },
+          "samples": 1812,
           "baseline": {
             "samples": 1812,
             "nll": -0.4616640503023629,
@@ -316,9 +338,20 @@
             "medianForwardReturn": -0.01491533656877151,
             "upRate": 0.4420529801324503
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1812,
+            "nll": -0.4616640503023629,
+            "meanAbsLogError": 0.1082666802629209,
+            "medianAbsLogError": 0.08470686314937659,
+            "coverage90": 0.8940397350993378,
+            "q05Pinball": 0.01755040997946045,
+            "q50Pinball": 0.05413334013146045,
+            "q95Pinball": 0.01653751925539071,
+            "medianForwardReturn": -0.01491533656877151,
+            "upRate": 0.4420529801324503
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 14,
             "iterations": 2000,
@@ -326,15 +359,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1812,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 130,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -343,11 +376,17 @@
           }
         },
         "30": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",12642.741716306586],[\"sigma\",0.26979808040354286],[\"q025\",7450.556682014412],[\"q05\",8111.679385040327],[\"q10\",8947.043309173145],[\"q50\",12642.741716306586],[\"q90\",17864.998813782488],[\"q95\",19704.787445127175],[\"q975\",21453.285294921483]]",
+            "candidateOutput": "[[\"median\",12642.741716306586],[\"sigma\",0.26979808040354286],[\"q025\",7450.556682014412],[\"q05\",8111.679385040327],[\"q10\",8947.043309173145],[\"q50\",12642.741716306586],[\"q90\",17864.998813782488],[\"q95\",19704.787445127175],[\"q975\",21453.285294921483]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1796,
+            "differingSamples": 0
+          },
+          "samples": 1796,
           "baseline": {
             "samples": 1796,
             "nll": -0.06141603306200352,
@@ -360,9 +399,20 @@
             "medianForwardReturn": -0.016464936939996906,
             "upRate": 0.4599109131403118
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1796,
+            "nll": -0.06141603306200352,
+            "meanAbsLogError": 0.15918031134927837,
+            "medianAbsLogError": 0.12735746598593511,
+            "coverage90": 0.8758351893095768,
+            "q05Pinball": 0.02566052931917223,
+            "q50Pinball": 0.07959015567463919,
+            "q95Pinball": 0.023272624391660116,
+            "medianForwardReturn": -0.016464936939996906,
+            "upRate": 0.4599109131403118
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 30,
             "iterations": 2000,
@@ -370,15 +420,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1796,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 60,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -387,11 +437,17 @@
           }
         },
         "60": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",11900.728128224748],[\"sigma\",0.360703394947858],[\"q025\",5868.704562833711],[\"q05\",6575.136239682333],[\"q10\",7495.775427470658],[\"q50\",11900.728128224748],[\"q90\",18894.28670219778],[\"q95\",21539.83200031199],[\"q975\",24132.63923333956]]",
+            "candidateOutput": "[[\"median\",11900.728128224748],[\"sigma\",0.360703394947858],[\"q025\",5868.704562833711],[\"q05\",6575.136239682333],[\"q10\",7495.775427470658],[\"q50\",11900.728128224748],[\"q90\",18894.28670219778],[\"q95\",21539.83200031199],[\"q975\",24132.63923333956]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1766,
+            "differingSamples": 0
+          },
+          "samples": 1766,
           "baseline": {
             "samples": 1766,
             "nll": 0.31446029981889523,
@@ -404,9 +460,20 @@
             "medianForwardReturn": -0.08110763711458707,
             "upRate": 0.3929784824462061
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1766,
+            "nll": 0.31446029981889523,
+            "meanAbsLogError": 0.2357035509049794,
+            "medianAbsLogError": 0.19861897767665138,
+            "coverage90": 0.840317100792752,
+            "q05Pinball": 0.03179092711085796,
+            "q50Pinball": 0.1178517754524897,
+            "q95Pinball": 0.03613606924425799,
+            "medianForwardReturn": -0.08110763711458707,
+            "upRate": 0.3929784824462061
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 60,
             "iterations": 2000,
@@ -414,15 +481,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1766,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 30,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -431,11 +498,17 @@
           }
         },
         "90": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",11207.335283799483],[\"sigma\",0.36451854751861434],[\"q025\",5485.593404009962],[\"q05\",6153.301983758193],[\"q10\",7024.606400467634],[\"q50\",11207.335283799483],[\"q90\",17880.626614914006],[\"q95\",20412.514207011736],[\"q975\",22897.133438960347]]",
+            "candidateOutput": "[[\"median\",11207.335283799483],[\"sigma\",0.36451854751861434],[\"q025\",5485.593404009962],[\"q05\",6153.301983758193],[\"q10\",7024.606400467634],[\"q50\",11207.335283799483],[\"q90\",17880.626614914006],[\"q95\",20412.514207011736],[\"q975\",22897.133438960347]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1736,
+            "differingSamples": 0
+          },
+          "samples": 1736,
           "baseline": {
             "samples": 1736,
             "nll": 0.6170000878295347,
@@ -448,9 +521,20 @@
             "medianForwardReturn": -0.11754481919441481,
             "upRate": 0.35599078341013823
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1736,
+            "nll": 0.6170000878295347,
+            "meanAbsLogError": 0.2932560147807406,
+            "medianAbsLogError": 0.265509004286165,
+            "coverage90": 0.7396313364055299,
+            "q05Pinball": 0.03569733262631473,
+            "q50Pinball": 0.1466280073903703,
+            "q95Pinball": 0.050278606608271735,
+            "medianForwardReturn": -0.11754481919441481,
+            "upRate": 0.35599078341013823
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 90,
             "iterations": 2000,
@@ -458,15 +542,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1736,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 20,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -477,11 +561,17 @@
       },
       "holdout": {
         "14": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",16699.114259508962],[\"sigma\",0.11303021946871265],[\"q025\",13380.795671530095],[\"q05\",13865.96828711187],[\"q10\",14447.214460962985],[\"q50\",16699.114259508962],[\"q90\",19302.019625003064],[\"q95\",20111.139105325306],[\"q975\",20840.34641119722]]",
+            "candidateOutput": "[[\"median\",16699.114259508962],[\"sigma\",0.11303021946871265],[\"q025\",13380.795671530095],[\"q05\",13865.96828711187],[\"q10\",14447.214460962985],[\"q50\",16699.114259508962],[\"q90\",19302.019625003064],[\"q95\",20111.139105325306],[\"q975\",20840.34641119722]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1272,
+            "differingSamples": 0
+          },
+          "samples": 1272,
           "baseline": {
             "samples": 1272,
             "nll": -0.9981769358710452,
@@ -494,38 +584,55 @@
             "medianForwardReturn": -0.0035748626299176526,
             "upRate": 0.47955974842767296
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1272,
+            "nll": -0.9981769358710452,
+            "meanAbsLogError": 0.0667002476815792,
+            "medianAbsLogError": 0.05055265453048374,
+            "coverage90": 0.8930817610062893,
+            "q05Pinball": 0.009716177111351811,
+            "q50Pinball": 0.0333501238407896,
+            "q95Pinball": 0.010528367712463411,
+            "medianForwardReturn": -0.0035748626299176526,
+            "upRate": 0.47955974842767296
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 14,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1272,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 91,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "30": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",16821.856314585006],[\"sigma\",0.15474926639488992],[\"q025\",12420.843923802773],[\"q05\",13041.533120386335],[\"q10\",13795.739982523928],[\"q50\",16821.856314585006],[\"q90\",20511.75581933324],[\"q95\",21697.974253211232],[\"q975\",22782.256310802084]]",
+            "candidateOutput": "[[\"median\",16821.856314585006],[\"sigma\",0.15474926639488992],[\"q025\",12420.843923802773],[\"q05\",13041.533120386335],[\"q10\",13795.739982523928],[\"q50\",16821.856314585006],[\"q90\",20511.75581933324],[\"q95\",21697.974253211232],[\"q975\",22782.256310802084]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1256,
+            "differingSamples": 0
+          },
+          "samples": 1256,
           "baseline": {
             "samples": 1256,
             "nll": -0.6447736043461959,
@@ -538,38 +645,55 @@
             "medianForwardReturn": -0.0030164024120214765,
             "upRate": 0.49044585987261147
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1256,
+            "nll": -0.6447736043461959,
+            "meanAbsLogError": 0.09822865621401944,
+            "medianAbsLogError": 0.07873181378324912,
+            "coverage90": 0.892515923566879,
+            "q05Pinball": 0.012956571361036435,
+            "q50Pinball": 0.04911432810700972,
+            "q95Pinball": 0.013588637378465591,
+            "medianForwardReturn": -0.0030164024120214765,
+            "upRate": 0.49044585987261147
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 30,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1256,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 42,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "60": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",17153.515167636102],[\"sigma\",0.20689022572302296],[\"q025\",11435.30760197859],[\"q05\",12205.650263375863],[\"q10\",13158.430110572308],[\"q50\",17153.515167636102],[\"q90\",22361.564421724477],[\"q95\",24107.12057588815],[\"q975\",25731.103425273013]]",
+            "candidateOutput": "[[\"median\",17153.515167636102],[\"sigma\",0.20689022572302296],[\"q025\",11435.30760197859],[\"q05\",12205.650263375863],[\"q10\",13158.430110572308],[\"q50\",17153.515167636102],[\"q90\",22361.564421724477],[\"q95\",24107.12057588815],[\"q975\",25731.103425273013]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1226,
+            "differingSamples": 0
+          },
+          "samples": 1226,
           "baseline": {
             "samples": 1226,
             "nll": -0.3976311502662715,
@@ -582,38 +706,55 @@
             "medianForwardReturn": 0.006107719093116857,
             "upRate": 0.5097879282218597
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1226,
+            "nll": -0.3976311502662715,
+            "meanAbsLogError": 0.13709032221035355,
+            "medianAbsLogError": 0.1356295760923807,
+            "coverage90": 0.933931484502447,
+            "q05Pinball": 0.014332358852706832,
+            "q50Pinball": 0.06854516110517678,
+            "q95Pinball": 0.015501835907453115,
+            "medianForwardReturn": 0.006107719093116857,
+            "upRate": 0.5097879282218597
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 60,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1226,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 21,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "90": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",17662.658637477954],[\"sigma\",0.20907849948918933],[\"q025\",11724.332701932559],[\"q05\",12522.777695734665],[\"q10\",13511.049761675176],[\"q50\",17662.658637477954],[\"q90\",23089.953456391893],[\"q95\",24912.165473506284],[\"q975\",26608.722054829756]]",
+            "candidateOutput": "[[\"median\",17662.658637477954],[\"sigma\",0.20907849948918933],[\"q025\",11724.332701932559],[\"q05\",12522.777695734665],[\"q10\",13511.049761675176],[\"q50\",17662.658637477954],[\"q90\",23089.953456391893],[\"q95\",24912.165473506284],[\"q975\",26608.722054829756]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1196,
+            "differingSamples": 0
+          },
+          "samples": 1196,
           "baseline": {
             "samples": 1196,
             "nll": -0.3233409315272135,
@@ -626,27 +767,38 @@
             "medianForwardReturn": -0.005873404609271429,
             "upRate": 0.4899665551839465
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1196,
+            "nll": -0.3233409315272135,
+            "meanAbsLogError": 0.15121550653586427,
+            "medianAbsLogError": 0.1511420577447069,
+            "coverage90": 0.9163879598662207,
+            "q05Pinball": 0.015186343213483132,
+            "q50Pinball": 0.07560775326793213,
+            "q95Pinball": 0.016008218819781123,
+            "medianForwardReturn": -0.005873404609271429,
+            "upRate": 0.4899665551839465
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 90,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1196,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 14,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
@@ -655,36 +807,36 @@
       },
       "holdoutHorizonSpaced": {
         "14": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 91,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "30": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 42,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "60": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 21,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "90": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 14,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         }
       },
-      "verdict": "needs-rerun",
-      "verdictReason": "needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available."
+      "verdict": "context-only",
+      "verdictReason": "The numerical promotion gate failed: 14d mean NLL improvement is not positive; 14d daily block-bootstrap one-sided lower95 is not positive; 14d Holm-adjusted p-value is not below 0.05; 14d horizon-spaced robustness failed; 14d candidate forecast outputs are identical to baseline; 30d mean NLL improvement is not positive; 30d daily block-bootstrap one-sided lower95 is not positive; 30d Holm-adjusted p-value is not below 0.05; 30d horizon-spaced robustness failed; 30d candidate forecast outputs are identical to baseline; 60d mean NLL improvement is not positive; 60d daily block-bootstrap one-sided lower95 is not positive; 60d Holm-adjusted p-value is not below 0.05; 60d horizon-spaced robustness failed; 60d candidate forecast outputs are identical to baseline; 90d mean NLL improvement is not positive; 90d daily block-bootstrap one-sided lower95 is not positive; 90d Holm-adjusted p-value is not below 0.05; 90d horizon-spaced robustness failed; 90d candidate forecast outputs are identical to baseline. Keep the signal context-only."
     },
     {
       "id": "liquidity-median",
@@ -699,24 +851,30 @@
       ],
       "threshold": 0,
       "selectedParameterByHorizon": {
-        "14": null,
-        "30": null,
-        "60": null,
-        "90": null
+        "14": 0,
+        "30": 0,
+        "60": 0,
+        "90": -0.05
       },
       "selectionStatusByHorizon": {
-        "14": "insufficient-data",
-        "30": "insufficient-data",
-        "60": "insufficient-data",
-        "90": "insufficient-data"
+        "14": "selected",
+        "30": "selected",
+        "60": "selected",
+        "90": "selected"
       },
       "validation": {
         "14": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",13062.137132236341],[\"sigma\",0.19706288081800455],[\"q025\",8877.159241477513],[\"q05\",9445.875168365601],[\"q10\",10146.933147173673],[\"q50\",13062.137132236341],[\"q90\",16814.876375614218],[\"q95\",18062.850018678568],[\"q975\",19220.04797031776]]",
+            "candidateOutput": "[[\"median\",13062.137132236341],[\"sigma\",0.19706288081800455],[\"q025\",8877.159241477513],[\"q05\",9445.875168365601],[\"q10\",10146.933147173673],[\"q50\",13062.137132236341],[\"q90\",16814.876375614218],[\"q95\",18062.850018678568],[\"q975\",19220.04797031776]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1812,
+            "differingSamples": 0
+          },
+          "samples": 1812,
           "baseline": {
             "samples": 1812,
             "nll": -0.4616640503023629,
@@ -729,9 +887,20 @@
             "medianForwardReturn": -0.01491533656877151,
             "upRate": 0.4420529801324503
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1812,
+            "nll": -0.4616640503023629,
+            "meanAbsLogError": 0.1082666802629209,
+            "medianAbsLogError": 0.08470686314937659,
+            "coverage90": 0.8940397350993378,
+            "q05Pinball": 0.01755040997946045,
+            "q50Pinball": 0.05413334013146045,
+            "q95Pinball": 0.01653751925539071,
+            "medianForwardReturn": -0.01491533656877151,
+            "upRate": 0.4420529801324503
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 14,
             "iterations": 2000,
@@ -739,15 +908,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1812,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 130,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -756,11 +925,17 @@
           }
         },
         "30": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",12642.741716306586],[\"sigma\",0.26979808040354286],[\"q025\",7450.556682014412],[\"q05\",8111.679385040327],[\"q10\",8947.043309173145],[\"q50\",12642.741716306586],[\"q90\",17864.998813782488],[\"q95\",19704.787445127175],[\"q975\",21453.285294921483]]",
+            "candidateOutput": "[[\"median\",12642.741716306586],[\"sigma\",0.26979808040354286],[\"q025\",7450.556682014412],[\"q05\",8111.679385040327],[\"q10\",8947.043309173145],[\"q50\",12642.741716306586],[\"q90\",17864.998813782488],[\"q95\",19704.787445127175],[\"q975\",21453.285294921483]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1796,
+            "differingSamples": 0
+          },
+          "samples": 1796,
           "baseline": {
             "samples": 1796,
             "nll": -0.06141603306200352,
@@ -773,9 +948,20 @@
             "medianForwardReturn": -0.016464936939996906,
             "upRate": 0.4599109131403118
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1796,
+            "nll": -0.06141603306200352,
+            "meanAbsLogError": 0.15918031134927837,
+            "medianAbsLogError": 0.12735746598593511,
+            "coverage90": 0.8758351893095768,
+            "q05Pinball": 0.02566052931917223,
+            "q50Pinball": 0.07959015567463919,
+            "q95Pinball": 0.023272624391660116,
+            "medianForwardReturn": -0.016464936939996906,
+            "upRate": 0.4599109131403118
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 30,
             "iterations": 2000,
@@ -783,15 +969,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1796,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 60,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -800,11 +986,17 @@
           }
         },
         "60": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",11900.728128224748],[\"sigma\",0.360703394947858],[\"q025\",5868.704562833711],[\"q05\",6575.136239682333],[\"q10\",7495.775427470658],[\"q50\",11900.728128224748],[\"q90\",18894.28670219778],[\"q95\",21539.83200031199],[\"q975\",24132.63923333956]]",
+            "candidateOutput": "[[\"median\",11900.728128224748],[\"sigma\",0.360703394947858],[\"q025\",5868.704562833711],[\"q05\",6575.136239682333],[\"q10\",7495.775427470658],[\"q50\",11900.728128224748],[\"q90\",18894.28670219778],[\"q95\",21539.83200031199],[\"q975\",24132.63923333956]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1766,
+            "differingSamples": 0
+          },
+          "samples": 1766,
           "baseline": {
             "samples": 1766,
             "nll": 0.31446029981889523,
@@ -817,9 +1009,20 @@
             "medianForwardReturn": -0.08110763711458707,
             "upRate": 0.3929784824462061
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1766,
+            "nll": 0.31446029981889523,
+            "meanAbsLogError": 0.2357035509049794,
+            "medianAbsLogError": 0.19861897767665138,
+            "coverage90": 0.840317100792752,
+            "q05Pinball": 0.03179092711085796,
+            "q50Pinball": 0.1178517754524897,
+            "q95Pinball": 0.03613606924425799,
+            "medianForwardReturn": -0.08110763711458707,
+            "upRate": 0.3929784824462061
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 60,
             "iterations": 2000,
@@ -827,15 +1030,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1766,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 30,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -844,11 +1047,17 @@
           }
         },
         "90": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": -0.05,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",11207.335283799483],[\"sigma\",0.36451854751861434],[\"q025\",5485.593404009962],[\"q05\",6153.301983758193],[\"q10\",7024.606400467634],[\"q50\",11207.335283799483],[\"q90\",17880.626614914006],[\"q95\",20412.514207011736],[\"q975\",22897.133438960347]]",
+            "candidateOutput": "[[\"median\",11318.025856751916],[\"sigma\",0.36451854751861434],[\"q025\",5539.772516305432],[\"q05\",6214.075798843042],[\"q10\",7093.985756714525],[\"q50\",11318.025856751916],[\"q90\",18057.226739264202],[\"q95\",20614.12081873147],[\"q975\",23123.279686497935]]",
+            "differsFromBaseline": true,
+            "comparedSamples": 1736,
+            "differingSamples": 1736
+          },
+          "samples": 1736,
           "baseline": {
             "samples": 1736,
             "nll": 0.6170000878295347,
@@ -861,9 +1070,20 @@
             "medianForwardReturn": -0.11754481919441481,
             "upRate": 0.35599078341013823
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1736,
+            "nll": 0.6050730442146319,
+            "meanAbsLogError": 0.2931285199224321,
+            "medianAbsLogError": 0.2502341299095292,
+            "coverage90": 0.7338709677419355,
+            "q05Pinball": 0.03538137782724834,
+            "q50Pinball": 0.14656425996121605,
+            "q95Pinball": 0.05047679731296475,
+            "medianForwardReturn": -0.14373681791101806,
+            "upRate": 0.35599078341013823
+          },
+          "meanNllImprovement": 0.011927043614903366,
+          "relativeNllImprovement": 0.019330700027708966,
           "bootstrap": {
             "blockLength": 90,
             "iterations": 2000,
@@ -871,15 +1091,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": -0.005760368663594417,
+          "medianAbsLogErrorDelta": 0.015274874376635772,
+          "signalSamples": 1736,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 20,
+            "meanNllImprovement": -0.005498611207590954,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": -0.050000000000000044,
+            "medianAbsLogErrorDelta": -0.009419670661345414
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -890,11 +1110,17 @@
       },
       "holdout": {
         "14": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",16699.114259508962],[\"sigma\",0.11303021946871265],[\"q025\",13380.795671530095],[\"q05\",13865.96828711187],[\"q10\",14447.214460962985],[\"q50\",16699.114259508962],[\"q90\",19302.019625003064],[\"q95\",20111.139105325306],[\"q975\",20840.34641119722]]",
+            "candidateOutput": "[[\"median\",16699.114259508962],[\"sigma\",0.11303021946871265],[\"q025\",13380.795671530095],[\"q05\",13865.96828711187],[\"q10\",14447.214460962985],[\"q50\",16699.114259508962],[\"q90\",19302.019625003064],[\"q95\",20111.139105325306],[\"q975\",20840.34641119722]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1272,
+            "differingSamples": 0
+          },
+          "samples": 1272,
           "baseline": {
             "samples": 1272,
             "nll": -0.9981769358710452,
@@ -907,38 +1133,55 @@
             "medianForwardReturn": -0.0035748626299176526,
             "upRate": 0.47955974842767296
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1272,
+            "nll": -0.9981769358710452,
+            "meanAbsLogError": 0.0667002476815792,
+            "medianAbsLogError": 0.05055265453048374,
+            "coverage90": 0.8930817610062893,
+            "q05Pinball": 0.009716177111351811,
+            "q50Pinball": 0.0333501238407896,
+            "q95Pinball": 0.010528367712463411,
+            "medianForwardReturn": -0.0035748626299176526,
+            "upRate": 0.47955974842767296
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 14,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 970,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1272,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 91,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "30": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",16821.856314585006],[\"sigma\",0.15474926639488992],[\"q025\",12420.843923802773],[\"q05\",13041.533120386335],[\"q10\",13795.739982523928],[\"q50\",16821.856314585006],[\"q90\",20511.75581933324],[\"q95\",21697.974253211232],[\"q975\",22782.256310802084]]",
+            "candidateOutput": "[[\"median\",16821.856314585006],[\"sigma\",0.15474926639488992],[\"q025\",12420.843923802773],[\"q05\",13041.533120386335],[\"q10\",13795.739982523928],[\"q50\",16821.856314585006],[\"q90\",20511.75581933324],[\"q95\",21697.974253211232],[\"q975\",22782.256310802084]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1256,
+            "differingSamples": 0
+          },
+          "samples": 1256,
           "baseline": {
             "samples": 1256,
             "nll": -0.6447736043461959,
@@ -951,38 +1194,55 @@
             "medianForwardReturn": -0.0030164024120214765,
             "upRate": 0.49044585987261147
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1256,
+            "nll": -0.6447736043461959,
+            "meanAbsLogError": 0.09822865621401944,
+            "medianAbsLogError": 0.07873181378324912,
+            "coverage90": 0.892515923566879,
+            "q05Pinball": 0.012956571361036435,
+            "q50Pinball": 0.04911432810700972,
+            "q95Pinball": 0.013588637378465591,
+            "medianForwardReturn": -0.0030164024120214765,
+            "upRate": 0.49044585987261147
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 30,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 954,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1256,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 42,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "60": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",17153.515167636102],[\"sigma\",0.20689022572302296],[\"q025\",11435.30760197859],[\"q05\",12205.650263375863],[\"q10\",13158.430110572308],[\"q50\",17153.515167636102],[\"q90\",22361.564421724477],[\"q95\",24107.12057588815],[\"q975\",25731.103425273013]]",
+            "candidateOutput": "[[\"median\",17153.515167636102],[\"sigma\",0.20689022572302296],[\"q025\",11435.30760197859],[\"q05\",12205.650263375863],[\"q10\",13158.430110572308],[\"q50\",17153.515167636102],[\"q90\",22361.564421724477],[\"q95\",24107.12057588815],[\"q975\",25731.103425273013]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1226,
+            "differingSamples": 0
+          },
+          "samples": 1226,
           "baseline": {
             "samples": 1226,
             "nll": -0.3976311502662715,
@@ -995,38 +1255,55 @@
             "medianForwardReturn": 0.006107719093116857,
             "upRate": 0.5097879282218597
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1226,
+            "nll": -0.3976311502662715,
+            "meanAbsLogError": 0.13709032221035355,
+            "medianAbsLogError": 0.1356295760923807,
+            "coverage90": 0.933931484502447,
+            "q05Pinball": 0.014332358852706832,
+            "q50Pinball": 0.06854516110517678,
+            "q95Pinball": 0.015501835907453115,
+            "medianForwardReturn": 0.006107719093116857,
+            "upRate": 0.5097879282218597
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 60,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 924,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1226,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 21,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "90": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": -0.05,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",17662.658637477954],[\"sigma\",0.20907849948918933],[\"q025\",11724.332701932559],[\"q05\",12522.777695734665],[\"q10\",13511.049761675176],[\"q50\",17662.658637477954],[\"q90\",23089.953456391893],[\"q95\",24912.165473506284],[\"q975\",26608.722054829756]]",
+            "candidateOutput": "[[\"median\",18104.796700248713],[\"sigma\",0.20907849948918933],[\"q025\",12017.820440925203],[\"q05\",12836.252398753191],[\"q10\",13849.263248683912],[\"q50\",18104.796700248713],[\"q90\",23667.949527097466],[\"q95\",25535.775814845783],[\"q975\",27274.80121446231]]",
+            "differsFromBaseline": true,
+            "comparedSamples": 1196,
+            "differingSamples": 1196
+          },
+          "samples": 1196,
           "baseline": {
             "samples": 1196,
             "nll": -0.3233409315272135,
@@ -1039,27 +1316,38 @@
             "medianForwardReturn": -0.005873404609271429,
             "upRate": 0.4899665551839465
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1196,
+            "nll": -0.29308380311047677,
+            "meanAbsLogError": 0.15487986420748107,
+            "medianAbsLogError": 0.1509063372004471,
+            "coverage90": 0.8979933110367893,
+            "q05Pinball": 0.015879655448552455,
+            "q50Pinball": 0.07743993210374053,
+            "q95Pinball": 0.016326108725889337,
+            "medianForwardReturn": 0.02610682460001858,
+            "upRate": 0.4899665551839465
+          },
+          "meanNllImprovement": -0.030257128416736286,
+          "relativeNllImprovement": -0.09357654867209467,
           "bootstrap": {
             "blockLength": 90,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": -0.10944243793214806,
+            "bootstrapUpper95OneSided": 0.026783930403405473,
+            "oneSidedPValue": 0.7306346826586707
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 894,
+          "coverage90Delta": -0.018394648829431426,
+          "medianAbsLogErrorDelta": 0.00023572054425979871,
+          "signalSamples": 1196,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 14,
+            "meanNllImprovement": 0.0070053470521012585,
+            "bootstrapLower95OneSided": 0.0070053470521012585,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0.006412855888782154
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
@@ -1068,36 +1356,36 @@
       },
       "holdoutHorizonSpaced": {
         "14": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 91,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "30": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 42,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "60": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 21,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "90": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 14,
+          "meanNllImprovement": 0.0070053470521012585,
+          "bootstrapLower95OneSided": 0.0070053470521012585,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0.006412855888782154
         }
       },
-      "verdict": "needs-rerun",
-      "verdictReason": "needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available."
+      "verdict": "context-only",
+      "verdictReason": "The numerical promotion gate failed: 14d mean NLL improvement is not positive; 14d daily block-bootstrap one-sided lower95 is not positive; 14d Holm-adjusted p-value is not below 0.05; 14d horizon-spaced robustness failed; 14d candidate forecast outputs are identical to baseline; 30d mean NLL improvement is not positive; 30d daily block-bootstrap one-sided lower95 is not positive; 30d Holm-adjusted p-value is not below 0.05; 30d horizon-spaced robustness failed; 30d candidate forecast outputs are identical to baseline; 60d mean NLL improvement is not positive; 60d daily block-bootstrap one-sided lower95 is not positive; 60d Holm-adjusted p-value is not below 0.05; 60d horizon-spaced robustness failed; 60d candidate forecast outputs are identical to baseline; 90d mean NLL improvement is not positive; 90d daily block-bootstrap one-sided lower95 is not positive; 90d Holm-adjusted p-value is not below 0.05. Keep the signal context-only."
     },
     {
       "id": "shock-interval",
@@ -1113,24 +1401,30 @@
       ],
       "threshold": 1,
       "selectedParameterByHorizon": {
-        "14": null,
-        "30": null,
-        "60": null,
-        "90": null
+        "14": 0.1,
+        "30": 0,
+        "60": 0,
+        "90": 0.1
       },
       "selectionStatusByHorizon": {
-        "14": "insufficient-data",
-        "30": "insufficient-data",
-        "60": "insufficient-data",
-        "90": "insufficient-data"
+        "14": "selected",
+        "30": "selected",
+        "60": "selected",
+        "90": "selected"
       },
       "validation": {
         "14": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0.1,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",13062.137132236341],[\"sigma\",0.19706288081800455],[\"q025\",8877.159241477513],[\"q05\",9445.875168365601],[\"q10\",10146.933147173673],[\"q50\",13062.137132236341],[\"q90\",16814.876375614218],[\"q95\",18062.850018678568],[\"q975\",19220.04797031776]]",
+            "candidateOutput": "[[\"median\",13062.137132236341],[\"sigma\",0.19706288081800455],[\"q025\",8877.159241477513],[\"q05\",9445.875168365601],[\"q10\",10146.933147173673],[\"q50\",13062.137132236341],[\"q90\",16814.876375614218],[\"q95\",18062.850018678568],[\"q975\",19220.04797031776]]",
+            "differsFromBaseline": true,
+            "comparedSamples": 1812,
+            "differingSamples": 319
+          },
+          "samples": 1812,
           "baseline": {
             "samples": 1812,
             "nll": -0.4616640503023629,
@@ -1143,9 +1437,20 @@
             "medianForwardReturn": -0.01491533656877151,
             "upRate": 0.4420529801324503
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1812,
+            "nll": -0.46233689986407034,
+            "meanAbsLogError": 0.1082666802629209,
+            "medianAbsLogError": 0.08470686314937659,
+            "coverage90": 0.8984547461368654,
+            "q05Pinball": 0.01754849249966544,
+            "q50Pinball": 0.05413334013146045,
+            "q95Pinball": 0.016635150995859133,
+            "medianForwardReturn": -0.01491533656877151,
+            "upRate": 0.4420529801324503
+          },
+          "meanNllImprovement": 0.0006728495617072569,
+          "relativeNllImprovement": 0.0014574441333839111,
           "bootstrap": {
             "blockLength": 14,
             "iterations": 2000,
@@ -1153,15 +1458,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0.004415011037527616,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1812,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 130,
+            "meanNllImprovement": -0.0013366624005944512,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -1170,11 +1475,17 @@
           }
         },
         "30": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",12642.741716306586],[\"sigma\",0.26979808040354286],[\"q025\",7450.556682014412],[\"q05\",8111.679385040327],[\"q10\",8947.043309173145],[\"q50\",12642.741716306586],[\"q90\",17864.998813782488],[\"q95\",19704.787445127175],[\"q975\",21453.285294921483]]",
+            "candidateOutput": "[[\"median\",12642.741716306586],[\"sigma\",0.26979808040354286],[\"q025\",7450.556682014412],[\"q05\",8111.679385040327],[\"q10\",8947.043309173145],[\"q50\",12642.741716306586],[\"q90\",17864.998813782488],[\"q95\",19704.787445127175],[\"q975\",21453.285294921483]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1796,
+            "differingSamples": 0
+          },
+          "samples": 1796,
           "baseline": {
             "samples": 1796,
             "nll": -0.06141603306200352,
@@ -1187,9 +1498,20 @@
             "medianForwardReturn": -0.016464936939996906,
             "upRate": 0.4599109131403118
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1796,
+            "nll": -0.06141603306200352,
+            "meanAbsLogError": 0.15918031134927837,
+            "medianAbsLogError": 0.12735746598593511,
+            "coverage90": 0.8758351893095768,
+            "q05Pinball": 0.02566052931917223,
+            "q50Pinball": 0.07959015567463919,
+            "q95Pinball": 0.023272624391660116,
+            "medianForwardReturn": -0.016464936939996906,
+            "upRate": 0.4599109131403118
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 30,
             "iterations": 2000,
@@ -1197,15 +1519,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1796,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 60,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -1214,11 +1536,17 @@
           }
         },
         "60": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",11900.728128224748],[\"sigma\",0.360703394947858],[\"q025\",5868.704562833711],[\"q05\",6575.136239682333],[\"q10\",7495.775427470658],[\"q50\",11900.728128224748],[\"q90\",18894.28670219778],[\"q95\",21539.83200031199],[\"q975\",24132.63923333956]]",
+            "candidateOutput": "[[\"median\",11900.728128224748],[\"sigma\",0.360703394947858],[\"q025\",5868.704562833711],[\"q05\",6575.136239682333],[\"q10\",7495.775427470658],[\"q50\",11900.728128224748],[\"q90\",18894.28670219778],[\"q95\",21539.83200031199],[\"q975\",24132.63923333956]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1766,
+            "differingSamples": 0
+          },
+          "samples": 1766,
           "baseline": {
             "samples": 1766,
             "nll": 0.31446029981889523,
@@ -1231,9 +1559,20 @@
             "medianForwardReturn": -0.08110763711458707,
             "upRate": 0.3929784824462061
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1766,
+            "nll": 0.31446029981889523,
+            "meanAbsLogError": 0.2357035509049794,
+            "medianAbsLogError": 0.19861897767665138,
+            "coverage90": 0.840317100792752,
+            "q05Pinball": 0.03179092711085796,
+            "q50Pinball": 0.1178517754524897,
+            "q95Pinball": 0.03613606924425799,
+            "medianForwardReturn": -0.08110763711458707,
+            "upRate": 0.3929784824462061
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 60,
             "iterations": 2000,
@@ -1241,15 +1580,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1766,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 30,
+            "meanNllImprovement": 0,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -1258,11 +1597,17 @@
           }
         },
         "90": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0.1,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",11207.335283799483],[\"sigma\",0.36451854751861434],[\"q025\",5485.593404009962],[\"q05\",6153.301983758193],[\"q10\",7024.606400467634],[\"q50\",11207.335283799483],[\"q90\",17880.626614914006],[\"q95\",20412.514207011736],[\"q975\",22897.133438960347]]",
+            "candidateOutput": "[[\"median\",11207.335283799483],[\"sigma\",0.36451854751861434],[\"q025\",5485.593404009962],[\"q05\",6153.301983758193],[\"q10\",7024.606400467634],[\"q50\",11207.335283799483],[\"q90\",17880.626614914006],[\"q95\",20412.514207011736],[\"q975\",22897.133438960347]]",
+            "differsFromBaseline": true,
+            "comparedSamples": 1736,
+            "differingSamples": 319
+          },
+          "samples": 1736,
           "baseline": {
             "samples": 1736,
             "nll": 0.6170000878295347,
@@ -1275,9 +1620,20 @@
             "medianForwardReturn": -0.11754481919441481,
             "upRate": 0.35599078341013823
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1736,
+            "nll": 0.6146308481592381,
+            "meanAbsLogError": 0.2932560147807406,
+            "medianAbsLogError": 0.265509004286165,
+            "coverage90": 0.7465437788018433,
+            "q05Pinball": 0.03487298281069852,
+            "q50Pinball": 0.1466280073903703,
+            "q95Pinball": 0.05073183538657394,
+            "medianForwardReturn": -0.11754481919441481,
+            "upRate": 0.35599078341013823
+          },
+          "meanNllImprovement": 0.002369239670296355,
+          "relativeNllImprovement": 0.0038399340892010534,
           "bootstrap": {
             "blockLength": 90,
             "iterations": 2000,
@@ -1285,15 +1641,15 @@
             "bootstrapUpper95OneSided": null,
             "oneSidedPValue": null
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0.00691244239631339,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1736,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
+            "samples": 20,
+            "meanNllImprovement": 0.00515332640954673,
             "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "coverage90Delta": 0.050000000000000044,
+            "medianAbsLogErrorDelta": 0
           },
           "holmAdjustedPValue": null,
           "gate": {
@@ -1304,11 +1660,17 @@
       },
       "holdout": {
         "14": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0.1,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",16699.114259508962],[\"sigma\",0.11303021946871265],[\"q025\",13380.795671530095],[\"q05\",13865.96828711187],[\"q10\",14447.214460962985],[\"q50\",16699.114259508962],[\"q90\",19302.019625003064],[\"q95\",20111.139105325306],[\"q975\",20840.34641119722]]",
+            "candidateOutput": "[[\"median\",16699.114259508962],[\"sigma\",0.11303021946871265],[\"q025\",13380.795671530095],[\"q05\",13865.96828711187],[\"q10\",14447.214460962985],[\"q50\",16699.114259508962],[\"q90\",19302.019625003064],[\"q95\",20111.139105325306],[\"q975\",20840.34641119722]]",
+            "differsFromBaseline": true,
+            "comparedSamples": 1272,
+            "differingSamples": 230
+          },
+          "samples": 1272,
           "baseline": {
             "samples": 1272,
             "nll": -0.9981769358710452,
@@ -1321,38 +1683,55 @@
             "medianForwardReturn": -0.0035748626299176526,
             "upRate": 0.47955974842767296
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1272,
+            "nll": -0.9953979891460316,
+            "meanAbsLogError": 0.0667002476815792,
+            "medianAbsLogError": 0.05055265453048374,
+            "coverage90": 0.8946540880503144,
+            "q05Pinball": 0.009774528009762995,
+            "q50Pinball": 0.0333501238407896,
+            "q95Pinball": 0.010537026488637491,
+            "medianForwardReturn": -0.0035748626299176526,
+            "upRate": 0.47955974842767296
+          },
+          "meanNllImprovement": -0.0027789467250141117,
+          "relativeNllImprovement": -0.0027840221759767914,
           "bootstrap": {
             "blockLength": 14,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": -0.008820845496769165,
+            "bootstrapUpper95OneSided": 0.0038465329126510777,
+            "oneSidedPValue": 0.7566216891554223
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0.0015723270440251014,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1272,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 91,
+            "meanNllImprovement": 0.004552170277646067,
+            "bootstrapLower95OneSided": -0.0044555171032413955,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "30": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",16821.856314585006],[\"sigma\",0.15474926639488992],[\"q025\",12420.843923802773],[\"q05\",13041.533120386335],[\"q10\",13795.739982523928],[\"q50\",16821.856314585006],[\"q90\",20511.75581933324],[\"q95\",21697.974253211232],[\"q975\",22782.256310802084]]",
+            "candidateOutput": "[[\"median\",16821.856314585006],[\"sigma\",0.15474926639488992],[\"q025\",12420.843923802773],[\"q05\",13041.533120386335],[\"q10\",13795.739982523928],[\"q50\",16821.856314585006],[\"q90\",20511.75581933324],[\"q95\",21697.974253211232],[\"q975\",22782.256310802084]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1256,
+            "differingSamples": 0
+          },
+          "samples": 1256,
           "baseline": {
             "samples": 1256,
             "nll": -0.6447736043461959,
@@ -1365,38 +1744,55 @@
             "medianForwardReturn": -0.0030164024120214765,
             "upRate": 0.49044585987261147
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1256,
+            "nll": -0.6447736043461959,
+            "meanAbsLogError": 0.09822865621401944,
+            "medianAbsLogError": 0.07873181378324912,
+            "coverage90": 0.892515923566879,
+            "q05Pinball": 0.012956571361036435,
+            "q50Pinball": 0.04911432810700972,
+            "q95Pinball": 0.013588637378465591,
+            "medianForwardReturn": -0.0030164024120214765,
+            "upRate": 0.49044585987261147
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 30,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1256,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 42,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "60": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",17153.515167636102],[\"sigma\",0.20689022572302296],[\"q025\",11435.30760197859],[\"q05\",12205.650263375863],[\"q10\",13158.430110572308],[\"q50\",17153.515167636102],[\"q90\",22361.564421724477],[\"q95\",24107.12057588815],[\"q975\",25731.103425273013]]",
+            "candidateOutput": "[[\"median\",17153.515167636102],[\"sigma\",0.20689022572302296],[\"q025\",11435.30760197859],[\"q05\",12205.650263375863],[\"q10\",13158.430110572308],[\"q50\",17153.515167636102],[\"q90\",22361.564421724477],[\"q95\",24107.12057588815],[\"q975\",25731.103425273013]]",
+            "differsFromBaseline": false,
+            "comparedSamples": 1226,
+            "differingSamples": 0
+          },
+          "samples": 1226,
           "baseline": {
             "samples": 1226,
             "nll": -0.3976311502662715,
@@ -1409,38 +1805,55 @@
             "medianForwardReturn": 0.006107719093116857,
             "upRate": 0.5097879282218597
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1226,
+            "nll": -0.3976311502662715,
+            "meanAbsLogError": 0.13709032221035355,
+            "medianAbsLogError": 0.1356295760923807,
+            "coverage90": 0.933931484502447,
+            "q05Pinball": 0.014332358852706832,
+            "q50Pinball": 0.06854516110517678,
+            "q95Pinball": 0.015501835907453115,
+            "medianForwardReturn": 0.006107719093116857,
+            "upRate": 0.5097879282218597
+          },
+          "meanNllImprovement": 0,
+          "relativeNllImprovement": 0,
           "bootstrap": {
             "blockLength": 60,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": 0,
+            "bootstrapUpper95OneSided": 0,
+            "oneSidedPValue": 1
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1226,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 21,
+            "meanNllImprovement": 0,
+            "bootstrapLower95OneSided": 0,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
           }
         },
         "90": {
-          "status": "insufficient-data",
-          "reason": "no usable validation signal rows; parameter selection is not defined",
-          "parameter": null,
-          "parameterIdentity": null,
-          "samples": 0,
+          "status": "scored",
+          "reason": null,
+          "parameter": 0.1,
+          "parameterIdentity": {
+            "baselineOutput": "[[\"median\",17662.658637477954],[\"sigma\",0.20907849948918933],[\"q025\",11724.332701932559],[\"q05\",12522.777695734665],[\"q10\",13511.049761675176],[\"q50\",17662.658637477954],[\"q90\",23089.953456391893],[\"q95\",24912.165473506284],[\"q975\",26608.722054829756]]",
+            "candidateOutput": "[[\"median\",17662.658637477954],[\"sigma\",0.20907849948918933],[\"q025\",11724.332701932559],[\"q05\",12522.777695734665],[\"q10\",13511.049761675176],[\"q50\",17662.658637477954],[\"q90\",23089.953456391893],[\"q95\",24912.165473506284],[\"q975\",26608.722054829756]]",
+            "differsFromBaseline": true,
+            "comparedSamples": 1196,
+            "differingSamples": 211
+          },
+          "samples": 1196,
           "baseline": {
             "samples": 1196,
             "nll": -0.3233409315272135,
@@ -1453,27 +1866,38 @@
             "medianForwardReturn": -0.005873404609271429,
             "upRate": 0.4899665551839465
           },
-          "candidate": null,
-          "meanNllImprovement": null,
-          "relativeNllImprovement": null,
+          "candidate": {
+            "samples": 1196,
+            "nll": -0.32023883645210804,
+            "meanAbsLogError": 0.15121550653586427,
+            "medianAbsLogError": 0.1511420577447069,
+            "coverage90": 0.9230769230769231,
+            "q05Pinball": 0.015285936760052292,
+            "q50Pinball": 0.07560775326793213,
+            "q95Pinball": 0.016185714661874382,
+            "medianForwardReturn": -0.005873404609271429,
+            "upRate": 0.4899665551839465
+          },
+          "meanNllImprovement": -0.0031020950751053816,
+          "relativeNllImprovement": -0.009593883027594253,
           "bootstrap": {
             "blockLength": 90,
             "iterations": 2000,
-            "bootstrapLower95OneSided": null,
-            "bootstrapUpper95OneSided": null,
-            "oneSidedPValue": null
+            "bootstrapLower95OneSided": -0.00855995216757617,
+            "bootstrapUpper95OneSided": 0.0052535924155197025,
+            "oneSidedPValue": 0.8605697151424287
           },
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null,
-          "signalSamples": 0,
+          "coverage90Delta": 0.006688963210702448,
+          "medianAbsLogErrorDelta": 0,
+          "signalSamples": 1196,
           "horizonSpaced": {
-            "samples": 0,
-            "meanNllImprovement": null,
-            "bootstrapLower95OneSided": null,
-            "coverage90Delta": null,
-            "medianAbsLogErrorDelta": null
+            "samples": 14,
+            "meanNllImprovement": -0.006072936051976119,
+            "bootstrapLower95OneSided": -0.006072936051976119,
+            "coverage90Delta": 0,
+            "medianAbsLogErrorDelta": 0
           },
-          "holmAdjustedPValue": null,
+          "holmAdjustedPValue": 1,
           "gate": {
             "passed": false,
             "reasons": []
@@ -1482,36 +1906,36 @@
       },
       "holdoutHorizonSpaced": {
         "14": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 91,
+          "meanNllImprovement": 0.004552170277646067,
+          "bootstrapLower95OneSided": -0.0044555171032413955,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "30": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 42,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "60": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 21,
+          "meanNllImprovement": 0,
+          "bootstrapLower95OneSided": 0,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         },
         "90": {
-          "samples": 0,
-          "meanNllImprovement": null,
-          "bootstrapLower95OneSided": null,
-          "coverage90Delta": null,
-          "medianAbsLogErrorDelta": null
+          "samples": 14,
+          "meanNllImprovement": -0.006072936051976119,
+          "bootstrapLower95OneSided": -0.006072936051976119,
+          "coverage90Delta": 0,
+          "medianAbsLogErrorDelta": 0
         }
       },
-      "verdict": "needs-rerun",
-      "verdictReason": "needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available."
+      "verdict": "context-only",
+      "verdictReason": "The numerical promotion gate failed: 14d mean NLL improvement is not positive; 14d daily block-bootstrap one-sided lower95 is not positive; 14d Holm-adjusted p-value is not below 0.05; 14d horizon-spaced robustness failed; 30d mean NLL improvement is not positive; 30d daily block-bootstrap one-sided lower95 is not positive; 30d Holm-adjusted p-value is not below 0.05; 30d horizon-spaced robustness failed; 30d candidate forecast outputs are identical to baseline; 60d mean NLL improvement is not positive; 60d daily block-bootstrap one-sided lower95 is not positive; 60d Holm-adjusted p-value is not below 0.05; 60d horizon-spaced robustness failed; 60d candidate forecast outputs are identical to baseline; 90d mean NLL improvement is not positive; 90d daily block-bootstrap one-sided lower95 is not positive; 90d Holm-adjusted p-value is not below 0.05; 90d horizon-spaced robustness failed. Keep the signal context-only."
     }
   ],
   "leakageProof": {
@@ -1519,13 +1943,17 @@
     "rollingStatisticsRule": "Every z-score at row i uses values from rows with index < i; the current observation is excluded from its own mean and variance.",
     "targetRule": "The target close at origin + horizonDays is read only after the forecast is constructed and is never used for signal construction or parameter selection.",
     "parameterRule": "Each arm and horizon selects its parameter by validation NLL only; holdout scores are computed after selection and cannot alter the parameter.",
-    "revisedDataLimitation": "The cache contains latest-revised FRED observations rather than ALFRED vintages. This proof prevents timestamp lookahead but cannot claim vintage safety; all results remain research-only."
+    "revisedDataLimitation": "The cache contains latest-revised FRED observations rather than ALFRED vintages. This proof prevents timestamp lookahead but cannot claim vintage safety; all results remain research-only.",
+    "creditSpreadProxyRule": "BAAFF is a historical Moody's Baa-minus-fed-funds proxy; it is not equivalent to the ICE/BofA high-yield option-adjusted spread BAMLH0A0HYM2."
   },
   "limitations": [
     "Latest-revised FRED observations can incorporate later revisions, so this is not a vintage-safe production experiment.",
     "Static power-law coefficients and interval calibration are inherited from the current app baseline and are not re-fit by this runner.",
-    "A positive result would require an ALFRED/vintage-safe rerun before any app-facing change."
+    "A positive result would require an ALFRED/vintage-safe rerun before any app-facing change.",
+    "FRED observations are latest revisions rather than point-in-time ALFRED vintages; all experiment results remain research-only.",
+    "Each aligned row is available only after the latest contributing observation plus a conservative 30-day lag.",
+    "BAAFF is a historical Moody's Baa-minus-fed-funds proxy; it is not equivalent to the ICE/BofA high-yield option-adjusted spread BAMLH0A0HYM2."
   ],
-  "verdict": "needs-rerun",
+  "verdict": "context-only",
   "reportsGeneratedWithoutProductionChange": true
 }

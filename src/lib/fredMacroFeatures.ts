@@ -133,7 +133,7 @@ function buildSignalForRow(
   };
 
   const stressComponents = {
-    highYieldSpread: z(['highYieldSpread']),
+    creditSpreadProxy: z(['baaMinusFedFundsCreditSpread', 'highYieldSpread']),
     nfci: z(['nfci']),
     vix: z(['vix']),
     baaSpread: z(['baaSpread']),

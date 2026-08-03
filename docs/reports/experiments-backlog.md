@@ -907,19 +907,68 @@ If latest-observation FRED macro fails, do not tune macro score weights on the s
 
 ---
 
+## 2026-08-03 — FRED credit-source coverage repair
+
+Status: `completed — context-only`
+
+### Hypothesis
+
+Replacing the current FRED ICE high-yield series, whose catalog coverage begins in 2023, with the historical Moody's Baa-minus-fed-funds series (`BAAFF`) will restore the registered BTC-era validation window without introducing future information.
+
+### Data/source changes
+
+The authenticated FRED API returned `BAMLH0A0HYM2` observations beginning `2023-08-01`. The rerun will use `BAAFF`, whose observations begin in 2010 for this execution, as an explicitly labeled historical credit-spread proxy. The legacy `highYieldSpread` field remains as a compatibility alias only; no equivalence to an ICE high-yield index is claimed.
+
+### Validation setup
+
+Run `yarn update:macro`, verify non-zero cache rows in 2018, 2020, and 2022, then run `yarn backtest:fred-macro` with the existing 2018–2022 validation, untouched 2023+ holdout, 14/30/60/90-day horizons, point-in-time lag rules, block bootstrap, and Holm correction.
+
+### Report artifacts
+
+- `docs/reports/results/btc-fred-macro-experiments.json`
+- `docs/reports/results/btc-fred-macro-experiments.md`
+- `src/data/macro-history.json`
+
+### Result / verdict
+
+`yarn update:macro` completed with `5,844` rows from `2010-08-01` through
+`2026-07-31`, including `2018=365`, `2020=366`, and `2022=365` rows. The
+registered `yarn backtest:fred-macro` rerun completed with `context-only` as
+the report verdict: all three arms failed the corrected holdout promotion gate.
+The BAAFF proxy is recorded as a historical Moody's Baa-minus-fed-funds proxy,
+not as an ICE/BofA high-yield equivalent. No production path changed.
+
+### Rerun criteria
+
+1. Confirm the proxy series and its catalog date range in the cache metadata.
+2. Require non-zero 2018, 2020, and 2022 rows before interpreting arm metrics.
+3. Keep any positive result research-only until an ALFRED/vintage-safe rerun passes.
+
+### Next better experiment
+
+Compare the BAAFF proxy against a vintage-safe ALFRED credit-spread construction before considering any app-facing use.
+
+---
+
 ## 2026-08-02 — FRED stress interval ablation
 
-Status: `needs-rerun — authenticated BTC-era cache unavailable; repaired runner requires a fresh run`
+Status: `completed — context-only`
 
 Arm id: `stress-interval`
 
 ### Hypothesis
 
-The point-in-time average of high-yield spread, NFCI, VIX, Baa spread, dollar momentum, and inverted yield curve identifies stressed origins where widening the current power-law interval improves log-score/NLL without moving the median.
+The point-in-time average of the historical credit-spread proxy, NFCI, VIX, Baa spread, dollar momentum, and inverted yield curve identifies stressed origins where widening the current power-law interval improves log-score/NLL without moving the median.
 
 ### Data/source changes
 
-The experiment registers an authenticated FRED observations API cache from `2010-07-17` with `WALCL`, `FEDFUNDS`, `DGS10`, `BAMLH0A0HYM2`, `M2SL`, `T10Y2Y`, `NFCI`, `VIXCLS`, `BAA10Y`, and `DTWEXBGS`. Rows use latest FRED revisions, per-series observed dates, and a conservative 30-day `availableAfter` rule. The local refresh was attempted with `yarn update:macro` and was blocked by the sandbox network before a response; the pre-existing cache remains a 2023+ legacy cache and is not evidence for the required BTC-era coverage.
+The experiment uses an authenticated FRED observations API cache from
+`2010-07-17` with `WALCL`, `FEDFUNDS`, `DGS10`, historical proxy `BAAFF`,
+`M2SL`, `T10Y2Y`, `NFCI`, `VIXCLS`, `BAA10Y`, and `DTWEXBGS`. Rows use latest
+FRED revisions, per-series observed dates, and a conservative 30-day
+`availableAfter` rule. `BAMLH0A0HYM2` begins at `2023-08-01` in the current
+catalog; BAAFF is the explicitly labeled historical proxy and is not claimed
+equivalent.
 
 ### Validation setup
 
@@ -938,7 +987,12 @@ Script: `scripts/backtest-fred-macro-experiments.ts` via `yarn backtest:fred-mac
 
 ### Result / verdict
 
-Verdict: `needs-rerun` / `needs more data`. The authenticated FRED BTC-era cache could not be fetched in this environment, and the available local cache has no 2018/2020/2022 rows. The repaired runner correctly leaves all parameters unselected, does not score a zero-effect candidate, and requires a fresh run before any experiment claim. No production forecast path changed.
+Verdict: `context-only`. On the completed rerun, the holdout had `1,272`,
+`1,256`, `1,226`, and `1,196` scored origins at 14/30/60/90d. NLL
+improvement was `0` at every horizon, with Holm-adjusted `p=1.0` and no
+positive one-sided bootstrap lower bound. The candidate outputs are identical
+to baseline at all selected zero-effect parameters. Keep the stress signal
+context-only.
 
 ### Rerun criteria
 
@@ -954,7 +1008,7 @@ Run the same stress interval ablation on a vintage-safe ALFRED cache with the st
 
 ## 2026-08-02 — FRED liquidity median ablation
 
-Status: `needs-rerun — authenticated BTC-era cache unavailable; repaired runner requires a fresh run`
+Status: `completed — context-only`
 
 Arm id: `liquidity-median`
 
@@ -964,7 +1018,11 @@ A point-in-time liquidity composite from Fed balance-sheet growth, M2 growth, fe
 
 ### Data/source changes
 
-Uses the authenticated ten-series FRED observations cache, latest revised observations, per-series `observedDates`, and 30-day `availableAfter` lag described in the shared FRED experiment report. The required refresh could not reach the FRED host in this sandbox, so the existing cache is insufficient for a valid 2018–2022 validation claim.
+Uses the authenticated ten-series FRED observations cache, latest revised
+observations, per-series `observedDates`, and 30-day `availableAfter` lag
+described in the shared FRED experiment report. The credit input is the
+registered BAAFF historical proxy; the legacy `highYieldSpread` field remains
+an alias only.
 
 ### Validation setup
 
@@ -977,7 +1035,11 @@ The runner selects the liquidity coefficient from `[-0.1, -0.05, 0, 0.05, 0.1]` 
 
 ### Result / verdict
 
-Verdict: `needs-rerun` / `needs more data`. The authenticated FRED BTC-era cache could not be fetched in this environment, so the cache coverage gate failed before a meaningful validation comparison could be made. The repaired runner does not select parameter zero or score an absent-signal candidate; it requires a fresh run. Latest-revised FRED data is explicitly research-only, and the production median remains unchanged.
+Verdict: `context-only`. The selected validation coefficient was `0` at
+14/30/60d and `-0.05` at 90d. Holdout NLL improvement was `0` at 14/30/60d
+and `-0.030257` at 90d; the 90d one-sided lower bound was `-0.109442`, with
+Holm-adjusted `p=1.0` and a `-0.018395` 90% coverage delta. The median signal
+does not pass promotion; production routing remains unchanged.
 
 ### Rerun criteria
 
@@ -993,7 +1055,7 @@ Use a frozen, vintage-safe liquidity composite and compare the median shift agai
 
 ## 2026-08-02 — FRED stress shock interval ablation
 
-Status: `needs-rerun — authenticated BTC-era cache unavailable; repaired runner requires a fresh run`
+Status: `completed — context-only`
 
 Arm id: `shock-interval`
 
@@ -1003,7 +1065,10 @@ A positive 30-day shock in the point-in-time stress composite, above a pre-regis
 
 ### Data/source changes
 
-Uses the authenticated FRED observations API loader and the same ten public series as the other two arms. Stress-change z-scores use prior rows only; the current macro observation is excluded from its own rolling mean and variance. The local network could not complete the refresh, leaving the legacy 2023+ cache in place for this run.
+Uses the authenticated FRED observations API loader and the same ten public
+series as the other two arms. Stress-change z-scores use prior rows only; the
+current macro observation is excluded from its own rolling mean and variance.
+The completed cache uses BAAFF as the historical credit-spread proxy.
 
 ### Validation setup
 
@@ -1016,7 +1081,12 @@ The runner selects the interval multiplier from `0/0.1/0.2/0.35/0.5/0.75` using 
 
 ### Result / verdict
 
-Verdict: `needs-rerun` / `needs more data`. The authenticated FRED BTC-era cache could not be fetched in this environment, so no usable 2018/2020/2022 validation signal was available. The repaired runner leaves the shock parameter unselected, does not score a zero-effect candidate, and requires a fresh run. No production interval or UI behavior changed.
+Verdict: `context-only`. The selected interval multipliers were `0.1`, `0`,
+`0`, and `0.1` at 14/30/60/90d. Holdout NLL improvement was `-0.002779` at
+14d, `0` at 30/60d, and `-0.003102` at 90d; the corresponding daily lower
+bounds were `-0.008821`, `0`, `0`, and `-0.008560`, with Holm-adjusted `p=1.0`.
+No shock interval passes the promotion gate; production interval and UI
+behavior remain unchanged.
 
 ### Rerun criteria
 

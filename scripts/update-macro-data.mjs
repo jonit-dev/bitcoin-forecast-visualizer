@@ -14,12 +14,16 @@ const OUT_PATH = join(__dirname, '../src/data/macro-history.json');
 const CONSERVATIVE_LAG_DAYS = 30;
 const Z_SCORE_LOOKBACK = 252;
 const MS_PER_DAY = 86400000;
-const CORE_SERIES = ['WALCL', 'FEDFUNDS', 'DGS10', 'BAMLH0A0HYM2', 'M2SL'];
+const CREDIT_PROXY_SERIES_ID = 'BAAFF';
+const CREDIT_PROXY_METRIC = 'baaMinusFedFundsCreditSpread';
+const CREDIT_PROXY_LABEL = "Moody's Baa-minus-fed-funds historical credit-spread proxy";
+const CREDIT_PROXY_LIMITATION = 'BAAFF is a historical Moody\'s Baa-minus-fed-funds proxy; it is not equivalent to the ICE/BofA high-yield option-adjusted spread BAMLH0A0HYM2.';
+const CORE_SERIES = ['WALCL', 'FEDFUNDS', 'DGS10', CREDIT_PROXY_SERIES_ID, 'M2SL'];
 const SERIES = [
   ['WALCL', 'Fed balance sheet assets'],
   ['FEDFUNDS', 'Effective federal funds rate'],
   ['DGS10', '10-year Treasury yield'],
-  ['BAMLH0A0HYM2', 'US high-yield option-adjusted spread'],
+  [CREDIT_PROXY_SERIES_ID, CREDIT_PROXY_LABEL],
   ['M2SL', 'M2 money stock'],
   ['T10Y2Y', '10-year minus 2-year Treasury yield spread'],
   ['NFCI', 'Chicago Fed National Financial Conditions Index'],
@@ -99,7 +103,7 @@ async function main() {
   const lastDate = dates.at(-1);
   const rows = [];
   const history = new Map([
-    ['highYieldSpread', []],
+    [CREDIT_PROXY_METRIC, []],
     ['dgs10', []],
     ['walclChange13w', []],
     ['nfci', []],
@@ -126,7 +130,7 @@ async function main() {
     const m2Change26w = change(bySeries.M2SL, date, 182);
     const yieldCurveChange30d = difference(bySeries.T10Y2Y, date, 30);
     const dollarMomentum30d = change(bySeries.DTWEXBGS, date, 30);
-    const highYieldSpread = latest.BAMLH0A0HYM2.value;
+    const baaMinusFedFundsCreditSpread = latest[CREDIT_PROXY_SERIES_ID].value;
     const dgs10 = latest.DGS10.value;
     const yieldCurve = latest.T10Y2Y?.value;
     const nfci = latest.NFCI?.value;
@@ -135,7 +139,7 @@ async function main() {
     const dollarIndex = latest.DTWEXBGS?.value;
     const yieldCurveInversion = Number.isFinite(yieldCurve) ? -yieldCurve : null;
 
-    const highYieldSpreadZ252d = priorZScore(history.get('highYieldSpread'), highYieldSpread);
+    const baaMinusFedFundsCreditSpreadZ252d = priorZScore(history.get(CREDIT_PROXY_METRIC), baaMinusFedFundsCreditSpread);
     const dgs10Z252d = priorZScore(history.get('dgs10'), dgs10);
     const walclImpulseZ252d = priorZScore(history.get('walclChange13w'), walclChange13w);
     const nfciZ252d = priorZScore(history.get('nfci'), nfci);
@@ -145,14 +149,14 @@ async function main() {
     const yieldCurveInversionZ252d = priorZScore(history.get('yieldCurveInversion'), yieldCurveInversion);
     const fedFundsChangeZ252d = priorZScore(history.get('fedFundsChange13w'), fedFundsChange13w);
     const macroRiskScore = meanFinite([
-      highYieldSpreadZ252d,
+      baaMinusFedFundsCreditSpreadZ252d,
       dgs10Z252d,
       Number.isFinite(walclImpulseZ252d) ? -walclImpulseZ252d : null,
       fedFundsChangeZ252d,
       yieldCurveInversionZ252d,
     ]);
     const stressScore = meanFinite([
-      highYieldSpreadZ252d,
+      baaMinusFedFundsCreditSpreadZ252d,
       nfciZ252d,
       vixZ252d,
       baaSpreadZ252d,
@@ -170,8 +174,10 @@ async function main() {
       treasury10yYield: dgs10,
       treasury10yChange30d: dgs10Change30d,
       treasury10yChange90d: dgs10Change90d,
-      highYieldSpread,
-      highYieldSpreadZ252d,
+      [CREDIT_PROXY_METRIC]: baaMinusFedFundsCreditSpread,
+      [`${CREDIT_PROXY_METRIC}Z252d`]: baaMinusFedFundsCreditSpreadZ252d,
+      highYieldSpread: baaMinusFedFundsCreditSpread,
+      highYieldSpreadZ252d: baaMinusFedFundsCreditSpreadZ252d,
       m2MoneyStock: latest.M2SL.value,
       m2Change26w,
       liquidityImpulseZ252d: walclImpulseZ252d,
@@ -190,7 +196,7 @@ async function main() {
       dollarMomentumZ252d,
       macroRiskScore,
       macroStressScore: stressScore,
-      macroHighYieldSpreadZ252d: highYieldSpreadZ252d,
+      macroHighYieldSpreadZ252d: baaMinusFedFundsCreditSpreadZ252d,
     };
     const observedDates = Object.fromEntries(Object.entries(latest).map(([seriesId, row]) => [seriesId, row.date]));
     const latestSourceDate = Object.values(observedDates).sort().at(-1);
@@ -201,7 +207,7 @@ async function main() {
 
     rows.push({
       date,
-      source: 'FRED observations API (latest revised observations)',
+      source: `FRED observations API (latest revised observations; ${CREDIT_PROXY_SERIES_ID} historical credit-spread proxy)`,
       fetchedAt,
       latestSourceDate,
       availableAfter: isoAfterLag(latestSourceDate),
@@ -211,12 +217,24 @@ async function main() {
         conservativeAvailableAfter: isoAfterLag(latestSourceDate),
         conservativeLagDays: CONSERVATIVE_LAG_DAYS,
         vintage: 'latest-revised FRED data; not an ALFRED vintage',
+        creditSpreadProxy: {
+          seriesId: CREDIT_PROXY_SERIES_ID,
+          metric: CREDIT_PROXY_METRIC,
+          label: CREDIT_PROXY_LABEL,
+          limitation: CREDIT_PROXY_LIMITATION,
+        },
+      },
+      creditSpreadProxy: {
+        seriesId: CREDIT_PROXY_SERIES_ID,
+        metric: CREDIT_PROXY_METRIC,
+        label: CREDIT_PROXY_LABEL,
+        limitation: CREDIT_PROXY_LIMITATION,
       },
       missingMetrics,
     });
 
     for (const [name, value] of [
-      ['highYieldSpread', highYieldSpread],
+      [CREDIT_PROXY_METRIC, baaMinusFedFundsCreditSpread],
       ['dgs10', dgs10],
       ['walclChange13w', walclChange13w],
       ['nfci', nfci],
@@ -240,9 +258,16 @@ async function main() {
     credentialRequired: true,
     conservativeLagDays: CONSERVATIVE_LAG_DAYS,
     vintage: 'latest-revised observations; not an ALFRED vintage',
+    creditSpreadProxy: {
+      seriesId: CREDIT_PROXY_SERIES_ID,
+      metric: CREDIT_PROXY_METRIC,
+      label: CREDIT_PROXY_LABEL,
+      limitation: CREDIT_PROXY_LIMITATION,
+    },
     limitations: [
       'FRED observations are latest revisions rather than point-in-time ALFRED vintages; all experiment results remain research-only.',
       'Each aligned row is available only after the latest contributing observation plus a conservative 30-day lag.',
+      CREDIT_PROXY_LIMITATION,
     ],
     docs: {
       observationsApi: 'https://api.stlouisfed.org/fred/series/observations',

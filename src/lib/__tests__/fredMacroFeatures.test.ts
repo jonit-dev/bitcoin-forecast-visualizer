@@ -67,6 +67,47 @@ describe('fred macro features', () => {
     expect(signal?.stressShockZ30d).toEqual(expect.any(Number));
   });
 
+  it('prefers the BAAFF proxy metric and falls back to the legacy alias', () => {
+    const makeRows = (metric: 'proxy' | 'legacy'): FredMacroRow[] => Array.from({ length: 320 }, (_, index) => {
+      const date = new Date(Date.UTC(2019, 0, 1 + index)).toISOString().split('T')[0];
+      const creditSpread = metric === 'proxy'
+        ? 10 + Math.sin(index / 11) + index / 200
+        : 1000 + index * 0.25;
+      return {
+        date,
+        availableAfter: `${new Date(Date.UTC(2019, 0, 2 + index)).toISOString().split('T')[0]}T00:00:00.000Z`,
+        metrics: {
+          ...(metric === 'proxy' ? { baaMinusFedFundsCreditSpread: creditSpread, highYieldSpread: 1000 + index * 0.25 } : { highYieldSpread: creditSpread }),
+          nfci: Math.cos(index / 17) + index / 700,
+          vix: 16 + Math.sin(index / 11) * 3 + index / 100,
+          baaSpread: 2 + Math.cos(index / 13) * 0.2 + index / 800,
+          dollarMomentum30d: Math.sin(index / 19) * 0.02 + index / 10000,
+          yieldCurve10y2y: 0.8 - Math.sin(index / 23) * 0.4,
+        },
+      };
+    });
+    const proxyRows = makeRows('proxy');
+    const legacyRows = makeRows('legacy');
+    const proxySignal = buildMacroSignalAtOrigin(proxyRows, '2019-11-18');
+    const legacySignal = buildMacroSignalAtOrigin(legacyRows, '2019-11-18');
+    const proxyExpected = priorOnlyZScore(
+      proxyRows.map(row => row.metrics.baaMinusFedFundsCreditSpread),
+      proxyRows.length - 1,
+      252,
+      30,
+    );
+    const legacyExpected = priorOnlyZScore(
+      legacyRows.map(row => row.metrics.highYieldSpread),
+      legacyRows.length - 1,
+      252,
+      30,
+    );
+
+    expect(proxySignal?.components.creditSpreadProxy).toBeCloseTo(proxyExpected as number, 8);
+    expect(proxySignal?.components.creditSpreadProxy).not.toBeCloseTo(legacyExpected as number, 4);
+    expect(legacySignal?.components.creditSpreadProxy).toBeCloseTo(legacyExpected as number, 8);
+  });
+
   it('rejects an empty FRED observation response before cache alignment', async () => {
     expect(() => parseFredObservations({ observations: [] }, 'WALCL')).toThrow(
       'FRED WALCL returned no finite observations after 2010-07-17.',

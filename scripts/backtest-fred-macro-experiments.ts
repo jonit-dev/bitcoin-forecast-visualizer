@@ -26,6 +26,13 @@ interface MacroCache {
     fetchedAt?: string;
     conservativeLagDays?: number;
     series?: Record<string, string>;
+    creditSpreadProxy?: {
+      seriesId?: string;
+      metric?: string;
+      label?: string;
+      limitation?: string;
+    };
+    limitations?: string[];
   };
   rows: FredMacroRow[];
 }
@@ -281,11 +288,14 @@ function main(): void {
       targetRule: 'The target close at origin + horizonDays is read only after the forecast is constructed and is never used for signal construction or parameter selection.',
       parameterRule: 'Each arm and horizon selects its parameter by validation NLL only; holdout scores are computed after selection and cannot alter the parameter.',
       revisedDataLimitation: 'The cache contains latest-revised FRED observations rather than ALFRED vintages. This proof prevents timestamp lookahead but cannot claim vintage safety; all results remain research-only.',
+      creditSpreadProxyRule: MACRO_CACHE.metadata?.creditSpreadProxy?.limitation
+        ?? 'The cache must identify any historical credit-spread proxy and must not claim equivalence to an ICE/BofA high-yield index.',
     },
     limitations: [
       'Latest-revised FRED observations can incorporate later revisions, so this is not a vintage-safe production experiment.',
       'Static power-law coefficients and interval calibration are inherited from the current app baseline and are not re-fit by this runner.',
       'A positive result would require an ALFRED/vintage-safe rerun before any app-facing change.',
+      ...(MACRO_CACHE.metadata?.limitations ?? []),
     ],
     verdict: reports.some(reportItem => reportItem.verdict === 'needs-rerun')
       ? 'needs-rerun'
@@ -669,6 +679,8 @@ function buildDataAudit(signalSeries: Array<FredMacroSignal | null>, recordsByHo
     fetchedAt: MACRO_CACHE.metadata?.fetchedAt ?? null,
     observationStart: MACRO_CACHE.metadata?.observationStart ?? null,
     series: MACRO_CACHE.metadata?.series ?? {},
+    creditSpreadProxy: MACRO_CACHE.metadata?.creditSpreadProxy ?? null,
+    sourceLimitations: MACRO_CACHE.metadata?.limitations ?? [],
     conservativeLagDays: MACRO_CACHE.metadata?.conservativeLagDays ?? 30,
     macroRows: MACRO_ROWS.length,
     macroFirstDate: MACRO_ROWS[0]?.date ?? null,
@@ -856,6 +868,7 @@ function renderMarkdown(report: any): string {
     `- Source: ${report.dataAudit.source}; vintage: ${report.dataAudit.vintage}; fetched: ${report.dataAudit.fetchedAt ?? 'not recorded'}.`,
     `- Macro cache: ${report.dataAudit.macroRows} rows, ${report.dataAudit.macroFirstDate ?? 'n/a'} → ${report.dataAudit.macroLastDate ?? 'n/a'}; signal rows: ${report.dataAudit.signalRows}.`,
     `- Required regime years: ${report.dataAudit.regimeYearCoverage.map((item: any) => `${item.year}=${item.rows}`).join(', ')}.`,
+    `- Credit-spread source: ${report.dataAudit.creditSpreadProxy?.seriesId ?? 'not recorded'} (${report.dataAudit.creditSpreadProxy?.label ?? 'not recorded'}); limitation: ${report.dataAudit.creditSpreadProxy?.limitation ?? 'not recorded'}`,
     `- Target split: validation target leakage=${report.dataAudit.validationTargetLeakageCount}; late-2022 origins excluded because their targets cross the cutoff=${report.dataAudit.validationOriginWindowExcludedTargetCount}; holdout targets before cutoff=${report.dataAudit.holdoutTargetBeforeStartCount}.`,
     `- Revised FRED data research-only: ${report.dataAudit.revisedDataResearchOnly ? 'yes' : 'no'}.`,
     '',
@@ -888,6 +901,7 @@ function renderMarkdown(report: any): string {
     `- Target isolation: ${report.leakageProof.targetRule}`,
     `- Selection isolation: ${report.leakageProof.parameterRule}`,
     `- Vintage limitation: ${report.leakageProof.revisedDataLimitation}`,
+    `- Credit proxy limitation: ${report.leakageProof.creditSpreadProxyRule}`,
     '',
     '## Arm verdicts and rerun policy',
     '',
@@ -907,7 +921,6 @@ function renderMarkdown(report: any): string {
     '',
     '- Production model and feature-table consumers are unchanged.',
     '- Latest-revised FRED observations are explicitly research-only; no vintage leakage claim is made.',
-    '',
   );
   return `${lines.join('\n')}\n`;
 }

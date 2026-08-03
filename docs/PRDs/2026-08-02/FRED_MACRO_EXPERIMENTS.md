@@ -4,8 +4,9 @@ prd_contract: v1
 
 # PRD: FRED Macro Forecast Experiments
 
-Status: Confirmed for execution after authoring. Research-only unless the
-out-of-sample evidence gate passes.
+Status: Executed. All three registered arms completed as `context-only`; no
+production forecast path changed because the out-of-sample evidence gate did
+not pass.
 
 Complexity: 5 → MEDIUM mode
 
@@ -53,8 +54,13 @@ backtests, and record a verdict without enabling an unproven signal.
 
 - Replace the graph CSV fetch with the authenticated FRED observations API,
   requesting `observation_start=2010-07-17` and never printing the key.
-- Add five additional public FRED series that represent credit stress, market
-  volatility, financial conditions, the yield curve, and the dollar:
+- Use `BAAFF` (Moody's Seasoned Baa Corporate Bond Minus Federal Funds Rate) as
+  the historical credit-spread proxy. The current FRED catalog reports
+  `BAMLH0A0HYM2` beginning at `2023-08-01`, so it cannot support the registered
+  BTC-era validation window. The cache preserves `highYieldSpread` as a legacy
+  field alias while recording the proxy limitation.
+- Add five additional public FRED series that represent market volatility,
+  financial conditions, the yield curve, and the dollar:
   `T10Y2Y`, `NFCI`, `VIXCLS`, `BAA10Y`, and `DTWEXBGS`.
 - Build signals only from observations whose conservative `availableAfter` date
   is on or before the BTC forecast origin; calculate rolling z-scores from prior
@@ -69,6 +75,9 @@ backtests, and record a verdict without enabling an unproven signal.
 **Data and leakage policy:**
 
 - Source: FRED observations API, latest revisions, fetched on execution date.
+- Credit-source decision registered on 2026-08-03: use historical `BAAFF` rather
+  than the current `BAMLH0A0HYM2` catalog range; this is a proxy, not a claim of
+  high-yield index equivalence.
 - BTC target: close price at `origin + horizonDays`.
 - Feature availability: macro observation date plus 30 calendar days.
 - Validation: `2018-01-01` through `2022-12-31`.
@@ -89,8 +98,9 @@ backtests, and record a verdict without enabling an unproven signal.
 **Candidate arms:**
 
 1. `stress-interval`: widen the baseline sigma when the point-in-time average
-   of high-yield spread, NFCI, VIX, Baa spread, dollar momentum, and inverted
-   yield-curve level is stressed. Select the scale only on validation.
+   of the historical credit-spread proxy, NFCI, VIX, Baa spread, dollar
+   momentum, and inverted yield-curve level is stressed. Select the scale only
+   on validation.
 2. `liquidity-median`: shift the baseline log median by a validation-selected
    coefficient on a liquidity composite from Fed balance-sheet growth, M2
    growth, fed-funds change, yield-curve change, and dollar momentum.
@@ -106,28 +116,31 @@ and must not alter `src/lib/backtestModels.ts`, `src/lib/data.ts`, or UI output.
 
 ### Phase 1: Authenticated FRED history — the macro cache covers the BTC era and records the source limitation
 
-**Files (3):**
+**Files (4):**
 
 - `scripts/lib/fredApi.mjs` - NEW: require the key, build authenticated observation URLs, parse numeric observations, and expose no secret in errors or logs
 - `scripts/update-macro-data.mjs` - EDIT: fetch the declared base and additional series through the FRED API, compute lag-safe metrics, and write the cache
 - `.env.example` - EDIT: document `FRED_API_KEY` as the local credential for `update:macro` without including a real value
+- `src/data/macro-history.json` - EDIT: refreshed authenticated FRED cache consumed by the research runner and existing feature-table build path
 
 **Implementation:**
 
-- [ ] Load `.env` through the existing `dotenv` dependency when the updater runs.
-- [ ] Throw an actionable `FRED_API_KEY` error before any network call when the
+- [x] Load `.env` through the existing `dotenv` dependency when the updater runs.
+- [x] Throw an actionable `FRED_API_KEY` error before any network call when the
       key is absent; do not fall back to graph CSV.
-- [ ] Request every series from `2010-07-17` and preserve finite observations
-      only; add the five new series to metadata and per-row `observedDates`.
-- [ ] Preserve the 30-day `availableAfter` rule and record that latest FRED
+- [x] Request every series from `2010-07-17` and preserve finite observations
+      only; use `BAAFF` for historical credit coverage, add the five new series
+      to metadata and per-row `observedDates`, and retain the legacy
+      `highYieldSpread` alias without claiming it is an ICE high-yield series.
+- [x] Preserve the 30-day `availableAfter` rule and record that latest FRED
       revisions are not ALFRED vintages.
 
 **Wiring:**
 
-- [ ] Caller edited: `package.json:52` invokes the updater through `update:macro`.
-- [ ] Registration: `update:forecast-data` already runs `update:macro`.
-- [ ] Old path: the graph CSV URL is deleted.
-- [ ] Ledger rows filled: #1.
+- [x] Caller edited: `package.json:52` invokes the updater through `update:macro`.
+- [x] Registration: `update:forecast-data` already runs `update:macro`.
+- [x] Old path: the graph CSV URL is deleted.
+- [x] Ledger rows filled: #1.
 
 **Tests Required:**
 
@@ -143,7 +156,21 @@ fail and the cache-start check report the old truncated range.
 
 - Action: `yarn update:macro`
 - Expected: the command reports rows beginning near `2010-07-17`, uses the
-  authenticated API, and does not print the credential.
+  authenticated API, includes rows covering 2018, 2020, and 2022, and does not
+  print the credential.
+
+#### Coverage repair addendum — registered before the 2026-08-03 rerun
+
+- Observation: the authenticated FRED catalog returned `BAMLH0A0HYM2` with
+  `observation_start=2023-08-01`, making the original ten-series cache
+  insufficient for the pre-registered 2018–2022 validation period.
+- Registered change: replace that series with `BAAFF`, which returned
+  observations beginning in 2010 for this run. Use the Baa-minus-fed-funds
+  series as a named historical credit-spread proxy and preserve the old metric
+  field only as a compatibility alias.
+- Acceptance: the refreshed cache must contain non-zero rows in 2018, 2020,
+  and 2022; the report must state the proxy limitation; no production forecast
+  path may be enabled from this rerun.
 
 ### Phase 2: Pre-registered FRED ablation — the runner compares three macro arms with untouched holdout data
 
@@ -156,24 +183,24 @@ fail and the cache-start check report the old truncated range.
 
 **Implementation:**
 
-- [ ] Keep all candidate definitions, coefficient grids, validation dates,
+- [x] Keep all candidate definitions, coefficient grids, validation dates,
       holdout dates, horizons, and thresholds in the runner's pre-registration
       object written into the report.
-- [ ] Use `getBacktestModels().find('powerlaw-current')` for the current app
+- [x] Use `getBacktestModels().find('powerlaw-current')` for the current app
       baseline and score `naive-current-price` as a second benchmark.
-- [ ] Select arm parameters only on validation; never inspect holdout metrics
+- [x] Select arm parameters only on validation; never inspect holdout metrics
       during selection.
-- [ ] Calculate NLL, absolute log error, coverage, q05/q95 pinball, paired block
+- [x] Calculate NLL, absolute log error, coverage, q05/q95 pinball, paired block
       bootstrap intervals, Holm-adjusted p-values, and horizon-spaced metrics.
-- [ ] Assert that an origin cannot use a macro row whose `availableAfter` is in
+- [x] Assert that an origin cannot use a macro row whose `availableAfter` is in
       the future, and include macro row counts/date ranges in the report.
 
 **Wiring:**
 
-- [ ] Caller edited: `package.json` adds and invokes `backtest:fred-macro`.
-- [ ] Registration: the command is the Phase 2 entry point used by the PRD.
-- [ ] Old path: none; the existing macro report remains as historical evidence.
-- [ ] Ledger rows filled: #2 and #3.
+- [x] Caller edited: `package.json` adds and invokes `backtest:fred-macro`.
+- [x] Registration: the command is the Phase 2 entry point used by the PRD.
+- [x] Old path: none; the existing macro report remains as historical evidence.
+- [x] Ledger rows filled: #2 and #3.
 
 **Tests Required:**
 
@@ -203,22 +230,22 @@ metrics equal to baseline and fails the candidate-difference assertion.
 
 **Implementation:**
 
-- [ ] Record the exact data-refresh and backtest commands, data ranges, row
+- [x] Record the exact data-refresh and backtest commands, data ranges, row
       counts, and artifact paths.
-- [ ] Register each arm separately with status, hypothesis, source changes,
+- [x] Register each arm separately with status, hypothesis, source changes,
       validation setup, result/verdict, rerun criteria, and next better
       experiment.
-- [ ] If any arm clears the numerical gate, classify it as `research-only` until
+- [x] If any arm clears the numerical gate, classify it as `research-only` until
       a vintage-safe FRED/ALFRED rerun; do not alter the production model.
-- [ ] Record a rejected or ambiguous arm explicitly rather than dropping it.
+- [x] Record a rejected or ambiguous arm explicitly rather than dropping it.
 
 **Wiring:**
 
-- [ ] Caller edited: the runner writes both report artifacts; the backlog cites
+- [x] Caller edited: the runner writes both report artifacts; the backlog cites
       their stable paths.
-- [ ] Registration: the backlog is the canonical experiment registry.
-- [ ] Old path: none; no production forecast path is replaced.
-- [ ] Ledger rows filled: #4.
+- [x] Registration: the backlog is the canonical experiment registry.
+- [x] Old path: none; no production forecast path is replaced.
+- [x] Ledger rows filled: #4.
 
 **Tests Required:**
 
@@ -249,28 +276,28 @@ unregistered and fails the repository experiment-registration audit.
 
 ## Acceptance Criteria
 
-- [ ] `.env` contains `FRED_API_KEY` and remains ignored by Git; no command output
+- [x] `.env` contains `FRED_API_KEY` and remains ignored by Git; no command output
       prints its value.
-- [ ] `yarn update:macro` fetches the authenticated API and writes a cache with
+- [x] `yarn update:macro` fetches the authenticated API and writes a cache with
       observations spanning the BTC era, including at least 2018, 2020, and 2022.
-- [ ] The experiment report contains all three arms, the untouched holdout
+- [x] The experiment report contains all three arms, the untouched holdout
       definition, baseline comparisons, effect sizes, uncertainty, p-values or
       corrected robustness evidence, and the mathematical leakage proof.
-- [ ] Every arm has a backlog entry with a final verdict, rerun criteria, and a
+- [x] Every arm has a backlog entry with a final verdict, rerun criteria, and a
       next better experiment.
-- [ ] No production median, interval, feature-table consumer, or UI behavior is
+- [x] No production median, interval, feature-table consumer, or UI behavior is
       changed solely because a research result is positive.
-- [ ] `npm run backtest`, `npm run lint`, targeted tests, and relevant data
+- [x] `npm run backtest`, `npm run lint`, targeted tests, and relevant data
       validation pass after the experiment.
 
 **Integration gates:**
 
-- [ ] Integration Ledger has zero unresolved cells and every row names a non-test
+- [x] Integration Ledger has zero unresolved cells and every row names a non-test
       caller.
-- [ ] Every candidate signal has a non-test consumer in the experiment runner.
-- [ ] The candidate and baseline are proven to be different parameterizations.
-- [ ] Every gate has an observed-red control recorded in the evidence packet.
-- [ ] Latest-revised FRED data is explicitly marked research-only; no vintage
+- [x] Every candidate signal has a non-test consumer in the experiment runner.
+- [x] The candidate and baseline are proven to be different parameterizations.
+- [x] Every gate has an observed-red control recorded in the evidence packet.
+- [x] Latest-revised FRED data is explicitly marked research-only; no vintage
       leakage is claimed away.
 
 ## Checkpoint Protocol
@@ -304,11 +331,11 @@ promoted without a positive validated signal and a vintage-safe follow-up.
 
 ## Verification Evidence
 
-Status: partial execution — implementation, full test suite, backtest, feature validation, report generation, contract, and Linchpin gate checks pass; only the authenticated FRED data refresh is blocked by DNS.
+Status: completed execution — authenticated FRED refresh, walk-forward backtest, artifact generation, repository regression checks, contract, and Linchpin gate all pass. The three arms are `context-only`.
 
 Contract conformance: `prd_contract: v1` — `CONFORMING docs/PRDs/2026-08-02/FRED_MACRO_EXPERIMENTS.md`.
 
-### Phase 1 — authenticated FRED history
+### Historical first attempt — authenticated FRED history (superseded by the final rerun below)
 
 - `node --input-type=module -e "import('./scripts/lib/fredApi.mjs').then(({requireFredApiKey}) => requireFredApiKey(''))"` → RED, exit `1`, `Missing FRED_API_KEY`; no network call or credential output.
 - `node --input-type=module -e "import('./scripts/lib/fredApi.mjs').then(({fredObservationUrl}) => { if (!fredObservationUrl('WALCL', 'key').replace('observation_start=2010-07-17', '').includes('observation_start=2010-07-17')) throw new Error('missing observation_start') })"` → RED, exit `1`; the deliberately altered URL is missing `observation_start`.
@@ -342,7 +369,7 @@ Contract conformance: `prd_contract: v1` — `CONFORMING docs/PRDs/2026-08-02/FR
 - `yarn test` → PASS, `29` test files and `117` tests passed.
 - Production files `src/lib/backtestModels.ts`, `src/lib/data.ts`, and UI files were not changed.
 
-### Repair handoff — independent-review correctness fixes
+### Historical repair handoff — independent-review correctness fixes
 
 The first runner output was not a valid macro experiment: the authenticated
 cache refresh could not reach FRED, the local cache had zero rows in 2018,
@@ -399,17 +426,31 @@ Exact repair verification:
 - `git diff --check` → PASS.
 - `$LINCHPIN_PLUGIN_ROOT/scripts/linchpin.sh contract docs/PRDs/2026-08-02/FRED_MACRO_EXPERIMENTS.md` → `CONFORMING docs/PRDs/2026-08-02/FRED_MACRO_EXPERIMENTS.md`.
 
-Remaining blockers:
+### Final execution update — 2026-08-03
 
-- `yarn update:macro` → RED, exit `1`,
-  `[Macro data] FAILED: FRED WALCL request failed: fetch failed`; direct DNS
-  check reports `Could not resolve host: api.stlouisfed.org`. No key value was
-  printed, and the pre-existing cache was preserved.
-- `npm run backtest`, `yarn validate:features`, and `yarn test` pass in the
-  final manager-side verification: the baseline backtest completes, feature
-  validation reports `[Feature validation] OK` with `rows=5836`, and the full
-  suite reports `29` test files and `117` tests passed.
+- `yarn update:macro` → PASS; authenticated FRED observations API cache wrote
+  `5,844` rows from `2010-08-01` through `2026-07-31`. Required coverage is
+  present: `2018=365`, `2020=366`, and `2022=365` rows. The cache uses `BAAFF`
+  as an explicitly labeled historical credit-spread proxy and retains the
+  legacy `highYieldSpread` alias for compatibility.
+- `yarn backtest:fred-macro` → PASS; report verdict `context-only`. All three
+  arms completed with scored holdout origins: stress interval `0` NLL gain at
+  every horizon, liquidity median `-0.030257` at 90d and `0` at 14/30/60d,
+  and shock interval `-0.002779` at 14d, `-0.003102` at 90d, and `0` at 30/60d.
+  Holm-adjusted p-values are `1.0`; no arm clears the promotion gate.
+- Report audit → PASS; `signalRows=5844`, `usedSignalRows=2212`,
+  `validationOrigins=7110`, `holdoutOrigins=4950`,
+  `validationTargetLeakageCount=0`, `pointInTimeViolations=0`, and holdout
+  parameter selections `0`.
+- `yarn test` → PASS, `29` files and `118` tests. `yarn lint` → PASS;
+  `yarn validate:features` → PASS; `npm run backtest` → PASS.
+- Contract → `CONFORMING`; Linchpin gate → `GATES-PASS 6 controls`. The stable
+  artifacts are [JSON report](../../reports/results/btc-fred-macro-experiments.json)
+  and [Markdown report](../../reports/results/btc-fred-macro-experiments.md).
+- Baseline regression artifact: `docs/reports/results/backtest-2026-08-03T08-19-57-835Z.{json,md}`.
 
-Delivery remains blocked from claiming a valid macro result until an
-authenticated refresh supplies BTC-era rows including 2018, 2020, and 2022,
-after which the repaired runner must be rerun with the untouched holdout.
+Final decision: keep every macro signal context-only. The result is not
+vintage-safe because the cache uses latest-revised FRED observations rather
+than ALFRED vintages, and BAAFF is a historical proxy rather than the ICE/BofA
+high-yield spread. No production model, feature table, interval, median, or UI
+behavior changed.
