@@ -1,0 +1,1531 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-03T07:57:43.650Z",
+    "command": "yarn backtest:fred-macro",
+    "asset": "BTC",
+    "artifactPaths": [
+      "/home/joao/projects/bitcoin-forecast-visualizer/docs/reports/results/btc-fred-macro-experiments.json",
+      "/home/joao/projects/bitcoin-forecast-visualizer/docs/reports/results/btc-fred-macro-experiments.md"
+    ],
+    "horizons": [
+      14,
+      30,
+      60,
+      90
+    ],
+    "bootstrapIterations": 2000,
+    "bootstrapBlockLength": "equal to forecast horizon",
+    "multipleTesting": "Holm correction across three arms and four horizons"
+  },
+  "preRegistration": {
+    "validationPeriod": "2018-01-01 through 2022-12-31",
+    "finalHoldoutPeriod": "2023-01-01 through latest target with a complete horizon",
+    "selectionCutoff": "2023-01-01",
+    "holdoutParameterSelectionOrigins": [],
+    "origins": "daily for primary scores; horizon-spaced origins for non-overlapping robustness",
+    "target": "BTC close at origin + horizonDays; validation targets <= 2022-12-31 and holdout targets >= 2023-01-01",
+    "primaryMetrics": [
+      "mean log-score/NLL",
+      "mean absolute log error"
+    ],
+    "secondaryMetrics": [
+      "90% coverage",
+      "q05/q95 log pinball",
+      "median absolute log error"
+    ],
+    "promotionThreshold": "At least 30 final-holdout daily origins, positive one-sided lower 95% block-bootstrap bound after Holm review, no median-error regression, stable 90% coverage, and no horizon-spaced failure.",
+    "bootstrapBoundDefinition": "bootstrapLower95OneSided is the 5th percentile of the paired-improvement bootstrap distribution; the gate uses this one-sided lower bound. bootstrapUpper95OneSided is the 95th percentile and is not called a two-sided 95% interval.",
+    "noAppChange": "All candidate signals remain outside the production feature table, median, interval, model, and UI paths."
+  },
+  "dataAudit": {
+    "source": "FRED CSV",
+    "vintage": "unspecified",
+    "fetchedAt": "2026-07-07T00:12:56.962Z",
+    "observationStart": null,
+    "series": {
+      "WALCL": "Fed balance sheet assets",
+      "FEDFUNDS": "Effective federal funds rate",
+      "DGS10": "10-year Treasury yield",
+      "BAMLH0A0HYM2": "US high-yield option-adjusted spread",
+      "M2SL": "M2 money stock"
+    },
+    "conservativeLagDays": 30,
+    "macroRows": 1093,
+    "macroFirstDate": "2023-07-07",
+    "macroLastDate": "2026-07-03",
+    "regimeYearCoverage": [
+      {
+        "year": "2018",
+        "rows": 0
+      },
+      {
+        "year": "2020",
+        "rows": 0
+      },
+      {
+        "year": "2022",
+        "rows": 0
+      }
+    ],
+    "signalRows": 1093,
+    "usedSignalRows": 1055,
+    "validationOrigins": 7110,
+    "holdoutOrigins": 4950,
+    "validationTargetLeakageCount": 0,
+    "validationOriginWindowExcludedTargetCount": 194,
+    "holdoutTargetBeforeStartCount": 0,
+    "pointInTimeViolations": 0,
+    "revisedDataResearchOnly": true
+  },
+  "baselines": {
+    "14": {
+      "powerlawCurrent": {
+        "samples": 3098,
+        "nll": -0.6841609829606862,
+        "meanAbsLogError": 0.09094352577746233,
+        "medianAbsLogError": 0.06836507760826205,
+        "coverage90": 0.89380245319561,
+        "q05Pinball": 0.014307499523715517,
+        "q50Pinball": 0.045471762888731164,
+        "q95Pinball": 0.014041948224404821,
+        "medianForwardReturn": -0.009101967220509124,
+        "upRate": 0.45868302130406713
+      },
+      "naiveCurrentPrice": {
+        "samples": 3098,
+        "nll": null,
+        "meanAbsLogError": 0.0942157687269626,
+        "medianAbsLogError": 0.06596659302330288,
+        "coverage90": null,
+        "q05Pinball": null,
+        "q50Pinball": 0.0471078843634813,
+        "q95Pinball": null,
+        "medianForwardReturn": 0.005953175909130422,
+        "upRate": 0.45868302130406713
+      },
+      "naiveComparison": {
+        "medianAbsLogErrorDelta": -0.0023984845849591707,
+        "q50PinballDelta": 0.0016361214747501393
+      },
+      "naiveMetricApplicability": {
+        "applicable": [
+          "meanAbsLogError",
+          "medianAbsLogError",
+          "q50Pinball",
+          "medianForwardReturn",
+          "upRate"
+        ],
+        "notApplicable": [
+          "nll",
+          "coverage90",
+          "q05Pinball",
+          "q95Pinball"
+        ],
+        "reason": "naive-current-price is a median-only forecast and has no finite interval or sigma; NLL, interval coverage, and tail pinball are not applicable."
+      },
+      "validationPeriod": "2018-01-01 through 2022-12-31",
+      "holdoutPeriod": "2023-01-01 through latest target"
+    },
+    "30": {
+      "powerlawCurrent": {
+        "samples": 3082,
+        "nll": -0.29860958128289083,
+        "meanAbsLogError": 0.1344181193234441,
+        "medianAbsLogError": 0.10461240930251492,
+        "coverage90": 0.8802725502920181,
+        "q05Pinball": 0.02043879367004752,
+        "q50Pinball": 0.06720905966172205,
+        "q95Pinball": 0.019328265715145638,
+        "medianForwardReturn": -0.00964972995695058,
+        "upRate": 0.47501622323166776
+      },
+      "naiveCurrentPrice": {
+        "samples": 3082,
+        "nll": null,
+        "meanAbsLogError": 0.14706527534850142,
+        "medianAbsLogError": 0.11451004304534784,
+        "coverage90": null,
+        "q05Pinball": null,
+        "q50Pinball": 0.07353263767425071,
+        "q95Pinball": null,
+        "medianForwardReturn": 0.010534373796311012,
+        "upRate": 0.47501622323166776
+      },
+      "naiveComparison": {
+        "medianAbsLogErrorDelta": 0.009897633742832923,
+        "q50PinballDelta": 0.006323578012528655
+      },
+      "naiveMetricApplicability": {
+        "applicable": [
+          "meanAbsLogError",
+          "medianAbsLogError",
+          "q50Pinball",
+          "medianForwardReturn",
+          "upRate"
+        ],
+        "notApplicable": [
+          "nll",
+          "coverage90",
+          "q05Pinball",
+          "q95Pinball"
+        ],
+        "reason": "naive-current-price is a median-only forecast and has no finite interval or sigma; NLL, interval coverage, and tail pinball are not applicable."
+      },
+      "validationPeriod": "2018-01-01 through 2022-12-31",
+      "holdoutPeriod": "2023-01-01 through latest target"
+    },
+    "60": {
+      "powerlawCurrent": {
+        "samples": 3052,
+        "nll": 0.025399572298226578,
+        "meanAbsLogError": 0.19644696138301643,
+        "medianAbsLogError": 0.16518063245716696,
+        "coverage90": 0.8794233289646134,
+        "q05Pinball": 0.024721378354303353,
+        "q50Pinball": 0.09822348069150821,
+        "q95Pinball": 0.027300992522380108,
+        "medianForwardReturn": -0.035337365404015775,
+        "upRate": 0.449213630406291
+      },
+      "naiveCurrentPrice": {
+        "samples": 3052,
+        "nll": null,
+        "meanAbsLogError": 0.2249275725240657,
+        "medianAbsLogError": 0.1841611889109016,
+        "coverage90": null,
+        "q05Pinball": null,
+        "q50Pinball": 0.11246378626203285,
+        "q95Pinball": null,
+        "medianForwardReturn": 0.01489288323285055,
+        "upRate": 0.449213630406291
+      },
+      "naiveComparison": {
+        "medianAbsLogErrorDelta": 0.018980556453734643,
+        "q50PinballDelta": 0.014240305570524636
+      },
+      "naiveMetricApplicability": {
+        "applicable": [
+          "meanAbsLogError",
+          "medianAbsLogError",
+          "q50Pinball",
+          "medianForwardReturn",
+          "upRate"
+        ],
+        "notApplicable": [
+          "nll",
+          "coverage90",
+          "q05Pinball",
+          "q95Pinball"
+        ],
+        "reason": "naive-current-price is a median-only forecast and has no finite interval or sigma; NLL, interval coverage, and tail pinball are not applicable."
+      },
+      "validationPeriod": "2018-01-01 through 2022-12-31",
+      "holdoutPeriod": "2023-01-01 through latest target"
+    },
+    "90": {
+      "powerlawCurrent": {
+        "samples": 3022,
+        "nll": 0.23305245871731206,
+        "meanAbsLogError": 0.23579290320038748,
+        "medianAbsLogError": 0.19248835528260955,
+        "coverage90": 0.8117140966247518,
+        "q05Pinball": 0.027391555555533357,
+        "q50Pinball": 0.11789645160019374,
+        "q95Pinball": 0.03595226122587612,
+        "medianForwardReturn": -0.05435360400660508,
+        "upRate": 0.4245532759761747
+      },
+      "naiveCurrentPrice": {
+        "samples": 3022,
+        "nll": null,
+        "meanAbsLogError": 0.28540745183123434,
+        "medianAbsLogError": 0.2283422211704016,
+        "coverage90": null,
+        "q05Pinball": null,
+        "q50Pinball": 0.14270372591561717,
+        "q95Pinball": null,
+        "medianForwardReturn": 0.023418286385207505,
+        "upRate": 0.4245532759761747
+      },
+      "naiveComparison": {
+        "medianAbsLogErrorDelta": 0.03585386588779205,
+        "q50PinballDelta": 0.024807274315423428
+      },
+      "naiveMetricApplicability": {
+        "applicable": [
+          "meanAbsLogError",
+          "medianAbsLogError",
+          "q50Pinball",
+          "medianForwardReturn",
+          "upRate"
+        ],
+        "notApplicable": [
+          "nll",
+          "coverage90",
+          "q05Pinball",
+          "q95Pinball"
+        ],
+        "reason": "naive-current-price is a median-only forecast and has no finite interval or sigma; NLL, interval coverage, and tail pinball are not applicable."
+      },
+      "validationPeriod": "2018-01-01 through 2022-12-31",
+      "holdoutPeriod": "2023-01-01 through latest target"
+    }
+  },
+  "candidateArms": [
+    {
+      "id": "stress-interval",
+      "hypothesis": "A point-in-time stress composite widens the current power-law interval when credit, financial conditions, volatility, dollar momentum, or curve inversion is stressed.",
+      "formula": "sigma_candidate = sigma_powerlaw * (1 + scale * I(stressComposite >= 1)); median unchanged.",
+      "parameterGrid": [
+        0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.75
+      ],
+      "threshold": 1,
+      "selectedParameterByHorizon": {
+        "14": null,
+        "30": null,
+        "60": null,
+        "90": null
+      },
+      "selectionStatusByHorizon": {
+        "14": "insufficient-data",
+        "30": "insufficient-data",
+        "60": "insufficient-data",
+        "90": "insufficient-data"
+      },
+      "validation": {
+        "14": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1812,
+            "nll": -0.4616640503023629,
+            "meanAbsLogError": 0.1082666802629209,
+            "medianAbsLogError": 0.08470686314937659,
+            "coverage90": 0.8940397350993378,
+            "q05Pinball": 0.01755040997946045,
+            "q50Pinball": 0.05413334013146045,
+            "q95Pinball": 0.01653751925539071,
+            "medianForwardReturn": -0.01491533656877151,
+            "upRate": 0.4420529801324503
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 14,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "30": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1796,
+            "nll": -0.06141603306200352,
+            "meanAbsLogError": 0.15918031134927837,
+            "medianAbsLogError": 0.12735746598593511,
+            "coverage90": 0.8758351893095768,
+            "q05Pinball": 0.02566052931917223,
+            "q50Pinball": 0.07959015567463919,
+            "q95Pinball": 0.023272624391660116,
+            "medianForwardReturn": -0.016464936939996906,
+            "upRate": 0.4599109131403118
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 30,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "60": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1766,
+            "nll": 0.31446029981889523,
+            "meanAbsLogError": 0.2357035509049794,
+            "medianAbsLogError": 0.19861897767665138,
+            "coverage90": 0.840317100792752,
+            "q05Pinball": 0.03179092711085796,
+            "q50Pinball": 0.1178517754524897,
+            "q95Pinball": 0.03613606924425799,
+            "medianForwardReturn": -0.08110763711458707,
+            "upRate": 0.3929784824462061
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 60,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "90": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1736,
+            "nll": 0.6170000878295347,
+            "meanAbsLogError": 0.2932560147807406,
+            "medianAbsLogError": 0.265509004286165,
+            "coverage90": 0.7396313364055299,
+            "q05Pinball": 0.03569733262631473,
+            "q50Pinball": 0.1466280073903703,
+            "q95Pinball": 0.050278606608271735,
+            "medianForwardReturn": -0.11754481919441481,
+            "upRate": 0.35599078341013823
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 90,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        }
+      },
+      "holdout": {
+        "14": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1272,
+            "nll": -0.9981769358710452,
+            "meanAbsLogError": 0.0667002476815792,
+            "medianAbsLogError": 0.05055265453048374,
+            "coverage90": 0.8930817610062893,
+            "q05Pinball": 0.009716177111351811,
+            "q50Pinball": 0.0333501238407896,
+            "q95Pinball": 0.010528367712463411,
+            "medianForwardReturn": -0.0035748626299176526,
+            "upRate": 0.47955974842767296
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 14,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "30": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1256,
+            "nll": -0.6447736043461959,
+            "meanAbsLogError": 0.09822865621401944,
+            "medianAbsLogError": 0.07873181378324912,
+            "coverage90": 0.892515923566879,
+            "q05Pinball": 0.012956571361036435,
+            "q50Pinball": 0.04911432810700972,
+            "q95Pinball": 0.013588637378465591,
+            "medianForwardReturn": -0.0030164024120214765,
+            "upRate": 0.49044585987261147
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 30,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "60": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1226,
+            "nll": -0.3976311502662715,
+            "meanAbsLogError": 0.13709032221035355,
+            "medianAbsLogError": 0.1356295760923807,
+            "coverage90": 0.933931484502447,
+            "q05Pinball": 0.014332358852706832,
+            "q50Pinball": 0.06854516110517678,
+            "q95Pinball": 0.015501835907453115,
+            "medianForwardReturn": 0.006107719093116857,
+            "upRate": 0.5097879282218597
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 60,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "90": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1196,
+            "nll": -0.3233409315272135,
+            "meanAbsLogError": 0.15121550653586427,
+            "medianAbsLogError": 0.1511420577447069,
+            "coverage90": 0.9163879598662207,
+            "q05Pinball": 0.015186343213483132,
+            "q50Pinball": 0.07560775326793213,
+            "q95Pinball": 0.016008218819781123,
+            "medianForwardReturn": -0.005873404609271429,
+            "upRate": 0.4899665551839465
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 90,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        }
+      },
+      "holdoutHorizonSpaced": {
+        "14": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "30": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "60": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "90": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        }
+      },
+      "verdict": "needs-rerun",
+      "verdictReason": "needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available."
+    },
+    {
+      "id": "liquidity-median",
+      "hypothesis": "A point-in-time liquidity composite shifts the log median while leaving the baseline interval scale unchanged.",
+      "formula": "log(median_candidate) = log(median_powerlaw) + coefficient * liquidityComposite.",
+      "parameterGrid": [
+        -0.1,
+        -0.05,
+        0,
+        0.05,
+        0.1
+      ],
+      "threshold": 0,
+      "selectedParameterByHorizon": {
+        "14": null,
+        "30": null,
+        "60": null,
+        "90": null
+      },
+      "selectionStatusByHorizon": {
+        "14": "insufficient-data",
+        "30": "insufficient-data",
+        "60": "insufficient-data",
+        "90": "insufficient-data"
+      },
+      "validation": {
+        "14": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1812,
+            "nll": -0.4616640503023629,
+            "meanAbsLogError": 0.1082666802629209,
+            "medianAbsLogError": 0.08470686314937659,
+            "coverage90": 0.8940397350993378,
+            "q05Pinball": 0.01755040997946045,
+            "q50Pinball": 0.05413334013146045,
+            "q95Pinball": 0.01653751925539071,
+            "medianForwardReturn": -0.01491533656877151,
+            "upRate": 0.4420529801324503
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 14,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "30": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1796,
+            "nll": -0.06141603306200352,
+            "meanAbsLogError": 0.15918031134927837,
+            "medianAbsLogError": 0.12735746598593511,
+            "coverage90": 0.8758351893095768,
+            "q05Pinball": 0.02566052931917223,
+            "q50Pinball": 0.07959015567463919,
+            "q95Pinball": 0.023272624391660116,
+            "medianForwardReturn": -0.016464936939996906,
+            "upRate": 0.4599109131403118
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 30,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "60": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1766,
+            "nll": 0.31446029981889523,
+            "meanAbsLogError": 0.2357035509049794,
+            "medianAbsLogError": 0.19861897767665138,
+            "coverage90": 0.840317100792752,
+            "q05Pinball": 0.03179092711085796,
+            "q50Pinball": 0.1178517754524897,
+            "q95Pinball": 0.03613606924425799,
+            "medianForwardReturn": -0.08110763711458707,
+            "upRate": 0.3929784824462061
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 60,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "90": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1736,
+            "nll": 0.6170000878295347,
+            "meanAbsLogError": 0.2932560147807406,
+            "medianAbsLogError": 0.265509004286165,
+            "coverage90": 0.7396313364055299,
+            "q05Pinball": 0.03569733262631473,
+            "q50Pinball": 0.1466280073903703,
+            "q95Pinball": 0.050278606608271735,
+            "medianForwardReturn": -0.11754481919441481,
+            "upRate": 0.35599078341013823
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 90,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        }
+      },
+      "holdout": {
+        "14": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1272,
+            "nll": -0.9981769358710452,
+            "meanAbsLogError": 0.0667002476815792,
+            "medianAbsLogError": 0.05055265453048374,
+            "coverage90": 0.8930817610062893,
+            "q05Pinball": 0.009716177111351811,
+            "q50Pinball": 0.0333501238407896,
+            "q95Pinball": 0.010528367712463411,
+            "medianForwardReturn": -0.0035748626299176526,
+            "upRate": 0.47955974842767296
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 14,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 970,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "30": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1256,
+            "nll": -0.6447736043461959,
+            "meanAbsLogError": 0.09822865621401944,
+            "medianAbsLogError": 0.07873181378324912,
+            "coverage90": 0.892515923566879,
+            "q05Pinball": 0.012956571361036435,
+            "q50Pinball": 0.04911432810700972,
+            "q95Pinball": 0.013588637378465591,
+            "medianForwardReturn": -0.0030164024120214765,
+            "upRate": 0.49044585987261147
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 30,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 954,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "60": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1226,
+            "nll": -0.3976311502662715,
+            "meanAbsLogError": 0.13709032221035355,
+            "medianAbsLogError": 0.1356295760923807,
+            "coverage90": 0.933931484502447,
+            "q05Pinball": 0.014332358852706832,
+            "q50Pinball": 0.06854516110517678,
+            "q95Pinball": 0.015501835907453115,
+            "medianForwardReturn": 0.006107719093116857,
+            "upRate": 0.5097879282218597
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 60,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 924,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "90": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1196,
+            "nll": -0.3233409315272135,
+            "meanAbsLogError": 0.15121550653586427,
+            "medianAbsLogError": 0.1511420577447069,
+            "coverage90": 0.9163879598662207,
+            "q05Pinball": 0.015186343213483132,
+            "q50Pinball": 0.07560775326793213,
+            "q95Pinball": 0.016008218819781123,
+            "medianForwardReturn": -0.005873404609271429,
+            "upRate": 0.4899665551839465
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 90,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 894,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        }
+      },
+      "holdoutHorizonSpaced": {
+        "14": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "30": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "60": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "90": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        }
+      },
+      "verdict": "needs-rerun",
+      "verdictReason": "needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available."
+    },
+    {
+      "id": "shock-interval",
+      "hypothesis": "A positive 30-day shock in the point-in-time stress composite widens the interval without moving the median.",
+      "formula": "sigma_candidate = sigma_powerlaw * (1 + multiplier * I(stressShockZ30d >= 1)); median unchanged.",
+      "parameterGrid": [
+        0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.75
+      ],
+      "threshold": 1,
+      "selectedParameterByHorizon": {
+        "14": null,
+        "30": null,
+        "60": null,
+        "90": null
+      },
+      "selectionStatusByHorizon": {
+        "14": "insufficient-data",
+        "30": "insufficient-data",
+        "60": "insufficient-data",
+        "90": "insufficient-data"
+      },
+      "validation": {
+        "14": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1812,
+            "nll": -0.4616640503023629,
+            "meanAbsLogError": 0.1082666802629209,
+            "medianAbsLogError": 0.08470686314937659,
+            "coverage90": 0.8940397350993378,
+            "q05Pinball": 0.01755040997946045,
+            "q50Pinball": 0.05413334013146045,
+            "q95Pinball": 0.01653751925539071,
+            "medianForwardReturn": -0.01491533656877151,
+            "upRate": 0.4420529801324503
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 14,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "30": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1796,
+            "nll": -0.06141603306200352,
+            "meanAbsLogError": 0.15918031134927837,
+            "medianAbsLogError": 0.12735746598593511,
+            "coverage90": 0.8758351893095768,
+            "q05Pinball": 0.02566052931917223,
+            "q50Pinball": 0.07959015567463919,
+            "q95Pinball": 0.023272624391660116,
+            "medianForwardReturn": -0.016464936939996906,
+            "upRate": 0.4599109131403118
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 30,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "60": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1766,
+            "nll": 0.31446029981889523,
+            "meanAbsLogError": 0.2357035509049794,
+            "medianAbsLogError": 0.19861897767665138,
+            "coverage90": 0.840317100792752,
+            "q05Pinball": 0.03179092711085796,
+            "q50Pinball": 0.1178517754524897,
+            "q95Pinball": 0.03613606924425799,
+            "medianForwardReturn": -0.08110763711458707,
+            "upRate": 0.3929784824462061
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 60,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "90": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1736,
+            "nll": 0.6170000878295347,
+            "meanAbsLogError": 0.2932560147807406,
+            "medianAbsLogError": 0.265509004286165,
+            "coverage90": 0.7396313364055299,
+            "q05Pinball": 0.03569733262631473,
+            "q50Pinball": 0.1466280073903703,
+            "q95Pinball": 0.050278606608271735,
+            "medianForwardReturn": -0.11754481919441481,
+            "upRate": 0.35599078341013823
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 90,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        }
+      },
+      "holdout": {
+        "14": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1272,
+            "nll": -0.9981769358710452,
+            "meanAbsLogError": 0.0667002476815792,
+            "medianAbsLogError": 0.05055265453048374,
+            "coverage90": 0.8930817610062893,
+            "q05Pinball": 0.009716177111351811,
+            "q50Pinball": 0.0333501238407896,
+            "q95Pinball": 0.010528367712463411,
+            "medianForwardReturn": -0.0035748626299176526,
+            "upRate": 0.47955974842767296
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 14,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "30": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1256,
+            "nll": -0.6447736043461959,
+            "meanAbsLogError": 0.09822865621401944,
+            "medianAbsLogError": 0.07873181378324912,
+            "coverage90": 0.892515923566879,
+            "q05Pinball": 0.012956571361036435,
+            "q50Pinball": 0.04911432810700972,
+            "q95Pinball": 0.013588637378465591,
+            "medianForwardReturn": -0.0030164024120214765,
+            "upRate": 0.49044585987261147
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 30,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "60": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1226,
+            "nll": -0.3976311502662715,
+            "meanAbsLogError": 0.13709032221035355,
+            "medianAbsLogError": 0.1356295760923807,
+            "coverage90": 0.933931484502447,
+            "q05Pinball": 0.014332358852706832,
+            "q50Pinball": 0.06854516110517678,
+            "q95Pinball": 0.015501835907453115,
+            "medianForwardReturn": 0.006107719093116857,
+            "upRate": 0.5097879282218597
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 60,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        },
+        "90": {
+          "status": "insufficient-data",
+          "reason": "no usable validation signal rows; parameter selection is not defined",
+          "parameter": null,
+          "parameterIdentity": null,
+          "samples": 0,
+          "baseline": {
+            "samples": 1196,
+            "nll": -0.3233409315272135,
+            "meanAbsLogError": 0.15121550653586427,
+            "medianAbsLogError": 0.1511420577447069,
+            "coverage90": 0.9163879598662207,
+            "q05Pinball": 0.015186343213483132,
+            "q50Pinball": 0.07560775326793213,
+            "q95Pinball": 0.016008218819781123,
+            "medianForwardReturn": -0.005873404609271429,
+            "upRate": 0.4899665551839465
+          },
+          "candidate": null,
+          "meanNllImprovement": null,
+          "relativeNllImprovement": null,
+          "bootstrap": {
+            "blockLength": 90,
+            "iterations": 2000,
+            "bootstrapLower95OneSided": null,
+            "bootstrapUpper95OneSided": null,
+            "oneSidedPValue": null
+          },
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null,
+          "signalSamples": 0,
+          "horizonSpaced": {
+            "samples": 0,
+            "meanNllImprovement": null,
+            "bootstrapLower95OneSided": null,
+            "coverage90Delta": null,
+            "medianAbsLogErrorDelta": null
+          },
+          "holmAdjustedPValue": null,
+          "gate": {
+            "passed": false,
+            "reasons": []
+          }
+        }
+      },
+      "holdoutHorizonSpaced": {
+        "14": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "30": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "60": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        },
+        "90": {
+          "samples": 0,
+          "meanNllImprovement": null,
+          "bootstrapLower95OneSided": null,
+          "coverage90Delta": null,
+          "medianAbsLogErrorDelta": null
+        }
+      },
+      "verdict": "needs-rerun",
+      "verdictReason": "needs more data: 14d needs more data: no usable validation signal rows; parameter selection is not defined; 30d needs more data: no usable validation signal rows; parameter selection is not defined; 60d needs more data: no usable validation signal rows; parameter selection is not defined; 90d needs more data: no usable validation signal rows; parameter selection is not defined. Rerun after an authenticated BTC-era cache is available."
+    }
+  ],
+  "leakageProof": {
+    "availabilityRule": "A macro row dated d is eligible at origin o only when row.availableAfter <= o; availableAfter is the latest contributing FRED observation date plus 30 calendar days.",
+    "rollingStatisticsRule": "Every z-score at row i uses values from rows with index < i; the current observation is excluded from its own mean and variance.",
+    "targetRule": "The target close at origin + horizonDays is read only after the forecast is constructed and is never used for signal construction or parameter selection.",
+    "parameterRule": "Each arm and horizon selects its parameter by validation NLL only; holdout scores are computed after selection and cannot alter the parameter.",
+    "revisedDataLimitation": "The cache contains latest-revised FRED observations rather than ALFRED vintages. This proof prevents timestamp lookahead but cannot claim vintage safety; all results remain research-only."
+  },
+  "limitations": [
+    "Latest-revised FRED observations can incorporate later revisions, so this is not a vintage-safe production experiment.",
+    "Static power-law coefficients and interval calibration are inherited from the current app baseline and are not re-fit by this runner.",
+    "A positive result would require an ALFRED/vintage-safe rerun before any app-facing change."
+  ],
+  "verdict": "needs-rerun",
+  "reportsGeneratedWithoutProductionChange": true
+}

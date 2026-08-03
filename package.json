@@ -35,6 +35,7 @@
     "backtest:sentiment-extremes": "tsx scripts/backtest-sentiment-extremes.ts",
     "backtest:cme-cot": "tsx scripts/backtest-cme-cot.ts",
     "backtest:macro-liquidity": "tsx scripts/backtest-macro-liquidity.ts",
+    "backtest:fred-macro": "node --import tsx/esm scripts/backtest-fred-macro-experiments.ts",
     "backtest:etf-demand": "tsx scripts/backtest-etf-demand.ts",
     "backtest:features-continuous": "tsx scripts/backtest-feature-family.ts",
     "backtest:residual-model": "tsx scripts/backtest-residual-model.ts",

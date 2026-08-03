@@ -907,6 +907,129 @@ If latest-observation FRED macro fails, do not tune macro score weights on the s
 
 ---
 
+## 2026-08-02 — FRED stress interval ablation
+
+Status: `needs-rerun — authenticated BTC-era cache unavailable; repaired runner requires a fresh run`
+
+Arm id: `stress-interval`
+
+### Hypothesis
+
+The point-in-time average of high-yield spread, NFCI, VIX, Baa spread, dollar momentum, and inverted yield curve identifies stressed origins where widening the current power-law interval improves log-score/NLL without moving the median.
+
+### Data/source changes
+
+The experiment registers an authenticated FRED observations API cache from `2010-07-17` with `WALCL`, `FEDFUNDS`, `DGS10`, `BAMLH0A0HYM2`, `M2SL`, `T10Y2Y`, `NFCI`, `VIXCLS`, `BAA10Y`, and `DTWEXBGS`. Rows use latest FRED revisions, per-series observed dates, and a conservative 30-day `availableAfter` rule. The local refresh was attempted with `yarn update:macro` and was blocked by the sandbox network before a response; the pre-existing cache remains a 2023+ legacy cache and is not evidence for the required BTC-era coverage.
+
+### Validation setup
+
+Script: `scripts/backtest-fred-macro-experiments.ts` via `yarn backtest:fred-macro`.
+
+- Baselines: `powerlaw-current` and `naive-current-price`.
+- Validation: `2018-01-01 → 2022-12-31`; final holdout: `2023-01-01 → latest complete target`.
+- Horizons: `14/30/60/90d`; daily origins plus horizon-spaced robustness.
+- Parameter grid: interval scales `0/0.1/0.2/0.35/0.5/0.75`, selected on validation only.
+- Metrics: NLL, mean/median absolute log error, 90% coverage, q05/q95 log pinball, paired 2,000-iteration horizon-length moving-block bootstrap, and Holm correction across three arms and four horizons.
+
+### Report artifacts
+
+- `docs/reports/results/btc-fred-macro-experiments.json`
+- `docs/reports/results/btc-fred-macro-experiments.md`
+
+### Result / verdict
+
+Verdict: `needs-rerun` / `needs more data`. The authenticated FRED BTC-era cache could not be fetched in this environment, and the available local cache has no 2018/2020/2022 rows. The repaired runner correctly leaves all parameters unselected, does not score a zero-effect candidate, and requires a fresh run before any experiment claim. No production forecast path changed.
+
+### Rerun criteria
+
+1. `yarn update:macro` succeeds with a real `FRED_API_KEY` and the cache contains rows covering 2018, 2020, and 2022.
+2. Re-run the exact validation/holdout split with no parameter selection after `2023-01-01`.
+3. Repeat with ALFRED vintages and publication/revision dates before considering any promotion.
+
+### Next better experiment
+
+Run the same stress interval ablation on a vintage-safe ALFRED cache with the stress threshold frozen before the new holdout. Keep the signal context-only until the corrected holdout gate passes.
+
+---
+
+## 2026-08-02 — FRED liquidity median ablation
+
+Status: `needs-rerun — authenticated BTC-era cache unavailable; repaired runner requires a fresh run`
+
+Arm id: `liquidity-median`
+
+### Hypothesis
+
+A point-in-time liquidity composite from Fed balance-sheet growth, M2 growth, fed-funds change, yield-curve change, and dollar momentum shifts the current power-law log median enough to improve endpoint accuracy without degrading calibrated intervals.
+
+### Data/source changes
+
+Uses the authenticated ten-series FRED observations cache, latest revised observations, per-series `observedDates`, and 30-day `availableAfter` lag described in the shared FRED experiment report. The required refresh could not reach the FRED host in this sandbox, so the existing cache is insufficient for a valid 2018–2022 validation claim.
+
+### Validation setup
+
+The runner selects the liquidity coefficient from `[-0.1, -0.05, 0, 0.05, 0.1]` on `2018-01-01 → 2022-12-31` only, then scores the untouched `2023-01-01+` holdout at `14/30/60/90d` against `powerlaw-current` and `naive-current-price`. It reports NLL, absolute log error, pinball loss, 90% coverage, horizon-length block-bootstrap uncertainty, Holm-adjusted p-values, and horizon-spaced robustness.
+
+### Report artifacts
+
+- `docs/reports/results/btc-fred-macro-experiments.json`
+- `docs/reports/results/btc-fred-macro-experiments.md`
+
+### Result / verdict
+
+Verdict: `needs-rerun` / `needs more data`. The authenticated FRED BTC-era cache could not be fetched in this environment, so the cache coverage gate failed before a meaningful validation comparison could be made. The repaired runner does not select parameter zero or score an absent-signal candidate; it requires a fresh run. Latest-revised FRED data is explicitly research-only, and the production median remains unchanged.
+
+### Rerun criteria
+
+1. Refresh the cache successfully with authenticated FRED API observations spanning the BTC era.
+2. Select the coefficient before the holdout and require positive corrected out-of-sample evidence with no median-error regression.
+3. Re-run on ALFRED vintages before treating a positive result as more than research-only.
+
+### Next better experiment
+
+Use a frozen, vintage-safe liquidity composite and compare the median shift against a no-shift baseline on a newly accumulated holdout, with coefficient sign and magnitude selected only in the historical validation window.
+
+---
+
+## 2026-08-02 — FRED stress shock interval ablation
+
+Status: `needs-rerun — authenticated BTC-era cache unavailable; repaired runner requires a fresh run`
+
+Arm id: `shock-interval`
+
+### Hypothesis
+
+A positive 30-day shock in the point-in-time stress composite, above a pre-registered one-standard-deviation threshold, identifies origins where widening only the forecast interval improves tail calibration.
+
+### Data/source changes
+
+Uses the authenticated FRED observations API loader and the same ten public series as the other two arms. Stress-change z-scores use prior rows only; the current macro observation is excluded from its own rolling mean and variance. The local network could not complete the refresh, leaving the legacy 2023+ cache in place for this run.
+
+### Validation setup
+
+The runner selects the interval multiplier from `0/0.1/0.2/0.35/0.5/0.75` using validation NLL only, then evaluates the untouched holdout at `14/30/60/90d` with daily and horizon-spaced origins. The report includes paired effect sizes, 2,000 moving-block bootstrap intervals, Holm correction, 90% coverage, q05/q95 pinball, and the median-error guardrail.
+
+### Report artifacts
+
+- `docs/reports/results/btc-fred-macro-experiments.json`
+- `docs/reports/results/btc-fred-macro-experiments.md`
+
+### Result / verdict
+
+Verdict: `needs-rerun` / `needs more data`. The authenticated FRED BTC-era cache could not be fetched in this environment, so no usable 2018/2020/2022 validation signal was available. The repaired runner leaves the shock parameter unselected, does not score a zero-effect candidate, and requires a fresh run. No production interval or UI behavior changed.
+
+### Rerun criteria
+
+1. Successfully refresh the ten-series cache with `FRED_API_KEY` and verify 2018, 2020, and 2022 rows.
+2. Freeze the shock threshold and multiplier selection before the `2023-01-01` holdout.
+3. Repeat with ALFRED vintages and reject any candidate that fails corrected daily or horizon-spaced robustness.
+
+### Next better experiment
+
+Test the frozen shock definition on vintage-safe observations with a new holdout, then compare a single widening rule against a no-shock negative control before considering any app integration.
+
+---
+
 ## 2026-07-06 — Continuous residual feature-family redesign
 
 Status: `completed`
