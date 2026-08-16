@@ -24,6 +24,56 @@ Skills may reference this file as the place to read/write experiment history, bu
 
 Every pinball figure cited by an entry dated before 2026-08 is superseded by the P1 evaluation-integrity experiment below. Those historical figures remain for provenance only; current comparisons must use absolute-scale pinball rows carrying `pinballScale: absolute`.
 
+## 2026-08-15 — S&P 500 Crisis Challenger v2
+
+Status: `completed — context-only; not promoted`
+
+### Hypothesis
+
+The supplied S&P 500 base classifier's annual out-of-sample raw probability can
+be mapped by a leakage-controlled, low-dimensional challenger into a better
+calibrated 63-trading-day crisis probability. The challenger is a distinct
+second-stage context signal; it must not replace the existing VOO price
+forecast or generic probability output.
+
+### Data/source changes
+
+- Source archive: `sp500-crisis-model-v2.zip`, supplied by the project, archive/report date `2026-08-15`.
+- Browser snapshot: `src/data/sp500-crisis-model.json`, containing the current score as of `2026-08-14`, frozen deployment and locked thresholds, 1,025 weekly OOS rows from `2000-01-07` through `2025-12-26`, holdout metrics, uncertainty, and limitations.
+- No external API, forecast feature, database schema, Python joblib, or live recomputation was added. VOO remains the quote/context source.
+
+### Validation setup
+
+- Target: cross 15% below the recent 252-session high within 63 trading days.
+- Candidate selection: 126 mapper candidates, expanding 2006–2015 forward validation with a 100-calendar-day embargo; locked comparison: 2016–2025.
+- Primary evidence: average precision, ROC AUC, Brier score, log loss, event hits, and calendar-year block bootstrap uncertainty.
+- Runtime gate: imported `shadow` / `context-only` presentation with explicit stale-date behavior; the challenger probability is prohibited from entering `buildMarketForecast`, `ForecastSummary`, or `probabilityForecast`.
+- Contract and regression commands: `yarn vitest run src/lib/__tests__/sp500CrisisModel.test.ts`, focused panel/API tests, `yarn test --run`, `yarn lint`, `yarn build`, `yarn backtest`, and crisis E2E/accessibility coverage.
+
+### Report artifacts
+
+- [Human-readable result](results/sp500-crisis-model-v2-2026-08-15.md)
+- [Machine-readable result](results/sp500-crisis-model-v2-2026-08-15.json)
+- [Browser snapshot](../../src/data/sp500-crisis-model.json)
+- [Implementation PRD](../../docs/PRDs/2026-08-15/SP500_CRISIS_MODEL_V2_TAB.md)
+
+### Result / verdict
+
+The supplied locked artifact improves all four headline metrics: AP `0.225161 → 0.248045`, ROC AUC `0.658993 → 0.660583`, Brier `0.084333 → 0.082754`, and log loss `0.310601 → 0.303813`. However, every reported 95% uncertainty interval crosses zero; the holdout was already known to the researcher before the challenger study, and only four distinct crisis crossings occur. Verdict: retain the Crisis tab as imported monitoring context only. Promotion is disabled.
+
+### Rerun criteria
+
+Rerun only after a genuinely unseen period/crisis, a refreshed point-in-time
+base-score snapshot, or a separately registered validation experiment with a
+new holdout. Do not tune thresholds or mapper behavior against the displayed
+history, and do not promote from this artifact alone.
+
+### Next better experiment
+
+Collect a preregistered unseen crisis/period with refreshed base scores and
+repeat the locked comparison with uncertainty; until then, keep v2 in shadow
+mode and preserve the current generic VOO price path.
+
 ---
 
 ## 2026-07-10 — Yellow forecast-path horizon prefix stability
