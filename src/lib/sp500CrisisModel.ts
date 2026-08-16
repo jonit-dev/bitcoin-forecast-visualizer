@@ -93,7 +93,7 @@ interface CrisisSelectionProtocol {
   selected_development_metrics: Record<string, number>;
 }
 
-export interface CrisisRiskSnapshot {
+interface CrisisRiskSnapshot {
   schemaVersion: 1;
   source: {
     archive: string;
@@ -384,7 +384,7 @@ function validateSnapshot(value: unknown): CrisisRiskSnapshot {
 
 const validatedSnapshot = validateSnapshot(rawSnapshot);
 
-export const sp500CrisisModel: CrisisRiskSnapshot = validatedSnapshot;
+const sp500CrisisModel: CrisisRiskSnapshot = validatedSnapshot;
 
 export function getCurrentCrisisRisk(quoteDate: string): CrisisRiskAssessment {
   requiredDate({ quoteDate }, 'quoteDate', 'current risk');

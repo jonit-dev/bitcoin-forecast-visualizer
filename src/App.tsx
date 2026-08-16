@@ -179,13 +179,21 @@ export default function App() {
 
   useEffect(() => {
     let active = true;
-    (Object.keys(marketDataByAsset) as ForecastAssetId[]).forEach(async (assetId) => {
-      const hydrationAssetId: MarketAssetId = assetId === 'sp500-crisis' ? 'sp500' : assetId;
-      const hydrated = await hydrateMarketData(hydrationAssetId, marketDataByAsset[assetId]);
+    const hydrateAsset = async (assetId: MarketAssetId, bundled: MarketData) => {
+      const hydrated = await hydrateMarketData(assetId, bundled);
       if (!active) return;
       setMarketDataByAsset((current) => ({ ...current, [assetId]: hydrated.data }));
       setMarketStatusByAsset((current) => ({ ...current, [assetId]: hydrated.status }));
-    });
+    };
+    const hydrateSharedVOO = async () => {
+      const hydrated = await hydrateMarketData('sp500', marketDataByAsset.sp500);
+      if (!active) return;
+      setMarketDataByAsset((current) => ({ ...current, sp500: hydrated.data, 'sp500-crisis': hydrated.data }));
+      setMarketStatusByAsset((current) => ({ ...current, sp500: hydrated.status, 'sp500-crisis': hydrated.status }));
+    };
+    void hydrateAsset('btc', marketDataByAsset.btc);
+    void hydrateSharedVOO();
+    void hydrateAsset('gold', marketDataByAsset.gold);
     return () => { active = false; };
   }, []);
 

@@ -1,6 +1,6 @@
 import snapshot from '../../data/sp500-crisis-model.json';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getCurrentCrisisRisk, sp500CrisisModel } from '../sp500CrisisModel';
+import { getCurrentCrisisRisk } from '../sp500CrisisModel';
 
 afterEach(() => {
   vi.doUnmock('../../data/sp500-crisis-model.json');
@@ -9,10 +9,11 @@ afterEach(() => {
 
 describe('S&P 500 crisis challenger snapshot', () => {
   it('should expose the imported current score when the snapshot is valid', () => {
-    const current = sp500CrisisModel.currentScore;
+    const assessment = getCurrentCrisisRisk('2026-08-14');
+    const current = assessment.snapshot.currentScore;
 
-    expect(sp500CrisisModel.source.archive).toBe('sp500-crisis-model-v2.zip');
-    expect(sp500CrisisModel.source.snapshotDate).toBe('2026-08-15');
+    expect(assessment.snapshot.source.archive).toBe('sp500-crisis-model-v2.zip');
+    expect(assessment.snapshot.source.snapshotDate).toBe('2026-08-15');
     expect(current.asOfDate).toBe('2026-08-14');
     expect(current.baseRawProbability).toBeCloseTo(0.3496369834, 10);
     expect(current.incumbentProbability).toBeCloseTo(0.0483463555, 10);
@@ -38,14 +39,15 @@ describe('S&P 500 crisis challenger snapshot', () => {
   });
 
   it('should preserve the OOS history, holdout uncertainty, and context-only verdict', () => {
-    expect(sp500CrisisModel.oosHistory).toHaveLength(1025);
-    expect(sp500CrisisModel.oosHistory[0]).toMatchObject({ date: '2000-01-07', target: 0 });
-    expect(sp500CrisisModel.oosHistory.at(-1)).toMatchObject({ date: '2025-12-26', target: 0 });
-    expect(sp500CrisisModel.holdout.period).toBe('2016-2025');
-    expect(sp500CrisisModel.holdout.uncertainty.brier_improvement.ci_95[0]).toBeLessThan(0);
-    expect(sp500CrisisModel.holdout.uncertainty.brier_improvement.ci_95[1]).toBeGreaterThan(0);
-    expect(sp500CrisisModel.runtime.mode).toBe('shadow');
-    expect(sp500CrisisModel.runtime.verdict).toBe('context-only');
-    expect(sp500CrisisModel.runtime.promotionStatus).toBe('not-promoted');
+    const snapshot = getCurrentCrisisRisk('2026-08-14').snapshot;
+    expect(snapshot.oosHistory).toHaveLength(1025);
+    expect(snapshot.oosHistory[0]).toMatchObject({ date: '2000-01-07', target: 0 });
+    expect(snapshot.oosHistory.at(-1)).toMatchObject({ date: '2025-12-26', target: 0 });
+    expect(snapshot.holdout.period).toBe('2016-2025');
+    expect(snapshot.holdout.uncertainty.brier_improvement.ci_95[0]).toBeLessThan(0);
+    expect(snapshot.holdout.uncertainty.brier_improvement.ci_95[1]).toBeGreaterThan(0);
+    expect(snapshot.runtime.mode).toBe('shadow');
+    expect(snapshot.runtime.verdict).toBe('context-only');
+    expect(snapshot.runtime.promotionStatus).toBe('not-promoted');
   });
 });
