@@ -1587,3 +1587,169 @@ Rerun the frozen family only after genuinely new observations mature, an indepen
 ### Next better experiment
 
 If every rule fails, keep these indicators as chart context only and prospectively accumulate observations. If one rule clears all gates, independently reproduce it on exchange candles and run the forecast regression gates before considering a separately scoped integration.
+
+---
+
+## 2026-08-07 — Median structure ablation
+
+Status: `planned — registered before implementation; report-only`
+
+### Hypothesis
+
+The shipped median's deterministic structural terms cost accuracy rather than adding it. Under the strict point-in-time benchmark the reconstructed policy loses to `naive-current-price` at all four gated horizons (`+1.48%` at 14d, `+2.56%` at 30d, `+0.16%` at 60d, `+0.33%` at 90d MALE). Deleting one structural term at a time — the horizon growth ratio `B(t_fut)/B(t_now)`, the four-year sinusoid, or both — will identify which term is responsible. Precedent: `no-future-pivots`, a deletion, produced the largest improvement recorded in this repo.
+
+### Data/source changes
+
+None. Checked-in daily UTC BTC OHLCV only. No new source, feature, or interval change.
+
+### Validation setup
+
+- PRD: `docs/PRDs/2026-08-07/E1_MEDIAN_STRUCTURE_ABLATION.md`.
+- Arms, frozen: `A0` shipped policy; `A1` growth ratio set to 1; `A2` `c1 = c2 = 0`; `A3` full deletion (must reproduce `naive-current-price` to 1e-12, a correctness control, not a candidate); `A4` = `A1` + `A2`.
+- `tau` is frozen at 210 in every arm. This is explicitly **not** a tau search; 60/90/120/150/300/420, volatility-conditional tau, and adaptive AR(1) tau remain blocked. Any arm that alters tau invalidates the experiment.
+- Harness: existing 458-origin point-in-time schedule, five benchmarks, unchanged `PIT_SEED`.
+- Primary metric: paired MALE improvement vs `A0`. Secondary: median absolute log error, bias, direction hit rate, plus CRPS/Winkler/PIT once P1 lands.
+- Dependence/multiplicity: moving-block bootstrap, block `max(horizon, spacing)`, 1,000 iterations, Holm across four arms x four horizons (16 comparisons).
+- Gate: >= 2% relative MALE improvement at a promoted horizon; Holm p < 0.05 with positive bootstrap 95% lower bound; <= 0.5% regression elsewhere; the arm must also beat `naive-current-price`; sign stability in every regime bucket with >= 5 samples; coverage loss <= 2 points.
+- Blocked by `docs/PRDs/2026-08-02/EVALUATION_INTEGRITY_AND_PROPER_SCORING.md` Phases 1-2 (D3 improper pinball, D4 unapplied embargo).
+
+### Report artifacts
+
+- Planning artifact: `docs/PRDs/2026-08-07/E1_MEDIAN_STRUCTURE_ABLATION.md`.
+- Planned results: `docs/reports/results/median-structure-ablation-YYYY-MM-DDTHH-MM-SS-sssZ.{json,md}`.
+- Reproduction: `yarn backtest:median-ablation --arm A0..A4`.
+
+### Result / verdict
+
+Pending. No arm has been run. This entry registers the experiment before implementation or result inspection.
+
+### Rerun criteria
+
+Rerun only for a materially extended origin cohort (>= 60 new non-overlapping 90d outcomes), a change to the structural fit procedure, or a distinct pre-registered term decomposition. Do not rerun with adjusted tau, adjusted sinusoid period, or refitted coefficients on an inspected cohort.
+
+### Next better experiment
+
+If a deletion arm passes, freeze it into the prospective ledger and rerun the interval term-structure experiment on top of it, since the interval calibrates from this median's errors. If no arm passes, record that the median is at its noise floor at 60-90d and close median structure as a research direction.
+
+---
+
+## 2026-08-07 — Interval term structure and conformal calibration
+
+Status: `planned — registered before implementation; ships disabled`
+
+### Hypothesis
+
+The interval's horizon term structure is mis-specified, independently of its shape. `sigma_base(H) = sigma_d * sqrt(SUM exp(-2k/210))` converges to `10.3 * sigma_d`, so dispersion stops growing with horizon, and `intervalMultiplierForHorizon` freezes at 0.59 above 365 days — the 10-year band equals the 1-year band. A fitted scaling law `sigma(H) = sigma_d * H^alpha`, split-conformal empirical quantiles on embargoed point-in-time errors, or their composition will produce simultaneous coverage at 80/90/95 that six fitted constants cannot.
+
+### Data/source changes
+
+None. `sigma_d` is frozen at the current blended estimator in every arm; dynamic volatility, EWMA/HAR, vol-of-vol and asymmetric widening remain blocked.
+
+### Validation setup
+
+- PRD: `docs/PRDs/2026-08-07/E2_INTERVAL_TERM_STRUCTURE_AND_CONFORMAL.md`.
+- Arms, frozen: `B1` scaling law with `alpha` from `{0.35, 0.40, 0.45, 0.50, 0.55}` fitted on inner folds only; `B2` split-conformal quantiles on embargoed matured log errors with a minimum calibration count of 50 and explicit abstention below it; `B3` conformal on `B1`-standardised errors.
+- q50 must be bit-identical in every arm.
+- Primary metric: paired CRPS improvement vs baseline. Secondary: Winkler at 80/90/95, PIT KS, three-level coverage, mean log-width, width monotonicity in H.
+- Holm correction is applied across the **combined** family of this experiment's arms and the fat-tail PRD's shape arm. Splitting the family across documents to weaken the correction is disallowed.
+- Gate: >= 3% paired CRPS improvement at a promoted horizon; positive bootstrap 95% lower bound; Holm p < 0.05 in the combined family; PIT KS improved and not rejected at 5%; coverage within 2 points of nominal at all three levels simultaneously; width inflation <= 10% absent significant undercoverage correction; width strictly increasing 14 -> 3,650 days; parameter neighbours stable within 25%.
+- Blocked by `docs/PRDs/2026-08-02/EVALUATION_INTEGRITY_AND_PROPER_SCORING.md` Phases 1-2.
+
+### Report artifacts
+
+- Planning artifact: `docs/PRDs/2026-08-07/E2_INTERVAL_TERM_STRUCTURE_AND_CONFORMAL.md`.
+- Planned results: `docs/reports/results/interval-term-structure-YYYY-MM-DDTHH-MM-SS-sssZ.{json,md}`.
+- Reproduction: `yarn backtest:interval-term-structure`.
+
+### Result / verdict
+
+Pending. This entry registers the experiment before implementation or result inspection.
+
+### Rerun criteria
+
+Rerun for a new outer-holdout cohort, a changed median (a promoted median-ablation arm requires a rerun), or a distinct pre-registered calibration mechanism. Do not search `alpha` off the frozen grid or tune the minimum calibration count on an inspected holdout.
+
+### Next better experiment
+
+If an arm passes it becomes the baseline for the implied-volatility experiment. If all arms fail, the binding constraint is `sigma_d` itself and the only untried input for it is forward-looking implied volatility.
+
+---
+
+## 2026-08-07 — Implied volatility as an interval input
+
+Status: `planned — registered before implementation; report-only`
+
+### Hypothesis
+
+The interval scale is estimated entirely from trailing realised volatility. Deribit's DVOL index and ATM implied-volatility term structure are forward-looking estimates of that same quantity and have never been ingested. Substituting or blending implied volatility into `sigma_d` will improve CRPS at short horizons. No median adjustment is tested — directional constructions from risk reversal are blocked by existing rerun criteria and would be re-rejected.
+
+### Data/source changes
+
+New source: Deribit public `get_volatility_index_data` (BTC DVOL, daily) plus ATM IV by expiry where the availability audit permits. New `scripts/update-implied-vol-data.mjs`, `scripts/validate-implied-vol-data.mjs`, `src/data/implied-vol-history.json`, and a `check-data-freshness.ts` entry. Append-only merge, explicit `observation_start` with a first-date assertion, per-row `availableAfter` with a conservative publication lag, and `(series, as_of_date, observed_at, value)` storage — written specifically to avoid the D1 truncation and D2 bounded-lookback failures.
+
+### Validation setup
+
+- PRD: `docs/PRDs/2026-08-07/E3_IMPLIED_VOLATILITY_INTERVAL_INPUT.md`.
+- Arms, frozen: `C0` baseline (whatever the term-structure/fat-tail work promoted, else current model); `C1` `sigma_d := DVOL / sqrt(365)`; `C2` `lambda * IV + (1 - lambda) * RV` with `lambda` from `{0.25, 0.5, 0.75}` on inner folds; `C3` IV term-structure slope scaling, run only if the audit finds usable multi-expiry data.
+- Sample-size rule, frozen before the audit: DVOL history begins in 2021, so only 14d and 30d are eligible for promotion. 60d and 90d are development-signal-only regardless of outcome. If the audited first date is later than 2021-06-30, 30d also drops to development-only.
+- q50 bit-identity is a gate.
+- Gate: >= 3% paired CRPS improvement at 14d or 30d; Holm p < 0.05 across `{C1,C2,C3} x {14,30}` with positive bootstrap lower bound; >= 30 nominal non-overlapping matured outcomes at the promoted horizon within the DVOL era; coverage within 2 points at all three levels; PIT KS not rejected; `lambda` neighbours stable within 25%; no 60/90d CRPS regression beyond 0.5%; a tested fallback for missing or stale source days.
+- Blocked by the evaluation-integrity PRD and by the vintage-archive PRD Phase 1.
+
+### Report artifacts
+
+- Planning artifact: `docs/PRDs/2026-08-07/E3_IMPLIED_VOLATILITY_INTERVAL_INPUT.md`.
+- Planned results: `docs/reports/results/btc-implied-volatility-YYYY-MM-DDTHH-MM-SS-sssZ.{json,md}`.
+- Reproduction: `node scripts/update-implied-vol-data.mjs --audit-only`, then `yarn backtest:implied-vol`.
+
+### Result / verdict
+
+Pending. This entry registers the experiment before implementation or result inspection. A Phase 1 audit failure against the availability contract is a complete and recordable outcome.
+
+### Rerun criteria
+
+Rerun when a development-only horizon accumulates >= 30 additional non-overlapping outcomes, when the baseline changes, or for a distinct pre-registered IV construction. Do not re-search `lambda` on an inspected holdout and do not appeal a rejection by adding expiry buckets after seeing results.
+
+### Next better experiment
+
+If implied volatility wins at 14/30d, test the variance risk premium (`IV - RV`) as a regime label for the conformal calibration set — using IV without ever placing it in the median. If it loses, close the input-class question for the interval scale.
+
+---
+
+## 2026-08-07 — Prospective ledger activation (protocol v2)
+
+Status: `planned — process change; no forecast behaviour change`
+
+### Hypothesis
+
+Nothing in this repository can be promoted, under its own rules, for years. `src/data/prospective-forecast-ledger.json` has been hash-bound and empty since 2026-07-10; protocol `yellow-line-prospective-v1` Rule 2 admits only `YL-1`/`YL-2`, both rejected at Holm `p=1.0`, and Rule 5 requires 30 non-overlapping outcomes at the longest proposed horizon — roughly 7.4 years at 90d, versus ~14 months at 14d. Opening the candidate registry, allowing each horizon to promote on its own evidence, and automating the daily append will start the clock without weakening any statistical gate.
+
+### Data/source changes
+
+None to forecast inputs. New `workers/prospective-ledger-append` scheduled job running after the existing 23:15 UTC market-quote refresh; new `docs/reports/results/prospective-protocol-v2.md`; v2 genesis hash for the (empty) ledger.
+
+### Validation setup
+
+- PRD: `docs/PRDs/2026-08-07/E4_PROSPECTIVE_LEDGER_ACTIVATION.md`.
+- Protocol v2 diff from v1 is limited to: Rule 2 open candidate registry (candidate id + config hash + backlog commit sha predating the freeze); Rule 5 per-horizon independent stopping rule; Rule 6 per-horizon review firing once; new Rule 9 daily automated append with gap rows and no backfill; new Rule 10 pre-registered safety stop on non-finite values, inverted intervals, or coverage collapse below 50% of nominal over 30 consecutive matured rows.
+- Effect sizes, Holm correction, coverage tolerances, the 30-outcome count, the non-overlap counting rule, the no-outcome-driven-change rule, hash chaining, and interim-suppression are carried over verbatim. This is not a weakening of any gate.
+- Acceptance is integrity, not accuracy: chain verification, per-origin idempotency, hand-checked non-overlap counting, horizon independence, suppression of interim comparisons, freeze-timestamp ordering, gap handling with backfill rejection, and a firing safety stop.
+- Phase 4 freezes one candidate per horizon from the median-ablation, term-structure, or fat-tail work. If none produces a development signal, freeze the baseline-equivalent comparison (current policy vs `naive-current-price`) so the clock starts and the harness is proven in production.
+
+### Report artifacts
+
+- Planning artifact: `docs/PRDs/2026-08-07/E4_PROSPECTIVE_LEDGER_ACTIVATION.md`.
+- Planned protocol: `docs/reports/results/prospective-protocol-v2.md`.
+- Reproduction: `yarn evaluate:prospective-forecast` reports per-horizon pending counts.
+
+### Result / verdict
+
+Pending. The v1 protocol document is retained unmodified for provenance and will be marked superseded, not edited.
+
+### Rerun criteria
+
+The protocol is versioned rather than rerun. Any future change requires a v3 document and a new genesis, and may never be applied to a ledger that already contains rows.
+
+### Next better experiment
+
+Once rows mature, drive the public reliability surface from matured prospective outcomes rather than from backtests. The 14d horizon reaches its stopping rule roughly 14 months after the first freeze, which is the earliest any current accuracy work can reach production.
