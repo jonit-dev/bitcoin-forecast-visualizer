@@ -1,18 +1,18 @@
 import { CONFIDENCE_Z_SCORES } from '../lib/data';
-import { loadMarketData, type MarketAssetId } from '../lib/api';
+import { loadMarketData, type ForecastAssetId } from '../lib/api';
 import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from '../lib/marketForecast';
 import { Controller, Get, type ControllerRequest, type ControllerResponse } from './decorators';
 
-const VALID_ASSETS = new Set<MarketAssetId>(MARKET_ASSETS.map((asset) => asset.id));
+const VALID_ASSETS = new Set<ForecastAssetId>(MARKET_ASSETS.map((asset) => asset.id as ForecastAssetId));
 const VALID_CONFIDENCE_LEVELS = Object.keys(CONFIDENCE_Z_SCORES).map(Number);
-const DEFAULT_ASSET: MarketAssetId = 'btc';
+const DEFAULT_ASSET: ForecastAssetId = 'btc';
 const DEFAULT_HORIZON_DAYS = 180;
 const DEFAULT_CONFIDENCE = 0.95;
 const MAX_HORIZON_DAYS = 3650;
 
-function parseAsset(value: unknown): MarketAssetId | null {
+function parseAsset(value: unknown): ForecastAssetId | null {
   const asset = typeof value === 'string' && value.length > 0 ? value : DEFAULT_ASSET;
-  return VALID_ASSETS.has(asset as MarketAssetId) ? asset as MarketAssetId : null;
+  return VALID_ASSETS.has(asset as ForecastAssetId) ? asset as ForecastAssetId : null;
 }
 
 function parseHorizon(value: unknown): number | null {

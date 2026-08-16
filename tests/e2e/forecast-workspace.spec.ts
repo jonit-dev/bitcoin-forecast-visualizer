@@ -23,6 +23,23 @@ for (const viewport of viewports) {
   });
 }
 
+for (const viewport of [viewports[0], viewports[3]]) {
+  test(`opens the crisis tab and keeps the shared VOO workspace usable at ${viewport.name} crisis`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await page.getByRole('tab', { name: 'Crisis' }).click();
+    await expect(page.getByRole('region', { name: 'Crisis risk context' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'NORMAL' })).toBeVisible();
+    await expect(page.getByText('SHADOW MODE · NOT PROMOTED')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Forecast chart' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'S&P 500 / VOO Forward View' })).toBeVisible();
+    await page.getByRole('region', { name: 'Forecast controls' }).getByRole('button', { name: '1Y' }).click();
+    await expect(page.getByRole('region', { name: 'Crisis risk context' })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+}
+
 test('supports keyboard-only navigation and visible focus', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 }); await page.emulateMedia({ reducedMotion: 'reduce' }); await page.goto('/');
   const btc = page.getByRole('tab', { name: 'BTC' }); await btc.focus(); await page.keyboard.press('ArrowRight');

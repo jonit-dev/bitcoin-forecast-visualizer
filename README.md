@@ -35,7 +35,7 @@ Endpoints:
 
 - `GET /health` — liveness check.
 - `GET /api/assets` — supported forecast assets.
-- `GET /api/forecast?asset=btc&horizon=180&confidence=0.95` — compact forecast summary for `btc`, `sp500`, or `gold`.
+- `GET /api/forecast?asset=btc&horizon=180&confidence=0.95` — compact forecast summary for `btc`, `sp500`, `sp500-crisis`, or `gold`.
 
 The API is implemented with lightweight Express decorators in `src/server/decorators.ts`; controllers use `@Controller` and `@Get`.
 
@@ -65,6 +65,21 @@ top = trend * exp(99th percentile residual over prior 1,260 sessions)
 ```
 
 `npm run backtest:market` is the reproducible statistical gate for the S&P 500 model. On the current VOO cache through 2026-06-05, the walk-forward channel test covers 96.3% of sampled closes with 2.4% below-channel breaks and 1.4% above-channel breaks. The median forecast also passes at 30, 90, and 180 trading-day horizons with statistically significant median-error improvement versus a no-change baseline and directional relevance against a 50% null.
+
+### S&P 500 Crisis context tab
+
+The keyboard-accessible `Crisis` tab is additive to the generic `S&P 500` price tab. It reuses the VOO quote, chart, controls, and forecast route, then shows the checked-in S&P 500 Crisis Challenger v2 score as imported context. The challenger is a second-stage mapper over a supplied base model score; it is not recomputed from VOO prices and never changes the shared price forecast or `probabilityForecast`.
+
+The browser snapshot is dated `2026-08-15` and the current score is as of `2026-08-14`. The panel compares that score with the active VOO quote date and shows a stale warning when the quote is newer. `SHADOW MODE · NOT PROMOTED`, the raw base probability, incumbent probability, challenger deployment probability, frozen NORMAL/WATCH/HIGH thresholds, the target definition, OOS history, and locked 2016–2025 uncertainty are all intentionally visible.
+
+Evidence and rerun criteria:
+
+- [Crisis model result report](docs/reports/results/sp500-crisis-model-v2-2026-08-15.md)
+- [Machine-readable result artifact](docs/reports/results/sp500-crisis-model-v2-2026-08-15.json)
+- [Crisis model PRD](docs/PRDs/2026-08-15/SP500_CRISIS_MODEL_V2_TAB.md)
+- [Browser snapshot](src/data/sp500-crisis-model.json)
+
+The locked result improves all four headline metrics in the supplied artifact, but every reported 95% uncertainty interval crosses zero and the archive notes that the incumbent holdout was already known to the researcher. v2 remains context-only until a genuinely unseen period, refreshed base-score snapshot, or separately registered stronger validation supports promotion; thresholds must not be tuned ad hoc.
 # Daily production market quotes
 
 BTC, VOO, and GLD retain checked-in JSON as an immediate read fallback. Production

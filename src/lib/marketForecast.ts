@@ -1,4 +1,4 @@
-import type { MarketAssetId, MarketData, OHLCVData } from './api';
+import type { ForecastAssetId, MarketAssetId, MarketData, OHLCVData } from './api';
 import {
   computeDrawdownStats,
   computeProbabilityForecast,
@@ -78,6 +78,25 @@ export const MARKET_ASSETS: MarketAssetConfig[] = [
     },
   },
   {
+    id: 'sp500-crisis' as MarketAssetId,
+    label: 'S&P 500 Crisis',
+    shortLabel: 'Crisis',
+    ticker: 'VOO',
+    quote: 'USD',
+    chartTitle: 'S&P 500 / VOO Forward View',
+    subtitle: 'S&P 500 crisis-risk context workspace',
+    dataSourceLabel: 'Yahoo Finance chart API',
+    instrumentLabel: 'VOO ETF, adjusted daily OHLCV',
+    capabilities: {
+      bitcoinOverlays: false,
+      mvrv: false,
+      halvings: false,
+      drawdownCycle: false,
+      modelTrust: false,
+      sourceFreshness: false,
+    },
+  },
+  {
     id: 'gold',
     label: 'Gold',
     shortLabel: 'Gold',
@@ -98,7 +117,7 @@ export const MARKET_ASSETS: MarketAssetConfig[] = [
   },
 ];
 
-export function getMarketAssetConfig(assetId: MarketAssetId): MarketAssetConfig {
+export function getMarketAssetConfig(assetId: ForecastAssetId): MarketAssetConfig {
   return MARKET_ASSETS.find((asset) => asset.id === assetId) ?? MARKET_ASSETS[0];
 }
 
@@ -338,7 +357,7 @@ export function computeGoldModelInputs(ohlcv: OHLCVData[]): GenericModelInputs {
 }
 
 function generateGenericStochasticTraces(
-  assetId: Exclude<MarketAssetId, 'btc'>,
+  assetId: Exclude<ForecastAssetId, 'btc'>,
   ohlcv: OHLCVData[],
   horizon: number,
   drift: number,
@@ -359,7 +378,7 @@ function generateGenericStochasticTraces(
     () => GENERIC_RETURN_BOOTSTRAP_BLOCK_DAYS
   );
   const rngs = prices.map((_, traceIndex) => mulberry32(forecastPathSeed({
-    assetId,
+    assetId: assetId as MarketAssetId,
     originDate: last.date,
     dataVersion: forecastDataVersion(ohlcv),
     methodId: 'generic-return-block-bootstrap-10d',
@@ -465,7 +484,7 @@ function promotePrimaryTrace(rows: any[], initialPrice: number, selectionWindowD
 }
 
 function processGenericData(
-  assetId: Exclude<MarketAssetId, 'btc'>,
+  assetId: Exclude<ForecastAssetId, 'btc'>,
   ohlcv: OHLCVData[],
   horizon: number,
   confidenceZ: number,
@@ -661,7 +680,7 @@ function normalCdf(x: number): number {
 }
 
 export function buildMarketForecast(
-  assetId: MarketAssetId,
+  assetId: ForecastAssetId,
   marketData: MarketData,
   horizon: number,
   confidenceZ: number,

@@ -10,7 +10,7 @@ import {
   HISTORICAL_CYCLE_DRAWDOWNS,
   CONFIDENCE_Z_SCORES,
 } from './lib/data';
-import { computeMVRVStats, computeMVRVZScoreSeries, loadMarketData, type MarketAssetId, type MarketData, type MarketDataStatus as DataStatus, type MVRVStats } from './lib/api';
+import { computeMVRVStats, computeMVRVZScoreSeries, loadMarketData, type ForecastAssetId, type MarketAssetId, type MarketData, type MarketDataStatus as DataStatus, type MVRVStats } from './lib/api';
 import { hydrateMarketData } from './lib/marketDataClient';
 import { MarketDataStatus } from './components/MarketDataStatus';
 import { MarketBar } from './components/workspace/MarketBar';
@@ -19,6 +19,7 @@ import { ForecastControls } from './components/workspace/ForecastControls';
 import { ChartSettings, type OverlayControl } from './components/workspace/ChartSettings';
 import { EvidencePanel } from './components/workspace/EvidencePanel';
 import { ChartPanel } from './components/workspace/ChartPanel';
+import { CrisisRiskPanel } from './components/workspace/CrisisRiskPanel';
 import { cn } from './lib/utils';
 import { loadCurrentRegimeSummary, loadPowerLawStabilitySummary, loadReliabilitySummary, loadSourceFreshness } from './lib/reliabilityReport';
 import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from './lib/marketForecast';
@@ -104,13 +105,14 @@ function featureStatusLabel(status: string): string {
 }
 
 export default function App() {
-  const [activeAssetId, setActiveAssetId] = useState<MarketAssetId>('btc');
-  const [marketDataByAsset, setMarketDataByAsset] = useState<Record<MarketAssetId, MarketData>>(() => ({
+  const [activeAssetId, setActiveAssetId] = useState<ForecastAssetId>('btc');
+  const [marketDataByAsset, setMarketDataByAsset] = useState<Record<ForecastAssetId, MarketData>>(() => ({
     btc: loadMarketData('btc'),
     sp500: loadMarketData('sp500'),
+    'sp500-crisis': loadMarketData('sp500-crisis'),
     gold: loadMarketData('gold'),
   }));
-  const [marketStatusByAsset, setMarketStatusByAsset] = useState<Record<MarketAssetId, DataStatus>>({ btc: 'fallback', sp500: 'fallback', gold: 'fallback' });
+  const [marketStatusByAsset, setMarketStatusByAsset] = useState<Record<ForecastAssetId, DataStatus>>({ btc: 'fallback', sp500: 'fallback', 'sp500-crisis': 'fallback', gold: 'fallback' });
   const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
   const [mvrvZScoreData] = useState(() => computeMVRVZScoreSeries());
   const [reliabilitySummary] = useState(() => loadReliabilitySummary());
@@ -177,8 +179,9 @@ export default function App() {
 
   useEffect(() => {
     let active = true;
-    (Object.keys(marketDataByAsset) as MarketAssetId[]).forEach(async (assetId) => {
-      const hydrated = await hydrateMarketData(assetId, marketDataByAsset[assetId]);
+    (Object.keys(marketDataByAsset) as ForecastAssetId[]).forEach(async (assetId) => {
+      const hydrationAssetId: MarketAssetId = assetId === 'sp500-crisis' ? 'sp500' : assetId;
+      const hydrated = await hydrateMarketData(hydrationAssetId, marketDataByAsset[assetId]);
       if (!active) return;
       setMarketDataByAsset((current) => ({ ...current, [assetId]: hydrated.data }));
       setMarketStatusByAsset((current) => ({ ...current, [assetId]: hydrated.status }));
@@ -281,7 +284,7 @@ export default function App() {
   const currentPrice = marketData?.currentPrice ?? 0;
   const priceChange24h = marketData?.priceChange24h ?? 0;
   const forecastPrice = useMemo(() => {
-    if ((activeAssetId === 'sp500' || activeAssetId === 'gold') && probabilityForecast?.median) {
+    if ((activeAssetId === 'sp500' || activeAssetId === 'sp500-crisis' || activeAssetId === 'gold') && probabilityForecast?.median) {
       return probabilityForecast.median;
     }
     const fcast = activeDisplayData.filter(d => d.isForecast);
@@ -339,6 +342,8 @@ export default function App() {
             </motion.div>
           </ChartPanel>
         </div>
+
+        {activeAssetId === 'sp500-crisis' && <CrisisRiskPanel quoteDate={marketData.ohlcv.at(-1)!.date} />}
 
         <EvidencePanel panels={{
           overview: <div className="evidence-grid">
