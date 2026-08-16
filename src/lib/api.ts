@@ -21,7 +21,10 @@ export interface MarketData {
   fetchedAt: number;
 }
 
+// Keep the quote-refresh worker's asset contract stable; the browser-only
+// crisis context aliases its market data to the existing VOO asset.
 export type MarketAssetId = 'btc' | 'sp500' | 'gold';
+export type ForecastAssetId = MarketAssetId | 'sp500-crisis';
 export type MarketDataStatus = 'current' | 'delayed' | 'fallback' | 'unavailable';
 
 export function isValidOHLCV(row: unknown): row is OHLCVData {
@@ -155,8 +158,8 @@ export function loadGLDData(): MarketData {
   };
 }
 
-export function loadMarketData(assetId: MarketAssetId): MarketData {
-  if (assetId === 'sp500') return loadVOOData();
+export function loadMarketData(assetId: ForecastAssetId): MarketData {
+  if (assetId === 'sp500' || assetId === 'sp500-crisis') return loadVOOData();
   if (assetId === 'gold') return loadGLDData();
   return loadBTCData();
 }

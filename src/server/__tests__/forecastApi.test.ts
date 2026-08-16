@@ -54,6 +54,25 @@ describe('forecast API', () => {
     });
   });
 
+  it('should list and accept the S&P 500 crisis asset', async () => {
+    await withServer(async (baseUrl) => {
+      const assetsResponse = await fetch(`${baseUrl}/api/assets`);
+      const assetsBody = await assetsResponse.json();
+      expect(assetsBody.assets).toEqual(expect.arrayContaining([
+        expect.objectContaining({ id: 'sp500-crisis', label: 'S&P 500 Crisis', ticker: 'VOO' }),
+      ]));
+
+      const forecastResponse = await fetch(`${baseUrl}/api/forecast?asset=sp500-crisis&horizon=30&confidence=0.9`);
+      const forecastBody = await forecastResponse.json();
+      expect(forecastResponse.status).toBe(200);
+      expect(forecastBody).toMatchObject({
+        asset: expect.objectContaining({ id: 'sp500-crisis', ticker: 'VOO' }),
+        input: { horizonDays: 30, confidence: 0.9 },
+        forecast: expect.objectContaining({ median: expect.any(Number), probabilityUp: expect.any(Number) }),
+      });
+    });
+  });
+
   it('rejects invalid forecast query inputs', async () => {
     await withServer(async (baseUrl) => {
       const response = await fetch(`${baseUrl}/api/forecast?asset=doge&horizon=0&confidence=0.42`);

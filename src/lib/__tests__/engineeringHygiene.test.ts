@@ -9,6 +9,7 @@ import type { FeatureRow } from '../features';
 import { computeBuyZoneBacktests, type BuyZonePoint } from '../buyZone';
 import { yellowLineForecastRoute } from '../data';
 import {
+  INTERVAL_CONFIG,
   YELLOW_LINE_FORECAST_CONFIG,
   validateYellowLineForecastConfig,
   type YellowLineForecastCandidateConfig,
@@ -17,6 +18,11 @@ import {
 const ohlcv = (btcHistory as OHLCVData[]).slice(-900);
 
 describe('engineering hygiene guardrails', () => {
+  it('should not export unreferenced interval configuration', () => {
+    expect(Object.prototype.hasOwnProperty.call(INTERVAL_CONFIG, 'stressMultiplier')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(INTERVAL_CONFIG, 'logDriftScale')).toBe(false);
+  });
+
   it('should require evidence artifact for enabled forecast candidate', () => {
     expect(YELLOW_LINE_FORECAST_CONFIG.enabled).toBe(false);
     expect(yellowLineForecastRoute(90)).toBe('production-baseline');

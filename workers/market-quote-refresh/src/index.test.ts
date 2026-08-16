@@ -79,4 +79,21 @@ describe('scheduled market quote refresh', () => {
     expect(results.find((result) => result.assetId === 'sp500')?.status).toBe('failed');
     expect(results.filter((result) => result.assetId !== 'sp500').every((result) => result.status === 'no-op')).toBe(true);
   });
+
+  it('should fall back to Yahoo BTC-USD when CoinGecko is rate limited', async () => {
+    const db = new MemoryDb();
+    const fetcher = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('coingecko')) return new Response('rate limited', { status: 429, headers: { 'retry-after': '0.001' } });
+      if (url.includes('/BTC-USD?')) {
+        return Response.json({ chart: { result: [{ timestamp: [timestamp / 1000], indicators: { quote: [{ open: [100], high: [101], low: [99], close: [100], volume: [10] }], adjclose: [{ adjclose: [100] }] } }] } });
+      }
+      return successfulFetch()(input);
+    }) as typeof fetch;
+
+    const results = await runRefresh({ MARKET_QUOTES_DB: db }, new Date('2026-07-09T23:15:00Z'), fetcher);
+
+    expect(results.find((result) => result.assetId === 'btc')?.status).toBe('updated');
+    expect(db.candles.has('btc/2026-07-08')).toBe(true);
+  });
 });

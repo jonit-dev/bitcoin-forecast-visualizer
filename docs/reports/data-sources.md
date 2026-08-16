@@ -62,3 +62,29 @@ Current validation on the VOO cache through 2026-06-05:
 | 180 trading days | 556 | 84.2% | 1.432e-63 | 23.53% | 2.078e-13 | 92.1% |
 
 This proves statistical relevance for the cached VOO backtest window used by the app. It does not guarantee future performance, and the model should be revalidated after material data-source, formula, or market-regime changes.
+
+## S&P 500 Crisis Challenger v2
+
+The additive `Crisis` tab uses the same VOO adjusted daily OHLCV context as the
+generic S&P 500 price tab. Its imported challenger snapshot is derived from
+the supplied `sp500-crisis-model-v2.zip` archive, with archive/report date
+`2026-08-15` and current score as-of date `2026-08-14`. The browser bundle
+contains only deterministic JSON outputs: the base raw score, incumbent and
+challenger probabilities, frozen deployment thresholds, the weekly OOS history,
+locked 2016–2025 metrics, uncertainty intervals, and limitations. The Python
+joblib mapper is not shipped or executed.
+
+The target is **cross 15% below the recent 252-session high within 63 trading
+days**. VOO is a quote/context source only; no score is inferred from VOO
+prices, and the challenger never enters the generic VOO price forecast,
+`probabilityForecast`, or any existing asset output. When the active VOO quote
+date is newer than the imported score date, the Crisis panel labels the score
+stale rather than extrapolating it.
+
+The challenger improves average precision, ROC AUC, Brier score, and log loss
+on the locked 2016–2025 artifact, but all reported 95% calendar-year
+block-bootstrap intervals cross zero. The result is promising but not
+statistical proof; runtime status is `shadow` / `context-only` and v2 is not
+promoted. Rerun only for a genuinely unseen period/crisis, a refreshed base
+score snapshot, or a separately registered validation experiment. Do not tune
+thresholds against the displayed history.

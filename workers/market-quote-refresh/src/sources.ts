@@ -37,8 +37,14 @@ export async function fetchAssetCandles(asset: AssetConfig, now = new Date(), fe
   const to = Math.floor(now.getTime() / 1000);
   if (asset.source === 'coingecko') {
     const base = `https://api.coingecko.com/api/v3/coins/${asset.symbol}/market_chart/range?vs_currency=usd&from=${from}&to=${to}`;
-    const hourly = await fetchJson(`${base}&interval=hourly`, fetcher);
-    return normalizeCoinGecko(asset, hourly, hourly, now);
+    try {
+      const hourly = await fetchJson(`${base}&interval=hourly`, fetcher);
+      return normalizeCoinGecko(asset, hourly, hourly, now);
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.startsWith('429 ')) throw error;
+      const fallback = await fetchJson(`https://query1.finance.yahoo.com/v8/finance/chart/BTC-USD?period1=${from}&period2=${to}&interval=1d&events=history&includeAdjustedClose=true`, fetcher);
+      return normalizeYahoo({ ...asset, source: 'yahoo', symbol: 'BTC-USD' }, fallback, now);
+    }
   }
   const payload = await fetchJson(`https://query1.finance.yahoo.com/v8/finance/chart/${asset.symbol}?period1=${from}&period2=${to}&interval=1d&events=history&includeAdjustedClose=true`, fetcher);
   return normalizeYahoo(asset, payload, now);

@@ -290,19 +290,5 @@ async function main() {
 }
 
 main().catch(err => {
-  const fetchedAt = new Date().toISOString();
-  writeFileSync(OUT_PATH, `${JSON.stringify({
-    metadata: {
-      source: 'Binance USD-M Futures public REST',
-      status: 'unavailable',
-      fetchedAt,
-      fields: ['openInterestUSD', 'fundingRateDailyAvg', 'premiumClose'],
-      cadence: 'daily',
-      credentialRequired: false,
-      note: `Fetch failed: ${err.message}`,
-    },
-    rows: [],
-  }, null, 2)}\n`);
-  console.error(`[Derivatives data] FAILED: ${err.message}`);
-  process.exitCode = 1;
+  console.warn(`[Derivatives data] optional refresh failed; preserving existing cache: ${err.message}`);
 });

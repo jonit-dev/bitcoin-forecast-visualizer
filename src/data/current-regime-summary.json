@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-07-10T20:42:20.793Z",
-  "featureDate": "2026-07-09",
+  "generatedAt": "2026-07-16T04:51:12.178Z",
+  "featureDate": "2026-07-15",
   "regime": {
     "probabilities": {
-      "accumulation-value": 0.30188679245283023,
-      "trend-expansion": 0.07547169811320756,
-      "late-cycle-overheating": 0.07547169811320756,
-      "deleveraging-bear": 0.30188679245283023,
-      "sideways-chop": 0.24528301886792456
+      "accumulation-value": 0.3516483516483516,
+      "trend-expansion": 0.12087912087912087,
+      "late-cycle-overheating": 0.0879120879120879,
+      "deleveraging-bear": 0.3516483516483516,
+      "sideways-chop": 0.0879120879120879
     },
     "topState": "accumulation-value",
     "reasonCodes": [
       "value-discount",
       "drawdown-or-negative-momentum",
-      "low-momentum-low-volatility"
+      "hashrate-available"
     ],
     "contextOnly": true
   },
@@ -27,15 +27,26 @@
   },
   "derivativesContext": {
     "source": "Binance USD-M Futures public REST",
-    "sourceDate": "2026-07-08",
-    "openInterestUSD": 6296278784.3424,
-    "openInterestToMarketCap": 0.0050466370605452004,
-    "fundingRateDailySum": 0.00012741,
-    "fundingRateDailyAvg": 0.00004247,
+    "sourceDate": "2026-07-14",
+    "openInterestUSD": 6686095881.528,
+    "openInterestToMarketCap": 0.005133898174626595,
+    "fundingRateDailySum": 0.00017334999999999999,
+    "fundingRateDailyAvg": 0.000057783333333333326,
     "leverageState": "crowded",
     "fundingState": "neutral",
     "insight": "Open interest is elevated, but funding is not chasing price right now.",
     "status": "context-only"
   },
-  "networkContext": null
+  "networkContext": {
+    "source": "CoinMetrics Community API",
+    "sourceDate": "2026-07-14",
+    "transferCount": 1065266,
+    "addressBalanceCount": 57367385,
+    "activeAddressShare": 0.011145270086827211,
+    "transfersPerTransaction": 1.4412196844449374,
+    "transferActivityPercentile": 0.9477829138846088,
+    "networkState": "speculative-congestion",
+    "insight": "Transfers are high while active address share is low, which can indicate churn rather than broad demand.",
+    "status": "context-only"
+  }
 }
