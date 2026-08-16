@@ -20,60 +20,6 @@ For each experiment, record:
 
 Skills may reference this file as the place to read/write experiment history, but should keep only reusable methodology and source patterns.
 
-### P1 metric supersession annotation — 2026-08-02
-
-Every pinball figure cited by an entry dated before 2026-08 is superseded by the P1 evaluation-integrity experiment below. Those historical figures remain for provenance only; current comparisons must use absolute-scale pinball rows carrying `pinballScale: absolute`.
-
-## 2026-08-15 — S&P 500 Crisis Challenger v2
-
-Status: `completed — context-only; not promoted`
-
-### Hypothesis
-
-The supplied S&P 500 base classifier's annual out-of-sample raw probability can
-be mapped by a leakage-controlled, low-dimensional challenger into a better
-calibrated 63-trading-day crisis probability. The challenger is a distinct
-second-stage context signal; it must not replace the existing VOO price
-forecast or generic probability output.
-
-### Data/source changes
-
-- Source archive: `sp500-crisis-model-v2.zip`, supplied by the project, archive/report date `2026-08-15`.
-- Browser snapshot: `src/data/sp500-crisis-model.json`, containing the current score as of `2026-08-14`, frozen deployment and locked thresholds, 1,025 weekly OOS rows from `2000-01-07` through `2025-12-26`, holdout metrics, uncertainty, and limitations.
-- No external API, forecast feature, database schema, Python joblib, or live recomputation was added. VOO remains the quote/context source.
-
-### Validation setup
-
-- Target: cross 15% below the recent 252-session high within 63 trading days.
-- Candidate selection: 126 mapper candidates, expanding 2006–2015 forward validation with a 100-calendar-day embargo; locked comparison: 2016–2025.
-- Primary evidence: average precision, ROC AUC, Brier score, log loss, event hits, and calendar-year block bootstrap uncertainty.
-- Runtime gate: imported `shadow` / `context-only` presentation with explicit stale-date behavior; the challenger probability is prohibited from entering `buildMarketForecast`, `ForecastSummary`, or `probabilityForecast`.
-- Contract and regression commands: `yarn vitest run src/lib/__tests__/sp500CrisisModel.test.ts`, focused panel/API tests, `yarn test --run`, `yarn lint`, `yarn build`, `yarn backtest`, and crisis E2E/accessibility coverage.
-
-### Report artifacts
-
-- [Human-readable result](results/sp500-crisis-model-v2-2026-08-15.md)
-- [Machine-readable result](results/sp500-crisis-model-v2-2026-08-15.json)
-- [Browser snapshot](../../src/data/sp500-crisis-model.json)
-- [Implementation PRD](../../docs/PRDs/2026-08-15/SP500_CRISIS_MODEL_V2_TAB.md)
-
-### Result / verdict
-
-The supplied locked artifact improves all four headline metrics: AP `0.225161 → 0.248045`, ROC AUC `0.658993 → 0.660583`, Brier `0.084333 → 0.082754`, and log loss `0.310601 → 0.303813`. However, every reported 95% uncertainty interval crosses zero; the holdout was already known to the researcher before the challenger study, and only four distinct crisis crossings occur. Verdict: retain the Crisis tab as imported monitoring context only. Promotion is disabled.
-
-### Rerun criteria
-
-Rerun only after a genuinely unseen period/crisis, a refreshed point-in-time
-base-score snapshot, or a separately registered validation experiment with a
-new holdout. Do not tune thresholds or mapper behavior against the displayed
-history, and do not promote from this artifact alone.
-
-### Next better experiment
-
-Collect a preregistered unseen crisis/period with refreshed base scores and
-repeat the locked comparison with uncertainty; until then, keep v2 in shadow
-mode and preserve the current generic VOO price path.
-
 ---
 
 ## 2026-07-10 — Yellow forecast-path horizon prefix stability
@@ -1807,120 +1753,70 @@ The protocol is versioned rather than rerun. Any future change requires a v3 doc
 ### Next better experiment
 
 Once rows mature, drive the public reliability surface from matured prospective outcomes rather than from backtests. The 14d horizon reaches its stopping rule roughly 14 months after the first freeze, which is the earliest any current accuracy work can reach production.
-## 2026-08-02 — P1 evaluation integrity and proper scoring
 
-Status: `completed — PARTIAL; scoring and embargo gates pass, disjoint calibration refuses promotion`
+---
 
-### Hypothesis
+## 2026-08-15 — S&P 500 crisis challenger v2 context tab
 
-Replacing relative pinball loss with absolute proper pinball loss, adding CRPS/PIT/Winkler diagnostics, applying the existing point-in-time interval embargo, and fitting interval multipliers on a disjoint historical window will make evaluation metrics interpretable and prevent interval coverage from being self-confirming. Point-in-time interval coverage is expected to change after applying the embargo because in-window origin rows will be withheld.
-
-Every pinball figure produced before 2026-08 is superseded by this experiment and must not be compared with the corrected absolute-scale figures without the `pinballScale: absolute` discriminator.
-
-### Data/source changes
-
-No source-history or median-forecast changes are authorized. Use the checked-in BTC, VOO, and GLD histories. Change only evaluation code, proper-scoring diagnostics, point-in-time eligibility, report writers, calibration-window configuration, and committed interval multipliers if all required gates pass. P2 data-history/vintage work and P3 Student-t, long-horizon, and heatmap work are out of scope.
-
-### Validation setup
-
-- Run focused metric, proper-scoring, point-in-time, calibration, and script-guard tests, then `yarn test`, `yarn lint`, `yarn build`, `yarn backtest`, `yarn backtest:report-only`, `yarn backtest:pit-core`, and `yarn calibrate:intervals`.
-- Compare regenerated backtest and point-in-time artifacts with the cited pre-change reports, including absolute pinball deltas, CRPS, Winkler 80/90/95, PIT histograms, PIT-uniformity chi-square/df without p-values, and excluded embargo counts.
-- Fit interval multipliers on `2017-01-01` through `2021-12-31`; validate on `2022-01-01` onward, with the declared divergence tolerance and a minimum eligible interval-row count of 30 unless a harmless data boundary adjustment is documented.
-- Run the caller census, revert checks, incumbent-filter census, negative controls, `git diff --check`, and the complete acceptance-criterion audit. The known unrelated MVRV `yarn validate:data` failure remains recorded and out of scope.
-
-### Report artifacts
-
-Verified artifacts:
-
-- `docs/reports/results/backtest-2026-08-02T22-50-53-583Z.md`
-- `docs/reports/results/backtest-2026-08-02T22-50-53-583Z.json`
-- `docs/reports/results/backtest-2026-08-02T22-50-56-745Z.md` (report-only rerun)
-- `docs/reports/results/backtest-2026-08-02T22-50-56-745Z.json` (report-only rerun)
-- `docs/reports/results/point-in-time-core-2026-08-02T22-51-00-147Z.md`
-- `docs/reports/results/point-in-time-core-2026-08-02T22-51-00-147Z.json`
-- `docs/reports/results/interval-calibration-2026-08-02T22-51-16-892Z.md`
-- `docs/reports/results/interval-calibration-2026-08-02T22-51-16-892Z.json`
-
-### Result / verdict
-
-The implementation gates passed for scoring, report wiring, minimum-row interval skips, and shared embargo routing. The shipped interval table is the committed baseline (`90d=0.87`, `365d=0.59`, `aboveMaxMultiplier=0.59`); the rejected monotone-width experiment was reverted and no runtime multiplier is promoted from the divergent calibration. The corrected reports carry `pinballScale: absolute`, approximate CRPS with the full seven-quantile grid and endpoint-constant tails, Winkler 80/90/95, PIT histograms with expected counts, PIT chi-square/df without p-values, and excluded PIT counts. Verification: `yarn test` passed with 27 files and 124 tests; `yarn lint` passed; `yarn build` passed with the existing chunk-size warning; `yarn backtest` and `yarn backtest:report-only` both reported quality and robustness `PASS` at 14/30/60/90d; `yarn backtest:pit-core` produced 458 origin/horizon rows and 6 skips; `yarn calibrate:intervals` reported all six horizons `DIVERGENT` and refused a suggested config; `git diff --check` passed.
-
-The disjoint calibration fit window (`2017-01-01` through `2021-12-31`) and validation window (`2022-01-01` onward) each had ample rows, but all six horizons were `DIVERGENT` at the declared 0.05 tolerance. The script refused to emit a suggested config. Calibration metadata records the repaired source commit, working/source-tree state, and dataset SHA-256; the generated artifacts record `gitCommit=eeb1478aadb22bcc11ecfde1b6e0365683890435`, `sourceTreeDirty=false`, and the accurate generation state: the first backtest artifact has `workingTreeDirty=false`, while the report-only, PIT, and calibration artifacts have `workingTreeDirty=true` because earlier generated report files were present.
-
-The required manual `yarn dev` screenshot checkpoint for the changed chart band was not run in this lane, so the visual difference remains unverified.
-
-The PIT artifact contains 458 origin/horizon rows, 126 null intervals below the 30-row minimum, and `excludedByEmbargo=0` on the checked-in daily BTC history. A controlled dense-row test proves an in-window origin changes the unpurged quantile but not the shared-predicate interval quantile. The zero artifact count is a data-boundary result, not evidence that the embargo path is unused.
-
-`yarn validate:data` remains failed only at the known unrelated MVRV upstream drift check (`CoinMetrics mismatch count=5722`, first `2010-11-14`, local market cap `1281896`, upstream `1281924`); no data was changed.
-
-### Observed negative-control evidence
-
-Each mutation was applied with `apply_patch`, the named command was run, the exact source mutation was restored with the inverse `apply_patch`, and the restored command passed.
-
-1. **Pinball normalization:** Mutation in `src/lib/backtestMetrics.ts`: `pinballLoss(actual, predicted, quantile)` → `pinballLoss(actual, predicted, quantile) / actual`. Command: `yarn test src/lib/__tests__/backtestMetrics.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 2 failed | 6 passed`; `should score a perfect median... expected null to be +0`, and `should weight equal relative errors... expected 0.05 to be close to 2900`. Restoration: removed `/ actual`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
-2. **Proper-scoring wiring:** Mutation in `src/lib/backtestMetrics.ts`: replaced the CRPS input map/filter with `const crpsValues: number[] = []`. Command: `yarn test src/lib/__tests__/backtestMetrics.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should wire the full ForecastDistribution quantile grid... expected null to be close to 3.4750000000000014`. Restoration: restored the `inputs.map(({ actual, forecast }) => crpsFromQuantiles(actual, quantileSet(forecast)))` map/filter. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
-3. **Shared embargo:** Mutation in `src/lib/pointInTimeForecast.ts`: `intervalSnapshot(eligible.rows)` → `intervalSnapshot(errors)`. Command: `yarn test src/lib/__tests__/pointInTimeForecast.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should exclude an in-window origin... expected 33 to be 34`. Restoration: restored `intervalSnapshot(eligible.rows)`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
-4. **Minimum-row guard:** Mutation in `src/lib/pointInTimeForecast.ts`: `values.length < MIN_INTERVAL_ELIGIBLE_ROWS` → `values.length < 0`. Command: `yarn test src/lib/__tests__/pointInTimeForecast.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 7 passed`; `should skip the interval when fewer than the minimum eligible rows remain... expected { maturedErrors: 0, ... } to be null`. Restoration: restored `< MIN_INTERVAL_ELIGIBLE_ROWS`. Restored green: `Test Files 1 passed (1)`, `Tests 8 passed (8)`.
-5. **Divergence refusal:** Mutation in `scripts/calibrate-intervals.ts`: `if (rows.some(row => row.status !== 'VALIDATED' || row.multiplier === null)) return null` → `if (false) return null`. Command: `yarn test src/lib/__tests__/scriptGuards.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 1 failed | 6 passed`; `should refuse to emit a suggested multiplier... expected [ { horizonDays: 30, ... } ] to be null`. Restoration: restored the status/multiplier predicate. Restored green: `Test Files 1 passed (1)`, `Tests 7 passed (7)`.
-6. **Inflated-sigma PIT control:** Mutation in `src/lib/properScoring.ts`: PIT denominator `sigma` → `sigma * 2`. Command: `yarn test src/lib/__tests__/properScoring.test.ts`. Red output: `Test Files 1 failed (1)`, `Tests 2 failed | 7 passed`; calibrated sample chi-square was `462.91999999999996` instead of `< 21.666`, and the inflated-sigma control was `14.2` instead of `> 21.666`. Restoration: restored denominator `sigma`. Restored green: `Test Files 1 passed (1)`, `Tests 9 passed (9)`.
-
-### Rerun criteria
-
-Rerun if the checked-in histories, forecast quantile construction, scoring definitions, embargo predicate, calibration fit/validation windows, divergence tolerance, or report schema changes. Rerun before any promotion after a model, interval, data, or calibration change. Do not reinterpret pre-2026-08 pinball figures as current evidence. Do not promote the monotonicity-only multiplier adjustment until a future disjoint calibration run clears the divergence gate.
-
-### Next better experiment
-
-After this P1 is complete, use the corrected metrics on a prospectively frozen, point-in-time data-vintage evaluation with enough non-overlapping outcomes; only then consider P2 history/vintage work or a separately pre-registered distribution-family experiment.
-
-## 2026-08-02 — P3 standardized Student-t predictive distribution
-
-Status: `completed — report-only; rejected for promotion`
+Status: `completed — positive locked-holdout signal with uncertainty; context-only shadow integration`
 
 ### Hypothesis
 
-A standardized Student-t family on the log-price scale, with `nu > 2` selected per horizon by fit-window CRPS, will improve the real `powerlaw-current` validation distribution relative to the log-normal baseline without changing the median or weakening interval calibration. The candidate remains disabled unless the exact five-point gate below passes at every gated horizon.
+A low-dimensional spline/logistic mapper applied to the existing S&P 500 base
+classifier's temporally out-of-sample raw probability can improve calibration
+for the target of crossing 15% below the recent 252-session high within the next
+63 trading days, while leaving the base feature engine unchanged.
 
 ### Data/source changes
 
-No source-history or external-data changes. Use the checked-in daily BTC close history in `src/data/btc-history.json`, the production power-law median, the shipped interval construction, and `INTERVAL_CALIBRATION_CONFIG` (`2017-01-01` through `2021-12-31` fit; `2022-01-01` onward validation). Fit rows require the observed target to remain inside the fit window; validation rows begin at the validation window and use only origin-available history. The Student-t candidate is report-only and `DISTRIBUTION_CONFIG.defaultEnabled` remains `false`.
+Source archive: the supplied `sp500-crisis-model-v2.zip` package, containing
+`data/oos_predictions.csv`, `artifacts/current_score.json`,
+`artifacts/comparison.json`, `MODEL_CARD.md`, and a Python/joblib deployment
+bundle. The planned browser snapshot uses only deterministic JSON/CSV-derived
+outputs; it does not add a live API or execute joblib in the web app. The VOO
+history remains the existing S&P 500 price-context source.
 
 ### Validation setup
 
-Run `yarn backtest:distribution-family`. Evaluate the real `powerlaw-current` model at `14/30/60/90d` on disjoint fit and validation rows. Score the exact grid `{3, 4, 5, 6, 8, 10, 15, 20, 30, Infinity}`, where `Infinity` is the log-normal baseline through the same predictive-distribution seam. Select `nu` on fit-window CRPS, then score the selected fit value on validation. Report CRPS, Winkler 80/90/95, PIT histograms and chi-square, 80/90/95 coverage, and median absolute log error. Bootstrap paired validation CRPS differences with moving blocks of length equal to the forecast horizon and apply Holm correction across the four gated horizons.
+- PRD: `docs/PRDs/2026-08-15/SP500_CRISIS_MODEL_V2_TAB.md`.
+- Strict development cutoff: `2015-09-23`, with last usable development row
+  `2015-09-18`; locked comparison: `2016-2025`.
+- Candidate selection: 126 fixed linear/spline mappers, expanding annual
+  forward validation from 2006 through 2015, 100-calendar-day embargo, primary
+  objective minimum Brier score.
+- Holdout: 438 rows and 43 positive outcomes; paired calendar-year bootstrap
+  uncertainty is retained from the supplied artifact.
+- Runtime gate: show the challenger as imported shadow/context only. Do not
+  change the accepted VOO price forecast or any shared forecast probability
+  until a new registered validation experiment authorizes promotion.
 
 ### Report artifacts
 
-- `docs/reports/results/distribution-family-2026-08-02T23-35-46-064Z.json`
-- `docs/reports/results/distribution-family-2026-08-02T23-35-46-064Z.md`
-- `docs/reports/results/p3-fat-tail-distribution-evidence-2026-08-02.md`
-
-### Promotion gate (pre-registered verbatim)
-
-`DISTRIBUTION_CONFIG.defaultEnabled` may flip to `true` only if, at **every** one of 14/30/60/90d:
-
-1. Validation CRPS improves versus log-normal, with a positive block-bootstrap 5% lower bound after Holm correction across the four horizons;
-2. 80% coverage moves toward nominal and 95% coverage does not move away from it;
-3. PIT uniformity improves (lower chi-square statistic);
-4. Median absolute log error is **identical** to the baseline — any movement means the median was touched, which is out of scope and voids the run;
-5. The selected `nu` is within a factor of two between the fit and validation windows. Instability here is the ledger's most common failure signature (tau=120, close-sma200, MACD all reversed sign across subperiods) and must block promotion rather than be argued around.
+- Planning artifact: `docs/PRDs/2026-08-15/SP500_CRISIS_MODEL_V2_TAB.md`.
+- Preserved result summary: `docs/reports/results/sp500-crisis-model-v2-2026-08-15.md`.
+- Machine-readable result: `docs/reports/results/sp500-crisis-model-v2-2026-08-15.json`.
+- Source package: `sp500-crisis-model-v2.zip`.
 
 ### Result / verdict
 
-Verdict: `report-only; rejected for promotion`. The exact Infinity self-check passed at all four horizons with CRPS difference `0` and exact metric equality. `DISTRIBUTION_CONFIG.defaultEnabled` remains `false`, `kind` remains `lognormal`, and no promotion evidence or per-horizon runtime `nu` values were populated.
-
-| Horizon | Fit n | Validation n | Fit-selected nu | Validation-selected nu | Validation CRPS baseline / selected fit nu | CRPS improvement | Holm-adjusted p | Corrected 5% lower bound | 80% coverage baseline / candidate | 95% coverage baseline / candidate | PIT chi-square baseline / candidate | Median abs-log baseline / candidate | Gate result |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- | --- |
-| 14d | 1812 | 1643 | 10 | 4 | 2533.40793 / 2524.99604 | 8.41190 | 0.023994 | 0.84638 | 83.99% / 83.44% | 93.37% / 93.79% | 73.77 / 37.31 | 0.05266441 / 0.05266441 | FAIL: fit/validation nu instability |
-| 30d | 1796 | 1627 | Infinity | 10 | 3622.57329 / 3622.57329 | 0 | 1.000000 | 0 | 79.59% / 79.59% | 94.65% / 94.65% | 37.43 / 37.43 | 0.08374708 / 0.08374708 | FAIL: no CRPS/PIT improvement |
-| 60d | 1766 | 1597 | Infinity | 10 | 4858.52263 / 4858.52263 | 0 | 1.000000 | 0 | 79.84% / 79.84% | 98.00% / 98.00% | 42.69 / 42.69 | 0.13928360 / 0.13928360 | FAIL: no CRPS/PIT improvement |
-| 90d | 1736 | 1567 | Infinity | Infinity | 5420.69421 / 5420.69421 | 0 | 1.000000 | 0 | 76.96% / 76.96% | 95.85% / 95.85% | 126.36 / 126.36 | 0.15347419 / 0.15347419 | FAIL: no CRPS/PIT improvement |
-
-The 14d candidate passed CRPS, coverage, PIT, and exact median invariance but failed the fifth gate because `nu=10` in fit versus `nu=4` in validation. Every 30/60/90d fit selected the `Infinity` baseline, so no candidate improvement exists there. The real-data report used `2017-01-01` through `2021-12-31` fit origins with targets ending by fit end and `2022-01-01` onward validation origins; the dataset had 5,843 rows from `2010-07-17` through `2026-07-15`, SHA-256 `c347fddeffe98b42864ae6b5f9676c7c04d2b3be9de7cab317b366f7381c1ae0`.
+The challenger improves average precision from `0.225161` to `0.248045`, ROC
+AUC from `0.658993` to `0.660583`, Brier score from `0.084333` to `0.082754`,
+and log loss from `0.310601` to `0.303813` on the locked holdout. The result is
+promising but not statistically conclusive: the reported 95% intervals cross
+zero, only four distinct crisis crossings occur, and both models miss the
+March 2020 jump. Verdict: `context-only-shadow`; promotion is not authorized.
 
 ### Rerun criteria
 
-Rerun if the checked-in BTC history, interval construction, distribution implementation, scoring definitions, fit/validation windows, exact grid, bootstrap block length, or Holm family changes. A promotion claim additionally requires a fresh artifact from the unchanged registered protocol and a passing `yarn backtest` regression gate.
+Rerun before promotion for a genuinely unseen time period or crisis, a refreshed
+base-model score snapshot, or a separately registered challenger/calibration
+mechanism. Do not tune thresholds, spline shape, or deployment wording against
+the inspected 2016-2025 holdout.
 
 ### Next better experiment
 
-If the Student-t candidate is report-only, pre-register an empirical-shape residual distribution with origin-safe fit/validation selection, the same proper-scoring metrics, horizon blocks, and multiplicity correction. Do not enable either shape candidate without the exact gate and a committed evidence artifact.
+Accumulate a prospective score ledger tied to future base-model snapshots and
+evaluate the challenger on a new, frozen period with at least one additional
+independent crisis crossing. Promote only if the pre-registered proper-scoring,
+calibration, event-warning, and uncertainty gates pass without changing the
+existing VOO price forecast.
