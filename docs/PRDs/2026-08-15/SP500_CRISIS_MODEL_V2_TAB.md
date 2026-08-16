@@ -208,6 +208,7 @@ that the crisis model changed the price forecast.
 **Implementation:**
 
 - [ ] Make the primary value the challenger deployment probability and show the incumbent probability beside it; never present the challenger number as a price or as a live base-model recomputation.
+- [ ] Display the imported score's model-dependent probability note beside the current score so the challenger/incumbent values cannot be misread as directly comparable safety measures.
 - [ ] Show `NORMAL`, `WATCH`, or `HIGH` using the imported deployment thresholds and include the score date, quote date, model target definition, and `shadow mode` label.
 - [ ] Render the OOS history with an accessible text/table fallback and fixed WATCH/HIGH reference labels; limit the visual to the supplied weekly observations.
 - [ ] Make stale imported data obvious when `asOfDate < quoteDate`; do not silently refresh or extrapolate it.
