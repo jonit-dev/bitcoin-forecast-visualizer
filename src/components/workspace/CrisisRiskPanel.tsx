@@ -77,6 +77,7 @@ export function CrisisRiskPanel({ quoteDate }: CrisisRiskPanelProps) {
             <div><dt>Active VOO quote through</dt><dd><time dateTime={assessment.quoteDate}>{assessment.quoteDate}</time></dd></div>
           </dl>
           <p className="crisis-context-copy">Imported challenger output; shadow/context-only. The base raw score is shown separately and is not recomputed from VOO data.</p>
+          <p className="crisis-context-copy">{score.note}</p>
           {assessment.isStale && <p className="crisis-stale-warning" role="alert"><strong>Stale imported score.</strong> The score is as of {score.asOfDate}, earlier than the active VOO quote through {assessment.quoteDate}. No score is silently extrapolated or refreshed in this surface.</p>}
         </article>
 

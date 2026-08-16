@@ -12,6 +12,7 @@ describe('Crisis risk panel', () => {
     expect(screen.getByRole('heading', { name: 'NORMAL' })).toBeTruthy();
     expect(screen.getAllByText('3.51%').length).toBeGreaterThan(0);
     expect(screen.getByText(/shadow\/context-only/i)).toBeTruthy();
+    expect(screen.getByText(/Probability levels are model-dependent/i)).toBeTruthy();
     expect(screen.getByText(/Stale imported score/i)).toBeTruthy();
     expect(screen.getAllByText(/2026-08-14/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/2026-08-15/).length).toBeGreaterThan(0);
