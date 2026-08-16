@@ -1,8 +1,8 @@
 import { useRef, type KeyboardEvent } from 'react';
-import type { ForecastAssetId, MarketDataStatus } from '../../lib/api';
+import type { MarketAssetId, MarketDataStatus } from '../../lib/api';
 
-export interface MarketBarAsset { id: ForecastAssetId; label: string; shortLabel: string; ticker: string }
-export function MarketBar({ assets, activeId, onChange, quoteDate, status }: { assets: MarketBarAsset[]; activeId: ForecastAssetId; onChange(id: ForecastAssetId): void; quoteDate: string; status: MarketDataStatus }) {
+export interface MarketBarAsset { id: MarketAssetId; label: string; shortLabel: string; ticker: string }
+export function MarketBar({ assets, activeId, onChange, quoteDate, status }: { assets: MarketBarAsset[]; activeId: MarketAssetId; onChange(id: MarketAssetId): void; quoteDate: string; status: MarketDataStatus }) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const onKeyDown = (event: KeyboardEvent, index: number) => {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
