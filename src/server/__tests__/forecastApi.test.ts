@@ -54,22 +54,26 @@ describe('forecast API', () => {
     });
   });
 
-  it('should list and accept the S&P 500 crisis asset', async () => {
+  it('should expose the S&P 500 asset without a separate crisis asset', async () => {
     await withServer(async (baseUrl) => {
       const assetsResponse = await fetch(`${baseUrl}/api/assets`);
       const assetsBody = await assetsResponse.json();
       expect(assetsBody.assets).toEqual(expect.arrayContaining([
-        expect.objectContaining({ id: 'sp500-crisis', label: 'S&P 500 Crisis', ticker: 'VOO' }),
+        expect.objectContaining({ id: 'sp500', label: 'S&P 500', ticker: 'VOO' }),
       ]));
+      expect(assetsBody.assets.some((asset: { id: string }) => asset.id === 'sp500-crisis')).toBe(false);
 
-      const forecastResponse = await fetch(`${baseUrl}/api/forecast?asset=sp500-crisis&horizon=30&confidence=0.9`);
+      const forecastResponse = await fetch(`${baseUrl}/api/forecast?asset=sp500&horizon=30&confidence=0.9`);
       const forecastBody = await forecastResponse.json();
       expect(forecastResponse.status).toBe(200);
       expect(forecastBody).toMatchObject({
-        asset: expect.objectContaining({ id: 'sp500-crisis', ticker: 'VOO' }),
+        asset: expect.objectContaining({ id: 'sp500', ticker: 'VOO' }),
         input: { horizonDays: 30, confidence: 0.9 },
         forecast: expect.objectContaining({ median: expect.any(Number), probabilityUp: expect.any(Number) }),
       });
+
+      const crisisResponse = await fetch(`${baseUrl}/api/forecast?asset=sp500-crisis&horizon=30&confidence=0.9`);
+      expect(crisisResponse.status).toBe(400);
     });
   });
 

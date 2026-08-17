@@ -15,14 +15,16 @@ describe('forecast workspace header', () => {
     fireEvent.keyDown(btc, { key: 'ArrowRight' }); expect(onChange).toHaveBeenCalledWith('sp500');
   });
 
-  it('keeps BTC first and registers the Crisis tab in the live asset registry', () => {
+  it('keeps BTC first and exposes no standalone crisis tab', () => {
     const onChange = vi.fn();
     render(<MarketBar assets={MARKET_ASSETS} activeId="btc" onChange={onChange} quoteDate="2026-07-15" status="fallback" />);
 
     expect(screen.getByRole('tab', { name: 'BTC' }).getAttribute('aria-selected')).toBe('true');
-    expect(screen.getByRole('tab', { name: 'Crisis' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('tab', { name: 'Crisis' }));
-    expect(onChange).toHaveBeenCalledWith('sp500-crisis');
+    expect(screen.queryByRole('tab', { name: 'Crisis' })).toBeNull();
+    // Crisis risk is an indicator pane on the S&P 500 surface, not its own asset.
+    expect(MARKET_ASSETS.map((asset) => asset.id)).toEqual(['btc', 'sp500', 'gold']);
+    fireEvent.click(screen.getByRole('tab', { name: 'S&P 500' }));
+    expect(onChange).toHaveBeenCalledWith('sp500');
   });
 
   it('changes horizon and confidence without losing accessible names', () => {

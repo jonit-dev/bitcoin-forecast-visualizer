@@ -1,6 +1,7 @@
 import type { ISeriesApi } from 'lightweight-charts';
 import type { HeatmapCell } from '../../lib/data';
 import type { BuyZoneSpan } from '../../lib/buyZone';
+import type { CrisisHistoryPoint } from '../../lib/sp500CrisisModel';
 
 export interface ProbabilityForecastSummary {
   horizonDays: number;
@@ -30,6 +31,10 @@ export interface ForecastChartProps {
   showBitcoinOverlays?: boolean;
   showCoreModelLine?: boolean;
   probabilityForecast?: ProbabilityForecastSummary | null;
+  crisisHistory?: CrisisHistoryPoint[] | null;
+  crisisThresholds?: { watch: number; high: number } | null;
+  showCrisis?: boolean;
+  crisisEventCount?: number;
 }
 
 export interface ChartSeriesRefs {

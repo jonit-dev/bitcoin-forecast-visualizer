@@ -35,7 +35,7 @@ Endpoints:
 
 - `GET /health` — liveness check.
 - `GET /api/assets` — supported forecast assets.
-- `GET /api/forecast?asset=btc&horizon=180&confidence=0.95` — compact forecast summary for `btc`, `sp500`, `sp500-crisis`, or `gold`.
+- `GET /api/forecast?asset=btc&horizon=180&confidence=0.95` — compact forecast summary for `btc`, `sp500`, or `gold`.
 
 The API is implemented with lightweight Express decorators in `src/server/decorators.ts`; controllers use `@Controller` and `@Get`.
 
@@ -66,9 +66,9 @@ top = trend * exp(99th percentile residual over prior 1,260 sessions)
 
 `npm run backtest:market` is the reproducible statistical gate for the S&P 500 model. On the current VOO cache through 2026-06-05, the walk-forward channel test covers 96.3% of sampled closes with 2.4% below-channel breaks and 1.4% above-channel breaks. The median forecast also passes at 30, 90, and 180 trading-day horizons with statistically significant median-error improvement versus a no-change baseline and directional relevance against a 50% null.
 
-### S&P 500 Crisis context tab
+### S&P 500 crisis indicator
 
-The keyboard-accessible `Crisis` tab is additive to the generic `S&P 500` price tab and renders its own surface: a zone summary, a two-pane chart that stacks the VOO close over the imported weekly crisis probability on one shared time axis and crosshair — TradingView-style indicator layout, with labeled crisis windows shaded in both panes, WATCH/HIGH threshold lines, and challenger versus incumbent lines — and crisis-specific evidence panels. The indicator line breaks where the OOS sample has no scored weeks rather than interpolating across them. It shares the VOO quote and market-data hydration with the `S&P 500` tab but runs no price forecast of its own — `buildMarketForecast` is not called for `sp500-crisis`, and the price chart, horizon, and interval controls stay on the `S&P 500` tab. The challenger is a second-stage mapper over a supplied base model score; it is not recomputed from VOO prices and never changes the shared price forecast or `probabilityForecast`.
+Crisis risk is an indicator on the `S&P 500` tab, not a tab of its own. The imported weekly crisis probability is stacked under the VOO price as a TradingView-style lower pane inside the same chart — one shared time axis and crosshair — with labeled crisis windows shaded in both panes, WATCH/HIGH threshold lines, challenger versus incumbent lines, and a readout strip under the chart. The indicator line breaks where the OOS sample has no scored weeks rather than interpolating across them, and its history is clipped to the drawn VOO history so the shared time axis is unchanged. `Chart settings → Indicators → Crisis probability` removes the pane like any other indicator. Below the chart the surface keeps a zone summary and the crisis risk context panel, and crisis articles fold into the shared evidence tabs. The challenger is a second-stage mapper over a supplied base model score; it is not recomputed from VOO prices and never changes the price forecast or `probabilityForecast`.
 
 The browser snapshot is dated `2026-08-15` and the current score is as of `2026-08-14`. The context panel compares that score with the active VOO quote date and shows a stale warning when the quote is newer. `SHADOW MODE · NOT PROMOTED`, the raw base probability, incumbent probability, challenger deployment probability, frozen NORMAL/WATCH/HIGH thresholds, the target definition, OOS history, and locked 2016–2025 uncertainty are all intentionally visible.
 

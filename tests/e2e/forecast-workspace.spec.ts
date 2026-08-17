@@ -24,25 +24,29 @@ for (const viewport of viewports) {
 }
 
 for (const viewport of [viewports[0], viewports[3]]) {
-  test(`opens the crisis tab on its own crisis-risk surface at ${viewport.name} crisis`, async ({ page }) => {
+  test(`stacks the crisis indicator under the S&P 500 price at ${viewport.name} crisis`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
-    await page.getByRole('tab', { name: 'Crisis' }).click();
-    await expect(page.getByRole('region', { name: 'Crisis summary' })).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Crisis probability chart' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'VOO vs crisis probability' })).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Crisis risk context' })).toBeVisible();
-    await expect(page.getByText('SHADOW MODE · NOT PROMOTED')).toBeVisible();
-    // The price forecast lives on the S&P 500 tab only.
-    await expect(page.getByRole('region', { name: 'Forecast chart' })).toHaveCount(0);
-    await expect(page.getByRole('region', { name: 'Forecast controls' })).toHaveCount(0);
-    await page.getByRole('region', { name: 'Crisis probability chart' }).getByRole('button', { name: '10Y' }).click();
-    await expect(page.getByRole('region', { name: 'Crisis risk context' })).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-
+    // Crisis risk is an indicator on the S&P 500 surface, not a tab of its own.
+    await expect(page.getByRole('tab', { name: 'Crisis' })).toHaveCount(0);
     await page.getByRole('tab', { name: 'S&P 500' }).click();
     await expect(page.getByRole('heading', { name: 'S&P 500 / VOO Forward View' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Forecast chart' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Forecast controls' })).toBeVisible();
+    await expect(page.getByTestId('crisis-indicator-readout')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Crisis summary' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Crisis risk context' })).toBeVisible();
+    await expect(page.getByText('SHADOW MODE · NOT PROMOTED')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+    // The indicator pane is removable from chart settings, like any TradingView indicator.
+    await page.getByRole('button', { name: 'Chart settings' }).click();
+    await page.getByRole('switch', { name: 'Crisis probability' }).click();
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('crisis-indicator-readout')).toHaveCount(0);
+
+    await page.getByRole('tab', { name: 'BTC' }).click();
     await expect(page.getByRole('region', { name: 'Crisis risk context' })).toHaveCount(0);
   });
 }
@@ -68,7 +72,7 @@ test('has no critical or serious accessibility violations', async ({ page }) => 
   await page.setViewportSize({ width: 1440, height: 900 }); await page.emulateMedia({ reducedMotion: 'reduce' }); await page.goto('/');
   const defaultResults = await new AxeBuilder({ page }).analyze();
   expect(defaultResults.violations.filter((item) => ['critical', 'serious'].includes(item.impact ?? ''))).toEqual([]);
-  await page.getByRole('tab', { name: 'Crisis' }).click();
+  await page.getByRole('tab', { name: 'S&P 500' }).click();
   const crisisResults = await new AxeBuilder({ page }).analyze();
   expect(crisisResults.violations.filter((item) => ['critical', 'serious'].includes(item.impact ?? ''))).toEqual([]);
   await page.getByRole('tab', { name: 'BTC' }).click();

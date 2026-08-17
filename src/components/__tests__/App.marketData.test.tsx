@@ -4,7 +4,6 @@ import { loadMarketData } from '../../lib/api';
 
 vi.mock('../Chart', () => ({ ForecastChart: () => <div data-testid="forecast-chart" /> }));
 vi.mock('../workspace/CrisisRiskPanel', () => ({ CrisisRiskPanel: () => <div data-testid="crisis-risk-panel" /> }));
-vi.mock('../workspace/CrisisChartPanel', () => ({ CrisisChartPanel: () => <div data-testid="crisis-chart-panel" /> }));
 vi.mock('../../lib/marketForecast', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../lib/marketForecast')>();
   return { ...actual, buildMarketForecast: vi.fn(actual.buildMarketForecast) };
@@ -37,7 +36,7 @@ describe('App market data hydration', () => {
     await waitFor(() => expect(vi.mocked(buildMarketForecast).mock.calls.some((call) => call[0] === 'btc' && call[1].currentPrice === close)).toBe(true), { timeout: 3000 });
   });
 
-  it('should hydrate VOO once and share its exact data and status with the crisis tab', async () => {
+  it('should hydrate VOO once and render the crisis indicator on the S&P 500 surface', async () => {
     const latest = loadMarketData('sp500').ohlcv.at(-1)!;
     const date = new Date(`${latest.date}T00:00:00Z`); date.setUTCDate(date.getUTCDate() + 1);
     const quoteDate = date.toISOString().slice(0, 10);
@@ -54,18 +53,12 @@ describe('App market data hydration', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
     expect(fetchMock.mock.calls.map(([input]) => new URL(String(input), 'https://example.test').searchParams.get('asset')).sort()).toEqual(['btc', 'gold', 'sp500']);
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Crisis' }));
-    // The crisis surface shows the imported classifier, never a VOO price forecast.
-    expect(screen.getByTestId('crisis-chart-panel')).toBeTruthy();
-    expect(screen.queryByTestId('forecast-chart')).toBeNull();
-    expect(vi.mocked(buildMarketForecast).mock.calls.some((call) => call[0] === 'sp500-crisis')).toBe(false);
-    await waitFor(() => {
-      const quoteStatus = document.querySelector('.quote-freshness');
-      expect(quoteStatus?.textContent).toContain('Current');
-      expect(quoteStatus?.querySelector('time')?.getAttribute('datetime')).toBe(quoteDate);
-    });
+    expect(screen.queryByRole('tab', { name: 'Crisis' })).toBeNull();
 
     fireEvent.click(screen.getByRole('tab', { name: 'S&P 500' }));
+    // The S&P 500 surface keeps its price forecast and gains the crisis indicator as context.
+    expect(screen.getByTestId('forecast-chart')).toBeTruthy();
+    expect(screen.getByTestId('crisis-risk-panel')).toBeTruthy();
     await waitFor(() => expect(vi.mocked(buildMarketForecast).mock.calls.some((call) => call[0] === 'sp500' && call[1].currentPrice === close)).toBe(true));
     await waitFor(() => {
       const quoteStatus = document.querySelector('.quote-freshness');

@@ -20,7 +20,6 @@ import { ChartSettings, type OverlayControl } from './components/workspace/Chart
 import { EvidencePanel } from './components/workspace/EvidencePanel';
 import { ChartPanel } from './components/workspace/ChartPanel';
 import { CrisisRiskPanel } from './components/workspace/CrisisRiskPanel';
-import { CrisisChartPanel } from './components/workspace/CrisisChartPanel';
 import { CrisisSummary } from './components/workspace/CrisisSummary';
 import { getCurrentCrisisRisk } from './lib/sp500CrisisModel';
 import { cn } from './lib/utils';
@@ -112,10 +111,9 @@ export default function App() {
   const [marketDataByAsset, setMarketDataByAsset] = useState<Record<ForecastAssetId, MarketData>>(() => ({
     btc: loadMarketData('btc'),
     sp500: loadMarketData('sp500'),
-    'sp500-crisis': loadMarketData('sp500-crisis'),
     gold: loadMarketData('gold'),
   }));
-  const [marketStatusByAsset, setMarketStatusByAsset] = useState<Record<ForecastAssetId, DataStatus>>({ btc: 'fallback', sp500: 'fallback', 'sp500-crisis': 'fallback', gold: 'fallback' });
+  const [marketStatusByAsset, setMarketStatusByAsset] = useState<Record<ForecastAssetId, DataStatus>>({ btc: 'fallback', sp500: 'fallback', gold: 'fallback' });
   const [mvrvStats] = useState<MVRVStats>(() => computeMVRVStats());
   const [mvrvZScoreData] = useState(() => computeMVRVZScoreSeries());
   const [reliabilitySummary] = useState(() => loadReliabilitySummary());
@@ -164,14 +162,17 @@ export default function App() {
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showBuyZones, setShowBuyZones] = useState(true);
   const [showMVRV, setShowMVRV] = useState(false);
+  const [showCrisisIndicator, setShowCrisisIndicator] = useState(true);
   const [chartSettingsOpen, setChartSettingsOpen] = useState(false);
   const chartSettingsTriggerRef = React.useRef<HTMLButtonElement>(null);
   const [lastRunAt, setLastRunAt] = useState(() => new Date());
   const activeAsset = getMarketAssetConfig(activeAssetId);
   const marketData = marketDataByAsset[activeAssetId];
   const quoteDate = marketData.ohlcv.at(-1)!.date;
-  const isCrisisTab = activeAssetId === 'sp500-crisis';
-  const crisisAssessment = useMemo(() => (isCrisisTab ? getCurrentCrisisRisk(quoteDate) : null), [isCrisisTab, quoteDate]);
+  // The crisis model is an indicator on the S&P 500 surface, not an asset of its own.
+  const showsCrisisIndicator = activeAssetId === 'sp500';
+  const crisisAssessment = useMemo(() => (showsCrisisIndicator ? getCurrentCrisisRisk(quoteDate) : null), [showsCrisisIndicator, quoteDate]);
+  const crisisPaneVisible = Boolean(crisisAssessment && showCrisisIndicator);
   const canShowBitcoinOverlays = activeAsset.capabilities.bitcoinOverlays;
   const crossMarketContext = useMemo(() =>
     computeCrossMarketContext(marketDataByAsset.btc.ohlcv, marketDataByAsset.sp500.ohlcv, 90),
@@ -191,14 +192,8 @@ export default function App() {
       setMarketDataByAsset((current) => ({ ...current, [assetId]: hydrated.data }));
       setMarketStatusByAsset((current) => ({ ...current, [assetId]: hydrated.status }));
     };
-    const hydrateSharedVOO = async () => {
-      const hydrated = await hydrateMarketData('sp500', marketDataByAsset.sp500);
-      if (!active) return;
-      setMarketDataByAsset((current) => ({ ...current, sp500: hydrated.data, 'sp500-crisis': hydrated.data }));
-      setMarketStatusByAsset((current) => ({ ...current, sp500: hydrated.status, 'sp500-crisis': hydrated.status }));
-    };
     void hydrateAsset('btc', marketDataByAsset.btc);
-    void hydrateSharedVOO();
+    void hydrateAsset('sp500', marketDataByAsset.sp500);
     void hydrateAsset('gold', marketDataByAsset.gold);
     return () => { active = false; };
   }, []);
@@ -225,8 +220,6 @@ export default function App() {
       forecastInitialized.current = true;
       return;
     }
-    // The crisis surface renders the imported classifier, not a VOO price path.
-    if (isCrisisTab) return;
     return refreshForecast(350);
   }, [horizon, confidenceLevel, activeAssetId, marketData]);
 
@@ -300,7 +293,7 @@ export default function App() {
   const currentPrice = marketData?.currentPrice ?? 0;
   const priceChange24h = marketData?.priceChange24h ?? 0;
   const forecastPrice = useMemo(() => {
-    if ((activeAssetId === 'sp500' || activeAssetId === 'sp500-crisis' || activeAssetId === 'gold') && probabilityForecast?.median) {
+    if ((activeAssetId === 'sp500' || activeAssetId === 'gold') && probabilityForecast?.median) {
       return probabilityForecast.median;
     }
     const fcast = activeDisplayData.filter(d => d.isForecast);
@@ -324,29 +317,28 @@ export default function App() {
   }, [marketData, activeAssetId]);
 
   const volColor = volRisk === 'High' ? 'text-red-400' : volRisk === 'Medium' ? 'text-amber-500' : 'text-emerald-400';
-  const crisisEvidencePanels = useMemo(() => {
+  // Crisis articles fold into the shared evidence tabs; the indicator itself lives in the chart's lower pane.
+  const crisisEvidence = useMemo(() => {
     if (!crisisAssessment) return null;
     const { snapshot, score, zone } = crisisAssessment;
     const selection = snapshot.selectionProtocol;
     const history = snapshot.oosHistory;
     return {
-      overview: <div className="evidence-grid">
+      overview: <>
         <article><h3>Imported crisis score <small>shadow</small></h3><dl><div><dt>Zone</dt><dd>{zone}</dd></div><div><dt>Challenger v2</dt><dd>{formatUnsignedPercent(score.challengerDeploymentProbability, 2)}</dd></div><div><dt>Incumbent</dt><dd>{formatUnsignedPercent(score.incumbentProbability, 2)}</dd></div><div><dt>Base raw score</dt><dd>{formatUnsignedPercent(score.baseRawProbability, 2)}</dd></div><div><dt>S&P 500 close · VIX</dt><dd>{score.sp500Close.toFixed(2)} · {score.vix.toFixed(2)}</dd></div><div><dt>Drawdown at score date</dt><dd>{formatSignedPercent(score.currentDrawdown, 2)}</dd></div></dl><p>{snapshot.targetDefinition}.</p></article>
         <article><h3>Labeled crisis events</h3><dl><div><dt>Events in OOS history</dt><dd>{snapshot.events.count}</dd></div><div><dt>Incumbent HIGH hits</dt><dd>{snapshot.events.incumbent_high_hits}</dd></div><div><dt>Challenger HIGH hits</dt><dd>{snapshot.events.challenger_high_hits}</dd></div><div><dt>History coverage</dt><dd>{history[0].date} → {history.at(-1)!.date}</dd></div></dl><p>Four labeled events over 26 years is a small sample; hit counts are descriptive, not a skill estimate.</p></article>
-        <article><h3>VOO context <small>underlying</small></h3><dl><div><dt>Quote</dt><dd>{formatPrice(currentPrice)}</dd></div><div><dt>24h change</dt><dd>{priceChange24h >= 0 ? '+' : ''}{priceChange24h.toFixed(2)}%</dd></div><div><dt>30D annualized volatility</dt><dd>{annualizedVol.toFixed(1)}% · {volRisk}</dd></div><div><dt>Latest candle</dt><dd>{quoteDate}</dd></div></dl><p>The S&P 500 tab holds the VOO price forecast; this tab never forecasts price.</p></article>
-      </div>,
-      'model-risk': <div className="evidence-grid">
+      </>,
+      'model-risk': <>
         <article><h3>Promotion status</h3><dl><div><dt>Mode</dt><dd>{snapshot.runtime.mode}</dd></div><div><dt>Verdict</dt><dd>{snapshot.runtime.verdict}</dd></div><div><dt>Promotion</dt><dd>{snapshot.runtime.promotionStatus}</dd></div></dl><p>{snapshot.runtime.promotionBlocker}</p></article>
         <article><h3>Locked {snapshot.holdout.period} holdout</h3><dl><div><dt>Average precision</dt><dd>{snapshot.holdout.incumbent.average_precision.toFixed(4)} → {snapshot.holdout.challenger.average_precision.toFixed(4)}</dd></div><div><dt>ROC AUC</dt><dd>{snapshot.holdout.incumbent.roc_auc.toFixed(4)} → {snapshot.holdout.challenger.roc_auc.toFixed(4)}</dd></div><div><dt>Brier score</dt><dd>{snapshot.holdout.incumbent.brier_score.toFixed(4)} → {snapshot.holdout.challenger.brier_score.toFixed(4)}</dd></div><div><dt>Rows · positives</dt><dd>{snapshot.holdout.challenger.rows} · {snapshot.holdout.challenger.positives}</dd></div></dl><p>Every 95% block-bootstrap interval crosses zero; see the full comparison below the chart.</p></article>
         <article><h3>Selection protocol</h3><dl><div><dt>Candidates screened</dt><dd>{selection.candidate_count}</dd></div><div><dt>Selected mapper</dt><dd>{String(selection.selected_candidate.name ?? '—')}</dd></div><div><dt>Primary metric</dt><dd>{selection.primary_selection_metric}</dd></div><div><dt>Development cutoff</dt><dd>{selection.development_last_date}</dd></div><div><dt>Strict cutoff</dt><dd>{selection.strict_cutoff}</dd></div></dl><p>Selection used pre-{selection.strict_cutoff} data only; the {snapshot.holdout.period} window is the locked evaluation.</p></article>
-      </div>,
-      'data-market': <div className="evidence-grid">
+      </>,
+      'data-market': <>
         <article><h3>Snapshot provenance</h3><dl><div><dt>Archive</dt><dd>{snapshot.source.archive}</dd></div><div><dt>Archive date</dt><dd>{snapshot.source.archiveDate}</dd></div><div><dt>Browser snapshot</dt><dd>{snapshot.source.snapshotDate}</dd></div><div><dt>Score as of</dt><dd>{score.asOfDate}</dd></div></dl><p>Derived from {snapshot.source.comparisonArtifact} and {snapshot.source.oosArtifact}. The Python/joblib model is never shipped to the browser.</p></article>
-        <article><h3>Market data</h3><dl><div><dt>Source</dt><dd>{activeAsset.dataSourceLabel}</dd></div><div><dt>Latest candle</dt><dd>{quoteDate}</dd></div><div><dt>Volume</dt><dd>{formatMarketCap(marketData.volume24h)}</dd></div><div><dt>Instrument</dt><dd>{activeAsset.instrumentLabel}</dd></div></dl><p>VOO data is shared with the S&P 500 tab and hydrated once per session.</p></article>
-        <article><h3>Known limitations</h3><ol className="crisis-evidence-list">{snapshot.knownLimitations.slice(0, 3).map((limitation) => <li key={limitation}>{limitation}</li>)}</ol><p>The full list is in the crisis risk context panel.</p></article>
-      </div>,
+        <article><h3>Known limitations <small>crisis model</small></h3><ol className="crisis-evidence-list">{snapshot.knownLimitations.slice(0, 3).map((limitation) => <li key={limitation}>{limitation}</li>)}</ol><p>The full list is in the crisis risk context panel below.</p></article>
+      </>,
     };
-  }, [crisisAssessment, currentPrice, priceChange24h, annualizedVol, volRisk, quoteDate, activeAsset, marketData.volume24h]);
+  }, [crisisAssessment]);
   const overlayControls: OverlayControl[] = [
     { id: 'sma', label: 'Moving average', group: 'Price', checked: showSMA, onChange: () => setShowSMA(!showSMA), description: 'Show the simple moving average.' },
     { id: 'volume', label: 'Volume', group: 'Price', checked: showVolume, onChange: () => setShowVolume(!showVolume), description: 'Show daily trading volume.' },
@@ -355,6 +347,7 @@ export default function App() {
     { id: 'floor', label: canShowBitcoinOverlays ? 'Power-law floor' : 'Lower channel', group: 'Forecast', checked: showFloorLine, onChange: () => setShowFloorLine(!showFloorLine), description: 'Show the lower reference boundary.' },
     { id: 'peak', label: canShowBitcoinOverlays ? 'Power-law peak' : 'Upper channel', group: 'Forecast', checked: showPeakLine, onChange: () => setShowPeakLine(!showPeakLine), description: 'Show the upper reference boundary.' },
     { id: 'heatmap', label: 'Forecast heatmap', group: 'Forecast', checked: showHeatmap, onChange: () => setShowHeatmap(!showHeatmap), description: 'Show forecast probability density.' },
+    ...(crisisAssessment ? [{ id: 'crisis', label: 'Crisis probability', group: 'Indicators' as const, checked: showCrisisIndicator, onChange: () => setShowCrisisIndicator(!showCrisisIndicator), description: 'Stack the imported shadow crisis probability under the price.' }] : []),
     ...(canShowBitcoinOverlays ? [
       { id: 'buy-zones', label: 'Buy zones', group: 'Bitcoin context' as const, checked: showBuyZones, onChange: () => setShowBuyZones(!showBuyZones), description: 'Show context-only historical buy zones.' },
       ...(mvrvZScoreData.length ? [{ id: 'mvrv', label: 'MVRV Z-score', group: 'Bitcoin context' as const, checked: showMVRV, onChange: () => setShowMVRV(!showMVRV), description: 'Show context-only MVRV valuation history.' }] : []),
@@ -373,27 +366,26 @@ export default function App() {
 
         {/* Main Content */}
         <div className="flex flex-col gap-4 md:gap-5 order-1 min-h-0">
-          {crisisAssessment ? <>
-          <CrisisSummary assessment={crisisAssessment} />
-          <CrisisChartPanel history={crisisAssessment.snapshot.oosHistory} priceRows={marketData.ohlcv} priceLabel={activeAsset.ticker} watchThreshold={crisisAssessment.score.deploymentThresholds.watch} highThreshold={crisisAssessment.score.deploymentThresholds.high} eventCount={crisisAssessment.snapshot.events.count} />
-          </> : <>
           <ForecastSummary current={currentPrice ? formatPrice(currentPrice) : '—'} median={forecastPrice ? formatPrice(forecastPrice) : '—'} move={`${forecastChange >= 0 ? '+' : ''}${forecastChange.toFixed(1)}%`} probability={adjustedProbabilityForecast ? formatUnsignedPercent(adjustedProbabilityForecast.probabilityUp) : undefined} lower={adjustedProbabilityForecast ? formatPrice(adjustedProbabilityForecast.q10) : undefined} upper={adjustedProbabilityForecast ? formatPrice(adjustedProbabilityForecast.q90) : undefined} horizonLabel={formatHorizonLabel(horizon)} />
           <ForecastControls horizon={horizon} options={HORIZON_OPTIONS} confidence={confidenceLevel} confidenceLabel={coefficientAwareCalibrationLabel(horizon, 'Interval Band', activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)} trustCopy={coefficientStabilityTrustCopy(horizon, activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)} busy={isGenerating} onHorizon={setHorizon} onConfidence={(value) => setConfidenceLevel(value as keyof typeof CONFIDENCE_Z_SCORES)} onRefresh={handleRunForecast} />
-          <ChartPanel title={activeAsset.chartTitle} subtitle={`${activeAsset.instrumentLabel}. Forecast auto-refreshes when horizon or interval changes.`} range={timeRange} onRange={setTimeRange} isPlaying={isPlaying} busy={isGenerating} onPlayToggle={isPlaying ? handleStop : handlePlay} settingsTriggerRef={chartSettingsTriggerRef} settingsOpen={chartSettingsOpen} onOpenSettings={() => setChartSettingsOpen(true)}>
+          <ChartPanel title={activeAsset.chartTitle} subtitle={`${activeAsset.instrumentLabel}. Forecast auto-refreshes when horizon or interval changes.`} range={timeRange} onRange={setTimeRange} isPlaying={isPlaying} busy={isGenerating} onPlayToggle={isPlaying ? handleStop : handlePlay} settingsTriggerRef={chartSettingsTriggerRef} settingsOpen={chartSettingsOpen} onOpenSettings={() => setChartSettingsOpen(true)} tall={crisisPaneVisible}>
             <motion.div initial={false} animate={{ opacity: isGenerating ? 0.5 : 1 }} transition={{ duration: 0.18 }} className="h-full w-full">
-              <ForecastChart data={activeDisplayData} showSMA={showSMA} showVolume={showVolume} showModelLine={showModelLine} showScenarios={showScenarios} showFloorLine={showFloorLine} showPeakLine={showPeakLine} showHeatmap={showHeatmap} heatmapData={heatmapData} showBuyZones={showBuyZones} buyZones={buyZoneSummary?.zones ?? []} timeRange={timeRange} playbackIndex={playbackIndex} mvrvData={mvrvZScoreData} showMVRV={showMVRV} showBitcoinOverlays={canShowBitcoinOverlays} probabilityForecast={adjustedProbabilityForecast} />
+              <ForecastChart data={activeDisplayData} showSMA={showSMA} showVolume={showVolume} showModelLine={showModelLine} showScenarios={showScenarios} showFloorLine={showFloorLine} showPeakLine={showPeakLine} showHeatmap={showHeatmap} heatmapData={heatmapData} showBuyZones={showBuyZones} buyZones={buyZoneSummary?.zones ?? []} timeRange={timeRange} playbackIndex={playbackIndex} mvrvData={mvrvZScoreData} showMVRV={showMVRV} showBitcoinOverlays={canShowBitcoinOverlays} probabilityForecast={adjustedProbabilityForecast} crisisHistory={crisisAssessment?.snapshot.oosHistory ?? null} crisisThresholds={crisisAssessment?.score.deploymentThresholds ?? null} showCrisis={showCrisisIndicator} crisisEventCount={crisisAssessment?.snapshot.events.count} />
             </motion.div>
           </ChartPanel>
-          </>}
         </div>
 
-        {crisisAssessment && <CrisisRiskPanel quoteDate={quoteDate} assessment={crisisAssessment} />}
+        {crisisAssessment && <>
+          <CrisisSummary assessment={crisisAssessment} />
+          <CrisisRiskPanel quoteDate={quoteDate} assessment={crisisAssessment} />
+        </>}
 
-        <EvidencePanel panels={crisisEvidencePanels ?? {
+        <EvidencePanel panels={{
           overview: <div className="evidence-grid">
             <article><h3>Market snapshot</h3><dl><div><dt>24h change</dt><dd>{priceChange24h >= 0 ? '+' : ''}{priceChange24h.toFixed(2)}%</dd></div><div><dt>30D annualized volatility</dt><dd>{annualizedVol.toFixed(1)}% · {volRisk}</dd></div><div><dt>Instrument</dt><dd>{activeAsset.instrumentLabel}</dd></div></dl></article>
             {latestBuyZone && primaryBuyZoneBacktest && <article><h3>Buy-zone context <small>context only</small></h3><dl><div><dt>Bottom score</dt><dd>{(latestBuyZone.bottomScore * 100).toFixed(1)} / 70</dd></div><div><dt>Status</dt><dd>{latestBuyZone.isHeavyBuy ? 'Heavy buy active' : 'Inactive'}</dd></div><div><dt>Backtest 1Y median</dt><dd>{formatSignedPercent(primaryBuyZoneBacktest.medianReturn1y ?? 0, 0)}</dd></div></dl><p>Historical context only; not applied as a forecast override.</p></article>}
             {crossMarketContext && <article><h3>Cross-market context <small>context only</small></h3><dl><div><dt>Regime</dt><dd>{crossMarketContext.regime}</dd></div><div><dt>90D correlation</dt><dd>{crossMarketContext.correlation.toFixed(2)}</dd></div><div><dt>BTC beta</dt><dd>{crossMarketContext.beta.toFixed(2)}x</dd></div><div><dt>BTC vs S&P 90D</dt><dd>{formatSignedPercent(crossMarketContext.btcRelativeReturn)}</dd></div><div><dt>BTC / S&P vol</dt><dd>{formatUnsignedPercent(crossMarketContext.btcAnnualizedVol, 0)} / {formatUnsignedPercent(crossMarketContext.sp500AnnualizedVol, 0)}</dd></div></dl><p>{crossMarketContext.summary}</p></article>}
+            {crisisEvidence?.overview}
           </div>,
           'model-risk': <div className="evidence-grid">
             <article><h3>Model trust</h3><dl><div><dt>14–90d backtest</dt><dd>{reliabilitySummary.qualityGateStatus}</dd></div><div><dt>Reliability score</dt><dd>{reliabilitySummary.reliabilityScore}/100</dd></div><div><dt>Active model</dt><dd>{reliabilitySummary.ensembleEnabled ? 'Regime ensemble' : 'Power-law'}</dd></div><div><dt>180d+ stability</dt><dd>{powerLawStabilitySummary.verdict}</dd></div>{tier3Status && <><div><dt>Ensemble</dt><dd>{featureStatusLabel(tier3Status.ensemble.status)}</dd></div><div><dt>Tail-risk gate</dt><dd>{featureStatusLabel(tier3Status.tailRisk.status)}</dd></div></>}</dl><p>{coefficientStabilityTrustCopy(horizon, activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)}</p></article>
@@ -401,11 +393,13 @@ export default function App() {
             {canShowBitcoinOverlays && <article><h3>Regime & tail risk</h3><dl><div><dt>Top state</dt><dd>{regimeContext.topState}</dd></div><div><dt>Tail risk</dt><dd>{tailRisk.riskFlag}</dd></div>{networkContext && <><div><dt>Network state</dt><dd>{networkContext.networkState}</dd></div><div><dt>Transfers</dt><dd>{networkContext.transferCount === null ? 'n/a' : formatCompactCount(networkContext.transferCount)}</dd></div><div><dt>Active share</dt><dd>{networkContext.activeAddressShare === null ? 'n/a' : formatUnsignedPercent(networkContext.activeAddressShare, 2)}</dd></div><div><dt>Transfers / tx</dt><dd>{networkContext.transfersPerTransaction === null ? 'n/a' : networkContext.transfersPerTransaction.toFixed(2)}</dd></div></>}</dl>{networkContext && <p>{networkContext.insight}</p>}<p>Context-only signals remain disabled for direct forecast influence unless their gates pass.</p></article>}
             {derivativesContext && <article><h3>Derivatives <small>context only</small></h3><dl><div><dt>Open interest</dt><dd>{derivativesContext.openInterestUSD === null ? 'n/a' : formatMarketCap(derivativesContext.openInterestUSD)}</dd></div><div><dt>OI / market cap</dt><dd>{derivativesContext.openInterestToMarketCap === null ? 'n/a' : formatUnsignedPercent(derivativesContext.openInterestToMarketCap, 2)}</dd></div><div><dt>Leverage / funding</dt><dd>{derivativesContext.leverageState} / {derivativesContext.fundingState}</dd></div></dl><p>{derivativesContext.insight}</p></article>}
             {drawdownStats && activeAsset.capabilities.drawdownCycle && <article><h3>Drawdown analysis</h3><dl><div><dt>Projected max drawdown</dt><dd>-{drawdownStats.projectedMDD.toFixed(1)}%</dd></div><div><dt>Cycle ATH</dt><dd>{formatPrice(drawdownStats.cycleHighPrice)} · {drawdownStats.cycleHighDate}</dd></div><div><dt>Current from ATH</dt><dd>-{drawdownStats.currentDrawdownPct.toFixed(1)}%</dd></div><div><dt>Bear-floor estimate</dt><dd>{formatPrice(drawdownStats.impliedFloorFromCycleHigh)}</dd></div><div><dt>GBM expected / worst 5%</dt><dd>-{drawdownStats.gbmExpectedMDD.toFixed(1)}% / -{drawdownStats.gbmP95MDD.toFixed(1)}%</dd></div></dl><p>Cycle history: {HISTORICAL_CYCLE_DRAWDOWNS.map((item) => `C${item.cycle} -${item.pct}%`).join(' · ')}</p></article>}
+            {crisisEvidence?.['model-risk']}
           </div>,
           'data-market': <div className="evidence-grid">
             <article><h3>Market data</h3><dl><div><dt>Source</dt><dd>{activeAsset.dataSourceLabel}</dd></div><div><dt>Latest candle</dt><dd>{marketData.ohlcv.at(-1)!.date}</dd></div><div><dt>Volume</dt><dd>{formatMarketCap(marketData.volume24h)}</dd></div><div><dt>Market cap</dt><dd>{marketData.marketCap > 0 ? formatMarketCap(marketData.marketCap) : 'N/A'}</dd></div>{canShowBitcoinOverlays && mvrvStats.currentMVRV !== null && <><div><dt>MVRV ratio</dt><dd>{mvrvStats.currentMVRV.toFixed(2)}</dd></div><div><dt>MVRV Z-score</dt><dd>{mvrvStats.zScore?.toFixed(2)}</dd></div><div><dt>Cycle signal</dt><dd>{mvrvStats.signal}</dd></div></>}</dl></article>
             {activeAsset.capabilities.sourceFreshness && <article><h3>Source freshness</h3><dl>{(Object.entries(sourceFreshness.sources) as [string, { status: string; latestDate: string | null; required: boolean }][]).map(([name, source]) => <div key={name}><dt>{name}{!source.required && ' (optional)'}</dt><dd>{source.latestDate ?? source.status}</dd></div>)}</dl></article>}
             {activeAsset.capabilities.halvings && <article><h3>Supply & halvings</h3><dl><div><dt>Next halving</dt><dd>{halvingInfo.nextDate} · {halvingInfo.daysUntil}d</dd></div><div><dt>Block reward</dt><dd>{halvingInfo.currentReward} → {halvingInfo.nextReward} BTC</dd></div><div><dt>Daily issuance</dt><dd>~{halvingInfo.dailyIssuance} → ~{halvingInfo.nextDailyIssuance} BTC</dd></div><div><dt>Circulating</dt><dd>{(CIRCULATING_SUPPLY / 1_000_000).toFixed(2)}M / 21M · {((CIRCULATING_SUPPLY / MAX_SUPPLY) * 100).toFixed(1)}%</dd></div></dl></article>}
+            {crisisEvidence?.['data-market']}
           </div>,
         }} />
 

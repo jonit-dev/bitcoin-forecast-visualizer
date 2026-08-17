@@ -4,6 +4,7 @@ import { cn } from '../lib/utils';
 import type { ChartSeriesRefs, ForecastChartProps, LegendData } from './chart/types';
 import { ChartLegend } from './chart/Legend';
 import { BuyZonePrimitive, HalvingCyclePrimitive, HALVING_DATES, HeatmapPrimitive, MVRVZonePrimitive } from './chart/primitives';
+import { attachCrisisPane, clipCrisisHistory, crisisPointAt, timeKey } from './chart/crisisPane';
 import {
   buildChartSeriesData,
   buildLegendFromRow,
@@ -12,7 +13,7 @@ import {
   visibleRangeForTimeRange,
 } from './chart/dataTransforms';
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, buyZones = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, buyZones = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast, crisisHistory = null, crisisThresholds = null, showCrisis = false, crisisEventCount }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<ChartSeriesRefs>({ stochasticTraces: [] });
@@ -378,6 +379,42 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     }
   }, [mvrvData]);
 
+  // ---- Crisis probability indicator pane (TradingView-style, stacked under the price) ----
+  const [crisisHoverDate, setCrisisHoverDate] = React.useState<string | null>(null);
+  const firstHistoricalDate = React.useMemo(() => data?.find((row: any) => !row.isForecast)?.date ?? null, [data]);
+  // Clipped to the drawn price history: the model starts in 2000, VOO in 2010, and an unclipped
+  // series would stretch the shared time axis a decade past the price it is read against.
+  const crisisPoints = React.useMemo(
+    () => (crisisHistory?.length ? clipCrisisHistory(crisisHistory, firstHistoricalDate) : []),
+    [crisisHistory, firstHistoricalDate]
+  );
+  const crisisActive = Boolean(showCrisis && crisisThresholds && crisisPoints.length > 0);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart || !crisisActive || !crisisThresholds) return;
+
+    const dispose = attachCrisisPane(chart, {
+      history: crisisPoints,
+      watchThreshold: crisisThresholds.watch,
+      highThreshold: crisisThresholds.high,
+    });
+    const handleMove = (param: any) => setCrisisHoverDate(timeKey(param?.time));
+    chart.subscribeCrosshairMove(handleMove);
+
+    return () => {
+      try { chart.unsubscribeCrosshairMove(handleMove); } catch { /* chart disposed */ }
+      dispose();
+      chart.panes()[0]?.setStretchFactor(1);
+    };
+  }, [crisisActive, crisisPoints, crisisThresholds, showBitcoinOverlays]);
+
+  const crisisReadout = React.useMemo(() => {
+    if (!crisisActive) return null;
+    const point = (crisisHoverDate ? crisisPointAt(crisisPoints, crisisHoverDate) : null) ?? crisisPoints.at(-1)!;
+    return point;
+  }, [crisisActive, crisisHoverDate, crisisPoints]);
+
   // Handle visibility toggles
   useEffect(() => {
     if (!chartRef.current) return;
@@ -442,6 +479,19 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
         <div ref={chartContainerRef} className="absolute inset-0" />
         <ChartLegend data={legendData} />
       </div>{/* end main chart wrapper */}
+
+      {/* Crisis indicator readout — the pane itself lives inside the main chart, under the price */}
+      {crisisReadout && crisisThresholds && (
+        <div className="crisis-indicator-readout" data-testid="crisis-indicator-readout">
+          <strong>Crisis probability</strong>
+          <span><span className="crisis-legend-swatch crisis-legend-challenger" aria-hidden="true" />challenger {(crisisReadout.challengerDeploymentProbability * 100).toFixed(2)}%</span>
+          <span><span className="crisis-legend-swatch crisis-legend-incumbent" aria-hidden="true" />incumbent {(crisisReadout.incumbentProbability * 100).toFixed(2)}%</span>
+          <span className="crisis-legend-watch">WATCH {(crisisThresholds.watch * 100).toFixed(2)}%</span>
+          <span className="crisis-legend-high">HIGH {(crisisThresholds.high * 100).toFixed(2)}%</span>
+          <span><span className="crisis-legend-swatch crisis-legend-band" aria-hidden="true" />crisis window{crisisEventCount ? ` (${crisisEventCount} events)` : ''}</span>
+          <span className={crisisReadout.target ? 'crisis-readout-hit' : undefined}>{crisisReadout.date} · {crisisReadout.target ? 'crisis within 63 sessions' : 'no crisis within 63 sessions'}</span>
+        </div>
+      )}
 
       {/* MVRV Z-Score indicator panel — separate chart, synced time range */}
       <div
