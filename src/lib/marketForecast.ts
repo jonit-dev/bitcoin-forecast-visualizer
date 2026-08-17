@@ -83,7 +83,7 @@ export const MARKET_ASSETS: MarketAssetConfig[] = [
     shortLabel: 'Crisis',
     ticker: 'VOO',
     quote: 'USD',
-    chartTitle: 'S&P 500 / VOO Forward View',
+    chartTitle: 'S&P 500 Crisis Risk (shadow model)',
     subtitle: 'S&P 500 crisis-risk context workspace',
     dataSourceLabel: 'Yahoo Finance chart API',
     instrumentLabel: 'VOO ETF, adjusted daily OHLCV',

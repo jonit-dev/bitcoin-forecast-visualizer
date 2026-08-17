@@ -24,19 +24,26 @@ for (const viewport of viewports) {
 }
 
 for (const viewport of [viewports[0], viewports[3]]) {
-  test(`opens the crisis tab and keeps the shared VOO workspace usable at ${viewport.name} crisis`, async ({ page }) => {
+  test(`opens the crisis tab on its own crisis-risk surface at ${viewport.name} crisis`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
     await page.getByRole('tab', { name: 'Crisis' }).click();
+    await expect(page.getByRole('region', { name: 'Crisis summary' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Crisis probability chart' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Crisis probability history' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Crisis risk context' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'NORMAL' })).toBeVisible();
     await expect(page.getByText('SHADOW MODE · NOT PROMOTED')).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Forecast chart' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'S&P 500 / VOO Forward View' })).toBeVisible();
-    await page.getByRole('region', { name: 'Forecast controls' }).getByRole('button', { name: '1Y' }).click();
+    // The price forecast lives on the S&P 500 tab only.
+    await expect(page.getByRole('region', { name: 'Forecast chart' })).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Forecast controls' })).toHaveCount(0);
+    await page.getByRole('region', { name: 'Crisis probability chart' }).getByRole('button', { name: '10Y' }).click();
     await expect(page.getByRole('region', { name: 'Crisis risk context' })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+    await page.getByRole('tab', { name: 'S&P 500' }).click();
+    await expect(page.getByRole('heading', { name: 'S&P 500 / VOO Forward View' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Crisis risk context' })).toHaveCount(0);
   });
 }
 
@@ -61,6 +68,10 @@ test('has no critical or serious accessibility violations', async ({ page }) => 
   await page.setViewportSize({ width: 1440, height: 900 }); await page.emulateMedia({ reducedMotion: 'reduce' }); await page.goto('/');
   const defaultResults = await new AxeBuilder({ page }).analyze();
   expect(defaultResults.violations.filter((item) => ['critical', 'serious'].includes(item.impact ?? ''))).toEqual([]);
+  await page.getByRole('tab', { name: 'Crisis' }).click();
+  const crisisResults = await new AxeBuilder({ page }).analyze();
+  expect(crisisResults.violations.filter((item) => ['critical', 'serious'].includes(item.impact ?? ''))).toEqual([]);
+  await page.getByRole('tab', { name: 'BTC' }).click();
   await page.getByRole('button', { name: 'Chart settings' }).click();
   const dialogResults = await new AxeBuilder({ page }).include('.chart-settings').analyze();
   expect(dialogResults.violations.filter((item) => ['critical', 'serious'].includes(item.impact ?? ''))).toEqual([]);

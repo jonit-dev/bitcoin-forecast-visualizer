@@ -68,9 +68,9 @@ top = trend * exp(99th percentile residual over prior 1,260 sessions)
 
 ### S&P 500 Crisis context tab
 
-The keyboard-accessible `Crisis` tab is additive to the generic `S&P 500` price tab. It reuses the VOO quote, chart, controls, and forecast route, then shows the checked-in S&P 500 Crisis Challenger v2 score as imported context. The challenger is a second-stage mapper over a supplied base model score; it is not recomputed from VOO prices and never changes the shared price forecast or `probabilityForecast`.
+The keyboard-accessible `Crisis` tab is additive to the generic `S&P 500` price tab and renders its own surface: a zone summary, a full-height chart of the imported weekly crisis probability (challenger versus incumbent, WATCH/HIGH threshold lines, shaded labeled crisis windows), and crisis-specific evidence panels. It shares the VOO quote and market-data hydration with the `S&P 500` tab but runs no price forecast of its own — `buildMarketForecast` is not called for `sp500-crisis`, and the price chart, horizon, and interval controls stay on the `S&P 500` tab. The challenger is a second-stage mapper over a supplied base model score; it is not recomputed from VOO prices and never changes the shared price forecast or `probabilityForecast`.
 
-The browser snapshot is dated `2026-08-15` and the current score is as of `2026-08-14`. The panel compares that score with the active VOO quote date and shows a stale warning when the quote is newer. `SHADOW MODE · NOT PROMOTED`, the raw base probability, incumbent probability, challenger deployment probability, frozen NORMAL/WATCH/HIGH thresholds, the target definition, OOS history, and locked 2016–2025 uncertainty are all intentionally visible.
+The browser snapshot is dated `2026-08-15` and the current score is as of `2026-08-14`. The context panel compares that score with the active VOO quote date and shows a stale warning when the quote is newer. `SHADOW MODE · NOT PROMOTED`, the raw base probability, incumbent probability, challenger deployment probability, frozen NORMAL/WATCH/HIGH thresholds, the target definition, OOS history, and locked 2016–2025 uncertainty are all intentionally visible.
 
 Evidence and rerun criteria:
 

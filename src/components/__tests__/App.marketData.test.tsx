@@ -4,6 +4,7 @@ import { loadMarketData } from '../../lib/api';
 
 vi.mock('../Chart', () => ({ ForecastChart: () => <div data-testid="forecast-chart" /> }));
 vi.mock('../workspace/CrisisRiskPanel', () => ({ CrisisRiskPanel: () => <div data-testid="crisis-risk-panel" /> }));
+vi.mock('../workspace/CrisisChartPanel', () => ({ CrisisChartPanel: () => <div data-testid="crisis-chart-panel" /> }));
 vi.mock('../../lib/marketForecast', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../lib/marketForecast')>();
   return { ...actual, buildMarketForecast: vi.fn(actual.buildMarketForecast) };
@@ -54,7 +55,10 @@ describe('App market data hydration', () => {
     expect(fetchMock.mock.calls.map(([input]) => new URL(String(input), 'https://example.test').searchParams.get('asset')).sort()).toEqual(['btc', 'gold', 'sp500']);
 
     fireEvent.click(screen.getByRole('tab', { name: 'Crisis' }));
-    await waitFor(() => expect(vi.mocked(buildMarketForecast).mock.calls.some((call) => call[0] === 'sp500-crisis' && call[1].currentPrice === close)).toBe(true));
+    // The crisis surface shows the imported classifier, never a VOO price forecast.
+    expect(screen.getByTestId('crisis-chart-panel')).toBeTruthy();
+    expect(screen.queryByTestId('forecast-chart')).toBeNull();
+    expect(vi.mocked(buildMarketForecast).mock.calls.some((call) => call[0] === 'sp500-crisis')).toBe(false);
     await waitFor(() => {
       const quoteStatus = document.querySelector('.quote-freshness');
       expect(quoteStatus?.textContent).toContain('Current');

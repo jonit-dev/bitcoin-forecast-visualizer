@@ -24,7 +24,7 @@ interface CrisisCurrentScore {
   note: string;
 }
 
-interface CrisisHistoryPoint {
+export interface CrisisHistoryPoint {
   date: string;
   target: 0 | 1;
   rawProbability: Probability;

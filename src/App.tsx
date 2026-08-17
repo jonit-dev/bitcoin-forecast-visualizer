@@ -20,6 +20,9 @@ import { ChartSettings, type OverlayControl } from './components/workspace/Chart
 import { EvidencePanel } from './components/workspace/EvidencePanel';
 import { ChartPanel } from './components/workspace/ChartPanel';
 import { CrisisRiskPanel } from './components/workspace/CrisisRiskPanel';
+import { CrisisChartPanel } from './components/workspace/CrisisChartPanel';
+import { CrisisSummary } from './components/workspace/CrisisSummary';
+import { getCurrentCrisisRisk } from './lib/sp500CrisisModel';
 import { cn } from './lib/utils';
 import { loadCurrentRegimeSummary, loadPowerLawStabilitySummary, loadReliabilitySummary, loadSourceFreshness } from './lib/reliabilityReport';
 import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from './lib/marketForecast';
@@ -166,6 +169,9 @@ export default function App() {
   const [lastRunAt, setLastRunAt] = useState(() => new Date());
   const activeAsset = getMarketAssetConfig(activeAssetId);
   const marketData = marketDataByAsset[activeAssetId];
+  const quoteDate = marketData.ohlcv.at(-1)!.date;
+  const isCrisisTab = activeAssetId === 'sp500-crisis';
+  const crisisAssessment = useMemo(() => (isCrisisTab ? getCurrentCrisisRisk(quoteDate) : null), [isCrisisTab, quoteDate]);
   const canShowBitcoinOverlays = activeAsset.capabilities.bitcoinOverlays;
   const crossMarketContext = useMemo(() =>
     computeCrossMarketContext(marketDataByAsset.btc.ohlcv, marketDataByAsset.sp500.ohlcv, 90),
@@ -219,6 +225,8 @@ export default function App() {
       forecastInitialized.current = true;
       return;
     }
+    // The crisis surface renders the imported classifier, not a VOO price path.
+    if (isCrisisTab) return;
     return refreshForecast(350);
   }, [horizon, confidenceLevel, activeAssetId, marketData]);
 
@@ -316,6 +324,29 @@ export default function App() {
   }, [marketData, activeAssetId]);
 
   const volColor = volRisk === 'High' ? 'text-red-400' : volRisk === 'Medium' ? 'text-amber-500' : 'text-emerald-400';
+  const crisisEvidencePanels = useMemo(() => {
+    if (!crisisAssessment) return null;
+    const { snapshot, score, zone } = crisisAssessment;
+    const selection = snapshot.selectionProtocol;
+    const history = snapshot.oosHistory;
+    return {
+      overview: <div className="evidence-grid">
+        <article><h3>Imported crisis score <small>shadow</small></h3><dl><div><dt>Zone</dt><dd>{zone}</dd></div><div><dt>Challenger v2</dt><dd>{formatUnsignedPercent(score.challengerDeploymentProbability, 2)}</dd></div><div><dt>Incumbent</dt><dd>{formatUnsignedPercent(score.incumbentProbability, 2)}</dd></div><div><dt>Base raw score</dt><dd>{formatUnsignedPercent(score.baseRawProbability, 2)}</dd></div><div><dt>S&P 500 close · VIX</dt><dd>{score.sp500Close.toFixed(2)} · {score.vix.toFixed(2)}</dd></div><div><dt>Drawdown at score date</dt><dd>{formatSignedPercent(score.currentDrawdown, 2)}</dd></div></dl><p>{snapshot.targetDefinition}.</p></article>
+        <article><h3>Labeled crisis events</h3><dl><div><dt>Events in OOS history</dt><dd>{snapshot.events.count}</dd></div><div><dt>Incumbent HIGH hits</dt><dd>{snapshot.events.incumbent_high_hits}</dd></div><div><dt>Challenger HIGH hits</dt><dd>{snapshot.events.challenger_high_hits}</dd></div><div><dt>History coverage</dt><dd>{history[0].date} → {history.at(-1)!.date}</dd></div></dl><p>Four labeled events over 26 years is a small sample; hit counts are descriptive, not a skill estimate.</p></article>
+        <article><h3>VOO context <small>underlying</small></h3><dl><div><dt>Quote</dt><dd>{formatPrice(currentPrice)}</dd></div><div><dt>24h change</dt><dd>{priceChange24h >= 0 ? '+' : ''}{priceChange24h.toFixed(2)}%</dd></div><div><dt>30D annualized volatility</dt><dd>{annualizedVol.toFixed(1)}% · {volRisk}</dd></div><div><dt>Latest candle</dt><dd>{quoteDate}</dd></div></dl><p>The S&P 500 tab holds the VOO price forecast; this tab never forecasts price.</p></article>
+      </div>,
+      'model-risk': <div className="evidence-grid">
+        <article><h3>Promotion status</h3><dl><div><dt>Mode</dt><dd>{snapshot.runtime.mode}</dd></div><div><dt>Verdict</dt><dd>{snapshot.runtime.verdict}</dd></div><div><dt>Promotion</dt><dd>{snapshot.runtime.promotionStatus}</dd></div></dl><p>{snapshot.runtime.promotionBlocker}</p></article>
+        <article><h3>Locked {snapshot.holdout.period} holdout</h3><dl><div><dt>Average precision</dt><dd>{snapshot.holdout.incumbent.average_precision.toFixed(4)} → {snapshot.holdout.challenger.average_precision.toFixed(4)}</dd></div><div><dt>ROC AUC</dt><dd>{snapshot.holdout.incumbent.roc_auc.toFixed(4)} → {snapshot.holdout.challenger.roc_auc.toFixed(4)}</dd></div><div><dt>Brier score</dt><dd>{snapshot.holdout.incumbent.brier_score.toFixed(4)} → {snapshot.holdout.challenger.brier_score.toFixed(4)}</dd></div><div><dt>Rows · positives</dt><dd>{snapshot.holdout.challenger.rows} · {snapshot.holdout.challenger.positives}</dd></div></dl><p>Every 95% block-bootstrap interval crosses zero; see the full comparison below the chart.</p></article>
+        <article><h3>Selection protocol</h3><dl><div><dt>Candidates screened</dt><dd>{selection.candidate_count}</dd></div><div><dt>Selected mapper</dt><dd>{String(selection.selected_candidate.name ?? '—')}</dd></div><div><dt>Primary metric</dt><dd>{selection.primary_selection_metric}</dd></div><div><dt>Development cutoff</dt><dd>{selection.development_last_date}</dd></div><div><dt>Strict cutoff</dt><dd>{selection.strict_cutoff}</dd></div></dl><p>Selection used pre-{selection.strict_cutoff} data only; the {snapshot.holdout.period} window is the locked evaluation.</p></article>
+      </div>,
+      'data-market': <div className="evidence-grid">
+        <article><h3>Snapshot provenance</h3><dl><div><dt>Archive</dt><dd>{snapshot.source.archive}</dd></div><div><dt>Archive date</dt><dd>{snapshot.source.archiveDate}</dd></div><div><dt>Browser snapshot</dt><dd>{snapshot.source.snapshotDate}</dd></div><div><dt>Score as of</dt><dd>{score.asOfDate}</dd></div></dl><p>Derived from {snapshot.source.comparisonArtifact} and {snapshot.source.oosArtifact}. The Python/joblib model is never shipped to the browser.</p></article>
+        <article><h3>Market data</h3><dl><div><dt>Source</dt><dd>{activeAsset.dataSourceLabel}</dd></div><div><dt>Latest candle</dt><dd>{quoteDate}</dd></div><div><dt>Volume</dt><dd>{formatMarketCap(marketData.volume24h)}</dd></div><div><dt>Instrument</dt><dd>{activeAsset.instrumentLabel}</dd></div></dl><p>VOO data is shared with the S&P 500 tab and hydrated once per session.</p></article>
+        <article><h3>Known limitations</h3><ol className="crisis-evidence-list">{snapshot.knownLimitations.slice(0, 3).map((limitation) => <li key={limitation}>{limitation}</li>)}</ol><p>The full list is in the crisis risk context panel.</p></article>
+      </div>,
+    };
+  }, [crisisAssessment, currentPrice, priceChange24h, annualizedVol, volRisk, quoteDate, activeAsset, marketData.volume24h]);
   const overlayControls: OverlayControl[] = [
     { id: 'sma', label: 'Moving average', group: 'Price', checked: showSMA, onChange: () => setShowSMA(!showSMA), description: 'Show the simple moving average.' },
     { id: 'volume', label: 'Volume', group: 'Price', checked: showVolume, onChange: () => setShowVolume(!showVolume), description: 'Show daily trading volume.' },
@@ -334,7 +365,7 @@ export default function App() {
     <div className="h-screen flex flex-col overflow-hidden bg-[#070806] text-zinc-50 font-sans selection:bg-amber-400/30">
       <a href="#forecast-workspace" className="skip-link">Skip to forecast workspace</a>
       <header className="workspace-header"><div className="brand"><span aria-hidden="true">₿</span><div><h1>Block Signal</h1><p>{activeAsset.subtitle}</p></div></div>
-        <MarketBar assets={MARKET_ASSETS} activeId={activeAssetId} onChange={setActiveAssetId} quoteDate={marketData.ohlcv.at(-1)!.date} status={marketStatusByAsset[activeAssetId]} />
+        <MarketBar assets={MARKET_ASSETS} activeId={activeAssetId} onChange={setActiveAssetId} quoteDate={quoteDate} status={marketStatusByAsset[activeAssetId]} />
       </header>
 
       <main id="forecast-workspace" tabIndex={-1} className="flex-1 min-h-0 overflow-y-auto">
@@ -342,6 +373,10 @@ export default function App() {
 
         {/* Main Content */}
         <div className="flex flex-col gap-4 md:gap-5 order-1 min-h-0">
+          {crisisAssessment ? <>
+          <CrisisSummary assessment={crisisAssessment} />
+          <CrisisChartPanel history={crisisAssessment.snapshot.oosHistory} watchThreshold={crisisAssessment.score.deploymentThresholds.watch} highThreshold={crisisAssessment.score.deploymentThresholds.high} eventCount={crisisAssessment.snapshot.events.count} />
+          </> : <>
           <ForecastSummary current={currentPrice ? formatPrice(currentPrice) : '—'} median={forecastPrice ? formatPrice(forecastPrice) : '—'} move={`${forecastChange >= 0 ? '+' : ''}${forecastChange.toFixed(1)}%`} probability={adjustedProbabilityForecast ? formatUnsignedPercent(adjustedProbabilityForecast.probabilityUp) : undefined} lower={adjustedProbabilityForecast ? formatPrice(adjustedProbabilityForecast.q10) : undefined} upper={adjustedProbabilityForecast ? formatPrice(adjustedProbabilityForecast.q90) : undefined} horizonLabel={formatHorizonLabel(horizon)} />
           <ForecastControls horizon={horizon} options={HORIZON_OPTIONS} confidence={confidenceLevel} confidenceLabel={coefficientAwareCalibrationLabel(horizon, 'Interval Band', activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)} trustCopy={coefficientStabilityTrustCopy(horizon, activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)} busy={isGenerating} onHorizon={setHorizon} onConfidence={(value) => setConfidenceLevel(value as keyof typeof CONFIDENCE_Z_SCORES)} onRefresh={handleRunForecast} />
           <ChartPanel title={activeAsset.chartTitle} subtitle={`${activeAsset.instrumentLabel}. Forecast auto-refreshes when horizon or interval changes.`} range={timeRange} onRange={setTimeRange} isPlaying={isPlaying} busy={isGenerating} onPlayToggle={isPlaying ? handleStop : handlePlay} settingsTriggerRef={chartSettingsTriggerRef} settingsOpen={chartSettingsOpen} onOpenSettings={() => setChartSettingsOpen(true)}>
@@ -349,11 +384,12 @@ export default function App() {
               <ForecastChart data={activeDisplayData} showSMA={showSMA} showVolume={showVolume} showModelLine={showModelLine} showScenarios={showScenarios} showFloorLine={showFloorLine} showPeakLine={showPeakLine} showHeatmap={showHeatmap} heatmapData={heatmapData} showBuyZones={showBuyZones} buyZones={buyZoneSummary?.zones ?? []} timeRange={timeRange} playbackIndex={playbackIndex} mvrvData={mvrvZScoreData} showMVRV={showMVRV} showBitcoinOverlays={canShowBitcoinOverlays} probabilityForecast={adjustedProbabilityForecast} />
             </motion.div>
           </ChartPanel>
+          </>}
         </div>
 
-        {activeAssetId === 'sp500-crisis' && <CrisisRiskPanel quoteDate={marketData.ohlcv.at(-1)!.date} />}
+        {crisisAssessment && <CrisisRiskPanel quoteDate={quoteDate} assessment={crisisAssessment} />}
 
-        <EvidencePanel panels={{
+        <EvidencePanel panels={crisisEvidencePanels ?? {
           overview: <div className="evidence-grid">
             <article><h3>Market snapshot</h3><dl><div><dt>24h change</dt><dd>{priceChange24h >= 0 ? '+' : ''}{priceChange24h.toFixed(2)}%</dd></div><div><dt>30D annualized volatility</dt><dd>{annualizedVol.toFixed(1)}% · {volRisk}</dd></div><div><dt>Instrument</dt><dd>{activeAsset.instrumentLabel}</dd></div></dl></article>
             {latestBuyZone && primaryBuyZoneBacktest && <article><h3>Buy-zone context <small>context only</small></h3><dl><div><dt>Bottom score</dt><dd>{(latestBuyZone.bottomScore * 100).toFixed(1)} / 70</dd></div><div><dt>Status</dt><dd>{latestBuyZone.isHeavyBuy ? 'Heavy buy active' : 'Inactive'}</dd></div><div><dt>Backtest 1Y median</dt><dd>{formatSignedPercent(primaryBuyZoneBacktest.medianReturn1y ?? 0, 0)}</dd></div></dl><p>Historical context only; not applied as a forecast override.</p></article>}

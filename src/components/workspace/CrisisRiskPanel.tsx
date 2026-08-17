@@ -1,7 +1,8 @@
-import { getCurrentCrisisRisk, type CrisisRiskAssessment, type CrisisRiskZone } from '../../lib/sp500CrisisModel';
+import { getCurrentCrisisRisk, type CrisisRiskAssessment } from '../../lib/sp500CrisisModel';
 
 interface CrisisRiskPanelProps {
   quoteDate: string;
+  assessment?: CrisisRiskAssessment;
 }
 
 const metricRows = [
@@ -23,22 +24,8 @@ function formatInterval(interval: [number, number]): string {
   return `[${formatSignedPercent(interval[0])}, ${formatSignedPercent(interval[1])}]`;
 }
 
-function zoneClass(zone: CrisisRiskZone): string {
-  return `crisis-zone-${zone.toLowerCase()}`;
-}
-
-function historyPolyline(assessment: CrisisRiskAssessment): string {
-  const history = assessment.snapshot.oosHistory;
-  const denominator = Math.max(1, history.length - 1);
-  return history.map((point, index) => {
-    const x = (index / denominator) * 100;
-    const y = 100 - point.challengerDeploymentProbability * 100;
-    return `${x.toFixed(2)},${y.toFixed(2)}`;
-  }).join(' ');
-}
-
-export function CrisisRiskPanel({ quoteDate }: CrisisRiskPanelProps) {
-  const assessment = getCurrentCrisisRisk(quoteDate);
+export function CrisisRiskPanel({ quoteDate, assessment: provided }: CrisisRiskPanelProps) {
+  const assessment = provided ?? getCurrentCrisisRisk(quoteDate);
   const { snapshot, score } = assessment;
   const { deploymentThresholds } = score;
   const history = snapshot.oosHistory;
@@ -46,8 +33,6 @@ export function CrisisRiskPanel({ quoteDate }: CrisisRiskPanelProps) {
   const uncertainty = holdout.uncertainty;
   const firstHistoryDate = history[0].date;
   const lastHistoryDate = history.at(-1)!.date;
-  const watchY = 100 - deploymentThresholds.watch * 100;
-  const highY = 100 - deploymentThresholds.high * 100;
 
   return (
     <section className="crisis-risk-panel" aria-labelledby="crisis-risk-title">
@@ -60,19 +45,14 @@ export function CrisisRiskPanel({ quoteDate }: CrisisRiskPanelProps) {
       </header>
 
       <div className="crisis-risk-grid">
-        <article className={`crisis-current-card ${zoneClass(assessment.zone)}`} aria-labelledby="crisis-current-title">
-          <div className="crisis-card-heading">
-            <div>
-              <p className="eyebrow">Operational zone</p>
-              <h3 id="crisis-current-title" aria-live="polite">{assessment.zone}</h3>
-            </div>
-            <span className="crisis-score-label">V2 deployment score</span>
-          </div>
-          <strong className="crisis-primary-score">{formatPercent(score.challengerDeploymentProbability)}</strong>
+        <article className="crisis-current-card" aria-labelledby="crisis-current-title">
+          <p className="eyebrow">Score provenance</p>
+          <h3 id="crisis-current-title">How the {formatPercent(score.challengerDeploymentProbability)} score was produced</h3>
           <dl className="crisis-score-list">
-            <div><dt>Incumbent probability</dt><dd>{formatPercent(score.incumbentProbability)}</dd></div>
+            <div><dt>Base raw probability (external classifier)</dt><dd>{formatPercent(score.baseRawProbability)}</dd></div>
+            <div><dt>Incumbent mapper output</dt><dd>{formatPercent(score.incumbentProbability)}</dd></div>
             <div><dt>Challenger evaluation probability</dt><dd>{formatPercent(score.challengerEvaluationProbability)}</dd></div>
-            <div><dt>Base raw probability</dt><dd>{formatPercent(score.baseRawProbability)}</dd></div>
+            <div><dt>Challenger deployment probability</dt><dd>{formatPercent(score.challengerDeploymentProbability)}</dd></div>
             <div><dt>Score as of</dt><dd><time dateTime={score.asOfDate}>{score.asOfDate}</time></dd></div>
             <div><dt>Active VOO quote through</dt><dd><time dateTime={assessment.quoteDate}>{assessment.quoteDate}</time></dd></div>
           </dl>
@@ -102,24 +82,11 @@ export function CrisisRiskPanel({ quoteDate }: CrisisRiskPanelProps) {
         <div className="crisis-section-heading">
           <div>
             <p className="eyebrow">Out-of-sample history</p>
-            <h3 id="crisis-history-title">Weekly challenger-risk history</h3>
+            <h3 id="crisis-history-title">Weekly challenger-risk observations</h3>
           </div>
           <p>{history.length.toLocaleString()} observations · {firstHistoryDate} to {lastHistoryDate}</p>
         </div>
-        <p className="crisis-context-copy">The line is the imported challenger deployment probability. It is not a new forecast and does not change the shared VOO price path.</p>
-        <figure className="crisis-history-figure" aria-labelledby="crisis-history-title crisis-history-caption">
-          <svg viewBox="0 0 100 100" role="img" aria-label={`Imported weekly challenger deployment probability from ${firstHistoryDate} to ${lastHistoryDate}`} preserveAspectRatio="none">
-            <line x1="0" x2="100" y1={watchY} y2={watchY} className="crisis-threshold-line crisis-threshold-line-watch" vectorEffect="non-scaling-stroke" />
-            <line x1="0" x2="100" y1={highY} y2={highY} className="crisis-threshold-line crisis-threshold-line-high" vectorEffect="non-scaling-stroke" />
-            <polyline points={historyPolyline(assessment)} className="crisis-history-line" vectorEffect="non-scaling-stroke" fill="none" />
-          </svg>
-          <figcaption id="crisis-history-caption">
-            <span>WATCH {formatPercent(deploymentThresholds.watch)}</span>
-            <span>HIGH {formatPercent(deploymentThresholds.high)}</span>
-            <span>{firstHistoryDate}</span>
-            <span>{lastHistoryDate}</span>
-          </figcaption>
-        </figure>
+        <p className="crisis-context-copy">Same series as the chart above, as raw numbers. Probabilities are imported, not recomputed, and do not change the shared VOO price path.</p>
         <details className="crisis-history-fallback">
           <summary>Accessible data table ({history.length.toLocaleString()} weekly observations)</summary>
           <div className="crisis-table-scroll">
