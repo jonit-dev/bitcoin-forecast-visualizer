@@ -31,7 +31,7 @@ for (const viewport of [viewports[0], viewports[3]]) {
     await page.getByRole('tab', { name: 'Crisis' }).click();
     await expect(page.getByRole('region', { name: 'Crisis summary' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Crisis probability chart' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Crisis probability history' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'VOO vs crisis probability' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Crisis risk context' })).toBeVisible();
     await expect(page.getByText('SHADOW MODE · NOT PROMOTED')).toBeVisible();
     // The price forecast lives on the S&P 500 tab only.
