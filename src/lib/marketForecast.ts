@@ -10,6 +10,15 @@ import {
   type ForecastPathPolicy,
 } from './data';
 import { FORECAST_PATH_GENERATOR_VERSION, forecastDataVersion, forecastPathSeed } from './forecastPathSeed';
+import {
+  buildCsrProjection,
+  computeCsrEndpoint,
+  csrLogScaleAtDay,
+  csrMedianLogReturnAtDay,
+  isCsrV1Horizon,
+  type CsrProjection,
+} from './csrV1';
+import { GOLD_365_V2_HORIZON_DAYS, buildGold365Forecast, shouldUseGold365V2 } from './gold365V2';
 
 export interface MarketAssetConfig {
   id: MarketAssetId;
@@ -183,6 +192,18 @@ interface GenericModelInputs {
   returns: number[];
   drift: number;
   dailyVol: number;
+  /**
+   * Causal Session-Residual v1 anchors for the S&P 500 surface. Null means the
+   * challenger failed its own validity checks, in which case every consumer
+   * below falls back to the incumbent constant-drift calendar-day path.
+   */
+  csr?: CsrProjection | null;
+  /**
+   * Daily log drift that reproduces a horizon-specific endpoint forecast, used
+   * for the median line, its interval and the heatmap. The stochastic traces
+   * keep `drift` so their horizon-prefix contract is unaffected.
+   */
+  medianDrift?: number;
 }
 
 function quantileInterpolated(values: number[], q: number): number {
@@ -344,7 +365,8 @@ function generateGenericStochasticTraces(
   drift: number,
   dailyVol: number,
   returns: number[],
-  pathPolicy: ForecastPathPolicy
+  pathPolicy: ForecastPathPolicy,
+  csr: CsrProjection | null = null
 ): Map<string, number[]> {
   const traces = new Map<string, number[]>();
   const last = ohlcv[ohlcv.length - 1];
@@ -370,6 +392,18 @@ function generateGenericStochasticTraces(
 
   for (let day = 1; day <= horizon; day++) {
     const date = dateKey(addUtcDays(lastDate, day));
+    // Under CSR the path advances only on market sessions; weekend and holiday
+    // rows carry the previous price. The anchor curve is already a log-return
+    // forecast, so no second -sigma^2/2 correction is applied on top of it.
+    const anchorIncrement = csr
+      ? csrMedianLogReturnAtDay(csr, day) - csrMedianLogReturnAtDay(csr, day - 1)
+      : null;
+    const isSession = !csr || csr.sessionsByCalendarDay[day] > csr.sessionsByCalendarDay[day - 1];
+    if (csr && !isSession) {
+      traces.set(date, [...prices]);
+      continue;
+    }
+
     for (let i = 0; i < prices.length; i++) {
       const rng = pathPolicy === 'prefix-stable-v1'
         ? rngs[i]
@@ -386,7 +420,9 @@ function generateGenericStochasticTraces(
       } else {
         innovation = dailyVol * normalFromRng(rng);
       }
-      prices[i] *= Math.exp(drift - 0.5 * dailyVol * dailyVol + innovation);
+      prices[i] *= anchorIncrement === null
+        ? Math.exp(drift - 0.5 * dailyVol * dailyVol + innovation)
+        : Math.exp(anchorIncrement + innovation);
     }
     traces.set(date, [...prices]);
   }
@@ -410,22 +446,26 @@ function selectPrimaryTraceIndex(rows: any[]): number {
 
   let best = { index: 0, score: Number.POSITIVE_INFINITY };
   for (let index = 0; index < traceCount; index++) {
+    // Scored against the horizon-independent reference path, never the displayed
+    // median: a horizon-specific median (gold 365d) would otherwise reselect the
+    // primary trace and rewrite a prefix the user has already seen.
+    const referenceOf = (row: any): number => row.traceReference ?? row.close;
     const validRows = rows.filter((row) =>
       Number.isFinite(row.stochasticTraces?.[index]) &&
       Number.isFinite(row.floorPriceModel) &&
-      Number.isFinite(row.close)
+      Number.isFinite(referenceOf(row))
     );
     if (validRows.length === 0) continue;
 
     const breaches = validRows.filter((row) => row.stochasticTraces[index] < row.floorPriceModel).length;
     const avgMedianDistance = validRows.reduce(
-      (sum, row) => sum + Math.abs(Math.log(row.stochasticTraces[index] / row.close)),
+      (sum, row) => sum + Math.abs(Math.log(row.stochasticTraces[index] / referenceOf(row))),
       0
     ) / validRows.length;
     const first = validRows[0];
     const terminal = validRows[validRows.length - 1];
-    const firstDistance = Math.abs(Math.log(first.stochasticTraces[index] / first.close));
-    const terminalDistance = Math.abs(Math.log(terminal.stochasticTraces[index] / terminal.close));
+    const firstDistance = Math.abs(Math.log(first.stochasticTraces[index] / referenceOf(first)));
+    const terminalDistance = Math.abs(Math.log(terminal.stochasticTraces[index] / referenceOf(terminal)));
     const breachRate = breaches / validRows.length;
     const score = avgMedianDistance + breachRate * 0.2 + firstDistance * 0.8 + terminalDistance * 0.25;
     if (score < best.score) best = { index, score };
@@ -474,8 +514,19 @@ function processGenericData(
   supportAwarePrimaryTrace = false,
   pathPolicy: ForecastPathPolicy = 'production-baseline'
 ): any[] {
-  const { returns, drift, dailyVol } = modelInputs;
-  const tracesByDate = generateGenericStochasticTraces(assetId, ohlcv, horizon, drift, dailyVol, returns, pathPolicy);
+  const { returns, drift, dailyVol, csr = null } = modelInputs;
+  const tracesByDate = generateGenericStochasticTraces(assetId, ohlcv, horizon, drift, dailyVol, returns, pathPolicy, csr);
+  // Anchors are horizon-independent, so the median at day d never depends on the
+  // selected horizon and switching 90d -> 180d preserves the whole 90d prefix.
+  const medianDrift = modelInputs.medianDrift ?? drift;
+  const medianLogReturnAt = (day: number): number =>
+    csr ? csrMedianLogReturnAtDay(csr, day) : medianDrift * day;
+  // Same curve minus any horizon-specific override, so trace selection stays
+  // identical whichever horizon the user asked for.
+  const referenceLogReturnAt = (day: number): number =>
+    csr ? csrMedianLogReturnAtDay(csr, day) : drift * day;
+  const logScaleAt = (day: number): number =>
+    csr ? csrLogScaleAtDay(csr, day) : dailyVol * Math.sqrt(day);
   const latestChannel = [...channelBounds].reverse().find((point) =>
     point.lowerResidual !== null && point.upperResidual !== null
   );
@@ -503,11 +554,11 @@ function processGenericData(
 
   for (let day = 1; day <= horizon; day++) {
     const date = dateKey(addUtcDays(lastDate, day));
-    const prevMedian = day === 1 ? last.close : last.close * Math.exp(drift * (day - 1));
-    const median = last.close * Math.exp(drift * day);
+    const prevMedian = day === 1 ? last.close : last.close * Math.exp(medianLogReturnAt(day - 1));
+    const median = last.close * Math.exp(medianLogReturnAt(day));
     const representativeClose = median;
     const representativeOpen = prevMedian;
-    const sigma = dailyVol * Math.sqrt(day);
+    const sigma = logScaleAt(day);
     const rangeLow = median * Math.exp(-confidenceZ * sigma);
     const rangeHigh = median * Math.exp(confidenceZ * sigma);
     const candleSpread = Math.max(0.001, dailyVol * 0.25);
@@ -536,6 +587,7 @@ function processGenericData(
       floorPriceModel: lowerBound,
       peakPriceModel: upperBound,
       stochasticTraces: tracesByDate.get(date),
+      traceReference: last.close * Math.exp(referenceLogReturnAt(day)),
       sma20: null,
       sma50: null,
     });
@@ -563,7 +615,8 @@ function generateGenericHeatmapData(
   const last = ohlcv[ohlcv.length - 1];
   if (!last || horizon < 1) return [];
 
-  const { drift, dailyVol } = modelInputs;
+  const { dailyVol, csr = null } = modelInputs;
+  const drift = modelInputs.medianDrift ?? modelInputs.drift;
   const lastDate = new Date(`${last.date}T00:00:00Z`);
   const rng = mulberry32(0x500500 + horizon * 53 + ohlcv.length);
   const sampleStep = horizon <= 90 ? 1 : horizon <= 365 ? 2 : horizon <= 1825 ? 5 : 10;
@@ -576,11 +629,23 @@ function generateGenericHeatmapData(
   const sampledSet = new Set(sampledDays);
   const results = new Float64Array(numSimulations * sampledCount);
 
+  // Gaussian innovations centred on the same anchor increments the summary card
+  // uses, so the heatmap and the quantile band cannot drift apart.
+  const anchorIncrements = csr
+    ? Array.from({ length: horizon + 1 }, (_, day) =>
+        day === 0 ? 0 : csrMedianLogReturnAtDay(csr, day) - csrMedianLogReturnAtDay(csr, day - 1))
+    : null;
+
   for (let sim = 0; sim < numSimulations; sim++) {
     let price = last.close;
     let sampleIndex = 0;
     for (let day = 1; day <= horizon; day++) {
-      price *= Math.exp(drift - 0.5 * dailyVol * dailyVol + dailyVol * normalFromRng(rng));
+      if (anchorIncrements) {
+        const isSession = csr!.sessionsByCalendarDay[day] > csr!.sessionsByCalendarDay[day - 1];
+        if (isSession) price *= Math.exp(anchorIncrements[day] + dailyVol * normalFromRng(rng));
+      } else {
+        price *= Math.exp(drift - 0.5 * dailyVol * dailyVol + dailyVol * normalFromRng(rng));
+      }
       if (sampledSet.has(day)) results[sim * sampledCount + sampleIndex++] = price;
     }
   }
@@ -628,8 +693,30 @@ function computeGenericProbabilityForecast(
   const last = ohlcv[ohlcv.length - 1];
   if (!last || horizonDays < 1 || ohlcv.length < 252) return null;
 
-  const { drift, dailyVol } = modelInputs;
+  const { dailyVol, csr = null } = modelInputs;
+  const drift = modelInputs.medianDrift ?? modelInputs.drift;
   const targetDate = dateKey(addUtcDays(new Date(`${last.date}T00:00:00Z`), horizonDays));
+
+  if (csr && isCsrV1Horizon(horizonDays)) {
+    const endpoint = computeCsrEndpoint(csr.origin, csr.anchors, horizonDays, 1.6448536269514722);
+    if (endpoint) {
+      const z80 = 1.2815515655446004;
+      const probabilityUp = Math.min(0.99, Math.max(0.01, endpoint.probabilityUp));
+      return {
+        horizonDays,
+        targetDate,
+        median: endpoint.medianPrice,
+        probabilityUp,
+        q05: endpoint.lowerPrice,
+        q10: endpoint.medianPrice * Math.exp(-z80 * endpoint.logScale),
+        q90: endpoint.medianPrice * Math.exp(z80 * endpoint.logScale),
+        q95: endpoint.upperPrice,
+        calibrationLabel: 'Session-residual interval',
+        verdict: probabilityUp > 0.57 ? 'Upside-biased scenario' : probabilityUp < 0.43 ? 'Downside-biased scenario' : 'Balanced distribution',
+      };
+    }
+  }
+
   const median = last.close * Math.exp(drift * horizonDays);
   const sigma = dailyVol * Math.sqrt(horizonDays);
   const q05 = median * Math.exp(-1.6448536269514722 * sigma);
@@ -678,7 +765,16 @@ export function buildMarketForecast(
   }
 
   if (assetId === 'gold') {
-    const modelInputs = computeGoldModelInputs(marketData.ohlcv);
+    const baselineGold = computeGoldModelInputs(marketData.ohlcv);
+    // Horizon-specific promotion: the direct Ridge challenger only cleared its
+    // gate at 365 days, so every other horizon keeps the momentum baseline. A
+    // null forecast (short snapshot, stale macro cache) also keeps the baseline.
+    const gold365 = shouldUseGold365V2(horizon)
+      ? buildGold365Forecast(marketData.ohlcv, baselineGold.dailyVol)
+      : null;
+    const modelInputs: GenericModelInputs = gold365
+      ? { ...baselineGold, medianDrift: gold365.logReturn / GOLD_365_V2_HORIZON_DAYS }
+      : baselineGold;
     return {
       displayData: processGenericData(
         'gold',
@@ -696,12 +792,28 @@ export function buildMarketForecast(
         marketData.ohlcv,
         horizon,
         modelInputs,
-        'Slow momentum interval'
+        gold365 ? 'Direct 1Y ridge interval' : 'Slow momentum interval'
       ),
     };
   }
 
-  const modelInputs = computeSP500ModelInputs(marketData.ohlcv);
+  const baselineInputs = computeSP500ModelInputs(marketData.ohlcv);
+  const lastSession = marketData.ohlcv[marketData.ohlcv.length - 1];
+  const modelInputs: GenericModelInputs = {
+    ...baselineInputs,
+    csr: lastSession
+      ? buildCsrProjection(
+          marketData.ohlcv,
+          {
+            spot: lastSession.close,
+            mu: baselineInputs.drift,
+            sigma: baselineInputs.dailyVol,
+            expandingEquityPremium: baselineInputs.expandingEquityPremium,
+          },
+          horizon
+        )
+      : null,
+  };
   return {
     displayData: processGenericData(
       'sp500',
