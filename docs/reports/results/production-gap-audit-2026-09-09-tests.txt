@@ -1,0 +1,74 @@
+
+> react-example@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.9 /home/joao/projects/bitcoin-forecast-visualizer
+
+(node:847191) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:849050) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/__tests__/forecastInterval.test.ts (7 tests | 1 failed) 251ms
+     × should produce quantiles identical to the pre-refactor lognormal output 11ms
+ ❯ src/lib/__tests__/forecastUiInvariance.test.ts (3 tests | 1 failed) 905ms
+     × preserves the sp500 180-day, 95% fixture 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/__tests__/forecastInterval.test.ts > residual bootstrap helpers > should produce quantiles identical to the pre-refactor lognormal output
+AssertionError: expected { sigma: 0.13730095856183525, …(11) } to match object { sigma: 0.14216065065934885, …(8) }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "probabilityUp": 0.9308662503989715,
+-   "q025": 93434.5744319942,
+-   "q05": 97715.2607169943,
+-   "q10": 102894.58360510557,
++   "probabilityUp": 0.9375759028497154,
++   "q025": 94328.7738595587,
++   "q05": 98499.47604058584,
++   "q10": 103537.40516761392,
+    "q50": 123456.789,
+-   "q90": 148128.0959227697,
+-   "q95": 155979.5127020502,
+-   "q975": 163125.6827876282,
+-   "sigma": 0.14216065065934885,
++   "q90": 147208.4289297799,
++   "q95": 154737.66321264897,
++   "q975": 161579.31590293892,
++   "sigma": 0.13730095856183525,
+  }
+
+ ❯ src/lib/__tests__/forecastInterval.test.ts:51:22
+     49|   it('should produce quantiles identical to the pre-refactor lognormal…
+     50|     const interval = computePowerLawInterval(goldenInput);
+     51|     expect(interval).toMatchObject({
+       |                      ^
+     52|       sigma: 0.14216065065934885,
+     53|       probabilityUp: 0.9308662503989715,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/__tests__/forecastUiInvariance.test.ts > forecast outputs remain invariant across workspace presentation > preserves the sp500 180-day, 95% fixture
+AssertionError: expected 177.1337 to be close to 177.1338, received difference is 0.00010000000000331966, but expected 5e-7
+ ❯ frozenFixture src/lib/__tests__/forecastUiInvariance.test.ts:20:24
+     18|   expect(ohlcv).toHaveLength(FIXTURES[asset].rows);
+     19|   expect(latest.date).toBe(FIXTURES[asset].end);
+     20|   expect(latest.close).toBeCloseTo(FIXTURES[asset].close, 6);
+       |                        ^
+     21|   return { ...live, ohlcv, currentPrice: latest.close, volume24h: late…
+     22| }
+ ❯ src/lib/__tests__/forecastUiInvariance.test.ts:27:51
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 33 passed (35)
+      Tests  2 failed | 186 passed (188)
+   Start at  16:16:30
+   Duration  32.57s (transform 12.83s, setup 0ms, import 23.99s, tests 85.79s, environment 107.94s)
+

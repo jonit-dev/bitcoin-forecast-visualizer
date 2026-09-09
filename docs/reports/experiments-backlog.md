@@ -1820,3 +1820,15 @@ evaluate the challenger on a new, frozen period with at least one additional
 independent crisis crossing. Promote only if the pre-registered proper-scoring,
 calibration, event-warning, and uncertainty gates pass without changing the
 existing VOO price forecast.
+
+
+## 2026-09-09 — Production candle continuity and forecast integrity audit
+
+- **Status:** Report-only diagnostic; production continuity defect confirmed. No model or data-source promotion.
+- **Hypothesis:** The apparent price jump is missing historical candles at the bundle/runtime boundary, contaminating daily-return forecast inputs rather than a forecast anchor error.
+- **Data/source changes:** None to runtime or tracked source datasets. Diagnostic copy inserts 15 missing Yahoo BTC-USD candles into captured production inputs, preserving the same latest quote; raw comparison and all three asset API responses are preserved.
+- **Validation setup:** Inspect deployed bundle and live market/forecast endpoints; compare calendar continuity; recompute unchanged BTC forecasts at 14/30/90/180/365 days with and without missing candles; run `npm run backtest`, `npm test`, and `npm run lint`; replay failing fixtures using original commit `d1353bf` data.
+- **Report artifacts:** `docs/reports/results/production-gap-audit-2026-09-09.md`, matching `.json`, `-tests.txt`, and `-lint.txt`; `docs/reports/results/backtest-2026-09-09T23-16-33-267Z.md` and `.json`.
+- **Result/verdict:** API truncation to eight candles omits August 18–September 1 for BTC and nine sessions for each ETF. Inserting missing BTC candles reduces daily volatility from 2.60% to 2.12%; median remains unchanged but probabilities/bands change. BTC bundled-data accuracy and robustness gates pass; type checking passes; 186 tests pass and two fail from mutable fixtures (original input replay matches expectations). Production forecasts cannot receive a clean sign-off until continuity is repaired. This is diagnostic evidence, not validated alpha or permission to promote any experimental model.
+- **Rerun criteria:** After candle pagination/backfill, continuity validation, browser/server repair parity, or frozen fixture changes; retain exact source provenance and verify the newly hydrated production inputs.
+- **Next better experiment:** Registered repair validation with a bundle older than eight candles, an outage exceeding seven days, calendar-aware completeness, full browser/server forecast parity, and the existing backtest/regression gates.
