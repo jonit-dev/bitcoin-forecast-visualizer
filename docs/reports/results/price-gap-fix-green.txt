@@ -1,0 +1,10 @@
+
+ RUN  v4.1.9 /home/joao/projects/bitcoin-forecast-visualizer/.worktrees/price-gap-fix
+
+
+ Test Files  37 passed (37)
+      Tests  226 passed (226)
+   Start at  16:46:47
+   Duration  22.01s (transform 11.78s, setup 0ms, import 22.90s, tests 62.52s, environment 54.97s)
+
+EXIT=0

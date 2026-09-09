@@ -15,3 +15,6 @@ export const MARKET_ASSET_REGISTRY: Record<MarketAssetId, AssetConfig> = {
 
 export const MARKET_ASSET_IDS = Object.keys(MARKET_ASSET_REGISTRY) as MarketAssetId[];
 export const REPAIR_LOOKBACK_DAYS = 7;
+// CoinGecko's hourly range payload is only practical for about a month. A
+// longer outage repair reads Yahoo daily history instead.
+export const COINGECKO_HOURLY_MAX_DAYS = 31;

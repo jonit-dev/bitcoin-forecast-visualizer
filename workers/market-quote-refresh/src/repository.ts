@@ -35,6 +35,13 @@ export class MarketQuoteRepository {
     return results.reduce((total, result) => total + (result.meta?.changes ?? 0), 0);
   }
 
+  /** Stored candle dates from `since` onwards, ascending and bounded. */
+  async storedDates(assetId: MarketAssetId, since: string, limit: number): Promise<string[]> {
+    const result = await this.db.prepare('SELECT date FROM market_candles WHERE asset_id = ? AND date >= ? ORDER BY date ASC LIMIT ?')
+      .bind(assetId, since, limit).all<{ date: string }>();
+    return (result.results ?? []).map((row) => row.date);
+  }
+
   latest(assetId: MarketAssetId) {
     return this.db.prepare('SELECT date FROM market_candles WHERE asset_id = ? ORDER BY date DESC LIMIT 1').bind(assetId).first<{ date: string }>();
   }

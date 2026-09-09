@@ -1,4 +1,4 @@
-import { REPAIR_LOOKBACK_DAYS, type AssetConfig } from './assets';
+import { COINGECKO_HOURLY_MAX_DAYS, REPAIR_LOOKBACK_DAYS, type AssetConfig } from './assets';
 import { normalizeCoinGecko, normalizeYahoo, type CanonicalCandle } from './normalize';
 
 const DAY_MS = 86_400_000;
@@ -32,10 +32,17 @@ export async function fetchJson(url: string, fetcher: typeof fetch = fetch, atte
   throw lastError ?? new Error('Source request failed');
 }
 
-export async function fetchAssetCandles(asset: AssetConfig, now = new Date(), fetcher: typeof fetch = fetch): Promise<CanonicalCandle[]> {
-  const from = Math.floor((now.getTime() - REPAIR_LOOKBACK_DAYS * DAY_MS) / 1000);
+/**
+ * Read one asset's candles for the window opening at `since` (UTC date). The
+ * window widens only as far as recovery needs; ordinary runs stay at the
+ * seven-day repair lookback.
+ */
+export async function fetchAssetCandles(asset: AssetConfig, now = new Date(), fetcher: typeof fetch = fetch, since?: string): Promise<CanonicalCandle[]> {
+  const fromMs = since ? Date.parse(`${since}T00:00:00Z`) : now.getTime() - REPAIR_LOOKBACK_DAYS * DAY_MS;
+  const from = Math.floor(fromMs / 1000);
   const to = Math.floor(now.getTime() / 1000);
-  if (asset.source === 'coingecko') {
+  const windowDays = (now.getTime() - fromMs) / DAY_MS;
+  if (asset.source === 'coingecko' && windowDays <= COINGECKO_HOURLY_MAX_DAYS) {
     const base = `https://api.coingecko.com/api/v3/coins/${asset.symbol}/market_chart/range?vs_currency=usd&from=${from}&to=${to}`;
     try {
       const hourly = await fetchJson(`${base}&interval=hourly`, fetcher);
@@ -46,6 +53,8 @@ export async function fetchAssetCandles(asset: AssetConfig, now = new Date(), fe
       return normalizeYahoo({ ...asset, source: 'yahoo', symbol: 'BTC-USD' }, fallback, now);
     }
   }
-  const payload = await fetchJson(`https://query1.finance.yahoo.com/v8/finance/chart/${asset.symbol}?period1=${from}&period2=${to}&interval=1d&events=history&includeAdjustedClose=true`, fetcher);
-  return normalizeYahoo(asset, payload, now);
+  // Bitcoin over a long window, and every ETF, comes from Yahoo daily history.
+  const yahoo = asset.source === 'coingecko' ? { ...asset, source: 'yahoo' as const, symbol: 'BTC-USD' } : asset;
+  const payload = await fetchJson(`https://query1.finance.yahoo.com/v8/finance/chart/${yahoo.symbol}?period1=${from}&period2=${to}&interval=1d&events=history&includeAdjustedClose=true`, fetcher);
+  return normalizeYahoo(yahoo, payload, now);
 }

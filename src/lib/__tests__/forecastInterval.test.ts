@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import btcHistory from '../../data/btc-history.json';
+// Frozen copy of the last 900 BTC rows as of 2026-07-15 (from commit d1353bf).
+// The golden quantiles below are a property of that exact input series, so the
+// test must not drift as live history is refreshed.
+import btcHistory from './fixtures/btc-history-last900-2026-07-15.json';
 import {
   computePowerLawInterval,
   intervalMultiplierForHorizon,
@@ -7,7 +10,7 @@ import {
 } from '../forecastInterval';
 import { DISTRIBUTION_CONFIG, INTERVAL_CONFIG, validateDistributionConfig } from '../modelConfig';
 
-const ohlcv = btcHistory.slice(-900);
+const ohlcv = btcHistory;
 const goldenInput = { ohlcv, horizonDays: 90, median: 123456.789, currentPrice: 100000 };
 
 describe('residual bootstrap helpers', () => {

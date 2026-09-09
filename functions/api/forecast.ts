@@ -97,6 +97,10 @@ export async function onRequestGet(context: { request: Request; env?: MarketData
       refreshedAt: freshness.refreshedAt,
       status: freshness.status,
       runStatus: freshness.runStatus,
+      // Callers need to know the anchor sits on contiguous history, not merely
+      // that a newer candle exists somewhere in the store.
+      observedLatestDate: freshness.observedLatestDate,
+      continuity: freshness.continuity,
     },
     generatedAt: new Date().toISOString(),
   }, { headers: jsonHeaders });

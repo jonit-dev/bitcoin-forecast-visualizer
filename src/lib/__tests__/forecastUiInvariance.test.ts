@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { CONFIDENCE_Z_SCORES } from '../data';
-import { loadMarketData, type MarketData, type MarketAssetId } from '../api';
+import { loadMarketData, type MarketData, type MarketAssetId, type OHLCVData } from '../api';
+// A Yahoo revision moved the 2017-01-03 VOO close from 177.1338 to 177.1337.
+// The fixture below is the original series from commit d1353bf, so the frozen
+// forecast numbers stay a statement about the model, not about the vendor feed.
+import vooThrough20170103 from './fixtures/voo-history-through-2017-01-03.json';
 import { buildMarketForecast } from '../marketForecast';
 
 // Presentation-only workspace changes must not change these frozen forecast fixtures.
@@ -10,9 +14,12 @@ const FIXTURES = {
   gold: { end: '2012-01-03', rows: 1794, close: 155.92, median: 164.42518564681197, q10: 131.41809678805419, q90: 205.72236499962844 },
 } as const;
 
+const FROZEN_HISTORY: Partial<Record<MarketAssetId, OHLCVData[]>> = { sp500: vooThrough20170103 as OHLCVData[] };
+
 function frozenFixture(asset: MarketAssetId): MarketData {
   const live = loadMarketData(asset);
-  const ohlcv = live.ohlcv.filter((row) => row.date <= FIXTURES[asset].end);
+  const source = FROZEN_HISTORY[asset] ?? live.ohlcv;
+  const ohlcv = source.filter((row) => row.date <= FIXTURES[asset].end);
   const latest = ohlcv.at(-1)!;
   const previous = ohlcv.at(-2)!;
   expect(ohlcv).toHaveLength(FIXTURES[asset].rows);
