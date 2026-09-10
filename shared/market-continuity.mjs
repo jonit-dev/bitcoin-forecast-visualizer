@@ -44,6 +44,13 @@ function sortedDates(rows) {
  * Report which expected candles the series is missing from `since` onwards.
  * `lastContiguousDate` is the newest candle reachable without crossing a hole,
  * which is the newest date a daily-return model may safely treat as adjacent.
+ *
+ * `since` selects the anchor candle, it does not assert coverage: a series whose
+ * first row is newer than `since` is measured from that row, because the caller's
+ * window routinely opens before the history it holds. Callers must therefore pass
+ * the full merged series they intend to render, never a partial page of repair
+ * rows — assessing rows that by construction start after `since` reports any
+ * leading hole as complete.
  */
 export function assessContinuity(assetId, rows, since) {
   const dates = sortedDates(rows);

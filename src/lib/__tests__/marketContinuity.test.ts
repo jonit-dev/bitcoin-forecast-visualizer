@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyContinuityGuard, assessContinuity, repairWindowStart } from '../marketContinuity';
-import type { OHLCVData } from '../api';
+import { loadMarketData, type MarketAssetId, type OHLCVData } from '../api';
 
 const row = (date: string, close: number): OHLCVData => ({ date, open: close, high: close, low: close, close, volume: 1 });
 const series = (dates: string[]) => dates.map((date, index) => row(date, 100 + index));
@@ -84,5 +84,16 @@ describe('calendar-aware candle continuity', () => {
     expect(assessment.truncated).toBe(true);
     expect(assessment.missingDates.length).toBeLessThanOrEqual(400);
     expect(assessment.lastContiguousDate).toBe('2026-07-07');
+  });
+
+  // The guard truncates a series at its last contiguous candle, so a calendar
+  // that calls a real closure a session would silently drop every candle after
+  // it. Unscheduled NYSE closures (Sandy, days of mourning) are only knowable
+  // from a table, so the shipped history is the calendar's regression fixture.
+  it.each(['btc', 'sp500', 'gold'] as MarketAssetId[])('should find the tracked %s history contiguous end to end', (assetId) => {
+    const rows = loadMarketData(assetId).ohlcv;
+    const assessment = assessContinuity(assetId, rows, rows[0].date);
+    expect(assessment.missingDates).toEqual([]);
+    expect(assessment.lastContiguousDate).toBe(rows.at(-1)!.date);
   });
 });

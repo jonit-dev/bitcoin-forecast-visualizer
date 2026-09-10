@@ -32,6 +32,21 @@ function goodFriday(year) {
   return dateKey(new Date(Date.UTC(year, month, day) - 2 * DAY_MS));
 }
 
+// Unscheduled full-day NYSE closures. These are historical facts no rule can
+// derive, and omitting one makes a real closure look like a missing candle:
+// every continuity consumer would then treat the whole series after it as
+// unreachable. `npm test` asserts the tracked datasets stay continuous under
+// this calendar, so a future closure fails there instead of silently freezing
+// the deployed chart. Add the date here when that test goes red.
+const UNSCHEDULED_CLOSURES = new Set([
+  '2001-09-11', '2001-09-12', '2001-09-13', '2001-09-14', // September 11 attacks
+  '2004-06-11', // National day of mourning, Ronald Reagan
+  '2007-01-02', // National day of mourning, Gerald Ford
+  '2012-10-29', '2012-10-30', // Hurricane Sandy
+  '2018-12-05', // National day of mourning, George H. W. Bush
+  '2025-01-09', // National day of mourning, Jimmy Carter
+]);
+
 export function usMarketHolidays(year) {
   const holidays = new Set([
     observed(year, 0, 1), nthWeekday(year, 0, 1, 3), nthWeekday(year, 1, 1, 3), goodFriday(year),
@@ -49,7 +64,8 @@ export function usMarketHolidays(year) {
 export function isUsMarketSessionDay(date) {
   const value = typeof date === 'string' ? new Date(`${date}T00:00:00Z`) : new Date(date);
   const weekday = value.getUTCDay();
-  return weekday !== 0 && weekday !== 6 && !usMarketHolidays(value.getUTCFullYear()).has(dateKey(value));
+  const key = dateKey(value);
+  return weekday !== 0 && weekday !== 6 && !UNSCHEDULED_CLOSURES.has(key) && !usMarketHolidays(value.getUTCFullYear()).has(key);
 }
 
 export function countUsMarketSessionsAfter(fromDate, throughDate) {
