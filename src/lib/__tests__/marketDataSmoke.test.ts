@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { evaluateMarketSnapshot } from '../../../shared/market-data-smoke.mjs';
+import { SMOKE_ASSETS, SMOKE_REPAIR_LOOKBACK_DAYS, evaluateMarketSnapshot } from '../../../shared/market-data-smoke.mjs';
+import { MARKET_ASSET_REGISTRY, REPAIR_LOOKBACK_DAYS } from '../../../workers/market-quote-refresh/src/assets';
 
 const candle = (date: string, close: number) => ({ date, open: close, high: close, low: close, close, volume: 1 });
 const snapshot = (overrides: Record<string, any> = {}) => {
@@ -54,5 +55,15 @@ describe('production market data smoke evaluation', () => {
   it('should fail an unavailable status regardless of dates', () => {
     const result = evaluateMarketSnapshot(snapshot({ market: { status: 'unavailable' } }));
     expect(result.ok).toBe(false);
+  });
+
+  // The production check runs under plain node and cannot import the registry,
+  // so it mirrors these values. Silent drift would flip a production verdict.
+  it('should mirror the worker asset contract exactly', () => {
+    expect(SMOKE_REPAIR_LOOKBACK_DAYS).toBe(REPAIR_LOOKBACK_DAYS);
+    expect(Object.keys(SMOKE_ASSETS).sort()).toEqual(Object.keys(MARKET_ASSET_REGISTRY).sort());
+    for (const [assetId, config] of Object.entries(MARKET_ASSET_REGISTRY)) {
+      expect(SMOKE_ASSETS[assetId as keyof typeof SMOKE_ASSETS].staleAfterDays).toBe(config.staleAfterDays);
+    }
   });
 });

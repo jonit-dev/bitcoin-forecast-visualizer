@@ -2,17 +2,17 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { applyContinuityGuard, repairWindowStart } from '../shared/market-continuity.mjs';
-import { evaluateMarketSnapshot } from '../shared/market-data-smoke.mjs';
+import { SMOKE_ASSETS, SMOKE_REPAIR_LOOKBACK_DAYS, evaluateMarketSnapshot } from '../shared/market-data-smoke.mjs';
 
 const baseUrl = (process.env.MARKET_DATA_BASE_URL || process.argv[2] || '').replace(/\/$/, '');
 if (!baseUrl) throw new Error('Set MARKET_DATA_BASE_URL or pass the deployment URL');
 
-const REPAIR_LOOKBACK_DAYS = 7;
-const ASSETS = {
-  btc: { staleAfterDays: 2, history: 'btc-history.json' },
-  sp500: { staleAfterDays: 3, history: 'voo-history.json' },
-  gold: { staleAfterDays: 3, history: 'gld-history.json' },
-};
+// The `since` window and the browser-side merge both come from the LOCAL bundle,
+// so run this against a deployment built from this checkout. Checking a
+// deployment whose `src/data` differs will report a disagreement that is really
+// a version skew, not a production fault.
+const REPAIR_LOOKBACK_DAYS = SMOKE_REPAIR_LOOKBACK_DAYS;
+const ASSETS = SMOKE_ASSETS;
 
 const bundleFor = (file) => JSON.parse(readFileSync(fileURLToPath(new URL(`../src/data/${file}`, import.meta.url)), 'utf8'));
 const today = new Date().toISOString().slice(0, 10);

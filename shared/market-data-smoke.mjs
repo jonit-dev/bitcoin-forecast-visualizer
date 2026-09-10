@@ -2,6 +2,17 @@ import { assessContinuity } from './market-continuity.mjs';
 import { countUsMarketSessionsAfter } from './us-market-calendar.mjs';
 
 const DAY_MS = 86_400_000;
+
+// Mirrors of the worker's asset contract. `scripts/check-production-market-data.mjs`
+// runs under plain node and cannot import the TypeScript registry, so these are
+// duplicated here and pinned against `assets.ts` by `marketDataSmoke.test.ts` --
+// drift would silently flip a production verdict.
+export const SMOKE_REPAIR_LOOKBACK_DAYS = 7;
+export const SMOKE_ASSETS = {
+  btc: { staleAfterDays: 2, history: 'btc-history.json' },
+  sp500: { staleAfterDays: 3, history: 'voo-history.json' },
+  gold: { staleAfterDays: 3, history: 'gld-history.json' },
+};
 const dayAge = (date, today) => Math.floor((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${date}T00:00:00Z`)) / DAY_MS);
 
 /**

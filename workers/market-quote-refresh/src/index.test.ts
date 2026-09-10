@@ -205,6 +205,23 @@ describe('outage backfill', () => {
     expect(windowStartFor(recorded, '/VOO?') >= floor).toBe(true);
   });
 
+  it('should fill only the missing dates when the window widened past the routine repair window', async () => {
+    const now = new Date('2026-07-09T23:15:00Z');
+    const stored = [...dateRange('2026-06-01', '2026-06-14'), ...dateRange('2026-06-18', '2026-07-08')];
+    const db = new MemoryDb().seed('btc', stored);
+    // A candle behind the routine window that the store already has right. The
+    // widened repair reads Yahoo rather than CoinGecko, so restating it here
+    // would plant a provider seam mid-series.
+    db.candles.set('btc/2026-06-20', { assetId: 'btc', date: '2026-06-20', open: 61, high: 62, low: 60, close: 61.5, volume: 7 });
+
+    await runRefresh({ MARKET_QUOTES_DB: db }, now, windowFetch([]));
+
+    expect(db.candles.get('btc/2026-06-20')).toMatchObject({ close: 61.5, volume: 7 });
+    for (const date of dateRange('2026-06-15', '2026-06-17')) expect(db.candles.has(`btc/${date}`)).toBe(true);
+    // Inside the routine window a source revision must still land.
+    expect(db.candles.get('btc/2026-07-05')?.close).toBe(100);
+  });
+
   it('should use daily Yahoo history when the bitcoin window exceeds the CoinGecko hourly range', async () => {
     const now = new Date('2026-07-09T23:15:00Z');
     const db = new MemoryDb().seed('btc', dateRange('2026-01-01', '2026-01-10'));

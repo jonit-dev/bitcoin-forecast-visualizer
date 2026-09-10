@@ -8,9 +8,21 @@ import { countUsMarketSessionsAfter } from '../../shared/us-market-calendar.mjs'
 export interface MarketDataEnv { MARKET_QUOTES_DB?: D1Database }
 export type MarketDataStatus = 'current' | 'delayed' | 'fallback' | 'unavailable';
 export interface RuntimeMarketData {
+  /**
+   * Repair candles after `since`, unguarded and in store order. `latestDate` and
+   * `continuity` describe the guarded merge of these rows with the bundled
+   * history, so `rows` may extend past `latestDate` while a hole is open.
+   * Consumers must merge them into the bundle and guard the result -- assessing
+   * `rows` alone reports a leading hole as complete, because `rows` starts after
+   * `since` by construction.
+   */
   rows: OHLCVData[];
+  /** Newest candle safe to anchor on: the last one reachable without a hole. */
   latestDate: string;
-  /** Newest candle the store holds, even when continuity forced an older anchor. */
+  /**
+   * Newest candle the store holds, even when continuity forced an older anchor.
+   * Equal to `latestDate` on a contiguous series; ahead of it while a hole is open.
+   */
   observedLatestDate: string;
   source: string;
   refreshedAt: string | null;
@@ -90,11 +102,15 @@ export async function readRuntimeMarketData(env: MarketDataEnv, assetId: MarketA
     const merged = mergeMarketRows(bundled, repairRows);
     const guarded = applyContinuityGuard(assetId, merged, windowStart);
     const latestDate = guarded.rows.at(-1)!.date;
+    // From the store's own newest row, not the paged read, so a page budget that
+    // truncated a very long interval still reports the true newest candle.
+    const mergedLatest = merged.at(-1)!.date;
+    const observedLatestDate = latestDb.date > mergedLatest ? latestDb.date : mergedLatest;
     const ageStatus: MarketDataStatus = marketAge(assetId, latestDate) > MARKET_ASSET_REGISTRY[assetId].staleAfterDays ? 'delayed' : 'current';
     return {
       rows: repairRows,
       latestDate,
-      observedLatestDate: merged.at(-1)!.date,
+      observedLatestDate,
       source: latestDb.source,
       refreshedAt: latestDb.ingested_at,
       // An interval with holes is never current: the newest candle is real but

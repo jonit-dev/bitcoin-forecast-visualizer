@@ -12,7 +12,10 @@ export async function onRequestGet(context: { request: Request; env: MarketDataE
     return Response.json({ error: `asset must be one of ${MARKET_ASSET_IDS.join(', ')} and since must be YYYY-MM-DD` }, { status: 400, headers });
   }
   const result = await readRuntimeMarketData(context.env, asset as MarketAssetId, since);
-  const etag = `W/\"${asset}-${result.latestDate}\"`;
+  // `latestDate` is pinned to the last contiguous candle, so while a hole is
+  // open it stays put as the store keeps gaining rows. Keying on it alone would
+  // serve a 304 for a body whose rows and continuity have since changed.
+  const etag = `W/\"${asset}-${since}-${result.latestDate}-${result.observedLatestDate}\"`;
   if (context.request.headers.get('if-none-match') === etag) return new Response(null, { status: 304, headers: { ...headers, etag } });
   return Response.json({ asset, ...result }, { headers: { ...headers, etag } });
 }
