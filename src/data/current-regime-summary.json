@@ -1,17 +1,16 @@
 {
-  "generatedAt": "2026-08-16T05:12:38.532Z",
-  "featureDate": "2026-08-15",
+  "generatedAt": "2026-10-30T19:19:43.956Z",
+  "featureDate": "2026-10-29",
   "regime": {
     "probabilities": {
-      "accumulation-value": 0.30188679245283023,
-      "trend-expansion": 0.07547169811320756,
-      "late-cycle-overheating": 0.07547169811320756,
-      "deleveraging-bear": 0.30188679245283023,
-      "sideways-chop": 0.24528301886792456
+      "accumulation-value": 0.09756097560975609,
+      "trend-expansion": 0.09756097560975609,
+      "late-cycle-overheating": 0.09756097560975609,
+      "deleveraging-bear": 0.39024390243902435,
+      "sideways-chop": 0.31707317073170727
     },
-    "topState": "accumulation-value",
+    "topState": "deleveraging-bear",
     "reasonCodes": [
-      "value-discount",
       "drawdown-or-negative-momentum",
       "low-momentum-low-volatility"
     ],
@@ -21,20 +20,20 @@
     "riskFlag": "two-sided",
     "direction": "both",
     "drivers": [
-      "large-cycle-drawdown"
+      "futures-leverage-crowding"
     ],
-    "intervalMultiplierAdjustment": 1.08
+    "intervalMultiplierAdjustment": 1.06
   },
   "derivativesContext": {
     "source": "Binance USD-M Futures public REST",
-    "sourceDate": "2026-08-14",
-    "openInterestUSD": 6953694869.931596,
-    "openInterestToMarketCap": 0.005506084558719772,
-    "fundingRateDailySum": 0.00015172999999999999,
-    "fundingRateDailyAvg": 0.00005057666666666666,
-    "leverageState": "crowded",
-    "fundingState": "neutral",
-    "insight": "Open interest is elevated, but funding is not chasing price right now.",
+    "sourceDate": "2026-10-28",
+    "openInterestUSD": 7665717402.658,
+    "openInterestToMarketCap": 0.0046934691849780585,
+    "fundingRateDailySum": 0.00021247,
+    "fundingRateDailyAvg": 0.00007082333333333333,
+    "leverageState": "normal",
+    "fundingState": "long-crowded",
+    "insight": "Funding is stretched positive, so long positioning may be crowded.",
     "status": "context-only"
   },
   "networkContext": null
