@@ -1,6 +1,6 @@
 import { CONFIDENCE_Z_SCORES } from '../../src/lib/data';
 import { type MarketAssetId } from '../../src/lib/api';
-import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from '../../src/lib/marketForecast';
+import { buildMarketForecastSummary, getMarketAssetConfig, MARKET_ASSETS } from '../../src/lib/marketForecast';
 import { loadMergedMarketData, type MarketDataEnv } from '../_shared/marketDataRepository';
 
 const VALID_ASSETS = new Set<MarketAssetId>(MARKET_ASSETS.map((asset) => asset.id));
@@ -31,7 +31,7 @@ function parseConfidence(value: string | null): number | null {
   return VALID_CONFIDENCE_LEVELS.includes(confidence) ? confidence : null;
 }
 
-function forecastSummary(result: ReturnType<typeof buildMarketForecast>) {
+function forecastSummary(result: ReturnType<typeof buildMarketForecastSummary>) {
   const forecast = result.probabilityForecast;
   if (!forecast) return null;
   return {
@@ -66,7 +66,8 @@ export async function onRequestGet(context: { request: Request; env?: MarketData
   const asset = getMarketAssetConfig(assetId);
   const { marketData, freshness } = await loadMergedMarketData(context.env ?? {}, assetId);
   const confidenceZ = CONFIDENCE_Z_SCORES[confidence as keyof typeof CONFIDENCE_Z_SCORES];
-  const result = buildMarketForecast(assetId, marketData, horizonDays, confidenceZ);
+  // The response carries no chart or heatmap, so build only the summary.
+  const result = buildMarketForecastSummary(assetId, marketData, horizonDays, confidenceZ);
   const latest = marketData.ohlcv[marketData.ohlcv.length - 1];
 
   return Response.json({

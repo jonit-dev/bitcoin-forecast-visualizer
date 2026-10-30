@@ -4,9 +4,9 @@
  * Patches src/data/mvrv-history.json with missing days from CoinMetrics.
  * Runs automatically as a predev hook before `yarn dev`.
  */
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, renameSync } from 'fs';
 import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '../src/data/btc-history.json');
@@ -138,6 +138,29 @@ async function fetchRecentDailyCandles(fromDateInclusive, toDateInclusive) {
   return candles;
 }
 
+/**
+ * Rebuild the repair window from a source response. `uncovered` lists the dates
+ * neither the response nor the cache can supply; a nonempty list means the
+ * source is incomplete and the caller must keep the cached file as it is.
+ */
+export function mergeRepairCandles(existing, rebuiltTail, repairStart, lastCompletedDate) {
+  const preserved = existing.filter((row) => row.date < repairStart);
+  const rebuiltByDate = new Map(rebuiltTail.map((row) => [row.date, row]));
+  const cachedByDate = new Map(existing.map((row) => [row.date, row]));
+  const rows = [...preserved];
+  const uncovered = [];
+
+  for (let date = repairStart; date <= lastCompletedDate; date = addUtcDays(date, 1)) {
+    // A successful response may still omit dates another provider already got
+    // right, so the cache fills the gaps instead of the window being replaced.
+    const row = rebuiltByDate.get(date) ?? cachedByDate.get(date);
+    if (row) rows.push(row);
+    else uncovered.push(date);
+  }
+
+  return { rows, uncovered };
+}
+
 async function updateBTCData() {
   const existing = JSON.parse(readFileSync(DATA_PATH, 'utf8'));
   const lastDate = existing[existing.length - 1].date;
@@ -164,9 +187,17 @@ async function updateBTCData() {
       return;
     }
 
-    const preserved = existing.filter((row) => row.date < repairStart);
-    const updated = [...preserved, ...rebuiltTail];
-    writeFileSync(DATA_PATH, JSON.stringify(updated));
+    const { rows: updated, uncovered } = mergeRepairCandles(existing, rebuiltTail, repairStart, lastCompletedUtcDate);
+    if (uncovered.length > 0) {
+      console.warn(
+        `[BTC data] Repair response is incomplete (${uncovered.length} uncovered day(s), first ${uncovered[0]}); keeping cached history.`
+      );
+      return;
+    }
+
+    const tempPath = `${DATA_PATH}.tmp`;
+    writeFileSync(tempPath, JSON.stringify(updated));
+    renameSync(tempPath, DATA_PATH);
 
     const repairedDays = rebuiltTail.length;
     const latest = updated[updated.length - 1].date;
@@ -236,4 +267,7 @@ async function updateMVRVData() {
   }
 }
 
-await Promise.all([updateBTCData(), updateMVRVData()]);
+// Importing this module must not fetch or write; `npm run` executes it.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await Promise.all([updateBTCData(), updateMVRVData()]);
+}

@@ -1,5 +1,5 @@
 import { mergeOHLCVRows, withOHLCV, type MarketAssetId, type MarketData, type MarketDataStatus, type OHLCVData } from './api';
-import { applyContinuityGuard, assessContinuity, repairWindowStart, type ContinuityAssessment } from './marketContinuity';
+import { applyContinuityGuard, repairWindowStart, type ContinuityAssessment } from './marketContinuity';
 import { REPAIR_LOOKBACK_DAYS } from '../../workers/market-quote-refresh/src/assets';
 
 export interface MarketDataHydration {
@@ -38,14 +38,17 @@ export async function hydrateMarketData(assetId: MarketAssetId, bundled: MarketD
       continuity: guarded.continuity,
     };
   } catch {
+    // The bundle is the only history available, so it needs the same guard the
+    // successful path and the server apply.
+    const guarded = applyContinuityGuard(assetId, bundled.ohlcv, windowStart);
     return {
-      data: bundled,
-      latestDate: latestBundle.date,
+      data: withOHLCV(bundled, guarded.rows),
+      latestDate: guarded.rows.at(-1)!.date,
       observedLatestDate: latestBundle.date,
       source: 'bundle',
       refreshedAt: null,
       status: 'fallback',
-      continuity: assessContinuity(assetId, bundled.ohlcv, windowStart),
+      continuity: guarded.continuity,
     };
   } finally { clearTimeout(timeout); }
 }

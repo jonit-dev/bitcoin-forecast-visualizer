@@ -1,4 +1,4 @@
-import { loadMarketData, type MarketAssetId, type OHLCVData } from '../../src/lib/api';
+import { loadMarketData, withOHLCV, type MarketAssetId, type OHLCVData } from '../../src/lib/api';
 import { applyContinuityGuard, repairWindowStart, type ContinuityAssessment } from '../../src/lib/marketContinuity';
 import type { D1Database } from '../../workers/market-quote-refresh/src/repository';
 import { MARKET_ASSET_REGISTRY, REPAIR_LOOKBACK_DAYS } from '../../workers/market-quote-refresh/src/assets';
@@ -130,10 +130,6 @@ export async function loadMergedMarketData(env: MarketDataEnv, assetId: MarketAs
   const runtime = await readRuntimeMarketData(env, assetId, windowStart);
   const merged = runtime.status === 'fallback' ? bundled.ohlcv : mergeMarketRows(bundled.ohlcv, runtime.rows);
   const ohlcv = applyContinuityGuard(assetId, merged, windowStart).rows;
-  const latest = ohlcv.at(-1)!;
-  const previous = ohlcv.at(-2);
-  return {
-    marketData: { ...bundled, ohlcv, currentPrice: latest.close, priceChange24h: previous ? ((latest.close - previous.close) / previous.close) * 100 : 0, volume24h: latest.volume },
-    freshness: runtime,
-  };
+  // One derivation path for price, change, volume and capitalization.
+  return { marketData: withOHLCV(bundled, ohlcv), freshness: runtime };
 }

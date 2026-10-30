@@ -1,6 +1,6 @@
 import { CONFIDENCE_Z_SCORES } from '../lib/data';
 import { loadMarketData, type ForecastAssetId } from '../lib/api';
-import { buildMarketForecast, getMarketAssetConfig, MARKET_ASSETS } from '../lib/marketForecast';
+import { buildMarketForecastSummary, getMarketAssetConfig, MARKET_ASSETS } from '../lib/marketForecast';
 import { Controller, Get, type ControllerRequest, type ControllerResponse } from './decorators';
 
 const VALID_ASSETS = new Set<ForecastAssetId>(MARKET_ASSETS.map((asset) => asset.id as ForecastAssetId));
@@ -27,7 +27,7 @@ function parseConfidence(value: unknown): number | null {
   return VALID_CONFIDENCE_LEVELS.includes(confidence) ? confidence : null;
 }
 
-function forecastSummary(result: ReturnType<typeof buildMarketForecast>) {
+function forecastSummary(result: ReturnType<typeof buildMarketForecastSummary>) {
   const forecast = result.probabilityForecast;
   if (!forecast) return null;
   return {
@@ -80,7 +80,9 @@ export class ForecastController {
     const asset = getMarketAssetConfig(assetId);
     const marketData = loadMarketData(assetId);
     const confidenceZ = CONFIDENCE_Z_SCORES[confidence as keyof typeof CONFIDENCE_Z_SCORES];
-    const result = buildMarketForecast(assetId, marketData, horizonDays, confidenceZ);
+    // This response carries no chart or heatmap; building them would block the
+    // single synchronous server process for work the caller discards.
+    const result = buildMarketForecastSummary(assetId, marketData, horizonDays, confidenceZ);
     const latest = marketData.ohlcv[marketData.ohlcv.length - 1];
 
     res.json({

@@ -47,6 +47,19 @@ describe('market data hydration', () => {
     expect(hydrated.status).not.toBe('current');
   });
 
+  it('should anchor the offline bundle on its last contiguous candle, exactly like the server', async () => {
+    // A bundle with a hole must not reach the model with the far side attached:
+    // the daily-return maths would treat two days as one observation.
+    const gapped = bundleOf([row('2026-07-06', 96), row('2026-07-08', 100)]);
+    const hydrated = await hydrateMarketData('btc', gapped, async () => { throw new Error('offline'); });
+
+    expect(hydrated.data.ohlcv).toEqual([row('2026-07-06', 96)]);
+    expect(hydrated.data.currentPrice).toBe(96);
+    expect(hydrated.latestDate).toBe('2026-07-06');
+    expect(hydrated.status).toBe('fallback');
+    expect(hydrated.continuity.missingDates).toEqual(['2026-07-07']);
+  });
+
   it('should request the same repair window the server merges from', async () => {
     const requested: string[] = [];
     const fetcher = (async (input: RequestInfo | URL) => {

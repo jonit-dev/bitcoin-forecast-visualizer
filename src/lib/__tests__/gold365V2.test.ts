@@ -10,7 +10,9 @@ import {
 } from '../gold365V2';
 import { buildMarketForecast, computeGoldModelInputs } from '../marketForecast';
 
-const ohlcv = gldHistory as { date: string; open: number; high: number; low: number; close: number; volume: number }[];
+// Pinned to the frozen snapshot so routine data refreshes cannot move the golden values.
+const ohlcv = (gldHistory as { date: string; open: number; high: number; low: number; close: number; volume: number }[])
+  .filter((row) => row.date <= GOLD_365_V2_GOLDEN.asOf);
 const baseline = computeGoldModelInputs(ohlcv);
 const marketData = { ohlcv } as Parameters<typeof buildMarketForecast>[1];
 
@@ -68,7 +70,9 @@ describe('GLD 365-day ridge challenger', () => {
 
   it('aligns the macro cache to GLD sessions so the one-session lag is exact', () => {
     const rows = (goldMacroHistory as { rows: { date: string }[] }).rows;
-    const tail = ohlcv.slice(ohlcv.length - rows.length).map((row) => row.date);
+    // The live caches, not the pinned snapshot: both must end on the same GLD session.
+    const live = gldHistory as { date: string }[];
+    const tail = live.slice(live.length - rows.length).map((row) => row.date);
     expect(rows.map((row) => row.date)).toEqual(tail);
   });
 

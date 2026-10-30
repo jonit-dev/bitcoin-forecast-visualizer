@@ -111,9 +111,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     });
     seriesRefs.current.forecast = forecastSeries;
 
+    // Forecast part of the model line below: same curve, same style.
     const forecastMedianSeries = chart.addSeries(LineSeries, {
       color: 'rgba(251, 191, 36, 0.95)',
-      lineWidth: 3,
+      lineWidth: 2,
       lineStyle: 0,
       crosshairMarkerVisible: true,
       lastValueVisible: false,
@@ -145,8 +146,8 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     // power-law median. They start a few days before the latest candle so the
     // user can see how sampled paths behaved against recent realized prices.
     seriesRefs.current.stochasticTraces = Array.from({ length: 12 }, (_, index) => chart.addSeries(LineSeries, {
-      color: index === 0 ? 'rgba(251, 191, 36, 0.55)' : 'rgba(251, 191, 36, 0.22)',
-      lineWidth: index === 0 ? 2 : 1,
+      color: index === 0 ? 'rgba(251, 191, 36, 0.3)' : 'rgba(251, 191, 36, 0.22)',
+      lineWidth: 1,
       lineStyle: 0,
       crosshairMarkerVisible: false,
       lastValueVisible: false,
@@ -155,9 +156,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     }));
 
     // Power Law Model Line
+    // History part of the model line; the forecast series continues the same curve.
     const modelLineSeries = chart.addSeries(LineSeries, {
-      color: 'rgba(251, 191, 36, 0.8)', // amber
-      lineWidth: 1,
+      color: 'rgba(251, 191, 36, 0.95)', // amber
+      lineWidth: 2,
       lineStyle: 0,
       crosshairMarkerVisible: false,
       lastValueVisible: false,
@@ -268,7 +270,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma20?.setData(seriesData.sma20Data);
     seriesRefs.current.sma50?.setData(seriesData.sma50Data);
     seriesRefs.current.forecast?.setData(seriesData.forecastData);
-    seriesRefs.current.forecastMedian?.setData(seriesData.forecastMedianData);
+    seriesRefs.current.forecastMedian?.setData(seriesData.modelProjectionData);
     seriesRefs.current.forecastUpper?.setData(seriesData.forecastUpperData);
     seriesRefs.current.forecastLower?.setData(seriesData.forecastLowerData);
     seriesRefs.current.stochasticTraces.forEach((series, traceIndex) => {
@@ -421,10 +423,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma20?.applyOptions({ visible: showSMA });
     seriesRefs.current.sma50?.applyOptions({ visible: showSMA });
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
-    seriesRefs.current.forecastMedian?.applyOptions({ visible: showCoreModelLine && showModelLine });
+    seriesRefs.current.forecastMedian?.applyOptions({ visible: showModelLine });
     seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
-    seriesRefs.current.stochasticTraces.forEach((series, index) => {
-      series.applyOptions({ visible: index === 0 ? showModelLine || showScenarios : showScenarios });
+    seriesRefs.current.stochasticTraces.forEach((series) => {
+      series.applyOptions({ visible: showScenarios });
     });
     seriesRefs.current.floorLine?.applyOptions({ visible: showFloorLine });
     seriesRefs.current.peakLine?.applyOptions({ visible: showPeakLine });

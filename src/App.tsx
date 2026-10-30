@@ -342,7 +342,7 @@ export default function App() {
   const overlayControls: OverlayControl[] = [
     { id: 'sma', label: 'Moving average', group: 'Price', checked: showSMA, onChange: () => setShowSMA(!showSMA), description: 'Show the simple moving average.' },
     { id: 'volume', label: 'Volume', group: 'Price', checked: showVolume, onChange: () => setShowVolume(!showVolume), description: 'Show daily trading volume.' },
-    { id: 'path', label: 'Forecast path', group: 'Forecast', checked: showModelLine, onChange: () => setShowModelLine(!showModelLine), description: 'Show the median forecast path.' },
+    { id: 'path', label: 'Forecast path', group: 'Forecast', checked: showModelLine, onChange: () => setShowModelLine(!showModelLine), description: 'Show the model line through history and forecast.' },
     { id: 'scenarios', label: 'Scenarios', group: 'Forecast', checked: showScenarios, onChange: () => setShowScenarios(!showScenarios), description: 'Show probabilistic scenario paths.' },
     { id: 'floor', label: canShowBitcoinOverlays ? 'Power-law floor' : 'Lower channel', group: 'Forecast', checked: showFloorLine, onChange: () => setShowFloorLine(!showFloorLine), description: 'Show the lower reference boundary.' },
     { id: 'peak', label: canShowBitcoinOverlays ? 'Power-law peak' : 'Upper channel', group: 'Forecast', checked: showPeakLine, onChange: () => setShowPeakLine(!showPeakLine), description: 'Show the upper reference boundary.' },

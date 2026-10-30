@@ -6,7 +6,8 @@
  */
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { isCompletedCandleDate } from '../shared/us-market-calendar.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const VOO_DATA_PATH = join(__dirname, '../src/data/voo-history.json');
@@ -15,8 +16,8 @@ const VOO_FIRST_TRADE_DATE = '2010-09-09';
 const GLD_FIRST_TRADE_DATE = '2004-11-18';
 
 const MARKET_SERIES = [
-  { label: 'VOO', symbol: 'VOO', firstTradeDate: VOO_FIRST_TRADE_DATE, dataPath: VOO_DATA_PATH },
-  { label: 'GLD', symbol: 'GLD', firstTradeDate: GLD_FIRST_TRADE_DATE, dataPath: GLD_DATA_PATH },
+  { assetId: 'sp500', label: 'VOO', symbol: 'VOO', firstTradeDate: VOO_FIRST_TRADE_DATE, dataPath: VOO_DATA_PATH },
+  { assetId: 'gold', label: 'GLD', symbol: 'GLD', firstTradeDate: GLD_FIRST_TRADE_DATE, dataPath: GLD_DATA_PATH },
 ];
 
 function isValidRow(row) {
@@ -41,7 +42,40 @@ function validateSortedRows(rows) {
   }
 }
 
-async function fetchYahooRows({ symbol, firstTradeDate }) {
+/** Daily rows from a Yahoo chart payload, adjusted by the adjusted-close ratio. */
+export function toDailyRows(result, assetId, now = new Date()) {
+  const timestamps = result?.timestamp || [];
+  const quote = result?.indicators?.quote?.[0];
+  const adjClose = result?.indicators?.adjclose?.[0]?.adjclose || [];
+  if (!quote) throw new Error('Yahoo chart response did not include a quote block');
+
+  return timestamps.flatMap((timestamp, index) => {
+    const open = quote.open?.[index];
+    const high = quote.high?.[index];
+    const low = quote.low?.[index];
+    const close = quote.close?.[index];
+    const adjustedClose = adjClose[index];
+    const volume = quote.volume?.[index];
+    if (![open, high, low, close, adjustedClose, volume].every(Number.isFinite) || close <= 0) return [];
+
+    const date = new Date(timestamp * 1000).toISOString().split('T')[0];
+    // A candle for a session that has not closed yet is provisional: its close
+    // and volume still move, so bundling it would feed the model a partial bar.
+    if (!isCompletedCandleDate(assetId, date, now)) return [];
+
+    const adjustment = adjustedClose > 0 ? adjustedClose / close : 1;
+    return [{
+      date,
+      open: +(open * adjustment).toFixed(4),
+      high: +(high * adjustment).toFixed(4),
+      low: +(low * adjustment).toFixed(4),
+      close: +adjustedClose.toFixed(4),
+      volume: Math.round(volume),
+    }];
+  });
+}
+
+async function fetchYahooRows({ symbol, assetId, firstTradeDate }, now = new Date()) {
   const period1 = Math.floor(new Date(`${firstTradeDate}T00:00:00Z`).getTime() / 1000);
   const period2 = Math.floor(Date.now() / 1000);
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=1d&events=history&includeAdjustedClose=true`;
@@ -55,31 +89,9 @@ async function fetchYahooRows({ symbol, firstTradeDate }) {
 
   const json = await res.json();
   const result = json.chart?.result?.[0];
-  const timestamps = result?.timestamp || [];
-  const quote = result?.indicators?.quote?.[0];
-  const adjClose = result?.indicators?.adjclose?.[0]?.adjclose || [];
-  if (!quote || timestamps.length === 0) throw new Error(`Yahoo chart response did not include ${symbol} candles`);
+  if (!result?.timestamp?.length) throw new Error(`Yahoo chart response did not include ${symbol} candles`);
 
-  const rows = timestamps.flatMap((timestamp, index) => {
-    const open = quote.open?.[index];
-    const high = quote.high?.[index];
-    const low = quote.low?.[index];
-    const close = quote.close?.[index];
-    const adjustedClose = adjClose[index];
-    const volume = quote.volume?.[index];
-    if (![open, high, low, close, adjustedClose, volume].every(Number.isFinite) || close <= 0) return [];
-
-    const adjustment = adjustedClose > 0 ? adjustedClose / close : 1;
-    return [{
-      date: new Date(timestamp * 1000).toISOString().split('T')[0],
-      open: +(open * adjustment).toFixed(4),
-      high: +(high * adjustment).toFixed(4),
-      low: +(low * adjustment).toFixed(4),
-      close: +adjustedClose.toFixed(4),
-      volume: Math.round(volume),
-    }];
-  });
-
+  const rows = toDailyRows(result, assetId, now);
   validateSortedRows(rows);
   return rows;
 }
@@ -125,4 +137,5 @@ async function main() {
   }
 }
 
-main();
+// Importing this module must not fetch or write; `npm run` executes it.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

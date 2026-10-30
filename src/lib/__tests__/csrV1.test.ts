@@ -12,8 +12,11 @@ import {
   type CsrOriginInputs,
 } from '../csrV1';
 import { buildMarketForecast, computeSP500ModelInputs } from '../marketForecast';
+import { isUsMarketSessionDay } from '../../../shared/us-market-calendar.mjs';
 
-const ohlcv = vooHistory as { date: string; open: number; high: number; low: number; close: number; volume: number }[];
+// Pinned to the frozen origin so routine data refreshes cannot move the golden values.
+const ohlcv = (vooHistory as { date: string; open: number; high: number; low: number; close: number; volume: number }[])
+  .filter((row) => row.date <= '2026-08-14');
 const last = ohlcv[ohlcv.length - 1];
 const baseline = computeSP500ModelInputs(ohlcv);
 const origin: CsrOriginInputs = {
@@ -87,6 +90,24 @@ describe('CSR v1 forecast surface', () => {
     }
   }, 30_000);
 
+  it('counts sessions with the shared calendar, including unscheduled exchange closures', () => {
+    const sharedCount = (originDate: string) => {
+      let sessions = 0;
+      const cursor = new Date(`${originDate}T00:00:00Z`);
+      for (let day = 1; day <= 7; day += 1) {
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+        if (isUsMarketSessionDay(cursor)) sessions += 1;
+      }
+      return sessions;
+    };
+
+    // 2025-01-09 was the Carter day of mourning; 2012-10-29/30 were the Sandy closures.
+    for (const originDate of ['2025-01-06', '2012-10-24', '2026-08-14']) {
+      expect(csrSessionCounts(originDate)[7]).toBe(sharedCount(originDate));
+    }
+    expect(csrSessionCounts('2025-01-06')[7]).toBe(4);
+  });
+
   it('holds the median flat across non-session calendar days', () => {
     const rows = buildMarketForecast('sp500', marketData, 30, 1.6448536269514722)
       .displayData.filter((row: { isForecast: boolean }) => row.isForecast);
@@ -122,6 +143,21 @@ describe('CSR v1 forecast surface', () => {
       .displayData.filter((row: { isForecast: boolean }) => row.isForecast);
     expect(rows[rows.length - 1].forecast).toBeCloseTo(endpoint.medianPrice, 6);
   });
+
+  it('matches the summary to the rendered path at every accepted horizon, not only the anchors', () => {
+    // The API accepts 1..3650; the chart interpolates CSR at every one of them.
+    for (const horizon of [60, 120, 200]) {
+      const result = buildMarketForecast('sp500', marketData, horizon, 1.6448536269514722);
+      const path = result.displayData.filter((row: { isForecast: boolean }) => row.isForecast).at(-1)!;
+      const summary = result.probabilityForecast!;
+
+      expect(summary.calibrationLabel).toBe('Session-residual interval');
+      expect(summary.targetDate).toBe(path.date);
+      expect(summary.median).toBeCloseTo(path.forecast, 6);
+      expect(summary.q05).toBeCloseTo(path.forecastLower, 6);
+      expect(summary.q95).toBeCloseTo(path.forecastUpper, 6);
+    }
+  }, 60_000);
 
   it('leaves the gold surface on its own model', () => {
     const gold = buildMarketForecast('gold', { ohlcv } as Parameters<typeof buildMarketForecast>[1], 30, 1.6448536269514722);

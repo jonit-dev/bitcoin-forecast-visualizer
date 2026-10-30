@@ -10,6 +10,7 @@ import {
 import {
   blendedPowerLawHeatmapVol,
   computePowerLawInterval,
+  effectiveSigmaScaleForHorizon,
   CONFIDENCE_Z_SCORES,
 } from './forecastInterval';
 import {
@@ -47,7 +48,7 @@ export interface ProbabilityForecast {
 }
 
 export type CoefficientStabilityVerdict = 'stable' | 'watch' | 'unstable';
-export type ForecastPathPolicy = 'production-baseline' | 'prefix-stable-v1';
+export type ForecastPathPolicy = 'production-baseline' | 'prefix-stable-v1' | 'date-keyed-v1';
 export interface CoreAssumptionTrustSummary {
   longHorizonLabel: 'Scenario range' | 'Directional only';
   reason: string;
@@ -132,7 +133,7 @@ export function computeProbabilityForecast(
   };
 }
 
-function mulberry32(seed: number) {
+export function mulberry32(seed: number) {
   return () => {
     let t = seed += 0x6D2B79F5;
     t = Math.imul(t ^ (t >>> 15), t | 1);
@@ -141,7 +142,7 @@ function mulberry32(seed: number) {
   };
 }
 
-function hashStringSeed(value: string): number {
+export function hashStringSeed(value: string): number {
   let hash = 2166136261;
   for (let i = 0; i < value.length; i++) {
     hash ^= value.charCodeAt(i);
@@ -150,7 +151,7 @@ function hashStringSeed(value: string): number {
   return hash >>> 0;
 }
 
-function normalFromRng(rng: () => number): number {
+export function normalFromRng(rng: () => number): number {
   const u1 = Math.max(rng(), 1e-12);
   const u2 = rng();
   return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
@@ -166,7 +167,7 @@ function dateKey(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lookbackDays?: number): number[] {
+function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lookbackDays?: number, epochDays?: number[]): number[] {
   const innovations: number[] = [];
   const startIndex = lookbackDays ? Math.max(1, endIndex - lookbackDays + 1) : 1;
 
@@ -181,9 +182,34 @@ function buildPowerLawInnovationHistory(ohlcv: OHLCVData[], endIndex: number, lo
     if (!Number.isFinite(expected) || expected <= 0) continue;
 
     innovations.push(Math.log(curr.close / expected));
+    epochDays?.push(Math.round(currDate.getTime() / 86400000));
   }
 
   return innovations;
+}
+
+function fmix32(value: number): number {
+  let h = value >>> 0;
+  h = Math.imul(h ^ (h >>> 16), 0x85EBCA6B);
+  h = Math.imul(h ^ (h >>> 13), 0xC2B2AE35);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+
+/** Rendezvous hashing: a target block keeps its source block until that source
+ * leaves the lookback window or a new source outranks it, so consecutive
+ * origins replay the same shocks instead of re-rolling the whole path. */
+function dateKeyedBlockStart(traceIndex: number, targetBlock: number, sourceEpochDays: number[]): number {
+  const base = hashStringSeed(`date-keyed-v1|btc|${traceIndex}|${targetBlock}`);
+  let best = 0;
+  let bestScore = -1;
+  for (let start = 0; start + STOCHASTIC_TRACE_BLOCK_DAYS <= sourceEpochDays.length; start++) {
+    const score = fmix32(base ^ Math.imul(sourceEpochDays[start], 0x9E3779B1));
+    if (score > bestScore) {
+      bestScore = score;
+      best = start;
+    }
+  }
+  return best;
 }
 
 function sampleStandardDeviation(values: number[]): number {
@@ -208,7 +234,8 @@ function generatePowerLawStochasticTraces(
   const lastDate = new Date(ohlcv[lastIndex].date + 'T00:00:00Z');
   const backcastDays = Math.round((lastDate.getTime() - anchorDate.getTime()) / 86400000);
   const totalDays = backcastDays + horizon;
-  const innovations = buildPowerLawInnovationHistory(ohlcv, anchorIndex, STOCHASTIC_TRACE_LOOKBACK_DAYS);
+  const sourceEpochDays: number[] = [];
+  const innovations = buildPowerLawInnovationHistory(ohlcv, anchorIndex, STOCHASTIC_TRACE_LOOKBACK_DAYS, sourceEpochDays);
   if (innovations.length < STOCHASTIC_TRACE_BLOCK_DAYS * 4) return tracesByDate;
 
   const centeredMean = innovations.reduce((sum, value) => sum + value, 0) / innovations.length;
@@ -243,6 +270,7 @@ function generatePowerLawStochasticTraces(
     let price = anchor.close;
     let blockStart = 0;
     let blockOffset = STOCHASTIC_TRACE_BLOCK_DAYS;
+    let keyedBlock = Number.NaN;
 
     for (let day = 1; day <= totalDays; day++) {
       // Future paths must be conditioned on the latest known candle. The 7-day
@@ -256,15 +284,27 @@ function generatePowerLawStochasticTraces(
         continue;
       }
 
-      if (blockOffset >= STOCHASTIC_TRACE_BLOCK_DAYS) {
-        blockStart = Math.floor(pathRng() * Math.max(1, centeredInnovations.length - STOCHASTIC_TRACE_BLOCK_DAYS));
-        blockOffset = 0;
-      }
-
       const prevDate = addUtcDays(anchorDate, day - 1);
       const currDate = addUtcDays(anchorDate, day);
+      let innovation: number;
+      if (pathPolicy === 'date-keyed-v1') {
+        // Shocks belong to calendar dates, not to the origin: 14-day blocks are
+        // aligned to the UTC epoch so every origin draws the same block for a date.
+        const epochDay = Math.round(currDate.getTime() / 86400000);
+        const targetBlock = Math.floor(epochDay / STOCHASTIC_TRACE_BLOCK_DAYS);
+        if (targetBlock !== keyedBlock) {
+          blockStart = dateKeyedBlockStart(pathIndex, targetBlock, sourceEpochDays);
+          keyedBlock = targetBlock;
+        }
+        innovation = centeredInnovations[blockStart + epochDay - targetBlock * STOCHASTIC_TRACE_BLOCK_DAYS];
+      } else {
+        if (blockOffset >= STOCHASTIC_TRACE_BLOCK_DAYS) {
+          blockStart = Math.floor(pathRng() * Math.max(1, centeredInnovations.length - STOCHASTIC_TRACE_BLOCK_DAYS));
+          blockOffset = 0;
+        }
+        innovation = centeredInnovations[blockStart + blockOffset++];
+      }
       const expected = cycleAdjustedPowerLawForecast(currDate, price, prevDate);
-      const innovation = centeredInnovations[blockStart + blockOffset++];
       price = expected * Math.exp(innovation);
       paths[pathIndex][day] = price;
     }
@@ -429,6 +469,22 @@ export function generateHeatmapData(
   return cells;
 }
 
+/**
+ * Cumulative log variance the published BTC interval targets at each calendar
+ * day. It carries the calibrated effective scales and the explicit widening past
+ * 365 days, which a bare mean-reverting residual process cannot reproduce: that
+ * process approaches a variance ceiling while the reported band keeps widening.
+ */
+export function heatmapIntervalLogVariances(ohlcv: OHLCVData[], horizon: number): Float64Array {
+  const dailyVol = blendedPowerLawHeatmapVol(ohlcv);
+  const variances = new Float64Array(horizon + 1);
+  for (let day = 1; day <= horizon; day++) {
+    const sigma = dailyVol * effectiveSigmaScaleForHorizon(day);
+    variances[day] = sigma * sigma;
+  }
+  return variances;
+}
+
 /** Generate the same terminal samples used by the rendered BTC heatmap. */
 export function simulateHeatmapPrices(
   ohlcv: OHLCVData[],
@@ -460,13 +516,23 @@ export function simulateHeatmapPrices(
   const residualShocks = buildSelectedResidualPolicyShocks(ohlcv, horizon, numSimulations, dailyVol, rng);
   const useResidualShocks = residualShocks.length === numSimulations * horizon;
   const prices = new Float64Array(numSimulations * sampledCount);
+  // Scale each shock by the change in the interval's cumulative variance, so the
+  // marginal distribution at every day is the one the summary card publishes.
+  const intervalVariances = heatmapIntervalLogVariances(ohlcv, horizon);
+  const decaySquared = residualDecay * residualDecay;
+  const innovationScale = new Float64Array(horizon + 1);
+  for (let day = 1; day <= horizon; day++) {
+    const variance = Math.max(0, intervalVariances[day] - decaySquared * intervalVariances[day - 1]);
+    innovationScale[day] = dailyVol > 0 ? Math.sqrt(variance) / dailyVol : 1;
+  }
 
   for (let simulation = 0; simulation < numSimulations; simulation++) {
     let sampleIndex = 0;
     const shockOffset = simulation * horizon;
     let residual = Math.log(lastPrice / lastBasePrice);
     for (let day = 1; day <= horizon; day++) {
-      const shock = useResidualShocks ? residualShocks[shockOffset + day - 1] : dailyVol * normalFromRng(rng);
+      const rawShock = useResidualShocks ? residualShocks[shockOffset + day - 1] : dailyVol * normalFromRng(rng);
+      const shock = rawShock * innovationScale[day];
       // The heatmap is the distribution of the median-consistent log process:
       // shocks are centred and no unexplained price-drift correction is added.
       residual = residual * residualDecay + shock;

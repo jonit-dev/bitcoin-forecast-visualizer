@@ -11,7 +11,7 @@
  * Every anchor is computed regardless of the selected UI horizon, which is what
  * keeps the median path prefix-stable when the user switches 90d -> 180d.
  */
-import { usMarketHolidays } from '../../shared/us-market-calendar.mjs';
+import { isUsMarketSessionDay } from '../../shared/us-market-calendar.mjs';
 import residualArtifact from '../data/voo-csr-v1-residuals.json';
 import type { OHLCVData } from './api';
 
@@ -85,10 +85,6 @@ export interface CsrEndpointForecast {
 export type SessionCounts = Record<CsrV1Horizon, number>;
 export type ResidualPredictions = Partial<Record<CsrV1Horizon, number>>;
 
-function isoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
 /** Zelen & Severo 26.2.17, matching the incumbent implementation. */
 export function csrNormalCdf(x: number): number {
   const absolute = Math.abs(x);
@@ -112,20 +108,12 @@ function buildSessionLadder(originDate: string, calendarDays: number): number[] 
   const ladder = new Array<number>(calendarDays + 1);
   ladder[0] = 0;
   let elapsed = 0;
-  let cachedYear = -1;
-  let cachedHolidays = new Set<string>();
 
   for (let day = 1; day <= calendarDays; day += 1) {
     cursor.setUTCDate(cursor.getUTCDate() + 1);
-    const weekday = cursor.getUTCDay();
-    if (weekday !== 0 && weekday !== 6) {
-      const year = cursor.getUTCFullYear();
-      if (year !== cachedYear) {
-        cachedYear = year;
-        cachedHolidays = usMarketHolidays(year) as Set<string>;
-      }
-      if (!cachedHolidays.has(isoDate(cursor))) elapsed += 1;
-    }
+    // The shared predicate is the single exchange calendar. A private weekday +
+    // recurring-holiday ladder here disagreed with it on exceptional closures.
+    if (isUsMarketSessionDay(cursor)) elapsed += 1;
     ladder[day] = elapsed;
   }
   return ladder;

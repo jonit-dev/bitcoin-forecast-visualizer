@@ -170,7 +170,7 @@ export function intervalMultiplierForHorizon(horizonDays: number): number {
   return last.multiplier;
 }
 
-function effectiveSigmaScaleForHorizon(horizonDays: number): number {
+export function effectiveSigmaScaleForHorizon(horizonDays: number): number {
   const table = [...INTERVAL_CONFIG.fittedMultipliers].sort((a, b) => a.horizonDays - b.horizonDays);
   const fittedScales = table.map(row => row.multiplier * Math.sqrt(powerLawResidualVariance(row.horizonDays, 1)));
   const monotoneScales = fittedScales.map((scale, index) =>

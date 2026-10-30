@@ -82,7 +82,6 @@ function renderChart(overrides = {}) {
         mvrvData={[{ date: '2024-01-03', zScore: 1.2, mvrv: 2 }]}
         showMVRV={false}
         showBitcoinOverlays
-        showCoreModelLine
         probabilityForecast={{
           horizonDays: 180,
           probabilityUp: 0.6,
@@ -105,13 +104,14 @@ afterEach(() => {
 });
 
 describe('ForecastChart component', () => {
-  it('should preserve the jagged yellow forecast as the primary visual', async () => {
-    renderChart({ showModelLine: true, showScenarios: false, showCoreModelLine: false });
+  it('should continue the model line through the forecast and keep sampled traces for the scenarios toggle', async () => {
+    renderChart({ showModelLine: true, showScenarios: false });
 
     await waitFor(() => expect(seriesMocks.length).toBeGreaterThanOrEqual(20));
 
-    // Series 4 owns the trace-based forecast candles. Series 5 is the smooth
-    // statistical median, while series 8 is the primary amber scenario trace.
+    // Series 4 owns the trace-based forecast candles. Series 5 is the forecast part
+    // of the model line, while series 8 is the primary amber scenario trace,
+    // shown only with the scenarios toggle.
     expect(seriesMocks[4].seriesType).toBe('CandlestickSeries');
     expect(seriesMocks[4].seriesOptions).toEqual({
       upColor: 'rgba(16, 185, 129, 0.5)',
@@ -122,15 +122,15 @@ describe('ForecastChart component', () => {
     });
     expect(seriesMocks[8].seriesType).toBe('LineSeries');
     expect(seriesMocks[8].seriesOptions).toMatchObject({
-      color: 'rgba(251, 191, 36, 0.55)',
-      lineWidth: 2,
+      color: 'rgba(251, 191, 36, 0.3)',
+      lineWidth: 1,
       lineStyle: 0,
       crosshairMarkerVisible: false,
       lastValueVisible: false,
       priceLineVisible: false,
       visible: false,
     });
-    expect(seriesMocks[8].applyOptions).toHaveBeenLastCalledWith({ visible: true });
+    expect(seriesMocks[8].applyOptions).toHaveBeenLastCalledWith({ visible: false });
     expect(seriesMocks[8].setData).toHaveBeenCalledWith([
       { time: '2024-01-04', value: 148 },
       { time: '2024-01-05', value: 132 },
@@ -142,9 +142,16 @@ describe('ForecastChart component', () => {
     expect(seriesMocks[9].applyOptions).toHaveBeenLastCalledWith({ visible: false });
     expect(seriesMocks[5].seriesOptions).toMatchObject({
       color: 'rgba(251, 191, 36, 0.95)',
-      lineWidth: 3,
+      lineWidth: 2,
+      lineStyle: 0,
     });
-    expect(seriesMocks[5].applyOptions).toHaveBeenLastCalledWith({ visible: false });
+    expect(seriesMocks[5].applyOptions).toHaveBeenLastCalledWith({ visible: true });
+    // Series 20 is the historical part of the same model line.
+    expect(seriesMocks[20].seriesOptions).toMatchObject({
+      color: 'rgba(251, 191, 36, 0.95)',
+      lineWidth: 2,
+      lineStyle: 0,
+    });
   });
 
   it('creates chart series, pushes stable data, and renders the latest legend', async () => {

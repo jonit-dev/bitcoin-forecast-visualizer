@@ -45,7 +45,18 @@ export function mergeOHLCVRows(bundle: OHLCVData[], remote: unknown[]): OHLCVDat
 export function withOHLCV(data: MarketData, ohlcv: OHLCVData[]): MarketData {
   const last = ohlcv.at(-1)!;
   const previous = ohlcv.at(-2);
-  return { ...data, ohlcv, currentPrice: last.close, priceChange24h: previous ? ((last.close - previous.close) / previous.close) * 100 : 0, volume24h: last.volume };
+  // Capitalization is derived from the close, so a repaired price must carry it:
+  // keep the implied supply estimate the bundle was built with, not the old cap.
+  // ETF proxies report zero and stay zero.
+  const impliedSupply = data.currentPrice > 0 ? data.marketCap / data.currentPrice : 0;
+  return {
+    ...data,
+    ohlcv,
+    currentPrice: last.close,
+    priceChange24h: previous ? ((last.close - previous.close) / previous.close) * 100 : 0,
+    marketCap: impliedSupply > 0 ? last.close * impliedSupply : data.marketCap,
+    volume24h: last.volume,
+  };
 }
 
 export interface MVRVPoint {

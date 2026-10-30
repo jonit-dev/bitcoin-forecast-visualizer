@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
@@ -65,6 +65,17 @@ describe('script guardrails', () => {
     expect(failureHandler).toContain('preserving existing cache');
     expect(failureHandler).not.toContain('rows: []');
     expect(failureHandler).not.toContain('process.exitCode = 1');
+  });
+
+  it('should only stage forecast data workflow paths that exist in the checkout', () => {
+    const workflow = readFileSync('.github/workflows/forecast-data-update.yml', 'utf8');
+    const staging = workflow.split('\n').find((line) => line.trim().startsWith('git add '));
+    expect(staging).toBeDefined();
+    // A staged path that does not exist makes `git add` exit 128, so the commit,
+    // the push and the deployment after it never run.
+    const paths = staging!.trim().replace('git add ', '').split(/\s+/);
+    expect(paths.length).toBeGreaterThan(0);
+    for (const path of paths) expect(existsSync(path), `staged path does not exist: ${path}`).toBe(true);
   });
 
   it('should give the production watchdog a working default deployment URL', () => {

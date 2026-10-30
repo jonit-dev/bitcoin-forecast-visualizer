@@ -2,9 +2,20 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { onRequestGet } from './market-data';
 import { onRequestGet as getForecast } from './forecast';
 import { loadMarketData } from '../../src/lib/api';
+import { isUsMarketSessionDay } from '../../shared/us-market-calendar.mjs';
 import { hydrateMarketData } from '../../src/lib/marketDataClient';
 import { loadMergedMarketData, RUNTIME_PAGE_SIZE } from '../_shared/marketDataRepository';
 import type { D1Database, D1PreparedStatement, D1Result } from '../../workers/market-quote-refresh/src/repository';
+
+/** The next `count` NYSE sessions after `date`, so tests follow the bundle tail. */
+function nextUsSessions(date: string, count: number): string[] {
+  const sessions: string[] = [];
+  for (let day = 1; sessions.length < count; day++) {
+    const candidate = shift(date, day);
+    if (isUsMarketSessionDay(candidate)) sessions.push(candidate);
+  }
+  return sessions;
+}
 
 class ReadStatement implements D1PreparedStatement {
   values: unknown[] = [];
@@ -74,6 +85,28 @@ describe('market data API', () => {
     expect(body.rows.map((row: any) => row.date)).toEqual(rows.map((row) => row.date));
   });
 
+  it('should answer 304 for an unchanged representation and 200 after a correction to an existing candle', async () => {
+    const latest = loadMarketData('btc').ohlcv.at(-1)!;
+    const db = new ReadDb([runtimeRow('btc', latest.date, latest.close + 77)]);
+    const conditional = (etag: string) => new Request(`https://example.test/api/market-data?asset=btc&since=${shift(latest.date, -7)}`, { headers: { 'if-none-match': etag } });
+
+    const first = await onRequestGet({ request: marketRequest('btc', shift(latest.date, -7)), env: { MARKET_QUOTES_DB: db } });
+    expect((await first.json()).rows.at(-1).close).toBe(latest.close + 77);
+    const etag = first.headers.get('etag')!;
+    expect(etag).toBeTruthy();
+
+    const repeated = await onRequestGet({ request: conditional(etag), env: { MARKET_QUOTES_DB: db } });
+    expect(repeated.status).toBe(304);
+
+    // Repairing OHLCV on an existing date changes the body without changing any
+    // date, so a validator keyed on dates alone would serve a wrong price.
+    const corrected = latest.close + 177;
+    Object.assign(db.rows[0], { open: corrected, high: corrected, low: corrected, close: corrected });
+    const repaired = await onRequestGet({ request: conditional(etag), env: { MARKET_QUOTES_DB: db } });
+    expect(repaired.status).toBe(200);
+    expect((await repaired.json()).rows.at(-1).close).toBe(corrected);
+  });
+
   it('should page the interval with bounded queries instead of one unbounded read', async () => {
     const total = RUNTIME_PAGE_SIZE + 5;
     const rows = Array.from({ length: total }, (_, index) => runtimeRow('btc', shift('2025-01-02', index), 100 + index));
@@ -120,26 +153,26 @@ describe('market data API', () => {
   });
 
   it('should accept an equity tail that skips weekends and observed holidays', async () => {
-    const bundleLatest = loadMarketData('sp500').ohlcv.at(-1)!.date; // 2026-08-14, a Friday
-    const sessions = ['2026-08-17', '2026-08-18', '2026-08-19', '2026-08-20', '2026-08-21'];
-    vi.setSystemTime(new Date('2026-08-21T22:00:00Z'));
+    const bundleLatest = loadMarketData('sp500').ohlcv.at(-1)!.date;
+    const sessions = nextUsSessions(bundleLatest, 5);
+    vi.setSystemTime(new Date(`${sessions.at(-1)}T22:00:00Z`));
     const db = new ReadDb(sessions.map((date, index) => runtimeRow('sp500', date, 620 + index)));
     const response = await onRequestGet({ request: marketRequest('sp500', shift(bundleLatest, -7)), env: { MARKET_QUOTES_DB: db } });
     const body = await response.json();
     expect(body.continuity).toMatchObject({ complete: true, missingDates: [] });
-    expect(body.latestDate).toBe('2026-08-21');
+    expect(body.latestDate).toBe(sessions.at(-1));
     expect(body.status).toBe('current');
   });
 
   it('should report a missing equity session as a gap', async () => {
     const bundleLatest = loadMarketData('sp500').ohlcv.at(-1)!.date;
-    vi.setSystemTime(new Date('2026-08-21T22:00:00Z'));
-    const sessions = ['2026-08-17', '2026-08-18', '2026-08-20', '2026-08-21'];
-    const db = new ReadDb(sessions.map((date, index) => runtimeRow('sp500', date, 620 + index)));
+    const sessions = nextUsSessions(bundleLatest, 5);
+    vi.setSystemTime(new Date(`${sessions.at(-1)}T22:00:00Z`));
+    const db = new ReadDb(sessions.filter((_, index) => index !== 2).map((date, index) => runtimeRow('sp500', date, 620 + index)));
     const response = await onRequestGet({ request: marketRequest('sp500', shift(bundleLatest, -7)), env: { MARKET_QUOTES_DB: db } });
     const body = await response.json();
-    expect(body.continuity.missingDates).toEqual(['2026-08-19']);
-    expect(body.latestDate).toBe('2026-08-18');
+    expect(body.continuity.missingDates).toEqual([sessions[2]]);
+    expect(body.latestDate).toBe(sessions[1]);
     expect(body.status).not.toBe('current');
   });
 

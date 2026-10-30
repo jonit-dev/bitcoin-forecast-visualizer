@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-10-26T23:57:25.664Z",
+  "gitCommit": "7767d7b+dirty",
+  "firstOrigin": "2022-01-01",
+  "originStepDays": 7,
+  "verdict": "fail",
+  "gates": [
+    {
+      "horizon": 30,
+      "checks": {
+        "persistenceCutAtLeast50pct": true,
+        "coverageWithin2pp": false,
+        "crpsNotWorseThan2pct": true,
+        "volWithin10pct": true,
+        "absAcfWithin10pct": false,
+        "drawdownWithin10pct": true
+      },
+      "pass": false
+    },
+    {
+      "horizon": 90,
+      "checks": {
+        "persistenceCutAtLeast50pct": true,
+        "coverageWithin2pp": true,
+        "crpsNotWorseThan2pct": true,
+        "volWithin10pct": true,
+        "absAcfWithin10pct": true,
+        "drawdownWithin10pct": true
+      },
+      "pass": true
+    }
+  ],
+  "results": [
+    {
+      "policy": "production-baseline",
+      "horizon": 30,
+      "origins": 237,
+      "meanDayOverDayChange": 0.11770706145476457,
+      "rangeCoverage": 0.8396624472573839,
+      "meanRelativeCrps": 0.08234878228712568,
+      "medianDailyVol": 0.024619443575227516,
+      "medianAbsReturnAcf1": 0.022962069432853376,
+      "medianMaxDrawdown": 0.11297851222281258
+    },
+    {
+      "policy": "date-keyed-v1",
+      "horizon": 30,
+      "origins": 237,
+      "meanDayOverDayChange": 0.023622126072584657,
+      "rangeCoverage": 0.8649789029535865,
+      "meanRelativeCrps": 0.07970460027811574,
+      "medianDailyVol": 0.02480515545472397,
+      "medianAbsReturnAcf1": 0.038681197025136727,
+      "medianMaxDrawdown": 0.11118466639580221
+    },
+    {
+      "policy": "production-baseline",
+      "horizon": 90,
+      "origins": 229,
+      "meanDayOverDayChange": 0.16825840039774265,
+      "rangeCoverage": 0.8864628820960698,
+      "meanRelativeCrps": 0.126752161922545,
+      "medianDailyVol": 0.02619353741672449,
+      "medianAbsReturnAcf1": 0.07622835208590165,
+      "medianMaxDrawdown": 0.20858361621549953
+    },
+    {
+      "policy": "date-keyed-v1",
+      "horizon": 90,
+      "origins": 229,
+      "meanDayOverDayChange": 0.022395428004854903,
+      "rangeCoverage": 0.8733624454148472,
+      "meanRelativeCrps": 0.12068726232579674,
+      "medianDailyVol": 0.02605125332550768,
+      "medianAbsReturnAcf1": 0.08380066441581337,
+      "medianMaxDrawdown": 0.1949573027628015
+    }
+  ]
+}

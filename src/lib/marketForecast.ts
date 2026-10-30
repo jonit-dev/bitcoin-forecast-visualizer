@@ -12,10 +12,9 @@ import {
 import { FORECAST_PATH_GENERATOR_VERSION, forecastDataVersion, forecastPathSeed } from './forecastPathSeed';
 import {
   buildCsrProjection,
-  computeCsrEndpoint,
   csrLogScaleAtDay,
   csrMedianLogReturnAtDay,
-  isCsrV1Horizon,
+  csrNormalCdf,
   type CsrProjection,
 } from './csrV1';
 import { GOLD_365_V2_HORIZON_DAYS, buildGold365Forecast, shouldUseGold365V2 } from './gold365V2';
@@ -188,7 +187,7 @@ export const GOLD_CHANNEL_CONFIG = {
   minResidualSamples: 756,
 } as const;
 
-interface GenericModelInputs {
+export interface GenericModelInputs {
   returns: number[];
   drift: number;
   dailyVol: number;
@@ -430,7 +429,7 @@ function generateGenericStochasticTraces(
   return traces;
 }
 
-function projectTraceAboveLowerBound(primary: number, lowerBound: number | null): number {
+export function projectTraceAboveLowerBound(primary: number, lowerBound: number | null): number {
   if (!lowerBound || lowerBound <= 0) return primary;
   const supportBuffer = 1.002;
   if (primary >= lowerBound * supportBuffer) return primary;
@@ -605,6 +604,81 @@ function processGenericData(
   return data;
 }
 
+/**
+ * Per-calendar-day median log return the heatmap applies before its shock. It is
+ * the same anchor curve the summary card and the rendered median use, and it
+ * carries no second `-sigma^2/2` correction: the curve is already a log-return
+ * forecast, so subtracting the Ito term again shifts the distribution below the
+ * declared median.
+ */
+export function genericHeatmapDriftIncrements(modelInputs: GenericModelInputs, horizon: number): number[] {
+  const { csr = null } = modelInputs;
+  const drift = modelInputs.medianDrift ?? modelInputs.drift;
+  if (!csr) return Array.from({ length: horizon }, () => drift);
+  return Array.from({ length: horizon }, (_, index) =>
+    csrMedianLogReturnAtDay(csr, index + 1) - csrMedianLogReturnAtDay(csr, index)
+  );
+}
+
+/**
+ * Per-calendar-day log variance the heatmap applies to its shock. Under CSR the
+ * increments are differences of the shared cumulative variance, so the simulated
+ * terminal width is exactly the projection's, including the retained 180-day
+ * variance and the interpolated curve between anchors.
+ */
+export function genericHeatmapLogVarianceIncrements(modelInputs: GenericModelInputs, horizon: number): number[] {
+  const { dailyVol, csr = null } = modelInputs;
+  if (!csr) return Array.from({ length: horizon }, () => dailyVol * dailyVol);
+  const logVarianceAt = (day: number) => csrLogScaleAtDay(csr, day) ** 2;
+  return Array.from({ length: horizon }, (_, index) =>
+    Math.max(0, logVarianceAt(index + 1) - logVarianceAt(index))
+  );
+}
+
+/** Model inputs the S&P 500 and gold surfaces forecast with at a given horizon. */
+export function buildGenericModelInputs(
+  assetId: Exclude<ForecastAssetId, 'btc'>,
+  ohlcv: OHLCVData[],
+  horizon: number
+): { modelInputs: GenericModelInputs; calibrationLabel: string } {
+  if (assetId === 'gold') {
+    const baseline = computeGoldModelInputs(ohlcv);
+    // Horizon-specific promotion: the direct Ridge challenger only cleared its
+    // gate at 365 days, so every other horizon keeps the momentum baseline. A
+    // null forecast (short snapshot, stale macro cache) also keeps the baseline.
+    const gold365 = shouldUseGold365V2(horizon)
+      ? buildGold365Forecast(ohlcv, baseline.dailyVol)
+      : null;
+    return {
+      modelInputs: gold365
+        ? { ...baseline, medianDrift: gold365.logReturn / GOLD_365_V2_HORIZON_DAYS }
+        : baseline,
+      calibrationLabel: gold365 ? 'Direct 1Y ridge interval' : 'Slow momentum interval',
+    };
+  }
+
+  const baseline = computeSP500ModelInputs(ohlcv);
+  const lastSession = ohlcv[ohlcv.length - 1];
+  return {
+    modelInputs: {
+      ...baseline,
+      csr: lastSession
+        ? buildCsrProjection(
+            ohlcv,
+            {
+              spot: lastSession.close,
+              mu: baseline.drift,
+              sigma: baseline.dailyVol,
+              expandingEquityPremium: baseline.expandingEquityPremium,
+            },
+            horizon
+          )
+        : null,
+    },
+    calibrationLabel: 'Log-return interval',
+  };
+}
+
 function generateGenericHeatmapData(
   ohlcv: OHLCVData[],
   horizon: number,
@@ -615,8 +689,6 @@ function generateGenericHeatmapData(
   const last = ohlcv[ohlcv.length - 1];
   if (!last || horizon < 1) return [];
 
-  const { dailyVol, csr = null } = modelInputs;
-  const drift = modelInputs.medianDrift ?? modelInputs.drift;
   const lastDate = new Date(`${last.date}T00:00:00Z`);
   const rng = mulberry32(0x500500 + horizon * 53 + ohlcv.length);
   const sampleStep = horizon <= 90 ? 1 : horizon <= 365 ? 2 : horizon <= 1825 ? 5 : 10;
@@ -628,24 +700,18 @@ function generateGenericHeatmapData(
   const sampledCount = sampledDays.length;
   const sampledSet = new Set(sampledDays);
   const results = new Float64Array(numSimulations * sampledCount);
-
-  // Gaussian innovations centred on the same anchor increments the summary card
-  // uses, so the heatmap and the quantile band cannot drift apart.
-  const anchorIncrements = csr
-    ? Array.from({ length: horizon + 1 }, (_, day) =>
-        day === 0 ? 0 : csrMedianLogReturnAtDay(csr, day) - csrMedianLogReturnAtDay(csr, day - 1))
-    : null;
+  // Gaussian innovations centred on the same anchor increments and scaled by the
+  // same cumulative variance the summary card uses, so the heatmap and the
+  // quantile band describe one distribution.
+  const driftIncrements = genericHeatmapDriftIncrements(modelInputs, horizon);
+  const varianceIncrements = genericHeatmapLogVarianceIncrements(modelInputs, horizon);
 
   for (let sim = 0; sim < numSimulations; sim++) {
     let price = last.close;
     let sampleIndex = 0;
     for (let day = 1; day <= horizon; day++) {
-      if (anchorIncrements) {
-        const isSession = csr!.sessionsByCalendarDay[day] > csr!.sessionsByCalendarDay[day - 1];
-        if (isSession) price *= Math.exp(anchorIncrements[day] + dailyVol * normalFromRng(rng));
-      } else {
-        price *= Math.exp(drift - 0.5 * dailyVol * dailyVol + dailyVol * normalFromRng(rng));
-      }
+      const logScale = Math.sqrt(varianceIncrements[day - 1]);
+      price *= Math.exp(driftIncrements[day - 1] + logScale * normalFromRng(rng));
       if (sampledSet.has(day)) results[sim * sampledCount + sampleIndex++] = price;
     }
   }
@@ -697,24 +763,28 @@ function computeGenericProbabilityForecast(
   const drift = modelInputs.medianDrift ?? modelInputs.drift;
   const targetDate = dateKey(addUtcDays(new Date(`${last.date}T00:00:00Z`), horizonDays));
 
-  if (csr && isCsrV1Horizon(horizonDays)) {
-    const endpoint = computeCsrEndpoint(csr.origin, csr.anchors, horizonDays, 1.6448536269514722);
-    if (endpoint) {
-      const z80 = 1.2815515655446004;
-      const probabilityUp = Math.min(0.99, Math.max(0.01, endpoint.probabilityUp));
-      return {
-        horizonDays,
-        targetDate,
-        median: endpoint.medianPrice,
-        probabilityUp,
-        q05: endpoint.lowerPrice,
-        q10: endpoint.medianPrice * Math.exp(-z80 * endpoint.logScale),
-        q90: endpoint.medianPrice * Math.exp(z80 * endpoint.logScale),
-        q95: endpoint.upperPrice,
-        calibrationLabel: 'Session-residual interval',
-        verdict: probabilityUp > 0.57 ? 'Upside-biased scenario' : probabilityUp < 0.43 ? 'Downside-biased scenario' : 'Balanced distribution',
-      };
-    }
+  if (csr) {
+    // Interpolated exactly like the rendered path for this day, so a summary
+    // request outside the anchor horizons cannot describe a different model
+    // from the chart built for the same request.
+    const z95 = 1.6448536269514722;
+    const z80 = 1.2815515655446004;
+    const medianLogReturn = csrMedianLogReturnAtDay(csr, horizonDays);
+    const logScale = Math.max(csrLogScaleAtDay(csr, horizonDays), 1e-18);
+    const median = last.close * Math.exp(medianLogReturn);
+    const probabilityUp = Math.min(0.99, Math.max(0.01, csrNormalCdf(medianLogReturn / logScale)));
+    return {
+      horizonDays,
+      targetDate,
+      median,
+      probabilityUp,
+      q05: median * Math.exp(-z95 * logScale),
+      q10: median * Math.exp(-z80 * logScale),
+      q90: median * Math.exp(z80 * logScale),
+      q95: median * Math.exp(z95 * logScale),
+      calibrationLabel: 'Session-residual interval',
+      verdict: probabilityUp > 0.57 ? 'Upside-biased scenario' : probabilityUp < 0.43 ? 'Downside-biased scenario' : 'Balanced distribution',
+    };
   }
 
   const median = last.close * Math.exp(drift * horizonDays);
@@ -764,69 +834,50 @@ export function buildMarketForecast(
     };
   }
 
-  if (assetId === 'gold') {
-    const baselineGold = computeGoldModelInputs(marketData.ohlcv);
-    // Horizon-specific promotion: the direct Ridge challenger only cleared its
-    // gate at 365 days, so every other horizon keeps the momentum baseline. A
-    // null forecast (short snapshot, stale macro cache) also keeps the baseline.
-    const gold365 = shouldUseGold365V2(horizon)
-      ? buildGold365Forecast(marketData.ohlcv, baselineGold.dailyVol)
-      : null;
-    const modelInputs: GenericModelInputs = gold365
-      ? { ...baselineGold, medianDrift: gold365.logReturn / GOLD_365_V2_HORIZON_DAYS }
-      : baselineGold;
-    return {
-      displayData: processGenericData(
-        'gold',
-        marketData.ohlcv,
-        horizon,
-        confidenceZ,
-        modelInputs,
-        computeGoldChannelBounds(marketData.ohlcv),
-        true,
-        pathPolicy
-      ),
-      heatmapData: generateGenericHeatmapData(marketData.ohlcv, horizon, modelInputs),
-      drawdownStats: null,
-      probabilityForecast: computeGenericProbabilityForecast(
-        marketData.ohlcv,
-        horizon,
-        modelInputs,
-        gold365 ? 'Direct 1Y ridge interval' : 'Slow momentum interval'
-      ),
-    };
-  }
-
-  const baselineInputs = computeSP500ModelInputs(marketData.ohlcv);
-  const lastSession = marketData.ohlcv[marketData.ohlcv.length - 1];
-  const modelInputs: GenericModelInputs = {
-    ...baselineInputs,
-    csr: lastSession
-      ? buildCsrProjection(
-          marketData.ohlcv,
-          {
-            spot: lastSession.close,
-            mu: baselineInputs.drift,
-            sigma: baselineInputs.dailyVol,
-            expandingEquityPremium: baselineInputs.expandingEquityPremium,
-          },
-          horizon
-        )
-      : null,
-  };
+  const { modelInputs, calibrationLabel } = buildGenericModelInputs(assetId, marketData.ohlcv, horizon);
   return {
     displayData: processGenericData(
-      'sp500',
+      assetId,
       marketData.ohlcv,
       horizon,
       confidenceZ,
       modelInputs,
-      computeSP500ChannelBounds(marketData.ohlcv),
-      false,
+      assetId === 'gold' ? computeGoldChannelBounds(marketData.ohlcv) : computeSP500ChannelBounds(marketData.ohlcv),
+      assetId === 'gold',
       pathPolicy
     ),
     heatmapData: generateGenericHeatmapData(marketData.ohlcv, horizon, modelInputs),
     drawdownStats: null,
-    probabilityForecast: computeGenericProbabilityForecast(marketData.ohlcv, horizon, modelInputs),
+    probabilityForecast: computeGenericProbabilityForecast(marketData.ohlcv, horizon, modelInputs, calibrationLabel),
+  };
+}
+
+/**
+ * Probability summary for a horizon. It never materializes chart rows, stochastic
+ * traces or heatmaps: a summary request must not pay for the chart-only work it
+ * then discards, and in the synchronous Express server that work blocks
+ * unrelated requests on the same process.
+ */
+export function buildMarketForecastSummary(
+  assetId: ForecastAssetId,
+  marketData: MarketData,
+  horizon: number,
+  confidenceZ: number
+): MarketForecastResult {
+  if (assetId === 'btc') {
+    return {
+      displayData: [],
+      heatmapData: [],
+      drawdownStats: computeDrawdownStats(marketData.ohlcv, horizon),
+      probabilityForecast: computeProbabilityForecast(marketData.ohlcv, horizon),
+    };
+  }
+
+  const { modelInputs, calibrationLabel } = buildGenericModelInputs(assetId, marketData.ohlcv, horizon);
+  return {
+    displayData: [],
+    heatmapData: [],
+    drawdownStats: null,
+    probabilityForecast: computeGenericProbabilityForecast(marketData.ohlcv, horizon, modelInputs, calibrationLabel),
   };
 }

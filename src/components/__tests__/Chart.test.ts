@@ -61,6 +61,7 @@ const rows = [
     forecastLower: 120,
     floorPriceModel: 95,
     peakPriceModel: 210,
+    powerLawModel: 130,
     stochasticTraces: [148, 151],
   },
   {
@@ -74,29 +75,46 @@ const rows = [
     forecastLower: 125,
     floorPriceModel: 100,
     peakPriceModel: 220,
+    powerLawModel: 140,
     stochasticTraces: [132, 161],
   },
 ];
 
 describe('Chart data transforms', () => {
-  it('should preserve trace-based yellow forecast candles', () => {
+  it('should project deterministic noisy candles around the median, ignoring sampled traces', () => {
     const first = buildChartSeriesData(rows, null, true, false, 2);
-    const second = buildChartSeriesData(rows, null, true, false, 2);
+    const reshuffled = rows.map(row => row.isForecast ? { ...row, stochasticTraces: [1, 2] } : row);
+    const second = buildChartSeriesData(reshuffled, null, true, false, 2);
+    const closes = first.forecastData.map(point => point.close);
 
-    const expectedForecastPath = [135, 148, 132];
-    expect(first.forecastData.map(point => point.close)).toEqual(expectedForecastPath);
-    expect(first.forecastData).toEqual(second.forecastData);
-    expect(first.forecastData.slice(1).map(point => point.open)).toEqual([135, 148]);
+    expect(second.forecastData).toEqual(first.forecastData);
+    expect(closes[0]).toBe(135);
+    expect(closes.slice(1)).not.toEqual([145, 155]);
+    closes.slice(1).forEach((close, index) => expect(Math.abs(Math.log(close / [145, 155][index]))).toBeLessThan(0.5));
+    expect(first.forecastData.slice(1).map(point => point.open)).toEqual(closes.slice(0, 2));
+  });
 
-    // Baseline visible-character diagnostics for this frozen fixture: daily
-    // innovations remain non-zero, keep their magnitudes, and do not acquire
-    // an artificial smooth-median endpoint (155).
-    const innovations = expectedForecastPath.slice(1).map((value, index) => value - expectedForecastPath[index]);
-    expect(innovations).toEqual([13, -16]);
-    expect(innovations.filter(value => Math.sign(value) !== 0)).toHaveLength(2);
-    expect(new Set(innovations.map(Math.sign))).toEqual(new Set([-1, 1]));
-    expect(first.forecastData.at(-1)?.close).toBe(132);
-    expect(first.forecastData.at(-1)?.close).not.toBe(first.forecastMedianData.at(-1)?.value);
+  it('should keep a long projection near the median and above the floor', () => {
+    // Two years against a flat 100 median and an 80 floor; trace 0 collapses toward 0.
+    const forecast = Array.from({ length: 730 }, (_, day) => ({
+      date: new Date(Date.UTC(2024, 0, 4 + day)).toISOString().slice(0, 10),
+      isForecast: true,
+      close: 100,
+      floorPriceModel: 80,
+      stochasticTraces: [100 * Math.pow(0.99, day + 1)],
+    }));
+    const series = buildChartSeriesData([{ ...rows[2], close: 100 }, ...forecast], null, true, false, 1);
+    const closes = series.forecastData.map(point => point.close);
+
+    expect(Math.min(...closes)).toBeGreaterThanOrEqual(80);
+    expect(closes.at(-1)!).toBeGreaterThan(60); // a candle on trace 0 ends near 0.07
+  });
+
+  it('continues the unmodified historical model line through the forecast', () => {
+    const series = buildChartSeriesData(rows, null, true, false, 2);
+
+    expect(series.modelLineData.at(-1)).toEqual({ time: '2024-01-03', value: 125 });
+    expect(series.modelProjectionData[0]).toEqual(series.modelLineData.at(-1));
   });
 
   it('normalizes volume against the rolling positive-volume median', () => {
@@ -107,19 +125,19 @@ describe('Chart data transforms', () => {
     expect(relativeVolumeForIndex([{ volume: 0 }], 0)).toBe(0);
   });
 
-  it('should map primary trace values to yellow forecast candles without resampling', () => {
+  it('should build projected candles, model line and traces', () => {
     const series = buildChartSeriesData(rows, null, true, false, 2);
 
     expect(series.candleData).toHaveLength(3);
-    expect(series.forecastData).toEqual([
-      { time: '2024-01-03', open: 135, high: 135, low: 135, close: 135 },
-      { time: '2024-01-04', open: 135, high: 148, low: 135, close: 148 },
-      { time: '2024-01-05', open: 148, high: 148, low: 132, close: 132 },
-    ]);
-    expect(series.forecastMedianData).toEqual([
-      { time: '2024-01-03', value: 135 },
-      { time: '2024-01-04', value: 145 },
-      { time: '2024-01-05', value: 155 },
+    expect(series.forecastData.map(point => point.time)).toEqual(['2024-01-03', '2024-01-04', '2024-01-05']);
+    series.forecastData.forEach(point => {
+      expect(point.high).toBeGreaterThanOrEqual(Math.max(point.open, point.close));
+      expect(point.low).toBeLessThanOrEqual(Math.min(point.open, point.close));
+    });
+    expect(series.modelProjectionData).toEqual([
+      { time: '2024-01-03', value: 125 },
+      { time: '2024-01-04', value: 130 },
+      { time: '2024-01-05', value: 140 },
     ]);
     expect(series.stochasticTraceData[0]).toEqual([
       { time: '2024-01-01', value: 110 },

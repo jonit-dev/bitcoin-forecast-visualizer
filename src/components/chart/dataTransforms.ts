@@ -1,6 +1,10 @@
 import type { LegendData, ProbabilityForecastSummary } from './types';
+import { hashStringSeed, mulberry32, normalFromRng } from '../../lib/data';
+import { projectTraceAboveLowerBound } from '../../lib/marketForecast';
 
 const VOLUME_NORMALIZATION_WINDOW = 90;
+const PROJECTION_VOL_WINDOW = 90;
+const PROJECTION_GAP_DECAY = Math.pow(0.5, 1 / 30);
 
 export function median(values: number[]): number {
   if (values.length === 0) return 0;
@@ -62,6 +66,34 @@ export function buildLegendFromRow(row: any): LegendData {
   };
 }
 
+/** Projected candles: the median path plus noise at the recent daily volatility.
+ * Shocks are seeded by calendar date, so every horizon draws the same candles,
+ * and the gap to the median decays (30-day half-life), so the path stays near
+ * the most probable price instead of wandering like a free random walk. */
+export function projectCandles(historical: any[], forecast: any[]) {
+  const closes = historical.slice(-PROJECTION_VOL_WINDOW - 1).map((d: any) => d.close);
+  const returns = closes.slice(1).map((close: number, index: number) => Math.log(close / closes[index]));
+  const mean = returns.reduce((sum: number, value: number) => sum + value, 0) / Math.max(1, returns.length);
+  const dailyVol = Math.sqrt(returns.reduce((sum: number, value: number) => sum + (value - mean) ** 2, 0) / Math.max(1, returns.length - 1));
+  let gap = 0;
+  let open = closes.at(-1);
+  return forecast.map((d: any) => {
+    const rng = mulberry32(hashStringSeed(`projected-candle|${d.date}`));
+    gap = PROJECTION_GAP_DECAY * gap + dailyVol * normalFromRng(rng);
+    const close = projectTraceAboveLowerBound(d.close * Math.exp(gap), d.floorPriceModel);
+    gap = Math.log(close / d.close);
+    const candle = {
+      time: d.date,
+      open,
+      high: Math.max(open, close) * Math.exp(0.5 * dailyVol * rng()),
+      low: Math.min(open, close) * Math.exp(-0.5 * dailyVol * rng()),
+      close,
+    };
+    open = close;
+    return candle;
+  });
+}
+
 export function buildChartSeriesData(
   data: any[],
   playbackIndex: number | null,
@@ -81,30 +113,15 @@ export function buildChartSeriesData(
   const sma50Data = historical.filter((d: any) => d.sma50 !== null).map((d: any) => ({ time: d.date, value: d.sma50 }));
   const lastHist = historical[historical.length - 1];
 
-  const forecastData = lastHist && forecast.length > 0 ? [
-    { time: lastHist.date, open: lastHist.close, high: lastHist.close, low: lastHist.close, close: lastHist.close },
-    ...forecast.map((d: any, index: number) => {
-      const primaryTraceClose = d.stochasticTraces?.[0];
-      const previousForecast = index > 0 ? forecast[index - 1] : null;
-      const primaryTraceOpen = previousForecast?.stochasticTraces?.[0];
-      const close = Number.isFinite(primaryTraceClose) && primaryTraceClose > 0 ? primaryTraceClose : d.close;
-      const open = Number.isFinite(primaryTraceOpen) && primaryTraceOpen > 0
-        ? primaryTraceOpen
-        : index === 0
-          ? lastHist.close
-          : forecast[index - 1].close;
-      return {
-        time: d.date,
-        open,
-        high: Math.max(open, close),
-        low: Math.min(open, close),
-        close,
-      };
-    }),
-  ] : [];
+  const forecastData = lastHist && forecast.length > 0
+    ? [{ time: lastHist.date, open: lastHist.close, high: lastHist.close, low: lastHist.close, close: lastHist.close }, ...projectCandles(historical, forecast)]
+    : [];
 
-  const forecastMedianData = lastHist && forecast.length > 0
-    ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.close }))]
+  // The same model line as history, continued through the forecast.
+  const modelProjectionData = lastHist && forecast.length > 0
+    ? [lastHist, ...forecast]
+      .filter((d: any) => d.powerLawModel != null && d.powerLawModel > 0)
+      .map((d: any) => ({ time: d.date, value: d.powerLawModel }))
     : [];
   const forecastUpperData = lastHist && forecast.length > 0
     ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastUpper }))]
@@ -140,7 +157,7 @@ export function buildChartSeriesData(
     sma20Data: sma20Data.sort(sortByTime),
     sma50Data: sma50Data.sort(sortByTime),
     forecastData: forecastData.sort(sortByTime),
-    forecastMedianData: forecastMedianData.sort(sortByTime),
+    modelProjectionData: modelProjectionData.sort(sortByTime),
     forecastUpperData: forecastUpperData.sort(sortByTime),
     forecastLowerData: forecastLowerData.sort(sortByTime),
     stochasticTraceData: stochasticTraceData.map(trace => trace.sort(sortByTime)),

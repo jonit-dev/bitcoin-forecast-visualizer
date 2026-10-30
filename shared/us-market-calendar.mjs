@@ -47,7 +47,14 @@ const UNSCHEDULED_CLOSURES = new Set([
   '2025-01-09', // National day of mourning, Jimmy Carter
 ]);
 
+// Cached per year: the calendar is walked once per day of history and per
+// heatmap day, and rebuilding the set each time dominated a 10-year render.
+const HOLIDAY_CACHE = new Map();
+
 export function usMarketHolidays(year) {
+  const cached = HOLIDAY_CACHE.get(year);
+  if (cached) return cached;
+
   const holidays = new Set([
     observed(year, 0, 1), nthWeekday(year, 0, 1, 3), nthWeekday(year, 1, 1, 3), goodFriday(year),
     lastWeekday(year, 4, 1), observed(year, 6, 4), nthWeekday(year, 8, 1, 1),
@@ -58,6 +65,7 @@ export function usMarketHolidays(year) {
   if (year >= 2022) holidays.add(observed(year, 5, 19));
   // A Dec 31 observation can belong to the following year's New Year's holiday.
   holidays.add(observed(year + 1, 0, 1));
+  HOLIDAY_CACHE.set(year, holidays);
   return holidays;
 }
 
@@ -68,9 +76,29 @@ export function isUsMarketSessionDay(date) {
   return weekday !== 0 && weekday !== 6 && !UNSCHEDULED_CLOSURES.has(key) && !usMarketHolidays(value.getUTCFullYear()).has(key);
 }
 
+// Regular-session close in UTC. 21:00 UTC covers both 16:00 EST and 16:00 EDT
+// plus the settlement tail, which is the cutoff the quote worker already used.
+export const US_SESSION_CLOSE_UTC_HOUR = 21;
+
+/**
+ * Whether a source's candle for `date` is final. A BTC candle covers the whole
+ * UTC day, so today's is never final; an ETF candle is final once the US session
+ * behind it has closed. Both ingestion paths share this rule, otherwise the
+ * anchor date depends on which provider answered.
+ */
+export function isCompletedCandleDate(assetId, date, now = new Date()) {
+  const moment = new Date(now);
+  const today = dateKey(moment);
+  if (date !== today) return date < today;
+  return assetId !== 'btc' && moment.getUTCHours() >= US_SESSION_CLOSE_UTC_HOUR;
+}
+
 export function countUsMarketSessionsAfter(fromDate, throughDate) {
   const cursor = new Date(`${fromDate}T00:00:00Z`);
-  const end = typeof throughDate === 'string' ? new Date(`${throughDate}T00:00:00Z`) : new Date(throughDate);
+  // A caller passing a Date may carry a time of day. Without normalizing it the
+  // walk reaches today's midnight, advances once more and counts tomorrow.
+  const rawEnd = typeof throughDate === 'string' ? new Date(`${throughDate}T00:00:00Z`) : new Date(throughDate);
+  const end = new Date(Date.UTC(rawEnd.getUTCFullYear(), rawEnd.getUTCMonth(), rawEnd.getUTCDate()));
   let sessions = 0;
   while (cursor < end) {
     cursor.setUTCDate(cursor.getUTCDate() + 1);

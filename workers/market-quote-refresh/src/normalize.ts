@@ -1,4 +1,5 @@
 import type { AssetConfig, MarketAssetId } from './assets';
+import { isCompletedCandleDate } from '../../../shared/us-market-calendar.mjs';
 
 export interface CanonicalCandle {
   assetId: MarketAssetId;
@@ -93,15 +94,13 @@ export function normalizeYahoo(asset: AssetConfig, payload: unknown, now = new D
   if (!Array.isArray(timestamps) || !quote || !Array.isArray(adjusted)) throw new CandleValidationError('Unexpected Yahoo response');
   const ingestedAt = now.toISOString();
   const rows: CanonicalCandle[] = [];
-  const today = utcDate(now);
-  const currentSessionComplete = now.getUTCHours() >= 21;
   for (let index = 0; index < timestamps.length; index += 1) {
     const timestamp = timestamps[index];
     const [open, high, low, close, volume, adjustedClose] = [quote.open?.[index], quote.high?.[index], quote.low?.[index], quote.close?.[index], quote.volume?.[index], adjusted[index]];
     if ([open, high, low, close, volume, adjustedClose].some((value) => value == null)) continue;
     if (![timestamp, open, high, low, close, volume, adjustedClose].every(Number.isFinite)) throw new CandleValidationError('Non-finite Yahoo candle');
     const date = utcDate(timestamp * 1000);
-    if (date > today || (date === today && !currentSessionComplete)) continue;
+    if (!isCompletedCandleDate(asset.id, date, now)) continue;
     const ratio = adjustedClose > 0 ? adjustedClose / close : 1;
     rows.push(validateCandle({
       assetId: asset.id, date, open: +(open * ratio).toFixed(4),

@@ -12,10 +12,12 @@ export async function onRequestGet(context: { request: Request; env: MarketDataE
     return Response.json({ error: `asset must be one of ${MARKET_ASSET_IDS.join(', ')} and since must be YYYY-MM-DD` }, { status: 400, headers });
   }
   const result = await readRuntimeMarketData(context.env, asset as MarketAssetId, since);
-  // `latestDate` is pinned to the last contiguous candle, so while a hole is
-  // open it stays put as the store keeps gaining rows. Keying on it alone would
-  // serve a 304 for a body whose rows and continuity have since changed.
-  const etag = `W/\"${asset}-${since}-${result.latestDate}-${result.observedLatestDate}\"`;
+  const body = JSON.stringify({ asset, ...result });
+  // The validator covers the representation, not just its date range. Repairing
+  // OHLCV on an existing date changes the body without changing any date, so a
+  // date-keyed validator would keep serving the old price from a 304.
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(body));
+  const etag = `W/"${[...new Uint8Array(digest).slice(0, 16)].map((byte) => byte.toString(16).padStart(2, '0')).join('')}"`;
   if (context.request.headers.get('if-none-match') === etag) return new Response(null, { status: 304, headers: { ...headers, etag } });
-  return Response.json({ asset, ...result }, { headers: { ...headers, etag } });
+  return new Response(body, { headers: { ...headers, etag } });
 }

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { loadMarketData, type MarketAssetId } from '../api';
-import { CONFIDENCE_Z_SCORES, simulateHeatmapPrices } from '../data';
+import { CONFIDENCE_Z_SCORES, simulateHeatmapPrices, type ForecastPathPolicy } from '../data';
 import { forecastDataVersion, forecastPathSeed, FORECAST_PATH_GENERATOR_VERSION } from '../forecastPathSeed';
 import { buildMarketForecast } from '../marketForecast';
+import { buildChartSeriesData } from '../../components/chart/dataTransforms';
 import { powerLawForecast } from '../powerLaw';
 
 const assets: MarketAssetId[] = ['btc', 'sp500', 'gold'];
@@ -12,8 +13,8 @@ const fixtures = Object.fromEntries(assets.map((asset) => {
   return [asset, { ...data, ohlcv: data.ohlcv.slice(-1400) }];
 })) as Record<MarketAssetId, ReturnType<typeof loadMarketData>>;
 
-function primary(asset: MarketAssetId, horizon: number, policy: 'production-baseline' | 'prefix-stable-v1') {
-  return buildMarketForecast(asset, fixtures[asset], horizon, CONFIDENCE_Z_SCORES[0.95], { pathPolicy: policy })
+function primary(asset: MarketAssetId, horizon: number, policy: ForecastPathPolicy, data = fixtures[asset]) {
+  return buildMarketForecast(asset, data, horizon, CONFIDENCE_Z_SCORES[0.95], { pathPolicy: policy })
     .displayData.filter((row) => row.isForecast)
     .map((row) => ({ date: row.date, value: row.stochasticTraces?.[0] }));
 }
@@ -66,6 +67,30 @@ describe('forecast path horizon-prefix contract', () => {
     expect(forecastPathSeed(identity, 0)).toBe(primarySeed);
   });
 
+  it('should keep the BTC date-keyed path when one new candle arrives', () => {
+    const btc = fixtures.btc;
+    const dayOverDayChanges = (policy: ForecastPathPolicy) => {
+      const paths = Array.from({ length: 6 }, (_, index) => {
+        const data = { ...btc, ohlcv: btc.ohlcv.slice(0, btc.ohlcv.length - index) };
+        return new Map(primary('btc', 90, policy, data).map((row) => [row.date, row.value!]));
+      });
+      return Array.from({ length: 5 }, (_, index) => {
+        const older = paths[index + 1];
+        const newer = paths[index];
+        const shared = [...older.keys()].filter((date) => newer.has(date));
+        return shared.reduce((sum, date) => sum + Math.abs(Math.log(newer.get(date)! / older.get(date)!)), 0) / shared.length;
+      });
+    };
+    const meanChange = (policy: ForecastPathPolicy) => {
+      const changes = dayOverDayChanges(policy);
+      return changes.reduce((sum, value) => sum + value, 0) / changes.length;
+    };
+    const policyUnderTest: ForecastPathPolicy = 'date-keyed-v1';
+    const underTestMean = meanChange(policyUnderTest);
+    expect(underTestMean).toBeLessThan(0.03);
+    expect(underTestMean).toBeLessThan(0.5 * meanChange('production-baseline'));
+  }, 30_000);
+
   it('should select the same gold primary trace for all requested horizons', () => {
     for (const [short, long] of pairs) expect(mismatchCount(primary('gold', short, 'prefix-stable-v1'), primary('gold', long, 'prefix-stable-v1'))).toBe(0);
   });
@@ -87,4 +112,19 @@ describe('forecast path horizon-prefix contract', () => {
       expect(Math.abs(Math.log(monteCarloMedian / forecastMedian))).toBeLessThan(0.01);
     }
   }, 30_000);
+});
+
+describe('projected chart candles across horizons', () => {
+  it('should draw the same projected candles on shared dates when the horizon changes', () => {
+    for (const asset of assets) for (const [short, long] of pairs) {
+      // At 365 days gold switches to the GLD ridge model: a different median, so different candles.
+      if (asset === 'gold' && long === 365) continue;
+      const candles = (horizon: number) => buildChartSeriesData(
+        buildMarketForecast(asset, fixtures[asset], horizon, CONFIDENCE_Z_SCORES[0.95]).displayData, null, true, false, 12,
+      ).forecastData;
+      const shortCandles = candles(short);
+      expect({ asset, short, long, candles: candles(long).slice(0, shortCandles.length) })
+        .toEqual({ asset, short, long, candles: shortCandles });
+    }
+  }, 60_000);
 });
