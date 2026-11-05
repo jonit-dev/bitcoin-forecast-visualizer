@@ -188,6 +188,9 @@ export const GOLD_CHANNEL_CONFIG = {
   minResidualSamples: 756,
 } as const;
 
+export const GOLD_MOMENTUM_DAYS = 365;
+export const GOLD_LONG_RUN_DRIFT = Math.log(1.04) / 365;
+
 /**
  * Session volatility term structure: an EWMA estimate of today's daily variance
  * that reverts geometrically to a long-run level, summed over the market sessions
@@ -315,11 +318,40 @@ export interface GenericModelInputs {
    */
   medianDrift?: number;
   /**
+   * Calendar days the momentum drift carries before the long-run drift starts.
+   * Gold sets this so one year of momentum does not extrapolate forever.
+   */
+  momentumDays?: number;
+  /** Per calendar day log drift after `momentumDays`. */
+  longRunDrift?: number;
+  /**
    * Cumulative log variance per calendar day from the session term structure.
    * When present it is the forecast width everywhere (band, heatmap, summary),
    * superseding the CSR anchor variance and `dailyVol * sqrt(day)`.
    */
   logVarianceByDay?: number[];
+}
+
+/**
+ * Median log return at a calendar day offset. Momentum carries for one year,
+ * then a long-run 4%/yr drift; evidence = monthly gold 1972-2026, 10y MAE -42%
+ * (1975-2003 origins) and -63% (2004+ origins) vs momentum forever.
+ */
+export function genericMedianLogReturnAtDay(modelInputs: GenericModelInputs, day: number): number {
+  const { csr = null, momentumDays, longRunDrift } = modelInputs;
+  if (csr) return csrMedianLogReturnAtDay(csr, day);
+  const dailyDrift = modelInputs.medianDrift ?? modelInputs.drift;
+  if (momentumDays === undefined) return dailyDrift * day;
+  return dailyDrift * Math.min(day, momentumDays) + (longRunDrift ?? 0) * Math.max(0, day - momentumDays);
+}
+
+/**
+ * Reference log return for traces and the projected channel: the same
+ * momentum-capped curve, with any horizon-specific median override removed so
+ * the 365-day ridge never enters.
+ */
+function genericReferenceLogReturnAtDay(modelInputs: GenericModelInputs, day: number): number {
+  return genericMedianLogReturnAtDay({ ...modelInputs, medianDrift: undefined }, day);
 }
 
 /** Log-price standard deviation of the forecast at a calendar day offset. */
@@ -489,7 +521,9 @@ function generateGenericStochasticTraces(
   dailyVol: number,
   returns: number[],
   pathPolicy: ForecastPathPolicy,
-  csr: CsrProjection | null = null
+  csr: CsrProjection | null = null,
+  momentumDays?: number,
+  longRunDrift?: number
 ): Map<string, number[]> {
   const traces = new Map<string, number[]>();
   const last = ohlcv[ohlcv.length - 1];
@@ -543,8 +577,9 @@ function generateGenericStochasticTraces(
       } else {
         innovation = dailyVol * normalFromRng(rng);
       }
+      const driftIncrement = momentumDays !== undefined && day > momentumDays ? longRunDrift ?? 0 : drift;
       prices[i] *= anchorIncrement === null
-        ? Math.exp(drift - 0.5 * dailyVol * dailyVol + innovation)
+        ? Math.exp(driftIncrement - 0.5 * dailyVol * dailyVol + innovation)
         : Math.exp(anchorIncrement + innovation);
     }
     traces.set(date, [...prices]);
@@ -638,20 +673,36 @@ function processGenericData(
   pathPolicy: ForecastPathPolicy = 'production-baseline'
 ): any[] {
   const { returns, drift, dailyVol, csr = null } = modelInputs;
-  const tracesByDate = generateGenericStochasticTraces(assetId, ohlcv, horizon, drift, dailyVol, returns, pathPolicy, csr);
+  const tracesByDate = generateGenericStochasticTraces(
+    assetId, ohlcv, horizon, drift, dailyVol, returns, pathPolicy, csr,
+    modelInputs.momentumDays, modelInputs.longRunDrift
+  );
   // Anchors are horizon-independent, so the median at day d never depends on the
   // selected horizon and switching 90d -> 180d preserves the whole 90d prefix.
-  const medianDrift = modelInputs.medianDrift ?? drift;
-  const medianLogReturnAt = (day: number): number =>
-    csr ? csrMedianLogReturnAtDay(csr, day) : medianDrift * day;
+  const medianLogReturnAt = (day: number): number => genericMedianLogReturnAtDay(modelInputs, day);
   // Same curve minus any horizon-specific override, so trace selection stays
   // identical whichever horizon the user asked for.
-  const referenceLogReturnAt = (day: number): number =>
-    csr ? csrMedianLogReturnAtDay(csr, day) : drift * day;
+  const referenceLogReturnAt = (day: number): number => genericReferenceLogReturnAtDay(modelInputs, day);
   const logScaleAt = (day: number): number => genericLogScaleAtDay(modelInputs, day);
   const latestChannel = [...channelBounds].reverse().find((point) =>
     point.lowerResidual !== null && point.upperResidual !== null
   );
+  // The projected trend is the same rolling SMA the history uses, fed with the
+  // horizon-independent reference path. A running sum keeps it O(n), so the
+  // channel and its floor never change when the requested horizon changes.
+  const channelWindowDays = assetId === 'gold'
+    ? GOLD_CHANNEL_CONFIG.trendWindowDays
+    : SP500_CHANNEL_CONFIG.trendWindowDays;
+  const channelWindow = new Float64Array(channelWindowDays);
+  let channelWindowSum = 0;
+  let channelWindowCount = 0;
+  let channelWindowWrite = 0;
+  for (let index = Math.max(0, ohlcv.length - (channelWindowDays - 1)); index < ohlcv.length; index++) {
+    channelWindowSum += ohlcv[index].close;
+    channelWindow[channelWindowWrite] = ohlcv[index].close;
+    channelWindowWrite = (channelWindowWrite + 1) % channelWindowDays;
+    channelWindowCount++;
+  }
   const data: any[] = ohlcv.map((row, index) => {
     const sma20 = index >= 19 ? mean(ohlcv.slice(index - 19, index + 1).map((d) => d.close)) : null;
     const sma50 = index >= 49 ? mean(ohlcv.slice(index - 49, index + 1).map((d) => d.close)) : null;
@@ -684,8 +735,13 @@ function processGenericData(
     const rangeLow = median * Math.exp(-confidenceZ * sigma);
     const rangeHigh = median * Math.exp(confidenceZ * sigma);
     const candleSpread = Math.max(0.001, dailyVol * 0.25);
+    const referencePrice = last.close * Math.exp(referenceLogReturnAt(day));
+    channelWindowSum += referencePrice - channelWindow[channelWindowWrite];
+    channelWindow[channelWindowWrite] = referencePrice;
+    channelWindowWrite = (channelWindowWrite + 1) % channelWindowDays;
+    channelWindowCount = Math.min(channelWindowDays, channelWindowCount + 1);
     const channelTrend = latestChannel?.trend
-      ? latestChannel.trend * Math.exp(drift * day)
+      ? channelWindowSum / channelWindowCount
       : null;
     const lowerBound = channelTrend && latestChannel?.lowerResidual !== null && latestChannel?.lowerResidual !== undefined
       ? channelTrend * Math.exp(latestChannel.lowerResidual)
@@ -735,9 +791,14 @@ function processGenericData(
  * declared median.
  */
 export function genericHeatmapDriftIncrements(modelInputs: GenericModelInputs, horizon: number): number[] {
-  const { csr = null } = modelInputs;
-  const drift = modelInputs.medianDrift ?? modelInputs.drift;
-  if (!csr) return Array.from({ length: horizon }, () => drift);
+  const { csr = null, momentumDays, longRunDrift } = modelInputs;
+  const dailyDrift = modelInputs.medianDrift ?? modelInputs.drift;
+  if (!csr && momentumDays !== undefined) {
+    return Array.from({ length: horizon }, (_, index) =>
+      index + 1 <= momentumDays ? dailyDrift : longRunDrift ?? 0
+    );
+  }
+  if (!csr) return Array.from({ length: horizon }, () => dailyDrift);
   return Array.from({ length: horizon }, (_, index) =>
     csrMedianLogReturnAtDay(csr, index + 1) - csrMedianLogReturnAtDay(csr, index)
   );
@@ -773,13 +834,20 @@ export function buildGenericModelInputs(
     if (gold365) {
       // The ridge keeps the sigma*sqrt(365) width it was validated with.
       return {
-        modelInputs: { ...baseline, medianDrift: gold365.logReturn / GOLD_365_V2_HORIZON_DAYS },
+        modelInputs: {
+          ...baseline,
+          medianDrift: gold365.logReturn / GOLD_365_V2_HORIZON_DAYS,
+          momentumDays: GOLD_MOMENTUM_DAYS,
+          longRunDrift: GOLD_LONG_RUN_DRIFT,
+        },
         calibrationLabel: 'Direct 1Y ridge interval',
       };
     }
     return {
       modelInputs: {
         ...baseline,
+        momentumDays: GOLD_MOMENTUM_DAYS,
+        longRunDrift: GOLD_LONG_RUN_DRIFT,
         logVarianceByDay: buildVolTermStructure(ohlcv, baseline.returns, horizon, GOLD_VOL_TERM_STRUCTURE) ?? undefined,
       },
       calibrationLabel: 'Slow momentum interval',
@@ -892,7 +960,6 @@ export function computeGenericProbabilityForecast(
   if (!last || horizonDays < 1 || ohlcv.length < 252) return null;
 
   const { csr = null } = modelInputs;
-  const drift = modelInputs.medianDrift ?? modelInputs.drift;
   const targetDate = dateKey(addUtcDays(new Date(`${last.date}T00:00:00Z`), horizonDays));
 
   if (csr) {
@@ -919,7 +986,7 @@ export function computeGenericProbabilityForecast(
     };
   }
 
-  const median = last.close * Math.exp(drift * horizonDays);
+  const median = last.close * Math.exp(genericMedianLogReturnAtDay(modelInputs, horizonDays));
   const sigma = genericLogScaleAtDay(modelInputs, horizonDays);
   const q05 = median * Math.exp(-1.6448536269514722 * sigma);
   const q10 = median * Math.exp(-1.2815515655446004 * sigma);

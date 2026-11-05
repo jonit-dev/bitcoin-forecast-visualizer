@@ -29,6 +29,7 @@
     "backtest:market": "tsx scripts/backtest-market-forecast.ts",
     "backtest:market-production": "tsx scripts/backtest-market-production.ts",
     "research:market-volatility": "tsx scripts/research-market-volatility.ts",
+    "research:gold-long-median": "tsx scripts/research-gold-long-median.ts",
     "backtest:buy-zones": "tsx scripts/backtest-buy-zones.ts",
     "backtest:liquidity-derivatives": "tsx scripts/backtest-liquidity-derivatives.ts",
     "backtest:derivatives-tail-risk": "tsx scripts/backtest-derivatives-tail-risk.ts",

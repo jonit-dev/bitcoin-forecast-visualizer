@@ -114,4 +114,49 @@ describe('session volatility term structure', () => {
       expect(long[index].forecastLower).toBe(short[index].forecastLower);
     }
   }, 30_000);
+
+  it('decays gold momentum to a 4% long-run drift after one year', () => {
+    const gold = loadMarketData('gold');
+    const { drift } = computeGoldModelInputs(gold.ohlcv);
+    const last = gold.ohlcv.at(-1)!;
+    const expectedLogReturn = drift * 365 + Math.log(1.04) * (3650 - 365) / 365;
+    const summary = buildMarketForecastSummary('gold', gold, 3650, Z95).probabilityForecast!;
+    expect(Math.log(summary.median / last.close)).toBeCloseTo(expectedLogReturn, 6);
+  });
+
+  it('keeps the gold ten-year primary path on the capped reference drift', () => {
+    const gold = loadMarketData('gold');
+    const { drift } = computeGoldModelInputs(gold.ohlcv);
+    const last = gold.ohlcv.at(-1)!;
+    const rows = buildMarketForecast('gold', gold, 3650, Z95).displayData.filter((row) => row.isForecast);
+    const terminal = rows.at(-1)!;
+    const ratio = terminal.close / terminal.forecast;
+    console.log('gold 3650 terminal candle/median ratio', ratio);
+    expect(ratio).toBeGreaterThan(0.6);
+    expect(ratio).toBeLessThan(1.6);
+    const cappedReference = last.close * Math.exp(drift * 365 + Math.log(1.04) * (3650 - 365) / 365);
+    expect(terminal.traceReference / cappedReference).toBeCloseTo(1, 6);
+  }, 60_000);
+
+  it('keeps the projected gold floor below the median at ten years', () => {
+    const gold = loadMarketData('gold');
+    const { drift } = computeGoldModelInputs(gold.ohlcv);
+    const last = gold.ohlcv.at(-1)!;
+    const rows = buildMarketForecast('gold', gold, 3650, Z95).displayData.filter((row) => row.isForecast);
+    const terminal = rows.at(-1)!;
+    expect(terminal.floorPriceModel).toBeLessThan(terminal.forecast);
+    expect(terminal.forecast).toBeLessThan(last.close * Math.exp(drift * 3650));
+  }, 60_000);
+
+  it('keeps gold chart rows prefix-stable past one year', () => {
+    const gold = loadMarketData('gold');
+    const short = buildMarketForecast('gold', gold, 730, Z95).displayData.filter((row) => row.isForecast);
+    const long = buildMarketForecast('gold', gold, 1825, Z95).displayData.filter((row) => row.isForecast);
+    for (let index = 0; index < short.length; index++) {
+      expect(long[index].forecast).toBe(short[index].forecast);
+      expect(long[index].forecastUpper).toBe(short[index].forecastUpper);
+      expect(long[index].forecastLower).toBe(short[index].forecastLower);
+      expect(long[index].floorPriceModel).toBe(short[index].floorPriceModel);
+    }
+  }, 60_000);
 });
