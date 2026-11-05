@@ -60,6 +60,12 @@ describe('market data hydration', () => {
     expect(hydrated.continuity.missingDates).toEqual(['2026-07-07']);
   });
 
+  it('should merge remote VIX rows past the bundled VIX tail', async () => {
+    const sp500 = { ...bundleOf([row('2026-07-08', 610)]), impliedVol: [row('2026-07-08', 15)] };
+    const hydrated = await hydrateMarketData('sp500', sp500, response([], { impliedVolRows: [row('2026-07-09', 16)] }) as typeof fetch);
+    expect(hydrated.data.impliedVol?.at(-1)).toEqual(row('2026-07-09', 16));
+  });
+
   it('should request the same repair window the server merges from', async () => {
     const requested: string[] = [];
     const fetcher = (async (input: RequestInfo | URL) => {

@@ -31,7 +31,7 @@ describe('heatmap distribution agrees with its summary', () => {
 
   it('should give the S&P 500 heatmap the session term-structure variance the summary declares', () => {
     for (const horizon of [180, 3650]) {
-      const { modelInputs } = buildGenericModelInputs('sp500', sp500.ohlcv, horizon);
+      const { modelInputs } = buildGenericModelInputs('sp500', sp500.ohlcv, horizon, sp500.impliedVol);
       const simulatedVariance = sum(genericHeatmapLogVarianceIncrements(modelInputs, horizon));
       const projectionVariance = modelInputs.logVarianceByDay![horizon];
 

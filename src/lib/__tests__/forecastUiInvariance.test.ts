@@ -12,7 +12,7 @@ import { buildMarketForecast } from '../marketForecast';
 // volatility term structure; their medians did not move.
 const FIXTURES = {
   btc: { end: '2020-01-01', rows: 3456, close: 7189.94, median: 16954.54260718957, q10: 11991.281389866706, q90: 23972.126553707858 },
-  sp500: { end: '2017-01-03', rows: 1591, close: 177.1338, median: 197.17322316012064, q10: 180.57496155888487, q90: 215.29717960744514 },
+  sp500: { end: '2017-01-03', rows: 1591, close: 177.1338, median: 197.17322316012064, q10: 180.10412742212114, q90: 215.86001657936276 },
   gold: { end: '2012-01-03', rows: 1794, close: 155.92, median: 164.42518564681197, q10: 137.48794085834191, q90: 196.64009444176807 },
 } as const;
 

@@ -1,4 +1,4 @@
-import { MARKET_ASSET_IDS, MARKET_ASSET_REGISTRY, REPAIR_LOOKBACK_DAYS } from './assets';
+import { REFRESH_SERIES, REPAIR_LOOKBACK_DAYS } from './assets';
 import { MarketQuoteRepository, type AssetRunResult, type D1Database } from './repository';
 import { fetchAssetCandles } from './sources';
 import { MAX_BACKFILL_DAYS, backfillWindowStart, repairWindowStart } from '../../../shared/market-continuity.mjs';
@@ -34,7 +34,8 @@ export async function runRefresh(env: Env, now = new Date(), fetcher: typeof fet
   const routineStart = repairWindowStart(today, REPAIR_LOOKBACK_DAYS);
   await repository.startRun(runId, now.toISOString(), 'scheduled');
   const results: AssetRunResult[] = [];
-  for (const assetId of MARKET_ASSET_IDS) {
+  for (const series of REFRESH_SERIES) {
+    const assetId = series.id;
     try {
       // Read only as far back as recovery needs: the routine seven-day repair
       // window, widened to the first hole or the stored tail after an outage.
@@ -43,7 +44,7 @@ export async function runRefresh(env: Env, now = new Date(), fetcher: typeof fet
         lookbackDays: REPAIR_LOOKBACK_DAYS,
         bootstrapSince: env.MARKET_DATA_BOOTSTRAP_SINCE,
       });
-      const rows = await fetchAssetCandles(MARKET_ASSET_REGISTRY[assetId], now, fetcher, since);
+      const rows = await fetchAssetCandles(series, now, fetcher, since);
       // A widened window reads bitcoin from Yahoo rather than CoinGecko, so
       // writing every returned row would restate correct candles in the other
       // provider's aggregation and rounding. The next ordinary run would then

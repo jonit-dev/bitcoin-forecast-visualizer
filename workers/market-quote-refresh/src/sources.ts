@@ -55,6 +55,6 @@ export async function fetchAssetCandles(asset: AssetConfig, now = new Date(), fe
   }
   // Bitcoin over a long window, and every ETF, comes from Yahoo daily history.
   const yahoo = asset.source === 'coingecko' ? { ...asset, source: 'yahoo' as const, symbol: 'BTC-USD' } : asset;
-  const payload = await fetchJson(`https://query1.finance.yahoo.com/v8/finance/chart/${yahoo.symbol}?period1=${from}&period2=${to}&interval=1d&events=history&includeAdjustedClose=true`, fetcher);
+  const payload = await fetchJson(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahoo.symbol)}?period1=${from}&period2=${to}&interval=1d&events=history&includeAdjustedClose=true`, fetcher);
   return normalizeYahoo(yahoo, payload, now);
 }

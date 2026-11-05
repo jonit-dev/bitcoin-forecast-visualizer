@@ -3,6 +3,7 @@ import { countUsMarketSessionsAfter } from '../../../shared/us-market-calendar.m
 import { loadMarketData } from '../api';
 import {
   GOLD_VOL_TERM_STRUCTURE,
+  SP500_VIX_TERM_STRUCTURE,
   SP500_VOL_TERM_STRUCTURE,
   buildMarketForecast,
   buildMarketForecastSummary,
@@ -10,6 +11,7 @@ import {
   computeSP500ModelInputs,
   ewmaDailyVariance,
   termStructureLogVariance,
+  vixSpotVariance,
   type VolTermStructureConfig,
 } from '../marketForecast';
 
@@ -45,15 +47,48 @@ describe('session volatility term structure', () => {
     expect(ewmaDailyVariance(Array(300).fill(0.01), 21)).toBeCloseTo(1e-4, 15);
   });
 
-  it('sets the S&P 500 summary width from the term structure', () => {
+  it('sets the S&P 500 summary width from the VIX term structure inside the first year', () => {
     const sp500 = loadMarketData('sp500');
+    const origin = sp500.ohlcv.at(-1)!.date;
+    const impliedSpot = vixSpotVariance(sp500.ohlcv, sp500.impliedVol);
+    expect(impliedSpot).not.toBeNull();
+    for (const horizon of [7, 180, 365]) {
+      const sessions = countUsMarketSessionsAfter(origin, addDays(origin, horizon));
+      const expected = SP500_VIX_TERM_STRUCTURE.scale * Math.sqrt(
+        termStructureLogVariance(
+          impliedSpot!,
+          SP500_VIX_TERM_STRUCTURE.longRunDailyVol ** 2,
+          SP500_VIX_TERM_STRUCTURE.persistence,
+          sessions
+        )
+      );
+      const summary = buildMarketForecastSummary('sp500', sp500, horizon, Z95).probabilityForecast!;
+      expect(Math.log(summary.q95 / summary.median) / Z95).toBeCloseTo(expected, 12);
+    }
+  });
+
+  it('keeps the EWMA price-only S&P 500 width when the VIX feed is absent', () => {
+    const sp500 = loadMarketData('sp500');
+    const noVix = { ...sp500, impliedVol: undefined };
     const { returns } = computeSP500ModelInputs(sp500.ohlcv);
     const origin = sp500.ohlcv.at(-1)!.date;
     for (const horizon of [7, 180, 365, 1825]) {
-      const summary = buildMarketForecastSummary('sp500', sp500, horizon, Z95).probabilityForecast!;
+      const summary = buildMarketForecastSummary('sp500', noVix, horizon, Z95).probabilityForecast!;
       expect(Math.log(summary.q95 / summary.median) / Z95)
         .toBeCloseTo(expectedLogScale(returns, origin, horizon, SP500_VOL_TERM_STRUCTURE), 12);
     }
+  });
+
+  it('reads the VIX close of the session before the origin and never carries a stale one', () => {
+    const sp500 = loadMarketData('sp500');
+    const vix = sp500.impliedVol!;
+    const previous = sp500.ohlcv.at(-2)!;
+    const index = vix.findIndex((row) => row.date === previous.date);
+    expect(index).toBeGreaterThan(-1);
+    const throughPrevious = vix.slice(0, index);
+    expect(vixSpotVariance(sp500.ohlcv, throughPrevious)).toBeNull();
+    const hit = vix.find((row) => row.date === previous.date)!;
+    expect(vixSpotVariance(sp500.ohlcv, vix)).toBeCloseTo((hit.close / 100) ** 2 / 252, 15);
   });
 
   it('sets the gold summary width from the term structure everywhere except the 365-day ridge', () => {

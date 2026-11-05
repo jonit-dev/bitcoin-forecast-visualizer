@@ -1,8 +1,8 @@
-import type { AssetConfig, MarketAssetId } from './assets';
+import type { AssetConfig, SeriesId } from './assets';
 import { isCompletedCandleDate } from '../../../shared/us-market-calendar.mjs';
 
 export interface CanonicalCandle {
-  assetId: MarketAssetId;
+  assetId: SeriesId;
   date: string;
   open: number;
   high: number;

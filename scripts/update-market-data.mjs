@@ -2,7 +2,8 @@
 /**
  * Fetches no-key daily OHLCV data for market proxies used by the tab workspace.
  * VOO and GLD are sourced from Yahoo Finance's chart endpoint as investable
- * proxies. OHLC values are adjusted by the adjusted-close ratio.
+ * proxies. OHLC values are adjusted by the adjusted-close ratio. VIX is not an
+ * asset: it sets the first year of the S&P 500 forecast width.
  */
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
@@ -12,12 +13,14 @@ import { isCompletedCandleDate } from '../shared/us-market-calendar.mjs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const VOO_DATA_PATH = join(__dirname, '../src/data/voo-history.json');
 const GLD_DATA_PATH = join(__dirname, '../src/data/gld-history.json');
+const VIX_DATA_PATH = join(__dirname, '../src/data/vix-history.json');
 const VOO_FIRST_TRADE_DATE = '2010-09-09';
 const GLD_FIRST_TRADE_DATE = '2004-11-18';
 
 const MARKET_SERIES = [
   { assetId: 'sp500', label: 'VOO', symbol: 'VOO', firstTradeDate: VOO_FIRST_TRADE_DATE, dataPath: VOO_DATA_PATH },
   { assetId: 'gold', label: 'GLD', symbol: 'GLD', firstTradeDate: GLD_FIRST_TRADE_DATE, dataPath: GLD_DATA_PATH },
+  { assetId: 'vix', label: 'VIX', symbol: '^VIX', firstTradeDate: VOO_FIRST_TRADE_DATE, dataPath: VIX_DATA_PATH },
 ];
 
 function isValidRow(row) {
@@ -78,7 +81,7 @@ export function toDailyRows(result, assetId, now = new Date()) {
 async function fetchYahooRows({ symbol, assetId, firstTradeDate }, now = new Date()) {
   const period1 = Math.floor(new Date(`${firstTradeDate}T00:00:00Z`).getTime() / 1000);
   const period2 = Math.floor(Date.now() / 1000);
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=1d&events=history&includeAdjustedClose=true`;
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${period1}&period2=${period2}&interval=1d&events=history&includeAdjustedClose=true`;
   const res = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0',

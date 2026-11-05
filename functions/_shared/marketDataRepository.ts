@@ -1,7 +1,7 @@
-import { loadMarketData, withOHLCV, type MarketAssetId, type OHLCVData } from '../../src/lib/api';
+import { loadMarketData, mergeOHLCVRows, withOHLCV, type MarketAssetId, type OHLCVData } from '../../src/lib/api';
 import { applyContinuityGuard, repairWindowStart, type ContinuityAssessment } from '../../src/lib/marketContinuity';
 import type { D1Database } from '../../workers/market-quote-refresh/src/repository';
-import { MARKET_ASSET_REGISTRY, REPAIR_LOOKBACK_DAYS } from '../../workers/market-quote-refresh/src/assets';
+import { MARKET_ASSET_REGISTRY, REPAIR_LOOKBACK_DAYS, type SeriesId } from '../../workers/market-quote-refresh/src/assets';
 import { validateCandle } from '../../workers/market-quote-refresh/src/normalize';
 import { countUsMarketSessionsAfter } from '../../shared/us-market-calendar.mjs';
 
@@ -29,6 +29,8 @@ export interface RuntimeMarketData {
   status: MarketDataStatus;
   runStatus: string | null;
   continuity: ContinuityAssessment;
+  /** S&P 500 only: stored VIX candles after `since`, merged into `MarketData.impliedVol`. */
+  impliedVolRows?: OHLCVData[];
 }
 
 // D1 caps a single result set, and an unbounded read would grow with history.
@@ -57,7 +59,7 @@ export const defaultRepairWindow = (assetId: MarketAssetId) =>
   repairWindowStart(loadMarketData(assetId).ohlcv.at(-1)!.date, REPAIR_LOOKBACK_DAYS);
 
 /** Read every stored candle after `since`, one bounded page at a time. */
-async function readCandlePages(db: D1Database, assetId: MarketAssetId, since: string): Promise<OHLCVData[]> {
+async function readCandlePages(db: D1Database, assetId: SeriesId, since: string): Promise<OHLCVData[]> {
   const rows: OHLCVData[] = [];
   let cursor = since;
   for (let page = 0; page < RUNTIME_MAX_PAGES; page += 1) {
@@ -96,6 +98,10 @@ export async function readRuntimeMarketData(env: MarketDataEnv, assetId: MarketA
     const latestDb = await env.MARKET_QUOTES_DB.prepare('SELECT date, source, ingested_at FROM market_candles WHERE asset_id = ? ORDER BY date DESC LIMIT 1').bind(assetId).first<any>();
     const latestRun = await env.MARKET_QUOTES_DB.prepare('SELECT status FROM refresh_runs ORDER BY started_at DESC LIMIT 1').first<{ status: string }>();
     if (!latestDb) return bundleOnly(latestRun?.status ?? null);
+    // A VIX read failure costs only the VIX width, never the price history.
+    const impliedVolRows = assetId === 'sp500'
+      ? await readCandlePages(env.MARKET_QUOTES_DB, 'vix', windowStart).catch(() => [])
+      : undefined;
 
     // Continuity is judged on what a consumer actually renders — the bundle
     // merged with the repair rows — not on the repair rows alone.
@@ -118,6 +124,7 @@ export async function readRuntimeMarketData(env: MarketDataEnv, assetId: MarketA
       status: guarded.continuity.complete ? ageStatus : 'delayed',
       runStatus: latestRun?.status ?? null,
       continuity: guarded.continuity,
+      ...(impliedVolRows ? { impliedVolRows } : {}),
     };
   } catch {
     return bundleOnly(null);
@@ -130,6 +137,9 @@ export async function loadMergedMarketData(env: MarketDataEnv, assetId: MarketAs
   const runtime = await readRuntimeMarketData(env, assetId, windowStart);
   const merged = runtime.status === 'fallback' ? bundled.ohlcv : mergeMarketRows(bundled.ohlcv, runtime.rows);
   const ohlcv = applyContinuityGuard(assetId, merged, windowStart).rows;
+  const impliedVol = bundled.impliedVol && runtime.impliedVolRows
+    ? mergeOHLCVRows(bundled.impliedVol, runtime.impliedVolRows)
+    : bundled.impliedVol;
   // One derivation path for price, change, volume and capitalization.
-  return { marketData: withOHLCV(bundled, ohlcv), freshness: runtime };
+  return { marketData: withOHLCV({ ...bundled, impliedVol }, ohlcv), freshness: runtime };
 }

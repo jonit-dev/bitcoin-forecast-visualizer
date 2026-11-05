@@ -222,6 +222,34 @@ export const GOLD_VOL_TERM_STRUCTURE: VolTermStructureConfig = {
   scale: 1,
 };
 
+/**
+ * VIX-set S&P 500 width for the first year: the spot variance is the VIX close
+ * of the session before the origin, and c 0.70 absorbs the variance risk premium.
+ * Beyond 365 days the band grows by the price-only increments, because this
+ * spec under-covered 2- and 5-year S&P 500 outcomes over 1991-2018.
+ */
+export const SP500_VIX_TERM_STRUCTURE = {
+  horizonDays: 365,
+  persistence: 0.998,
+  longRunDailyVol: 0.0106,
+  scale: 0.7,
+} as const;
+
+/**
+ * VIX close of the session before the origin as a daily variance. Null when the
+ * feed does not reach that session, which keeps the price-only width: a stale
+ * VIX is never carried forward. The lag matches the validated research setup.
+ */
+export function vixSpotVariance(ohlcv: OHLCVData[], vix: OHLCVData[] | undefined): number | null {
+  const previous = ohlcv[ohlcv.length - 2];
+  if (!previous || !vix) return null;
+  for (let index = vix.length - 1; index >= 0; index--) {
+    if (vix[index].date > previous.date) continue;
+    return vix[index].date === previous.date && vix[index].close > 0 ? (vix[index].close / 100) ** 2 / 252 : null;
+  }
+  return null;
+}
+
 const EWMA_SEED_RETURNS = 60;
 
 /** EWMA of squared daily log returns, seeded with the mean of the first 60. */
@@ -250,14 +278,23 @@ export function buildVolTermStructure(
   ohlcv: OHLCVData[],
   returns: number[],
   horizon: number,
-  config: VolTermStructureConfig
+  config: VolTermStructureConfig,
+  impliedSpot: number | null = null
 ): number[] | null {
   const last = ohlcv[ohlcv.length - 1];
   const spot = ewmaDailyVariance(returns, config.halfLifeSessions);
   if (!last || spot === null || !Number.isFinite(spot)) return null;
-  const longRun = config.longRunDailyVol ** 2;
-  return buildSessionLadder(last.date, horizon).map((sessions) =>
-    config.scale ** 2 * termStructureLogVariance(spot, longRun, config.persistence, sessions)
+  const priceOnly = (sessions: number) =>
+    config.scale ** 2 * termStructureLogVariance(spot, config.longRunDailyVol ** 2, config.persistence, sessions);
+  if (impliedSpot === null) return buildSessionLadder(last.date, horizon).map(priceOnly);
+
+  const vix = SP500_VIX_TERM_STRUCTURE;
+  const implied = (sessions: number) =>
+    vix.scale ** 2 * termStructureLogVariance(impliedSpot, vix.longRunDailyVol ** 2, vix.persistence, sessions);
+  const ladder = buildSessionLadder(last.date, Math.max(horizon, vix.horizonDays));
+  const cutoff = ladder[vix.horizonDays];
+  return ladder.slice(0, horizon + 1).map((sessions) =>
+    sessions <= cutoff ? implied(sessions) : implied(cutoff) + priceOnly(sessions) - priceOnly(cutoff)
   );
 }
 
@@ -722,7 +759,8 @@ export function genericHeatmapLogVarianceIncrements(modelInputs: GenericModelInp
 export function buildGenericModelInputs(
   assetId: Exclude<ForecastAssetId, 'btc'>,
   ohlcv: OHLCVData[],
-  horizon: number
+  horizon: number,
+  impliedVol?: OHLCVData[]
 ): { modelInputs: GenericModelInputs; calibrationLabel: string } {
   if (assetId === 'gold') {
     const baseline = computeGoldModelInputs(ohlcv);
@@ -753,7 +791,9 @@ export function buildGenericModelInputs(
   return {
     modelInputs: {
       ...baseline,
-      logVarianceByDay: buildVolTermStructure(ohlcv, baseline.returns, horizon, SP500_VOL_TERM_STRUCTURE) ?? undefined,
+      logVarianceByDay: buildVolTermStructure(
+        ohlcv, baseline.returns, horizon, SP500_VOL_TERM_STRUCTURE, vixSpotVariance(ohlcv, impliedVol)
+      ) ?? undefined,
       csr: lastSession
         ? buildCsrProjection(
             ohlcv,
@@ -926,7 +966,7 @@ export function buildMarketForecast(
     };
   }
 
-  const { modelInputs, calibrationLabel } = buildGenericModelInputs(assetId, marketData.ohlcv, horizon);
+  const { modelInputs, calibrationLabel } = buildGenericModelInputs(assetId, marketData.ohlcv, horizon, marketData.impliedVol);
   return {
     displayData: processGenericData(
       assetId,
@@ -965,7 +1005,7 @@ export function buildMarketForecastSummary(
     };
   }
 
-  const { modelInputs, calibrationLabel } = buildGenericModelInputs(assetId, marketData.ohlcv, horizon);
+  const { modelInputs, calibrationLabel } = buildGenericModelInputs(assetId, marketData.ohlcv, horizon, marketData.impliedVol);
   return {
     displayData: [],
     heatmapData: [],

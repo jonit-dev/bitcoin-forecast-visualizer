@@ -23,13 +23,16 @@ export async function hydrateMarketData(assetId: MarketAssetId, bundled: MarketD
   try {
     const response = await fetcher(`/api/market-data?asset=${assetId}&since=${windowStart}`, { signal: controller.signal });
     if (!response.ok) throw new Error(`Market data request failed: ${response.status}`);
-    const body = await response.json() as { rows?: unknown[]; latestDate?: string; source?: string; refreshedAt?: string | null; status?: MarketDataStatus };
+    const body = await response.json() as { rows?: unknown[]; impliedVolRows?: unknown[]; latestDate?: string; source?: string; refreshedAt?: string | null; status?: MarketDataStatus };
     // Repairs may rewrite candles behind the bundle tail, so every valid remote
     // row is merged, not only rows newer than the bundle.
     const merged = mergeOHLCVRows(bundled.ohlcv, (body.rows ?? []) as OHLCVData[]);
     const guarded = applyContinuityGuard(assetId, merged, windowStart);
+    const impliedVol = bundled.impliedVol && Array.isArray(body.impliedVolRows)
+      ? mergeOHLCVRows(bundled.impliedVol, body.impliedVolRows)
+      : bundled.impliedVol;
     return {
-      data: withOHLCV(bundled, guarded.rows),
+      data: withOHLCV({ ...bundled, impliedVol }, guarded.rows),
       latestDate: guarded.rows.at(-1)!.date,
       observedLatestDate: merged.at(-1)!.date,
       source: body.source ?? 'bundle',

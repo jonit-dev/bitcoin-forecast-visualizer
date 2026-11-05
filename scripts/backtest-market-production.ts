@@ -2,8 +2,9 @@
  * Walk-forward gate for the S&P 500 (VOO) and gold (GLD) forecasts exactly as
  * production serves them: `buildGenericModelInputs` + `computeGenericProbabilityForecast`
  * on the history up to each origin, calendar-day horizons, target = last close on
- * or before origin + horizon. The incumbent is the same forecast with the session
- * volatility term structure removed, so the comparison isolates that change.
+ * or before origin + horizon. Two incumbents share the production median:
+ * `legacy` drops the session volatility term structure, and `price-only` (S&P 500)
+ * drops only the VIX first year. Each comparison isolates one change.
  *
  *   npm run backtest:market-production [-- --json out.json]
  *
@@ -15,7 +16,12 @@
  */
 import { writeFileSync } from 'node:fs';
 import { loadMarketData, type OHLCVData } from '../src/lib/api';
-import { buildGenericModelInputs, computeGenericProbabilityForecast } from '../src/lib/marketForecast';
+import {
+  SP500_VOL_TERM_STRUCTURE,
+  buildGenericModelInputs,
+  buildVolTermStructure,
+  computeGenericProbabilityForecast,
+} from '../src/lib/marketForecast';
 import type { ProbabilityForecast } from '../src/lib/data';
 
 const ASSETS = ['sp500', 'gold'] as const;
@@ -56,9 +62,13 @@ function score(forecast: ProbabilityForecast, spot: number, y: number, origin: s
   };
 }
 
-/** Paired outcomes for every matured origin: [incumbent, production]. */
-function evaluate(assetId: (typeof ASSETS)[number], rows: OHLCVData[], horizon: number): [Outcome, Outcome][] {
-  const pairs: [Outcome, Outcome][] = [];
+interface Arms { legacy: Outcome; priceOnly: Outcome; production: Outcome }
+
+/** Scored outcomes of every arm for each matured origin. */
+function evaluate(assetId: (typeof ASSETS)[number], rows: OHLCVData[], horizon: number): Arms[] {
+  const arms: Arms[] = [];
+  // Full series: the model reads only the VIX dated on the session before the origin.
+  const impliedVol = loadMarketData(assetId).impliedVol;
   const lastDate = rows[rows.length - 1].date;
   let target = MIN_ORIGIN_INDEX;
   for (let index = MIN_ORIGIN_INDEX; index < rows.length; index += STEP) {
@@ -70,20 +80,24 @@ function evaluate(assetId: (typeof ASSETS)[number], rows: OHLCVData[], horizon: 
     if (target <= index) continue;
 
     const history = rows.slice(0, index + 1);
-    const { modelInputs, calibrationLabel } = buildGenericModelInputs(assetId, history, horizon);
-    const production = computeGenericProbabilityForecast(history, horizon, modelInputs, calibrationLabel);
-    const incumbent = computeGenericProbabilityForecast(
-      history,
-      horizon,
-      { ...modelInputs, logVarianceByDay: undefined },
-      calibrationLabel
-    );
-    if (!production || !incumbent) continue;
+    const { modelInputs, calibrationLabel } = buildGenericModelInputs(assetId, history, horizon, impliedVol);
+    const forecast = (logVarianceByDay: number[] | undefined) =>
+      computeGenericProbabilityForecast(history, horizon, { ...modelInputs, logVarianceByDay }, calibrationLabel);
+    const production = forecast(modelInputs.logVarianceByDay);
+    const legacy = forecast(undefined);
+    const priceOnly = impliedVol
+      ? forecast(buildVolTermStructure(history, modelInputs.returns, horizon, SP500_VOL_TERM_STRUCTURE) ?? undefined)
+      : production;
+    if (!production || !legacy || !priceOnly) continue;
     const spot = rows[index].close;
     const y = Math.log(rows[target].close / spot);
-    pairs.push([score(incumbent, spot, y, origin), score(production, spot, y, origin)]);
+    arms.push({
+      legacy: score(legacy, spot, y, origin),
+      priceOnly: score(priceOnly, spot, y, origin),
+      production: score(production, spot, y, origin),
+    });
   }
-  return pairs;
+  return arms;
 }
 
 const mean = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / Math.max(values.length, 1);
@@ -130,10 +144,10 @@ function compare(horizon: number, period: 'train' | 'holdout', pairs: [Outcome, 
 
 type Comparison = ReturnType<typeof compare>;
 
-function format(assetId: string, c: Comparison): string {
+function format(label: string, c: Comparison): string {
   const pct = (value: number) => `${(value * 100).toFixed(1)}%`;
   return [
-    `[${assetId}]`.padEnd(8),
+    `[${label}]`.padEnd(22),
     `h=${String(c.horizon).padStart(3)}`,
     c.period.padEnd(7),
     `n=${String(c.incumbent.n).padStart(3)}`,
@@ -167,22 +181,32 @@ function gate(comparisons: Comparison[]): string[] {
 function main(): void {
   const report: Record<string, Comparison[]> = {};
   let failed = false;
+  const gates = [
+    { assetId: 'sp500', baseline: 'legacy' },
+    { assetId: 'sp500', baseline: 'priceOnly' },
+    { assetId: 'gold', baseline: 'legacy' },
+  ] as const;
   for (const assetId of ASSETS) {
     const rows = loadMarketData(assetId).ohlcv;
-    const comparisons: Comparison[] = [];
-    for (const horizon of HORIZONS) {
-      const pairs = evaluate(assetId, rows, horizon);
-      for (const period of ['train', 'holdout'] as const) {
-        const subset = pairs.filter(([o]) => (period === 'holdout') === (o.origin >= HOLDOUT_START));
-        const c = compare(horizon, period, subset);
-        comparisons.push(c);
-        console.log(format(assetId, c));
+    const byHorizon = HORIZONS.map((horizon) => ({ horizon, arms: evaluate(assetId, rows, horizon) }));
+    for (const { baseline } of gates.filter((entry) => entry.assetId === assetId)) {
+      const label = `${assetId} vs ${baseline}`;
+      const comparisons: Comparison[] = [];
+      for (const { horizon, arms } of byHorizon) {
+        for (const period of ['train', 'holdout'] as const) {
+          const subset = arms
+            .filter((arm) => (period === 'holdout') === (arm.production.origin >= HOLDOUT_START))
+            .map((arm) => [arm[baseline], arm.production] as [Outcome, Outcome]);
+          const c = compare(horizon, period, subset);
+          comparisons.push(c);
+          console.log(format(label, c));
+        }
       }
+      const failures = gate(comparisons);
+      console.log(`[${label}] ${failures.length === 0 ? 'PASS' : `FAIL: ${failures.join('; ')}`}`);
+      failed ||= failures.length > 0;
+      report[label] = comparisons;
     }
-    const failures = gate(comparisons);
-    console.log(`[${assetId}] ${failures.length === 0 ? 'PASS' : `FAIL: ${failures.join('; ')}`}`);
-    failed ||= failures.length > 0;
-    report[assetId] = comparisons;
   }
   const jsonIndex = process.argv.indexOf('--json');
   if (jsonIndex > 0) writeFileSync(process.argv[jsonIndex + 1], `${JSON.stringify(report, null, 2)}\n`);

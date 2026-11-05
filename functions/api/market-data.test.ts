@@ -164,6 +164,24 @@ describe('market data API', () => {
     expect(body.status).toBe('current');
   });
 
+  it('should return stored VIX rows only for the S&P 500 so the client can widen its forecast', async () => {
+    const sp500Latest = loadMarketData('sp500').ohlcv.at(-1)!;
+    const goldLatest = loadMarketData('gold').ohlcv.at(-1)!;
+    const vixRow = runtimeRow('vix', sp500Latest.date, 18.25);
+    const db = new ReadDb([
+      runtimeRow('sp500', sp500Latest.date, sp500Latest.close + 1),
+      runtimeRow('gold', goldLatest.date, goldLatest.close + 1),
+      vixRow,
+    ]);
+
+    const sp500 = await onRequestGet({ request: marketRequest('sp500', shift(sp500Latest.date, -7)), env: { MARKET_QUOTES_DB: db } });
+    const sp500Body = await sp500.json();
+    expect(sp500Body.impliedVolRows).toContainEqual({ date: vixRow.date, open: 18.25, high: 18.25, low: 18.25, close: 18.25, volume: 10 });
+
+    const gold = await onRequestGet({ request: marketRequest('gold', shift(goldLatest.date, -7)), env: { MARKET_QUOTES_DB: db } });
+    expect((await gold.json()).impliedVolRows ?? []).toEqual([]);
+  });
+
   it('should report a missing equity session as a gap', async () => {
     const bundleLatest = loadMarketData('sp500').ohlcv.at(-1)!.date;
     const sessions = nextUsSessions(bundleLatest, 5);

@@ -108,7 +108,8 @@ describe('scheduled market quote refresh', () => {
   it('should upsert one candle per asset and date when scheduled event succeeds', async () => {
     const db = new MemoryDb();
     const results = await runRefresh({ MARKET_QUOTES_DB: db }, new Date('2026-07-09T23:15:00Z'), successfulFetch());
-    expect(db.candles.size).toBe(3);
+    expect(db.candles.size).toBe(4);
+    expect(db.candles.has('vix/2026-07-08')).toBe(true);
     expect(results.every((result) => result.status === 'updated')).toBe(true);
     expect([...db.runs.values()].at(-1).status).toBe('completed');
   });
@@ -117,7 +118,7 @@ describe('scheduled market quote refresh', () => {
     const db = new MemoryDb(); const now = new Date('2026-07-09T23:15:00Z');
     await runRefresh({ MARKET_QUOTES_DB: db }, now, successfulFetch());
     const results = await runRefresh({ MARKET_QUOTES_DB: db }, now, successfulFetch());
-    expect(db.candles.size).toBe(3);
+    expect(db.candles.size).toBe(4);
     expect(results.every((result) => result.status === 'no-op')).toBe(true);
   });
 

@@ -1,6 +1,7 @@
 import btcHistory from '../data/btc-history.json';
 import vooHistory from '../data/voo-history.json';
 import gldHistory from '../data/gld-history.json';
+import vixHistory from '../data/vix-history.json';
 import mvrvHistory from '../data/mvrv-history.json';
 
 export interface OHLCVData {
@@ -19,6 +20,8 @@ export interface MarketData {
   marketCap: number;
   volume24h: number;
   fetchedAt: number;
+  /** S&P 500 only: daily VIX candles that set the first year of the forecast width. */
+  impliedVol?: OHLCVData[];
 }
 
 // Keep the quote-refresh worker's asset contract stable. The crisis model is a
@@ -150,6 +153,7 @@ export function loadVOOData(): MarketData {
     marketCap: 0,
     volume24h: last.volume,
     fetchedAt: Date.now(),
+    impliedVol: vixHistory as OHLCVData[],
   };
 }
 

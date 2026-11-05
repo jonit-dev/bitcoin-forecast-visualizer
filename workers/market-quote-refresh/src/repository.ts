@@ -1,4 +1,4 @@
-import type { MarketAssetId } from './assets';
+import type { SeriesId } from './assets';
 import type { CanonicalCandle } from './normalize';
 
 export interface D1Result<T = unknown> { results?: T[]; success: boolean; meta?: { changes?: number } }
@@ -10,7 +10,7 @@ export interface D1PreparedStatement {
 }
 export interface D1Database { prepare(sql: string): D1PreparedStatement; batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]> }
 
-export type AssetRunResult = { assetId: MarketAssetId; status: 'updated' | 'no-op' | 'failed'; rowCount: number; latestDate?: string; error?: string };
+export type AssetRunResult = { assetId: SeriesId; status: 'updated' | 'no-op' | 'failed'; rowCount: number; latestDate?: string; error?: string };
 
 export class MarketQuoteRepository {
   constructor(private db: D1Database) {}
@@ -36,13 +36,13 @@ export class MarketQuoteRepository {
   }
 
   /** Stored candle dates from `since` onwards, ascending and bounded. */
-  async storedDates(assetId: MarketAssetId, since: string, limit: number): Promise<string[]> {
+  async storedDates(assetId: SeriesId, since: string, limit: number): Promise<string[]> {
     const result = await this.db.prepare('SELECT date FROM market_candles WHERE asset_id = ? AND date >= ? ORDER BY date ASC LIMIT ?')
       .bind(assetId, since, limit).all<{ date: string }>();
     return (result.results ?? []).map((row) => row.date);
   }
 
-  latest(assetId: MarketAssetId) {
+  latest(assetId: SeriesId) {
     return this.db.prepare('SELECT date FROM market_candles WHERE asset_id = ? ORDER BY date DESC LIMIT 1').bind(assetId).first<{ date: string }>();
   }
 
