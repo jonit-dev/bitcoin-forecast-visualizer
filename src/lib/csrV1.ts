@@ -103,7 +103,7 @@ const MAX_CSR_HORIZON = CSR_V1_HORIZONS[CSR_V1_HORIZONS.length - 1];
  * per-year holiday cache; scanning the calendar afresh for every offset is
  * quadratic and dominates a 10-year render.
  */
-function buildSessionLadder(originDate: string, calendarDays: number): number[] {
+export function buildSessionLadder(originDate: string, calendarDays: number): number[] {
   const cursor = new Date(`${originDate}T00:00:00Z`);
   const ladder = new Array<number>(calendarDays + 1);
   ladder[0] = 0;

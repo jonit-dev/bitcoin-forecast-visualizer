@@ -27,6 +27,8 @@
     "backtest:trend-reversal": "tsx scripts/backtest-trend-reversal.ts",
     "backtest:indicator-reversal": "tsx scripts/backtest-indicator-reversal.ts",
     "backtest:market": "tsx scripts/backtest-market-forecast.ts",
+    "backtest:market-production": "tsx scripts/backtest-market-production.ts",
+    "research:market-volatility": "tsx scripts/research-market-volatility.ts",
     "backtest:buy-zones": "tsx scripts/backtest-buy-zones.ts",
     "backtest:liquidity-derivatives": "tsx scripts/backtest-liquidity-derivatives.ts",
     "backtest:derivatives-tail-risk": "tsx scripts/backtest-derivatives-tail-risk.ts",

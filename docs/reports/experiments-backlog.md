@@ -1918,3 +1918,25 @@ existing VOO price forecast.
 - **Result/verdict:** Pass. Candles no longer change with the horizon, and nothing falls below the floor in the 5Y BTC view.
 - **Rerun criteria:** Any change to the median path, the floor model, or the candle noise parameters.
 - **Next better experiment:** Calibrate the noise scale against realized 30–90 day path roughness (volatility and ACF), so the texture matches the statistics as well as the scale.
+
+## 2026-11-05 — S&P 500 and gold session volatility term structure
+
+- **Status:** Promoted (forecast width only, both assets).
+- **Hypothesis:** One realized volatility times the square root of the horizon misprices width. It ignores that volatility clusters and reverts, and gold applied a per-session volatility per calendar day. An EWMA spot variance that reverts geometrically to a long-run level, summed over market sessions, gives a better quantile forecast.
+- **Data/source changes:** None at runtime: price-only, from the bundled and live OHLCV. Research only: S&P 500 index (^GSPC), VIX (^VIX) and gold futures (GC=F) daily closes from Yahoo, fetched by `scripts/research-market-volatility.ts`. `src/lib/marketForecast.ts` adds `SP500_VOL_TERM_STRUCTURE` (half-life 21, persistence 0.995, long-run daily vol 0.0106, c 0.86) and `GOLD_VOL_TERM_STRUCTURE` (42, 0.97, 0.0115, 1.0). `genericLogScaleAtDay` routes the band, the heatmap and the summary through them. The median, the stochastic traces, the channel and the gold 365-day ridge width are unchanged.
+- **Validation setup:** Parameters were searched on origins before 2019 only (`npm run research:market-volatility`). The gate is `npm run backtest:market-production`: production code at every 5th session, calendar-day horizons 7-365, and an incumbent arm with the same inputs minus the term structure. Holdout is origins from 2019 on. Metrics are pinball loss over q05-q95, 80%/90% coverage and Brier, with Newey-West t statistics. Gate: no holdout horizon regresses, mean gain ≥ 1%, 90% coverage within 85-95% or no worse than the incumbent. Red → green: `volTermStructure.test.ts`, 5 of 6 tests fail on HEAD.
+- **Report artifacts:** `docs/reports/results/market-vol-term-structure-2026-11-05.md` and `.json`.
+- **Result/verdict:** Pass for both assets. S&P 500 holdout pinball improves +2.8% to +7.6% at every horizon (t 1.3-3.3; 7, 14, 90 and 365 days have t > 2.5). Coverage moves to nominal (80% band 78.6-86.1% instead of 83.9-88.5%). Gold improves +6.5% to +7.9% on train (t 2.4-8.4) and +0.8% to +2.8% on holdout (t 0.5-3.1). Its 80% band moves from 86-87% to 79-82%. Caveat: gold c = 1 was chosen after the pre-2019 optimum c = 0.86 failed holdout calibration.
+- **Rerun criteria:** A volatility regime outside 2008-2026, a change to the median models (CSR v1, gold momentum or the ridge), or a source swap for VOO/GLD.
+- **Next better experiment:** Feed VIX through the market-quote worker so the S&P width can use it fresh. Implied vol scored +9.0% mean holdout gain against +5.3% price-only (see the next entry). After that, test asymmetric S&P quantiles for the negative skew.
+
+## 2026-11-05 — Implied-volatility width and gold median variants
+
+- **Status:** Report-only (implied vol); rejected (gold median variants, gold c = 0.86).
+- **Hypothesis:** (a) VIX/GVZ predict forecast width better than realized volatility. (b) Gold forecasts improve with a session-unit median, a zero or expanding-mean median, or other momentum weights and caps. (c) The pre-2019 optimal gold width (c = 0.86) holds on 2019+.
+- **Data/source changes:** Research only. ^VIX from Yahoo, lagged one session. GVZ from `gold-macro-history.json`, lagged one session.
+- **Validation setup:** The same split and metrics as the entry above, scored against the cached production incumbent. Parameters were chosen on pre-2019 data.
+- **Report artifacts:** `docs/reports/results/market-vol-term-structure-2026-11-05.md` ("Tried and not promoted").
+- **Result/verdict:** (a) VIX, c = 0.70: S&P holdout +5.6% to +11.6% at every horizon (t 1.9-5.5). This is the strongest signal found, but it stays report-only. Production has no fresh VIX: bundles refresh about monthly and live VOO candles run past them. GVZ adds nothing over EWMA for gold. (b) No gold median beats the calendar-day momentum incumbent on both periods. The session-unit fix scores MAE train +0 to +3.9% and holdout −0.1 to −4.2%, all |t| ≤ 1.6. A zero median loses 21.6% holdout pinball. (c) c = 0.86 under-covers 2019+: 90% band 84.7-87.1%, 80% band 74-78%.
+- **Rerun criteria:** (a) once VIX is in the D1 quote store with daily refresh. (b) New gold predictors, for example central-bank demand or real-rate surprises, with a fresh holdout.
+- **Next better experiment:** Add ^VIX to `workers/market-quote-refresh` and the runtime merge. Then gate the VIX width with `backtest:market-production`, falling back to EWMA when VIX is stale.

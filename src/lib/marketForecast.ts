@@ -12,6 +12,7 @@ import {
 import { FORECAST_PATH_GENERATOR_VERSION, forecastDataVersion, forecastPathSeed } from './forecastPathSeed';
 import {
   buildCsrProjection,
+  buildSessionLadder,
   csrLogScaleAtDay,
   csrMedianLogReturnAtDay,
   csrNormalCdf,
@@ -187,6 +188,79 @@ export const GOLD_CHANNEL_CONFIG = {
   minResidualSamples: 756,
 } as const;
 
+/**
+ * Session volatility term structure: an EWMA estimate of today's daily variance
+ * that reverts geometrically to a long-run level, summed over the market sessions
+ * to each calendar day. Parameters were fit on pre-2019 data (S&P 500 index
+ * 1991-2018 and GLD 2009-2018) and gated on 2019+ origins by
+ * scripts/backtest-market-production.ts. See the 2026-11-05 entry in
+ * docs/reports/experiments-backlog.md.
+ */
+export interface VolTermStructureConfig {
+  halfLifeSessions: number;
+  /** Per-session decay of the gap between today's variance and the long run. */
+  persistence: number;
+  longRunDailyVol: number;
+  /** Width multiplier; below 1 offsets fat tails under the pinball loss. */
+  scale: number;
+}
+
+export const SP500_VOL_TERM_STRUCTURE: VolTermStructureConfig = {
+  halfLifeSessions: 21,
+  persistence: 0.995,
+  // S&P 500 index daily log-return RMS, 1970-2018 (16.8% a year).
+  longRunDailyVol: 0.0106,
+  scale: 0.86,
+};
+
+export const GOLD_VOL_TERM_STRUCTURE: VolTermStructureConfig = {
+  halfLifeSessions: 42,
+  persistence: 0.97,
+  // Gold daily log-return RMS before 2019 (GLD 0.0117, gold futures 0.0112).
+  longRunDailyVol: 0.0115,
+  // The pre-2019 optimum (0.86) under-covered 2019+ outcomes; 1 did not.
+  scale: 1,
+};
+
+const EWMA_SEED_RETURNS = 60;
+
+/** EWMA of squared daily log returns, seeded with the mean of the first 60. */
+export function ewmaDailyVariance(returns: number[], halfLifeSessions: number): number | null {
+  if (returns.length <= EWMA_SEED_RETURNS) return null;
+  const lambda = 0.5 ** (1 / halfLifeSessions);
+  let variance = 0;
+  for (let i = 0; i < EWMA_SEED_RETURNS; i++) variance += returns[i] ** 2 / EWMA_SEED_RETURNS;
+  for (let i = EWMA_SEED_RETURNS; i < returns.length; i++) {
+    variance = lambda * variance + (1 - lambda) * returns[i] ** 2;
+  }
+  return variance;
+}
+
+/** Log variance accumulated over `sessions` while daily variance reverts from `spot` to `longRun`. */
+export function termStructureLogVariance(spot: number, longRun: number, persistence: number, sessions: number): number {
+  return sessions * longRun + ((spot - longRun) * persistence * (1 - persistence ** sessions)) / (1 - persistence);
+}
+
+/**
+ * Cumulative log variance at calendar days 0..horizon. It depends only on the
+ * origin, so a longer horizon never rewrites a shorter one's band. Null keeps
+ * the incumbent width.
+ */
+export function buildVolTermStructure(
+  ohlcv: OHLCVData[],
+  returns: number[],
+  horizon: number,
+  config: VolTermStructureConfig
+): number[] | null {
+  const last = ohlcv[ohlcv.length - 1];
+  const spot = ewmaDailyVariance(returns, config.halfLifeSessions);
+  if (!last || spot === null || !Number.isFinite(spot)) return null;
+  const longRun = config.longRunDailyVol ** 2;
+  return buildSessionLadder(last.date, horizon).map((sessions) =>
+    config.scale ** 2 * termStructureLogVariance(spot, longRun, config.persistence, sessions)
+  );
+}
+
 export interface GenericModelInputs {
   returns: number[];
   drift: number;
@@ -203,6 +277,19 @@ export interface GenericModelInputs {
    * keep `drift` so their horizon-prefix contract is unaffected.
    */
   medianDrift?: number;
+  /**
+   * Cumulative log variance per calendar day from the session term structure.
+   * When present it is the forecast width everywhere (band, heatmap, summary),
+   * superseding the CSR anchor variance and `dailyVol * sqrt(day)`.
+   */
+  logVarianceByDay?: number[];
+}
+
+/** Log-price standard deviation of the forecast at a calendar day offset. */
+export function genericLogScaleAtDay(modelInputs: GenericModelInputs, day: number): number {
+  const { logVarianceByDay, csr = null, dailyVol } = modelInputs;
+  if (logVarianceByDay) return Math.sqrt(logVarianceByDay[Math.max(0, Math.min(day, logVarianceByDay.length - 1))]);
+  return csr ? csrLogScaleAtDay(csr, day) : dailyVol * Math.sqrt(day);
 }
 
 function quantileInterpolated(values: number[], q: number): number {
@@ -524,8 +611,7 @@ function processGenericData(
   // identical whichever horizon the user asked for.
   const referenceLogReturnAt = (day: number): number =>
     csr ? csrMedianLogReturnAtDay(csr, day) : drift * day;
-  const logScaleAt = (day: number): number =>
-    csr ? csrLogScaleAtDay(csr, day) : dailyVol * Math.sqrt(day);
+  const logScaleAt = (day: number): number => genericLogScaleAtDay(modelInputs, day);
   const latestChannel = [...channelBounds].reverse().find((point) =>
     point.lowerResidual !== null && point.upperResidual !== null
   );
@@ -621,15 +707,12 @@ export function genericHeatmapDriftIncrements(modelInputs: GenericModelInputs, h
 }
 
 /**
- * Per-calendar-day log variance the heatmap applies to its shock. Under CSR the
- * increments are differences of the shared cumulative variance, so the simulated
- * terminal width is exactly the projection's, including the retained 180-day
- * variance and the interpolated curve between anchors.
+ * Per-calendar-day log variance the heatmap applies to its shock: differences of
+ * the same cumulative variance the band and the summary use, so the simulated
+ * terminal width is exactly the declared one.
  */
 export function genericHeatmapLogVarianceIncrements(modelInputs: GenericModelInputs, horizon: number): number[] {
-  const { dailyVol, csr = null } = modelInputs;
-  if (!csr) return Array.from({ length: horizon }, () => dailyVol * dailyVol);
-  const logVarianceAt = (day: number) => csrLogScaleAtDay(csr, day) ** 2;
+  const logVarianceAt = (day: number) => genericLogScaleAtDay(modelInputs, day) ** 2;
   return Array.from({ length: horizon }, (_, index) =>
     Math.max(0, logVarianceAt(index + 1) - logVarianceAt(index))
   );
@@ -649,11 +732,19 @@ export function buildGenericModelInputs(
     const gold365 = shouldUseGold365V2(horizon)
       ? buildGold365Forecast(ohlcv, baseline.dailyVol)
       : null;
+    if (gold365) {
+      // The ridge keeps the sigma*sqrt(365) width it was validated with.
+      return {
+        modelInputs: { ...baseline, medianDrift: gold365.logReturn / GOLD_365_V2_HORIZON_DAYS },
+        calibrationLabel: 'Direct 1Y ridge interval',
+      };
+    }
     return {
-      modelInputs: gold365
-        ? { ...baseline, medianDrift: gold365.logReturn / GOLD_365_V2_HORIZON_DAYS }
-        : baseline,
-      calibrationLabel: gold365 ? 'Direct 1Y ridge interval' : 'Slow momentum interval',
+      modelInputs: {
+        ...baseline,
+        logVarianceByDay: buildVolTermStructure(ohlcv, baseline.returns, horizon, GOLD_VOL_TERM_STRUCTURE) ?? undefined,
+      },
+      calibrationLabel: 'Slow momentum interval',
     };
   }
 
@@ -662,6 +753,7 @@ export function buildGenericModelInputs(
   return {
     modelInputs: {
       ...baseline,
+      logVarianceByDay: buildVolTermStructure(ohlcv, baseline.returns, horizon, SP500_VOL_TERM_STRUCTURE) ?? undefined,
       csr: lastSession
         ? buildCsrProjection(
             ohlcv,
@@ -750,7 +842,7 @@ function generateGenericHeatmapData(
   return cells;
 }
 
-function computeGenericProbabilityForecast(
+export function computeGenericProbabilityForecast(
   ohlcv: OHLCVData[],
   horizonDays: number,
   modelInputs: GenericModelInputs,
@@ -759,7 +851,7 @@ function computeGenericProbabilityForecast(
   const last = ohlcv[ohlcv.length - 1];
   if (!last || horizonDays < 1 || ohlcv.length < 252) return null;
 
-  const { dailyVol, csr = null } = modelInputs;
+  const { csr = null } = modelInputs;
   const drift = modelInputs.medianDrift ?? modelInputs.drift;
   const targetDate = dateKey(addUtcDays(new Date(`${last.date}T00:00:00Z`), horizonDays));
 
@@ -770,7 +862,7 @@ function computeGenericProbabilityForecast(
     const z95 = 1.6448536269514722;
     const z80 = 1.2815515655446004;
     const medianLogReturn = csrMedianLogReturnAtDay(csr, horizonDays);
-    const logScale = Math.max(csrLogScaleAtDay(csr, horizonDays), 1e-18);
+    const logScale = Math.max(genericLogScaleAtDay(modelInputs, horizonDays), 1e-18);
     const median = last.close * Math.exp(medianLogReturn);
     const probabilityUp = Math.min(0.99, Math.max(0.01, csrNormalCdf(medianLogReturn / logScale)));
     return {
@@ -788,7 +880,7 @@ function computeGenericProbabilityForecast(
   }
 
   const median = last.close * Math.exp(drift * horizonDays);
-  const sigma = dailyVol * Math.sqrt(horizonDays);
+  const sigma = genericLogScaleAtDay(modelInputs, horizonDays);
   const q05 = median * Math.exp(-1.6448536269514722 * sigma);
   const q10 = median * Math.exp(-1.2815515655446004 * sigma);
   const q90 = median * Math.exp(1.2815515655446004 * sigma);

@@ -6,7 +6,6 @@ import {
   genericHeatmapDriftIncrements,
   genericHeatmapLogVarianceIncrements,
 } from '../marketForecast';
-import { csrLogScaleAtDay } from '../csrV1';
 import { computeProbabilityForecast, heatmapIntervalLogVariances, simulateHeatmapPrices } from '../data';
 import { computePowerLawInterval } from '../forecastInterval';
 import { POWER_LAW_MEAN_REVERSION_TAU_DAYS } from '../powerLaw';
@@ -30,12 +29,11 @@ describe('heatmap distribution agrees with its summary', () => {
     }
   });
 
-  it('should give the S&P 500 heatmap the projection cumulative variance, including the retained 180-day width', () => {
+  it('should give the S&P 500 heatmap the session term-structure variance the summary declares', () => {
     for (const horizon of [180, 3650]) {
       const { modelInputs } = buildGenericModelInputs('sp500', sp500.ohlcv, horizon);
-      const csr = modelInputs.csr!;
       const simulatedVariance = sum(genericHeatmapLogVarianceIncrements(modelInputs, horizon));
-      const projectionVariance = csrLogScaleAtDay(csr, horizon) ** 2;
+      const projectionVariance = modelInputs.logVarianceByDay![horizon];
 
       expect(simulatedVariance).toBeCloseTo(projectionVariance, 12);
 
