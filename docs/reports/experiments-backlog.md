@@ -1962,3 +1962,30 @@ existing VOO price forecast.
 - **Result/verdict:** Pass. Chosen E (1 year momentum, then 4%/yr) gains +12%/+31%/+42% at 2/5/10 years in 1975-2003 (t 2.5/3.0/2.6) and +7%/+18%/+63% in 2004+ (t 1.1/0.8/4.2); 1 year ties by construction. All three gate arms pass. Live 10Y median $760 (+106%) → $564 (+53%), 10Y p(up) 0.89 → 0.77. Caveats: 4%/yr is a round prior, not fit; the 365-day ridge median (+33%) is still steeper than the 2Y path; the research data is spot gold, not GLD.
 - **Rerun criteria:** New gold source or holdout, a change to `GOLD_MOMENTUM_DAYS`, `GOLD_LONG_RUN_DRIFT` or the channel window, or retirement of the 365-day ridge.
 - **Next better experiment:** Fit the long-run drift on real rates or inflation, or retire the 365-day ridge in favour of a smooth momentum decay.
+
+---
+
+## 2026-11-17 — Frozen BTC median offset replay
+
+- **Status:** `rejected (report-only; registered before scoring)`
+- **Hypothesis:** A fixed log-price offset learned from pre-2022 endpoint errors reduces the shipped BTC median's out-of-sample absolute log error without degrading interval calibration.
+- **Data/source changes:** Use the refreshed bundled BTC UTC daily close series. The candidate introduces no inputs. The current-policy replay uses today's fixed power-law coefficients, so applying it to earlier dates has a historical vintage limitation. Treat the historical windows as development evidence only.
+- **Validation setup:** One candidate at each of 14/30/60/90 days. Fit the median of `log(actual / incumbent q50)` on weekly origins from 2017-01-01 whose targets mature by 2021-12-31. Shift all incumbent quantiles by `exp(offset)` and retain log width. Evaluate a fixed weekly schedule starting 2022-01-01 against the incumbent and current-price/GBM driftless baselines. The refreshed outcomes whose target dates are after 2026-11-05 are reported separately and are underpowered. A clean confirmation begins with origins after 2026-11-17.
+- **Gate:** At least 2% lower paired mean absolute log error at a useful horizon and lower error than price persistence. Require positive 95% circular moving-block bootstrap lower bound (5,000 replicates, block length `ceil(horizon / 7)`), Holm-adjusted one-sided centered-null p < 0.05 across four horizons, positive results in both 2022–2024 and 2025+ and no more than 0.5% MALE regression at any other horizon. Approximate CRPS must be no more than 0.5% worse than incumbent, with no greater than two percentage points of loss in 80/90/95% empirical coverage. Require the canonical backtest and 30 non-overlapping prospective outcomes before promotion.
+- **Report artifacts:** [Replay report](results/btc-frozen-offset-2026-11-17.md), [metrics](results/btc-frozen-offset-2026-11-17.json), and [canonical backtest](results/backtest-2026-11-18T03-22-20-396Z.md). Reproduce with `npm exec -- tsx scripts/research-btc-frozen-offset.ts`.
+- **Result/verdict:** `rejected`. Relative MALE gains at 14/30/60/90 days were +0.04%/−0.32%/−1.54%/−3.14%. All four confidence intervals crossed zero and all Holm p-values were 1.00. Both CRPS and coverage failed the non-inferiority gates at 60 and 90 days. The incumbent passed the canonical median gate and lost bootstrap support against persistence at 14 and 30 days.
+- **Rerun criteria:** Freeze the same offsets and evaluate on a materially new prospective cohort. Do not retune on the historical replay.
+- **Next better experiment:** If the replay is encouraging, verify whether the sign and effect survive a causal reconstruction of the median and then freeze a prospective comparison with price persistence.
+
+---
+
+## 2026-11-17 — Refreshed BTC heatmap median diagnostic
+
+- **Status:** `completed (report-only)`
+- **Hypothesis:** The observed discrepancy between simulated and analytic medians depends on the origin's residual distribution and persists with more Monte Carlo samples.
+- **Data/source changes:** Existing CoinGecko BTC OHLCV, refreshed to November 17 as described in the [refresh report](results/btc-frozen-offset-2026-11-17.md).
+- **Validation setup:** At several fixed historical origins, compare `simulateHeatmapPrices` terminal medians with `powerLawForecast` in absolute log units at 30/90/180/365 days on 1,400 trailing rows, using 5,000 and 25,000 simulations and 120 price bands. The replay uses the existing deterministic seeds and keeps the simulation policy fixed.
+- **Report artifacts:** [Refresh regression checks](results/btc-frozen-offset-2026-11-17.md#refresh-regression-checks).
+- **Result/verdict:** On November 17 the 365-day gap is 1.13% at 5,000 simulations and 1.28% at 25,000. November 5 reaches 2.44% at 25,000, and the August 17 replay stays within 0.45%. This measures an origin-dependent difference, with no predictive accuracy gain established.
+- **Rerun criteria:** Revisit on a fixed cohort across volatility regimes or when the simulated residual distribution changes.
+- **Next better experiment:** Pre-register centering of the simulated median on a fixed development and prospective schedule, and require calibration and dependence checks before changing the heatmap.

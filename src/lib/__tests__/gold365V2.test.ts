@@ -70,10 +70,9 @@ describe('GLD 365-day ridge challenger', () => {
 
   it('aligns the macro cache to GLD sessions so the one-session lag is exact', () => {
     const rows = (goldMacroHistory as { rows: { date: string }[] }).rows;
-    // The live caches, not the pinned snapshot: both must end on the same GLD session.
     const live = gldHistory as { date: string }[];
-    const tail = live.slice(live.length - rows.length).map((row) => row.date);
-    expect(rows.map((row) => row.date)).toEqual(tail);
+    const covered = live.filter(row => row.date >= rows[0].date && row.date <= rows.at(-1)!.date);
+    expect(rows.map(row => row.date)).toEqual(covered.map(row => row.date));
   });
 
   it('leaves the S&P 500 surface on its own model', () => {

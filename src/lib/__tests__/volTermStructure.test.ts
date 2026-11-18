@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { countUsMarketSessionsAfter } from '../../../shared/us-market-calendar.mjs';
 import { loadMarketData } from '../api';
+import { GOLD_365_V2_GOLDEN } from '../gold365V2';
 import {
   GOLD_VOL_TERM_STRUCTURE,
   SP500_VIX_TERM_STRUCTURE,
@@ -93,14 +94,16 @@ describe('session volatility term structure', () => {
 
   it('sets the gold summary width from the term structure everywhere except the 365-day ridge', () => {
     const gold = loadMarketData('gold');
-    const { returns, dailyVol } = computeGoldModelInputs(gold.ohlcv);
+    const { returns } = computeGoldModelInputs(gold.ohlcv);
     const origin = gold.ohlcv.at(-1)!.date;
     for (const horizon of [7, 30, 180, 730]) {
       const summary = buildMarketForecastSummary('gold', gold, horizon, Z95).probabilityForecast!;
       expect(Math.log(summary.q95 / summary.median) / Z95)
         .toBeCloseTo(expectedLogScale(returns, origin, horizon, GOLD_VOL_TERM_STRUCTURE), 12);
     }
-    const ridge = buildMarketForecastSummary('gold', gold, 365, Z95).probabilityForecast!;
+    const ridgeData = { ...gold, ohlcv: gold.ohlcv.filter(row => row.date <= GOLD_365_V2_GOLDEN.asOf) };
+    const { dailyVol } = computeGoldModelInputs(ridgeData.ohlcv);
+    const ridge = buildMarketForecastSummary('gold', ridgeData, 365, Z95).probabilityForecast!;
     expect(ridge.calibrationLabel).toBe('Direct 1Y ridge interval');
     expect(Math.log(ridge.q95 / ridge.median) / Z95).toBeCloseTo(dailyVol * Math.sqrt(365), 12);
   });

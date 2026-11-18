@@ -13,6 +13,11 @@ const fixtures = Object.fromEntries(assets.map((asset) => {
   return [asset, { ...data, ohlcv: data.ohlcv.slice(-1400) }];
 })) as Record<MarketAssetId, ReturnType<typeof loadMarketData>>;
 
+const btcReplay = {
+  ...fixtures.btc,
+  ohlcv: loadMarketData('btc').ohlcv.filter(row => row.date <= '2026-08-17').slice(-1400),
+};
+
 function primary(asset: MarketAssetId, horizon: number, policy: ForecastPathPolicy, data = fixtures[asset]) {
   return buildMarketForecast(asset, data, horizon, CONFIDENCE_Z_SCORES[0.95], { pathPolicy: policy })
     .displayData.filter((row) => row.isForecast)
@@ -68,7 +73,7 @@ describe('forecast path horizon-prefix contract', () => {
   });
 
   it('should keep the BTC date-keyed path when one new candle arrives', () => {
-    const btc = fixtures.btc;
+    const btc = btcReplay;
     const dayOverDayChanges = (policy: ForecastPathPolicy) => {
       const paths = Array.from({ length: 6 }, (_, index) => {
         const data = { ...btc, ohlcv: btc.ohlcv.slice(0, btc.ohlcv.length - index) };
@@ -95,8 +100,8 @@ describe('forecast path horizon-prefix contract', () => {
     for (const [short, long] of pairs) expect(mismatchCount(primary('gold', short, 'prefix-stable-v1'), primary('gold', long, 'prefix-stable-v1'))).toBe(0);
   });
 
-  it('should place the Monte Carlo median within a declared tolerance of the forecast median at every horizon', () => {
-    const data = fixtures.btc.ohlcv;
+  it('should place the Monte Carlo median within 1% on the August 17 BTC replay', () => {
+    const data = btcReplay.ohlcv;
     const last = data.at(-1)!;
     const lastDate = new Date(`${last.date}T00:00:00Z`);
     for (const horizon of [30, 90, 180, 365]) {

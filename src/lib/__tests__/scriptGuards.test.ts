@@ -55,8 +55,10 @@ describe('script guardrails', () => {
     expect(`${result.stderr}${result.stdout}`).toContain('feature-table.json must not be imported');
   });
 
-  it('should pass current UI import guard', () => {
-    expect(() => execFileSync('node', ['scripts/guard-ui-imports.mjs'], { cwd: process.cwd() })).not.toThrow();
+  it('should pass the UI import guard with only Node available', () => {
+    expect(() => execFileSync(process.execPath, ['scripts/guard-ui-imports.mjs'], {
+      cwd: process.cwd(), env: { ...process.env, PATH: '' },
+    })).not.toThrow();
   });
 
   it('should preserve the optional derivatives cache when Binance is unavailable', () => {

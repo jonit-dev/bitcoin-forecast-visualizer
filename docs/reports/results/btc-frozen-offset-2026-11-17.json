@@ -1,0 +1,1069 @@
+{
+  "data": {
+    "first": "2010-07-17",
+    "last": "2026-11-17",
+    "rows": 5968,
+    "sha256": "829f5416fcd5450371995e8e5bc6b4bfec74d5fd8f8d1d80ec9a14c3080e26e8"
+  },
+  "seed": 20261117,
+  "replicates": 5000,
+  "fit": [
+    "2017-01-01",
+    "2021-12-31"
+  ],
+  "evaluationStart": "2022-01-01",
+  "results": [
+    {
+      "horizon": 14,
+      "offset": -0.005248663108884794,
+      "fitOrigins": 259,
+      "firstOrigin": "2022-01-02",
+      "lastOrigin": "2026-11-01",
+      "lastTarget": "2026-11-15",
+      "incumbent": {
+        "pinballScale": "absolute",
+        "samples": 253,
+        "medianAbsLogError": 0.05413543235334231,
+        "approximateMultiplicativeError": 0.055627558598911886,
+        "meanAbsLogError": 0.07147567559353755,
+        "biasLogError": 0.0002292447770302717,
+        "nll": -0.9278367661480543,
+        "pinballLoss": {
+          "q05": 557.7172703163229,
+          "q10": 941.1029982678297,
+          "q50": 1996.294516207564,
+          "q90": 1036.1320169594067,
+          "q95": 659.0948969671872
+        },
+        "coverage": {
+          "interval80": 0.8300395256916996,
+          "interval90": 0.8814229249011858,
+          "interval95": 0.9209486166007905
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.2542094618772108,
+          "interval90": 0.32690902280191014,
+          "interval95": 0.3903453123819942
+        },
+        "crps": 2616.9739494448213,
+        "winkler80": 19772.350152272367,
+        "winkler90": 24336.243345670187,
+        "winkler95": 28044.86893578825,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            23,
+            15,
+            28,
+            30,
+            34,
+            29,
+            28,
+            24,
+            22,
+            20
+          ],
+          "expectedCounts": [
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 253
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 253,
+          "chiSquare": 10.992094861660078,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "candidate": {
+        "pinballScale": "absolute",
+        "samples": 253,
+        "medianAbsLogError": 0.053883699059818435,
+        "approximateMultiplicativeError": 0.055361855441419694,
+        "meanAbsLogError": 0.07144968943762173,
+        "biasLogError": -0.005019418331854516,
+        "nll": -0.9258237940567812,
+        "pinballLoss": {
+          "q05": 552.4208285564755,
+          "q10": 941.7998518889183,
+          "q50": 1993.5729997108597,
+          "q90": 1023.8969303862192,
+          "q95": 657.7571887581643
+        },
+        "coverage": {
+          "interval80": 0.8300395256916996,
+          "interval90": 0.8774703557312253,
+          "interval95": 0.9288537549407114
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.25420946187721083,
+          "interval90": 0.32690902280191014,
+          "interval95": 0.39034531238199416
+        },
+        "crps": 2608.7193802328215,
+        "winkler80": 19656.967822751387,
+        "winkler90": 24203.560346292787,
+        "winkler95": 27800.009341864024,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            21,
+            16,
+            20,
+            34,
+            35,
+            28,
+            29,
+            25,
+            23,
+            22
+          ],
+          "expectedCounts": [
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 253
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 253,
+          "chiSquare": 13.44268774703557,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "driftless": {
+        "pinballScale": "absolute",
+        "samples": 253,
+        "medianAbsLogError": 0.06072417987957339,
+        "approximateMultiplicativeError": 0.06260578570790742,
+        "meanAbsLogError": 0.07418069898517457,
+        "biasLogError": -0.0035414972362588565,
+        "nll": -0.8906247653926278,
+        "pinballLoss": {
+          "q05": 559.1223743081982,
+          "q10": 953.8220501976133,
+          "q50": 2065.3028260869546,
+          "q90": 1093.3427294408632,
+          "q95": 697.0235667886487
+        },
+        "coverage": {
+          "interval80": 0.83399209486166,
+          "interval90": 0.8893280632411067,
+          "interval95": 0.9367588932806324
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.26794928463435796,
+          "interval90": 0.3446518434044695,
+          "interval95": 0.41162496851144775
+        },
+        "crps": 2707.936392692428,
+        "winkler80": 20471.647796384776,
+        "winkler90": 25122.918821936935,
+        "winkler95": 29100.09276372638,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            21,
+            15,
+            27,
+            23,
+            41,
+            28,
+            28,
+            30,
+            19,
+            21
+          ],
+          "expectedCounts": [
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3,
+            25.3
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 253
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 253,
+          "chiSquare": 18.73913043478261,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "relativeMaleImprovement": 0.000363566425920947,
+      "relativeCrpsChange": -0.0031542420258906523,
+      "blockLength": 2,
+      "interval95": [
+        -0.0007100651461529704,
+        0.0007669107115615254
+      ],
+      "p": 0.47470505898820237,
+      "early": {
+        "samples": 157,
+        "pairedImprovement": 0.00031202297152105963
+      },
+      "recent": {
+        "samples": 96,
+        "pairedImprovement": -0.0004418032196051716
+      },
+      "addedTargets": {
+        "samples": 2,
+        "pairedImprovement": 0.005248663108884805
+      },
+      "holmP": 1
+    },
+    {
+      "horizon": 30,
+      "offset": -0.00972216327161256,
+      "fitOrigins": 257,
+      "firstOrigin": "2022-01-02",
+      "lastOrigin": "2026-10-18",
+      "lastTarget": "2026-11-17",
+      "incumbent": {
+        "pinballScale": "absolute",
+        "samples": 251,
+        "medianAbsLogError": 0.09061319894028423,
+        "approximateMultiplicativeError": 0.09484543597036343,
+        "meanAbsLogError": 0.10759163818437398,
+        "biasLogError": -0.0026010673594930875,
+        "nll": -0.5712215565585881,
+        "pinballLoss": {
+          "q05": 715.9767664778595,
+          "q10": 1254.3099180492834,
+          "q50": 3016.1425777763034,
+          "q90": 1478.905740471612,
+          "q95": 892.4503394641998
+        },
+        "coverage": {
+          "interval80": 0.7729083665338645,
+          "interval90": 0.8884462151394422,
+          "interval95": 0.9362549800796812
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.34950594110731675,
+          "interval90": 0.45022583425193907,
+          "interval95": 0.5385703170615367
+        },
+        "crps": 3813.306523213386,
+        "winkler80": 27332.15658520896,
+        "winkler90": 32168.542118841182,
+        "winkler95": 36628.66200219683,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            28,
+            18,
+            26,
+            21,
+            30,
+            25,
+            29,
+            23,
+            22,
+            29
+          ],
+          "expectedCounts": [
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 251
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 251,
+          "chiSquare": 5.772908366533863,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "candidate": {
+        "pinballScale": "absolute",
+        "samples": 251,
+        "medianAbsLogError": 0.09440492907826206,
+        "approximateMultiplicativeError": 0.0990046747787412,
+        "meanAbsLogError": 0.10793672388673668,
+        "biasLogError": -0.01232323063110565,
+        "nll": -0.5659001242999676,
+        "pinballLoss": {
+          "q05": 716.4097612614925,
+          "q10": 1244.323681340382,
+          "q50": 3013.5586603581287,
+          "q90": 1481.552822444765,
+          "q95": 896.6714284591748
+        },
+        "coverage": {
+          "interval80": 0.7768924302788844,
+          "interval90": 0.8884462151394422,
+          "interval95": 0.9362549800796812
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.34950594110731675,
+          "interval90": 0.450225834251939,
+          "interval95": 0.5385703170615367
+        },
+        "crps": 3808.7129475357974,
+        "winkler80": 27258.765037851477,
+        "winkler90": 32261.62379441332,
+        "winkler95": 36759.11437438919,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            24,
+            21,
+            23,
+            17,
+            34,
+            21,
+            33,
+            23,
+            23,
+            32
+          ],
+          "expectedCounts": [
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 251
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 251,
+          "chiSquare": 12.067729083665338,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "driftless": {
+        "pinballScale": "absolute",
+        "samples": 251,
+        "medianAbsLogError": 0.09034844657060534,
+        "approximateMultiplicativeError": 0.09455561141432,
+        "meanAbsLogError": 0.11505354555769819,
+        "biasLogError": -0.011314012027789425,
+        "nll": -0.47256361585939727,
+        "pinballLoss": {
+          "q05": 815.9233432406261,
+          "q10": 1400.1536701450332,
+          "q50": 3180.587609561753,
+          "q90": 1670.42205853028,
+          "q95": 1027.319565706789
+        },
+        "coverage": {
+          "interval80": 0.796812749003984,
+          "interval90": 0.8884462151394422,
+          "interval95": 0.9402390438247012
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.39425600847232534,
+          "interval90": 0.5083689279986441,
+          "interval95": 0.6087567444090343
+        },
+        "crps": 4123.292086445299,
+        "winkler80": 30705.75728675316,
+        "winkler90": 36864.858178948285,
+        "winkler95": 42607.27489658813,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            21,
+            23,
+            16,
+            20,
+            33,
+            29,
+            31,
+            31,
+            17,
+            30
+          ],
+          "expectedCounts": [
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1,
+            25.1
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 251
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 251,
+          "chiSquare": 14.61752988047809,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "relativeMaleImprovement": -0.0032073654438773413,
+      "relativeCrpsChange": -0.0012046174755754313,
+      "blockLength": 5,
+      "interval95": [
+        -0.0022478036922092322,
+        0.0015863868323934905
+      ],
+      "p": 0.6266746650669867,
+      "early": {
+        "samples": 157,
+        "pairedImprovement": 0.00023812897254139116
+      },
+      "recent": {
+        "samples": 94,
+        "pairedImprovement": -0.0013191782976814768
+      },
+      "addedTargets": {
+        "samples": 2,
+        "pairedImprovement": 0.009722163271612516
+      },
+      "holmP": 1
+    },
+    {
+      "horizon": 60,
+      "offset": -0.04159008955601713,
+      "fitOrigins": 253,
+      "firstOrigin": "2022-01-02",
+      "lastOrigin": "2026-09-13",
+      "lastTarget": "2026-11-12",
+      "incumbent": {
+        "pinballScale": "absolute",
+        "samples": 246,
+        "medianAbsLogError": 0.14784593636978818,
+        "approximateMultiplicativeError": 0.1593342713570447,
+        "meanAbsLogError": 0.15244792147849157,
+        "biasLogError": -0.0031159653397707953,
+        "nll": -0.27081014009832616,
+        "pinballLoss": {
+          "q05": 797.648439654929,
+          "q10": 1435.0896982022407,
+          "q50": 4328.838049947757,
+          "q90": 2069.425634875944,
+          "q95": 1277.2505723447493
+        },
+        "coverage": {
+          "interval80": 0.7845528455284553,
+          "interval90": 0.9024390243902439,
+          "interval95": 0.9512195121951219
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.47117428557882246,
+          "interval90": 0.6087223044686293,
+          "interval95": 0.7304239654783689
+        },
+        "crps": 5259.5286874334,
+        "winkler80": 35045.15333078186,
+        "winkler90": 41497.98023999354,
+        "winkler95": 47698.00968347708,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            24,
+            30,
+            30,
+            25,
+            11,
+            25,
+            21,
+            22,
+            29,
+            29
+          ],
+          "expectedCounts": [
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 246
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 246,
+          "chiSquare": 12.292682926829269,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "candidate": {
+        "pinballScale": "absolute",
+        "samples": 246,
+        "medianAbsLogError": 0.13624184506945497,
+        "approximateMultiplicativeError": 0.14595900461960842,
+        "meanAbsLogError": 0.15479280820530908,
+        "biasLogError": -0.04470605489578793,
+        "nll": -0.2306529223837186,
+        "pinballLoss": {
+          "q05": 860.5085517288743,
+          "q10": 1478.4462790049915,
+          "q50": 4340.535849790029,
+          "q90": 2109.5775670699522,
+          "q95": 1325.107253452813
+        },
+        "coverage": {
+          "interval80": 0.8008130081300813,
+          "interval90": 0.8821138211382114,
+          "interval95": 0.926829268292683
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.4711742855788224,
+          "interval90": 0.6087223044686293,
+          "interval95": 0.730423965478369
+        },
+        "crps": 5321.831801708519,
+        "winkler80": 35880.23846074944,
+        "winkler90": 43712.316103633726,
+        "winkler95": 50907.82431574692,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            9,
+            31,
+            24,
+            22,
+            24,
+            11,
+            25,
+            27,
+            33,
+            40
+          ],
+          "expectedCounts": [
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 246
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 246,
+          "chiSquare": 32.13008130081301,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "driftless": {
+        "pinballScale": "absolute",
+        "samples": 246,
+        "medianAbsLogError": 0.1499702662408004,
+        "approximateMultiplicativeError": 0.16179969754226153,
+        "meanAbsLogError": 0.174310330268294,
+        "biasLogError": -0.02393236996367577,
+        "nll": -0.08777647265725927,
+        "pinballLoss": {
+          "q05": 965.5517636039418,
+          "q10": 1799.4449152217717,
+          "q50": 4808.036869918699,
+          "q90": 2604.431622106978,
+          "q95": 1598.7492656771735
+        },
+        "coverage": {
+          "interval80": 0.7601626016260162,
+          "interval90": 0.8943089430894309,
+          "interval95": 0.9349593495934959
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.5633788406088875,
+          "interval90": 0.7298341882183981,
+          "interval95": 0.878296609727867
+        },
+        "crps": 6100.670369990961,
+        "winkler80": 44038.76537328752,
+        "winkler90": 51286.02058562232,
+        "winkler95": 58795.37805087761,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            22,
+            14,
+            27,
+            28,
+            24,
+            28,
+            16,
+            27,
+            23,
+            37
+          ],
+          "expectedCounts": [
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6,
+            24.6
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 246
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 246,
+          "chiSquare": 15.6260162601626,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "relativeMaleImprovement": -0.015381559184776128,
+      "relativeCrpsChange": 0.011845759948791779,
+      "blockLength": 9,
+      "interval95": [
+        -0.013813010866766527,
+        0.009091264508124742
+      ],
+      "p": 0.6754649070185963,
+      "early": {
+        "samples": 157,
+        "pairedImprovement": -0.0010158463463941717
+      },
+      "recent": {
+        "samples": 89,
+        "pairedImprovement": -0.004689373690036363
+      },
+      "addedTargets": {
+        "samples": 1,
+        "pairedImprovement": -0.04159008955601716
+      },
+      "holmP": 1
+    },
+    {
+      "horizon": 90,
+      "offset": -0.0634281043998537,
+      "fitOrigins": 248,
+      "firstOrigin": "2022-01-02",
+      "lastOrigin": "2026-08-16",
+      "lastTarget": "2026-11-14",
+      "incumbent": {
+        "pinballScale": "absolute",
+        "samples": 242,
+        "medianAbsLogError": 0.1537777163787553,
+        "approximateMultiplicativeError": 0.16623162377600442,
+        "meanAbsLogError": 0.16655607807656364,
+        "biasLogError": 0.0002798958223512498,
+        "nll": -0.168278363781726,
+        "pinballLoss": {
+          "q05": 856.1827839097632,
+          "q10": 1583.6391650441856,
+          "q50": 4776.5236572342355,
+          "q90": 2239.9656686241437,
+          "q95": 1403.063396887053
+        },
+        "coverage": {
+          "interval80": 0.7603305785123967,
+          "interval90": 0.8842975206611571,
+          "interval95": 0.9256198347107438
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.47779623765318957,
+          "interval90": 0.6173858204118186,
+          "interval95": 0.7409580074989268
+        },
+        "crps": 5784.1722917648085,
+        "winkler80": 38236.04833668329,
+        "winkler90": 45184.9236159363,
+        "winkler95": 52827.96488784485,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            29,
+            37,
+            12,
+            28,
+            18,
+            16,
+            16,
+            22,
+            35,
+            29
+          ],
+          "expectedCounts": [
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 242
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 242,
+          "chiSquare": 27.58677685950413,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "candidate": {
+        "pinballScale": "absolute",
+        "samples": 242,
+        "medianAbsLogError": 0.15708606586822937,
+        "approximateMultiplicativeError": 0.17009631492264687,
+        "meanAbsLogError": 0.17178848361154542,
+        "biasLogError": -0.06314820857750247,
+        "nll": -0.08409942550685981,
+        "pinballLoss": {
+          "q05": 931.2193273309108,
+          "q10": 1612.861684115242,
+          "q50": 4814.76138057844,
+          "q90": 2468.883157986544,
+          "q95": 1529.7556800576015
+        },
+        "coverage": {
+          "interval80": 0.731404958677686,
+          "interval90": 0.859504132231405,
+          "interval95": 0.9090909090909091
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.47779623765318957,
+          "interval90": 0.6173858204118186,
+          "interval95": 0.7409580074989268
+        },
+        "crps": 5958.596331779314,
+        "winkler80": 40817.448421017856,
+        "winkler90": 49219.500147770246,
+        "winkler95": 58658.98055042681,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            8,
+            26,
+            27,
+            17,
+            21,
+            19,
+            17,
+            18,
+            32,
+            57
+          ],
+          "expectedCounts": [
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 242
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 242,
+          "chiSquare": 65.68595041322314,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "driftless": {
+        "pinballScale": "absolute",
+        "samples": 242,
+        "medianAbsLogError": 0.1845424212601673,
+        "approximateMultiplicativeError": 0.20266799889482523,
+        "meanAbsLogError": 0.21735775484055841,
+        "biasLogError": -0.034235135282648134,
+        "nll": 0.11634503744403163,
+        "pinballLoss": {
+          "q05": 1155.5069555900002,
+          "q10": 2038.5879767608965,
+          "q50": 6039.733863636363,
+          "q90": 3280.027243292155,
+          "q95": 1884.1930840355901
+        },
+        "coverage": {
+          "interval80": 0.7520661157024794,
+          "interval90": 0.8636363636363636,
+          "interval95": 0.9297520661157025
+        },
+        "intervalWidthRatio": {
+          "interval80": 0.696962522209571,
+          "interval90": 0.9071175595315926,
+          "interval95": 1.0970707309472718
+        },
+        "crps": 7540.191267877043,
+        "winkler80": 53186.15220053055,
+        "winkler90": 60794.00079251182,
+        "winkler95": 66296.17110214797,
+        "pitHistogram": {
+          "bins": 10,
+          "counts": [
+            16,
+            23,
+            20,
+            33,
+            21,
+            21,
+            23,
+            20,
+            21,
+            44
+          ],
+          "expectedCounts": [
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2,
+            24.2
+          ],
+          "binEdges": [
+            0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "samples": 242
+        },
+        "pitUniformity": {
+          "bins": 10,
+          "samples": 242,
+          "chiSquare": 25.024793388429753,
+          "degreesOfFreedom": 9
+        },
+        "excludedFromPit": 0
+      },
+      "relativeMaleImprovement": -0.031415278237858724,
+      "relativeCrpsChange": 0.030155401882278055,
+      "blockLength": 13,
+      "interval95": [
+        -0.02509563561382978,
+        0.014561972606043921
+      ],
+      "p": 0.6966606678664267,
+      "early": {
+        "samples": 157,
+        "pairedImprovement": -0.004054331264439521
+      },
+      "recent": {
+        "samples": 85,
+        "pairedImprovement": -0.007408378011159898
+      },
+      "addedTargets": {
+        "samples": 2,
+        "pairedImprovement": -0.06342810439985368
+      },
+      "holmP": 1
+    }
+  ]
+}

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
-import { execFileSync } from 'node:child_process';
 
 const roots = process.argv.slice(2);
 if (roots.length === 0) {
-  roots.push('src/App.tsx', ...execFileSync('rg', ['--files', 'src/components'], { encoding: 'utf8' }).trim().split('\n').filter(Boolean));
+  roots.push('src/App.tsx');
+  const components = readdirSync('src/components', { recursive: true, withFileTypes: true });
+  roots.push(...components.filter(entry => entry.isFile()).map(entry => join(entry.parentPath, entry.name)));
 }
 const forbidden = /(?:from\s+['"].*data\/feature-table\.json['"]|import\s+['"].*data\/feature-table\.json['"])/;
 const offenders = roots.filter(file => {

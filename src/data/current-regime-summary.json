@@ -1,18 +1,19 @@
 {
-  "generatedAt": "2026-10-30T19:19:43.956Z",
-  "featureDate": "2026-10-29",
+  "generatedAt": "2026-11-18T03:22:05.937Z",
+  "featureDate": "2026-11-17",
   "regime": {
     "probabilities": {
-      "accumulation-value": 0.09756097560975609,
-      "trend-expansion": 0.09756097560975609,
-      "late-cycle-overheating": 0.09756097560975609,
-      "deleveraging-bear": 0.39024390243902435,
-      "sideways-chop": 0.31707317073170727
+      "accumulation-value": 0.3516483516483516,
+      "trend-expansion": 0.12087912087912087,
+      "late-cycle-overheating": 0.0879120879120879,
+      "deleveraging-bear": 0.3516483516483516,
+      "sideways-chop": 0.0879120879120879
     },
-    "topState": "deleveraging-bear",
+    "topState": "accumulation-value",
     "reasonCodes": [
+      "value-discount",
       "drawdown-or-negative-momentum",
-      "low-momentum-low-volatility"
+      "hashrate-available"
     ],
     "contextOnly": true
   },
@@ -20,21 +21,32 @@
     "riskFlag": "two-sided",
     "direction": "both",
     "drivers": [
-      "futures-leverage-crowding"
+      "large-cycle-drawdown"
     ],
-    "intervalMultiplierAdjustment": 1.06
+    "intervalMultiplierAdjustment": 1.08
   },
   "derivativesContext": {
     "source": "Binance USD-M Futures public REST",
-    "sourceDate": "2026-10-28",
-    "openInterestUSD": 7665717402.658,
-    "openInterestToMarketCap": 0.0046934691849780585,
-    "fundingRateDailySum": 0.00021247,
-    "fundingRateDailyAvg": 0.00007082333333333333,
+    "sourceDate": "2026-11-16",
+    "openInterestUSD": 6108658756.000196,
+    "openInterestToMarketCap": 0.004676703619489125,
+    "fundingRateDailySum": 0.00005629,
+    "fundingRateDailyAvg": 0.000018763333333333334,
     "leverageState": "normal",
-    "fundingState": "long-crowded",
-    "insight": "Funding is stretched positive, so long positioning may be crowded.",
+    "fundingState": "neutral",
+    "insight": "Funding is neutral, so derivatives are not confirming a crowded directional trade.",
     "status": "context-only"
   },
-  "networkContext": null
+  "networkContext": {
+    "source": "CoinMetrics Community API",
+    "sourceDate": "2026-11-16",
+    "transferCount": 1146981,
+    "addressBalanceCount": 57278497,
+    "activeAddressShare": 0.011874700552984133,
+    "transfersPerTransaction": 1.4475978564595233,
+    "transferActivityPercentile": 0.9711699631243714,
+    "networkState": "speculative-congestion",
+    "insight": "Transfers are high while active address share is low, which can indicate churn rather than broad demand.",
+    "status": "context-only"
+  }
 }
