@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-21T18:10:02.672Z",
+  "generatedAt": "2026-11-21T18:16:24.712Z",
   "reportPath": "docs/reports/results/backtest-2026-11-18T03-22-20-396Z.json",
   "qualityGateStatus": "PASS",
   "reliabilityScore": 97,
@@ -28,7 +28,7 @@
   "ensembleEnabled": false,
   "ensembleReason": "Regime signals are context-only until ablation beats the calibrated power-law baseline out of sample.",
   "coreAssumptions": {
-    "generatedAt": "2026-11-21T18:10:02.728Z",
+    "generatedAt": "2026-11-21T18:16:24.755Z",
     "longHorizonLabel": "Directional only",
     "reason": "coefficients=unstable; tau=watch; cycle=stable; residuals=stable",
     "coefficientStability": {
