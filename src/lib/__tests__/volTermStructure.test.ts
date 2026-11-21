@@ -148,7 +148,9 @@ describe('session volatility term structure', () => {
     const rows = buildMarketForecast('gold', gold, 3650, Z95).displayData.filter((row) => row.isForecast);
     const terminal = rows.at(-1)!;
     expect(terminal.floorPriceModel).toBeLessThan(terminal.forecast);
-    expect(terminal.forecast).toBeLessThan(last.close * Math.exp(drift * 3650));
+    // After one year the median decays to the 4% reference drift. It stays
+    // below the faster of the two drifts whatever the sign of recent momentum.
+    expect(terminal.forecast).toBeLessThan(last.close * Math.exp(Math.max(drift, Math.log(1.04) / 365) * 3650));
   }, 60_000);
 
   it('keeps gold chart rows prefix-stable past one year', () => {

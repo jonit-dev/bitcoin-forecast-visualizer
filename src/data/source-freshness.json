@@ -1,64 +1,64 @@
 {
-  "generatedAt": "2026-11-18T03:22:05.803Z",
+  "generatedAt": "2026-11-21T18:10:02.781Z",
   "sources": {
     "btc": {
       "status": "fresh",
-      "latestDate": "2026-11-17",
+      "latestDate": "2026-11-20",
       "lagDays": 1,
       "required": true
     },
     "mvrv": {
       "status": "fresh",
-      "latestDate": "2026-11-17",
+      "latestDate": "2026-11-20",
       "lagDays": 1,
       "required": true
     },
     "onchain": {
       "status": "fresh",
-      "latestDate": "2026-11-17",
+      "latestDate": "2026-11-20",
       "lagDays": 1,
       "required": true
     },
     "features": {
       "status": "fresh",
-      "latestDate": "2026-11-17",
+      "latestDate": "2026-11-20",
       "lagDays": 1,
       "required": true
     },
     "derivatives": {
       "status": "available",
-      "latestDate": "2026-11-17",
+      "latestDate": "2026-11-20",
       "lagDays": 1,
       "required": false
     },
     "stablecoins": {
       "status": "available",
-      "latestDate": "2026-11-18",
+      "latestDate": "2026-11-21",
       "lagDays": 0,
       "required": false
     },
     "etf": {
       "status": "available",
-      "latestDate": "2026-11-17",
+      "latestDate": "2026-11-20",
       "lagDays": 1,
       "required": false
     },
     "macro": {
       "status": "available",
-      "latestDate": "2026-11-17",
+      "latestDate": "2026-11-20",
       "lagDays": 1,
       "required": false
     },
     "sentiment": {
       "status": "available",
-      "latestDate": "2026-11-18",
+      "latestDate": "2026-11-21",
       "lagDays": 0,
       "required": false
     },
     "cot": {
       "status": "available",
-      "latestDate": "2026-11-10",
-      "lagDays": 8,
+      "latestDate": "2026-11-17",
+      "lagDays": 4,
       "required": false
     }
   }

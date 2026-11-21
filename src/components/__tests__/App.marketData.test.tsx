@@ -50,8 +50,10 @@ describe('App market data hydration', () => {
     vi.stubGlobal('fetch', fetchMock);
     render(<App />);
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
-    expect(fetchMock.mock.calls.map(([input]) => new URL(String(input), 'https://example.test').searchParams.get('asset')).sort()).toEqual(['btc', 'gold', 'sp500']);
+    // The live quote poll also calls fetch. Count only the market-data hydration.
+    const hydrationAssets = () => fetchMock.mock.calls.map(([input]) => String(input)).filter((url) => url.startsWith('/api/market-data')).map((url) => new URL(url, 'https://example.test').searchParams.get('asset')).sort();
+    await waitFor(() => expect(hydrationAssets()).toHaveLength(3));
+    expect(hydrationAssets()).toEqual(['btc', 'gold', 'sp500']);
 
     expect(screen.queryByRole('tab', { name: 'Crisis' })).toBeNull();
 

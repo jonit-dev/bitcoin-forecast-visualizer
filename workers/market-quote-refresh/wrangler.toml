@@ -12,7 +12,7 @@ migrations_dir = "../../migrations"
 name = "bitcoin-market-quote-refresh-production"
 
 [env.production.triggers]
-crons = ["15 23 * * *"]
+crons = ["15 23 * * *", "20 0 * * *"]
 
 [[env.production.d1_databases]]
 binding = "MARKET_QUOTES_DB"

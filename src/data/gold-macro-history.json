@@ -2,7 +2,7 @@
   "metadata": {
     "source": "FRED observations API",
     "status": "ok",
-    "fetchedAt": "2026-11-18T03:21:48.319Z",
+    "fetchedAt": "2026-11-21T18:09:50.651Z",
     "series": [
       {
         "seriesId": "DTWEXBGS",
@@ -24691,8 +24691,26 @@
     {
       "date": "2026-11-17",
       "usdBroad": 122.6503,
-      "real10": 2.91,
-      "gvz": 26.42
+      "real10": 2.89,
+      "gvz": 26.46
+    },
+    {
+      "date": "2026-11-18",
+      "usdBroad": 122.6503,
+      "real10": 2.88,
+      "gvz": 28.04
+    },
+    {
+      "date": "2026-11-19",
+      "usdBroad": 122.6503,
+      "real10": 2.88,
+      "gvz": 28.7
+    },
+    {
+      "date": "2026-11-20",
+      "usdBroad": 122.6503,
+      "real10": 2.89,
+      "gvz": 28.7
     }
   ]
 }

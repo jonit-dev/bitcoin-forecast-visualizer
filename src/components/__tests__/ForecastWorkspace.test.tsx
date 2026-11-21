@@ -15,6 +15,16 @@ describe('forecast workspace header', () => {
     fireEvent.keyDown(btc, { key: 'ArrowRight' }); expect(onChange).toHaveBeenCalledWith('sp500');
   });
 
+  it('shows the live spot price from the quote endpoint', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ asset: 'btc', price: 60020.26, time: '2026-11-21T14:00:00.000Z' })));
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      render(<MarketBar assets={assets} activeId="btc" onChange={vi.fn()} quoteDate="2026-11-20" status="current" />);
+      expect(await screen.findByText('$60,020.26')).toBeTruthy();
+      expect(fetchMock).toHaveBeenCalledWith('/api/quote?asset=btc');
+    } finally { vi.unstubAllGlobals(); }
+  });
+
   it('keeps BTC first and exposes no standalone crisis tab', () => {
     const onChange = vi.fn();
     render(<MarketBar assets={MARKET_ASSETS} activeId="btc" onChange={onChange} quoteDate="2026-07-15" status="fallback" />);
