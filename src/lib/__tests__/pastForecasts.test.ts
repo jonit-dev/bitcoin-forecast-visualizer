@@ -3,7 +3,7 @@ import btcHistory from '../../data/btc-history.json';
 import type { OHLCVData } from '../api';
 import { addDays } from '../cycle';
 import { processRealData } from '../data';
-import { MAX_PAST_FORECASTS, buildPastForecasts, pastForecastAt } from '../pastForecasts';
+import { MAX_PAST_FORECASTS, PAST_FORECAST_START, buildPastForecasts, pastForecastAt } from '../pastForecasts';
 
 const ohlcv = btcHistory as OHLCVData[];
 const Z95 = 1.96;
@@ -39,6 +39,7 @@ describe('buildPastForecasts', () => {
       expect(fans.at(-1)!.points.at(-1)!.date).toBe(ohlcv.at(-1)!.date);
       fans.slice(1).forEach((fan, index) => expect(fan.originDate).toBe(addDays(fans[index].originDate, horizon)));
       fans.forEach(fan => expect(upTo(fan.originDate).length).toBeGreaterThanOrEqual(365));
+      fans.forEach(fan => expect(fan.originDate >= PAST_FORECAST_START).toBe(true));
     }
     expect(buildPastForecasts(ohlcv, 30, Z95)).toHaveLength(MAX_PAST_FORECASTS);
   });

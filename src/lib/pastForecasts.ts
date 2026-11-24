@@ -16,6 +16,9 @@ export interface PastForecast {
 
 export const MAX_PAST_FORECASTS = 24;
 const MIN_HISTORY_ROWS = 365; // computePowerLawInterval minimum
+// Before 2022 the model constants fit the price badly, so old replays only show that misfit.
+// Matches the test period of docs/reports/results/btc-price-match-2026-11-24.md.
+export const PAST_FORECAST_START = '2022-01-01';
 
 /**
  * Today's model replayed from past dates: the same median path and band as the live
@@ -30,7 +33,7 @@ export function buildPastForecasts(ohlcv: OHLCVData[], horizon: number, confiden
 
   for (let k = 1; k <= MAX_PAST_FORECASTS; k++) {
     const end = lastIndexOnOrBefore(ohlcv, addDays(lastDate, -k * horizon));
-    if (end + 1 < MIN_HISTORY_ROWS) break;
+    if (end + 1 < MIN_HISTORY_ROWS || ohlcv[end].date < PAST_FORECAST_START) break;
     const rows = ohlcv.slice(0, end + 1);
     const origin = rows[end];
     const originTime = parseDate(origin.date);
