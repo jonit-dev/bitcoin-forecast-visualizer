@@ -2,7 +2,7 @@
   "metadata": {
     "source": "Farside Investors Bitcoin ETF Flow - All Data",
     "status": "available",
-    "fetchedAt": "2026-11-22T20:46:34.867Z",
+    "fetchedAt": "2026-11-24T01:43:44.911Z",
     "url": "https://farside.co.uk/bitcoin-etf-flow-all-data/",
     "fields": [
       "totalFlowUSDm",
@@ -23517,13 +23517,13 @@
       "latestSourceDate": "2026-11-20",
       "availableAfter": "2026-11-21T00:00:00.000Z",
       "metrics": {
-        "totalFlowUSDm": -124.5,
-        "totalFlowUSD": -124500000,
-        "cumulativeFlowUSDm": 53455.79999999993,
-        "cumulativeFlowUSD": 53455799999.99993,
-        "fundSumUSDm": -124.50000000000001,
+        "totalFlowUSDm": -669.2,
+        "totalFlowUSD": -669200000,
+        "cumulativeFlowUSDm": 52911.09999999993,
+        "cumulativeFlowUSD": 52911099999.99993,
+        "fundSumUSDm": -669.2,
         "fundFlowsUSDm": {
-          "IBIT": 0,
+          "IBIT": -544.7,
           "FBTC": -72.4,
           "BITB": -7,
           "ARKB": 0,
@@ -23540,6 +23540,38 @@
       "timing": {
         "sourceDate": "2026-11-20",
         "conservativeAvailableAfter": "2026-11-21T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-11-23",
+      "source": "Farside Investors Bitcoin ETF Flow - All Data",
+      "latestSourceDate": "2026-11-23",
+      "availableAfter": "2026-11-24T00:00:00.000Z",
+      "metrics": {
+        "totalFlowUSDm": -60.4,
+        "totalFlowUSD": -60400000,
+        "cumulativeFlowUSDm": 52850.69999999993,
+        "cumulativeFlowUSD": 52850699999.99993,
+        "fundSumUSDm": -60.4,
+        "fundFlowsUSDm": {
+          "IBIT": 0,
+          "FBTC": 13.3,
+          "BITB": -12.6,
+          "ARKB": 0,
+          "BTCO": 0,
+          "EZBC": 0,
+          "BRRR": 0,
+          "HODL": 0,
+          "BTCW": 0,
+          "MSBT": 0,
+          "GBTC": 0,
+          "BTC": -61.1
+        }
+      },
+      "timing": {
+        "sourceDate": "2026-11-23",
+        "conservativeAvailableAfter": "2026-11-24T00:00:00.000Z"
       },
       "missingMetrics": []
     }
