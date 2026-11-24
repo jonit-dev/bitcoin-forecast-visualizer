@@ -4,16 +4,18 @@ import { cn } from '../lib/utils';
 import type { ChartSeriesRefs, ForecastChartProps, LegendData } from './chart/types';
 import { ChartLegend } from './chart/Legend';
 import { BuyZonePrimitive, HalvingCyclePrimitive, HALVING_DATES, HeatmapPrimitive, MVRVZonePrimitive } from './chart/primitives';
+import { pastForecastAt } from '../lib/pastForecasts';
 import { attachCrisisPane, clipCrisisHistory, crisisPointAt, timeKey } from './chart/crisisPane';
 import {
   buildChartSeriesData,
   buildLegendFromRow,
   buildProbabilityMarker,
+  projectPastForecastCandles,
   mvrvZScoreColor,
   visibleRangeForTimeRange,
 } from './chart/dataTransforms';
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, buyZones = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast, crisisHistory = null, crisisThresholds = null, showCrisis = false, crisisEventCount }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, buyZones = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast, crisisHistory = null, crisisThresholds = null, showCrisis = false, crisisEventCount, showPastForecasts = false, pastForecasts = [] }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<ChartSeriesRefs>({ stochasticTraces: [] });
@@ -21,6 +23,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
   const forecastMarkersRef = useRef<any>(null);
   const heatmapPrimRef = useRef<HeatmapPrimitive | null>(null);
   const buyZonePrimRef = useRef<BuyZonePrimitive | null>(null);
+  const pastForecastSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const mvrvChartContainerRef = useRef<HTMLDivElement>(null);
   const mvrvChartRef = useRef<any>(null);
   const mvrvSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
@@ -192,6 +195,17 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     });
     seriesRefs.current.peakLine = peakLineSeries;
 
+    // Past forecasts: today's model replayed from earlier origins as candle projections, drawn over the real candles.
+    pastForecastSeriesRef.current = chart.addSeries(CandlestickSeries, {
+      upColor: 'rgba(16, 185, 129, 0.45)',
+      downColor: 'rgba(239, 68, 68, 0.45)',
+      borderVisible: false,
+      wickUpColor: 'rgba(16, 185, 129, 0.45)',
+      wickDownColor: 'rgba(239, 68, 68, 0.45)',
+      lastValueVisible: false,
+      priceLineVisible: false,
+    });
+
     // ---- MVRV Z-Score panel: completely separate chart instance ----
     if (showBitcoinOverlays && mvrvChartContainerRef.current) {
       const mvrvChart = createChart(mvrvChartContainerRef.current, {
@@ -245,6 +259,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       mvrvSeriesRef.current = null;
       heatmapPrimRef.current = null;
       buyZonePrimRef.current = null;
+      pastForecastSeriesRef.current = null;
       markersRef.current = null;
       forecastMarkersRef.current = null;
       seriesRefs.current = { stochasticTraces: [] };
@@ -446,6 +461,26 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     buyZonePrimRef.current.setZones(visible ? buyZones : []);
   }, [buyZones, showBuyZones, playbackIndex, showBitcoinOverlays]);
 
+  // Update past forecast candles; hidden during playback so they never show the future.
+  const pastForecastsVisible = showPastForecasts && playbackIndex === null && pastForecasts.length > 0;
+  useEffect(() => {
+    const historical = pastForecastsVisible ? data.filter((d: any) => !d.isForecast) : [];
+    pastForecastSeriesRef.current?.setData(pastForecastsVisible ? projectPastForecastCandles(historical, pastForecasts) : []);
+  }, [data, pastForecasts, pastForecastsVisible, showBitcoinOverlays]);
+
+  const [pastHoverDate, setPastHoverDate] = React.useState<string | null>(null);
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart || !pastForecastsVisible) return;
+    const handleMove = (param: any) => setPastHoverDate(timeKey(param?.time));
+    chart.subscribeCrosshairMove(handleMove);
+    return () => {
+      try { chart.unsubscribeCrosshairMove(handleMove); } catch { /* chart disposed */ }
+      setPastHoverDate(null);
+    };
+  }, [pastForecastsVisible, showBitcoinOverlays]);
+  const pastReadout = pastForecastsVisible && pastHoverDate ? pastForecastAt(pastForecasts, pastHoverDate) : null;
+
   // Handle time range — only reacts to explicit timeRange button clicks, not data changes
   const prevTimeRange = useRef(timeRange);
   const initialFitDone = useRef(false);
@@ -480,6 +515,11 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       <div className="relative flex-1 min-h-0">
         <div ref={chartContainerRef} className="absolute inset-0" />
         <ChartLegend data={legendData} />
+        {pastReadout && (
+          <div className="absolute bottom-16 left-3 z-10 pointer-events-none text-[10px] md:text-xs font-mono text-amber-300/90 bg-zinc-950/60 backdrop-blur-sm px-1.5 py-1 rounded border border-amber-400/20" data-testid="past-forecast-readout">
+            Forecast from {pastReadout.originDate} (model replay): median ${formatUsd(pastReadout.point.median)}, band ${formatUsd(pastReadout.point.lower)} to ${formatUsd(pastReadout.point.upper)}
+          </div>
+        )}
       </div>{/* end main chart wrapper */}
 
       {/* Crisis indicator readout — the pane itself lives inside the main chart, under the price */}
@@ -508,3 +548,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     </div>
   );
 });
+
+function formatUsd(value: number) {
+  return value.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}

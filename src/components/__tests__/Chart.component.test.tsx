@@ -1,6 +1,6 @@
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, waitFor } from '@testing-library/react';
+import { act, cleanup, render, waitFor } from '@testing-library/react';
 import { ForecastChart } from '../Chart';
 
 const seriesMocks: any[] = [];
@@ -179,5 +179,37 @@ describe('ForecastChart component', () => {
     await waitFor(() => expect(seriesMocks.length).toBeGreaterThan(0));
     expect(seriesMocks[4].setData).toHaveBeenCalledWith([]);
     expect(markerMocks).toHaveLength(0);
+  });
+
+  it('draws past forecast candle projections only when the toggle is on, and shows the replay readout', async () => {
+    const fan = (originDate: string, next: string) => ({ originDate, points: [
+      { date: originDate, median: 100, upper: 100, lower: 100 },
+      { date: next, median: 104, upper: 120, lower: 90 },
+    ] });
+    const pastForecasts = [fan('2024-01-01', '2024-01-02'), fan('2024-01-02', '2024-01-03')];
+    const pastSeries = () => seriesMocks.find((series) => series.seriesType === 'CandlestickSeries' && series.seriesOptions.upColor === 'rgba(16, 185, 129, 0.45)');
+
+    renderChart({ pastForecasts });
+    await waitFor(() => expect(pastSeries()?.setData).toHaveBeenCalled());
+    expect(pastSeries().setData).toHaveBeenLastCalledWith([]);
+    cleanup(); seriesMocks.length = 0; chartMocks.length = 0;
+
+    const screen = renderChart({ pastForecasts, showPastForecasts: true });
+    await waitFor(() => expect(pastSeries().setData.mock.lastCall[0].map((candle: any) => candle.time)).toEqual(['2024-01-02', '2024-01-03']));
+    // Each projection opens at the real close of its origin day.
+    expect(pastSeries().setData.mock.lastCall[0].map((candle: any) => candle.open)).toEqual([110, 125]);
+    act(() => {
+      for (const [handler] of chartMocks[0].subscribeCrosshairMove.mock.calls) {
+        handler({ time: '2024-01-02', point: { x: 1, y: 1 }, seriesData: new Map() });
+      }
+    });
+    expect(screen.getByTestId('past-forecast-readout').textContent).toBe('Forecast from 2024-01-01 (model replay): median $104, band $90 to $120');
+  });
+
+  it('hides past forecast candles during playback', async () => {
+    renderChart({ pastForecasts: [{ originDate: '2024-01-01', points: [{ date: '2024-01-01', median: 1, upper: 1, lower: 1 }, { date: '2024-01-02', median: 1, upper: 1, lower: 1 }] }], showPastForecasts: true, playbackIndex: 1 });
+    await waitFor(() => expect(seriesMocks.length).toBeGreaterThan(0));
+    const pastSeries = seriesMocks.find((series) => series.seriesOptions?.upColor === 'rgba(16, 185, 129, 0.45)');
+    expect(pastSeries.setData).toHaveBeenLastCalledWith([]);
   });
 });

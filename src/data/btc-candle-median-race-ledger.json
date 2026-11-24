@@ -1,0 +1,40 @@
+{
+  "raceVersion": "btc-candle-median-race-v1",
+  "protocolSha256": "a58a759c3128da03b887b088720631741dc2305ea34ff6b3091fc66bbbf675c9",
+  "candidateSourceSha256": "898e0cf850b4d3ca94072a122c159f2a7a960db903e6dfc62201f2570b78408f",
+  "rows": [
+    {
+      "kind": "prediction",
+      "originDate": "2026-11-20",
+      "recordedAt": "2026-11-24T18:03:51.490Z",
+      "originClose": 59056.19,
+      "forecasts": {
+        "14": {
+          "shipped": 57813.00005453054,
+          "naive": 59056.19,
+          "pit_powerlaw": 62593.45975024019
+        },
+        "30": {
+          "shipped": 56538.84946064522,
+          "naive": 59056.19,
+          "pit_powerlaw": 66647.30103821294
+        },
+        "90": {
+          "shipped": 53359.055012758814,
+          "naive": 59056.19,
+          "pit_powerlaw": 81771.42637226514
+        },
+        "180": {
+          "shipped": 54267.355089866585,
+          "naive": 59056.19,
+          "pit_powerlaw": 103533.49675026497
+        },
+        "365": {
+          "shipped": 81111.98407247184,
+          "naive": 59056.19,
+          "pit_powerlaw": 143028.004300003
+        }
+      }
+    }
+  ]
+}

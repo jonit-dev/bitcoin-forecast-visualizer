@@ -34,6 +34,12 @@ jobs:
       - name: Refresh forecast data
         run: yarn run update:forecast-data
 
+      # Prospective candle-median race (docs/reports/results/btc-candle-median-race-protocol-v1.md).
+      # Report-only: a failure here must not block the data refresh.
+      - name: Record BTC candle median race origin
+        continue-on-error: true
+        run: npx tsx scripts/btc-candle-median-race.ts
+
       - name: Typecheck
         run: yarn lint
 

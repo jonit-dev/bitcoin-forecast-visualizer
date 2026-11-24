@@ -2,6 +2,7 @@ import type { ISeriesApi } from 'lightweight-charts';
 import type { HeatmapCell } from '../../lib/data';
 import type { BuyZoneSpan } from '../../lib/buyZone';
 import type { CrisisHistoryPoint } from '../../lib/sp500CrisisModel';
+import type { PastForecast } from '../../lib/pastForecasts';
 
 export interface ProbabilityForecastSummary {
   horizonDays: number;
@@ -35,6 +36,8 @@ export interface ForecastChartProps {
   crisisThresholds?: { watch: number; high: number } | null;
   showCrisis?: boolean;
   crisisEventCount?: number;
+  showPastForecasts?: boolean;
+  pastForecasts?: PastForecast[];
 }
 
 export interface ChartSeriesRefs {

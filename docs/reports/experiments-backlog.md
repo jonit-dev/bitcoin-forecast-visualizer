@@ -1989,3 +1989,34 @@ existing VOO price forecast.
 - **Result/verdict:** On November 17 the 365-day gap is 1.13% at 5,000 simulations and 1.28% at 25,000. November 5 reaches 2.44% at 25,000, and the August 17 replay stays within 0.45%. This measures an origin-dependent difference, with no predictive accuracy gain established.
 - **Rerun criteria:** Revisit on a fixed cohort across volatility regimes or when the simulated residual distribution changes.
 - **Next better experiment:** Pre-register centering of the simulated median on a fixed development and prospective schedule, and require calibration and dependence checks before changing the heatmap.
+
+---
+
+## 2026-11-24 — BTC price-match study: which median tracks the real price (moving-average blends)
+
+- **Date:** 2026-11-24
+- **Status:** `completed — report-only; moving-average blends rejected; no production forecast or UI change`
+- **Hypothesis:** Weighting the BTC median with moving averages (SMA50 or SMA200, blended in log space) makes the projected path match the later real price better than the base median alone.
+- **Data/source changes:** None. Checked-in `src/data/btc-history.json` (5,971 daily candles, 2010-07-17 → 2026-11-20).
+- **Validation setup:** `npx tsx scripts/research-btc-price-match.ts`. Weekly origins from 2017-01-01. Train: origins before 2022-01-01. Test: 2022-01-01+. Frozen: origins from 2026-07-06 (commit `2bd91ca`, the last change to the shipped median formula: constants since 2026-03-22, tau 210 since 2026-04-04, strategy routing on 2026-07-06), so this is the only slice of the shipped model without hindsight. Horizons 14/30/90/180/365 days. Metric: MALE `|ln(forecast/actual)|`, plus MdALE, bias, direction hit rate and wins per test year. Candidates: `naive` (last close), `shipped_hindsight` (`cycleAdjustedPowerLawForecast`, which is in-sample before 2026-07-06), `pit_powerlaw` (causal log OLS from 2013 refit at each origin, `fitCausalLogPowerLaw`), SMA20/50/200 levels, 200-day momentum, and six blends of {naive, shipped, pit_powerlaw} × {SMA50, SMA200}. Blend weights were picked on Train only (grid 0..1, step 0.05). Pre-registered gate: a blend passes only if it cuts its base's test MALE by ≥ 2% at ≥ 2 horizons and wins ≥ 3 of the 5 test years at those horizons.
+- **Report artifacts:** [report](results/btc-price-match-2026-11-24.md) and [metrics](results/btc-price-match-2026-11-24.json).
+- **Result/verdict:** `reject` for all six blends. The train-optimal weight was 0 for 29 of the 30 blend/horizon pairs, so the moving averages added nothing. The one exception, `pit_powerlaw+sma50` at 180 days (w=0.15), cut test MALE by 3.8% and won 4 of 5 years, but it passed at only one horizon. SMA levels and momentum alone lost to `naive` at every horizon on test (−2% to −116%).
+  - Test MALE, naive / shipped (hindsight) / pit_powerlaw: 14d 0.074 / 0.071 / 0.077; 30d 0.115 / 0.108 / 0.117; 90d 0.217 / 0.167 / 0.222; 180d 0.342 / 0.177 / 0.318; 365d 0.527 / 0.145 / 0.348.
+  - Frozen slice (no hindsight; tiny and overlapping: n = 17/15/6 at 14/30/90d, 0 at 180/365d; one bear regime), naive / shipped / pit_powerlaw: 14d 0.064 / 0.064 / 0.076; 30d 0.107 / 0.131 / 0.097; 90d 0.177 / 0.300 / 0.099. In the only no-hindsight slice, the shipped model did not beat naive. The sample is too small for any claim.
+  - Reading: the shipped model's large 2022+ edge comes mostly from constants chosen with that history. An honest point-in-time power law matches naive up to 90 days and beats it at 180 days (+7%) and 365 days (+34%).
+- **Rerun criteria:** Rerun when the frozen slice has at least 52 weekly origins per horizon up to 180 days (about 2027-08 for 14–90d and 2028-01 for 180d), or when a new median candidate is frozen.
+- **Next better experiment:** Track the shipped model against naive and `pit_powerlaw` in the frozen slice through the prospective ledger, and do not tune on the 2022+ window again. If a moving-average signal is revisited, test it only as a short-horizon (≤ 30d) residual-momentum term with a frozen weight, not as a level blend.
+
+---
+
+## 2026-11-24 — BTC forecast-candle median race (prospective, `btc-candle-median-race-v1`)
+
+- **Date:** 2026-11-24
+- **Status:** `active — prospective recording; no production forecast or UI change; yellow model out of scope`
+- **Hypothesis:** A challenger median (`naive` = origin close, or `pit_powerlaw` = causal log power law refit on prices up to each origin from 2013) matches the later real price better than `shipped` (`cycleAdjustedPowerLawForecast`), which the semi-transparent forecast candles center on today. Historical tests cannot decide this fairly because `shipped` constants were chosen with 2022–2026 in view (see the 2026-11-24 price-match study). Only forecasts recorded before their outcome can.
+- **Data/source changes:** None. New append-only ledger `src/data/btc-candle-median-race-ledger.json`, filled from the checked-in `src/data/btc-history.json`.
+- **Validation setup:** Frozen protocol `docs/reports/results/btc-candle-median-race-protocol-v1.md` (bound to the ledger by SHA-256, with the candidate code hashed as well). Weekly origins from 2026-11-20. Horizons 14/30/90/180/365 days. Late recording is allowed only while the 14-day outcome is unknown, and missed origins become gap rows. Status shows counts only until 52 matured origins exist per horizon. Decision at review: ≥ 2% lower MALE than `shipped`, a 95% moving-block bootstrap interval entirely below 0, and the relevant `npm run backtest` gate. Code: `src/lib/candleMedianRace.ts`, `scripts/btc-candle-median-race.ts`, tests in `src/lib/__tests__/candleMedianRace.test.ts`.
+- **Report artifacts:** `docs/reports/results/btc-candle-median-race-protocol-v1.md`, `src/data/btc-candle-median-race-ledger.json`.
+- **Result/verdict:** `pending`. The first origin (2026-11-20) was recorded on 2026-11-24.
+- **Rerun criteria:** Run `npx tsx scripts/btc-candle-median-race.ts` at least every 13 days (weekly is best) after the BTC data refresh. The earliest reviews are 14d on 2027-11-26, 30d on 2027-12-12, 90d on 2028-02-10, 180d on 2028-05-10 and 365d on 2028-11-11.
+- **Next better experiment:** Add the append to the daily data job so no origin is missed. If a new challenger is proposed, freeze it in a new race version, and do not edit v1.

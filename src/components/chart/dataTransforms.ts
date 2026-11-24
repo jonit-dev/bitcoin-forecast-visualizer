@@ -1,6 +1,7 @@
 import type { LegendData, ProbabilityForecastSummary } from './types';
 import { hashStringSeed, mulberry32, normalFromRng } from '../../lib/data';
 import { projectTraceAboveLowerBound } from '../../lib/marketForecast';
+import type { PastForecast } from '../../lib/pastForecasts';
 
 const VOLUME_NORMALIZATION_WINDOW = 90;
 const PROJECTION_VOL_WINDOW = 90;
@@ -92,6 +93,16 @@ export function projectCandles(historical: any[], forecast: any[]) {
     open = close;
     return candle;
   });
+}
+
+/** Candle projections from each past forecast origin, built like the live projection
+ * from rows up to that origin. No floor clamp, so the median path alone sets the level. */
+export function projectPastForecastCandles(historical: any[], fans: PastForecast[]) {
+  return fans.flatMap((fan) => {
+    const end = historical.findIndex((d: any) => d.date > fan.originDate);
+    const known = end < 0 ? historical : historical.slice(0, end);
+    return projectCandles(known, fan.points.slice(1).map((point) => ({ date: point.date, close: point.median, floorPriceModel: null })));
+  }).sort(sortByTime);
 }
 
 export function buildChartSeriesData(
