@@ -1,17 +1,15 @@
 {
   "metadata": {
-    "fetchedAt": "2026-11-24T18:02:15.446Z",
+    "fetchedAt": "2026-11-24T23:31:48.496Z",
     "rowCount": 682,
     "firstMonth": "1970-01",
     "lastMonth": "2026-10",
-    "lastFullAllFourMonth": "2026-09",
+    "lastFullAllFourMonth": "2026-10",
     "missingMonths": {
       "cpi": [
         "2025-10"
       ],
-      "m2": [
-        "2026-10"
-      ],
+      "m2": [],
       "gs10": []
     },
     "sources": {
@@ -23,11 +21,11 @@
     "csvSha256": {
       "gold": "f20720f3413b3dd114cd116951516f0fab577ff8c91e102a3a92549582ea9608",
       "cpi": "c9be2d4909ffd28d91f07df5d113151b0fe7ba602144ee6fd453d3bc8426efde",
-      "m2": "626dcc3e6eb180613a0e7ac648de289c10fa2a73a42f674e98296a58430d5a84",
+      "m2": "76f38c370c4d9d14d59a6b1190501d8af5abc073549791b6f3dda424634cfd09",
       "gs10": "018e609eb98c52ec8d2cf0ea9f8e1450c24974c31cca455cc19717a77703af78"
     },
     "caveats": [
-      "Research-only monthly dataset; do not import into browser UI bundles.",
+      "Monthly spot gold + FRED macro cache used by Gold long-horizon research and the causal Gold/M2 valuation anchor (src/lib/goldLongAnchor.ts).",
       "FRED CPIAUCSL, M2SL, and GS10 are latest-revised series rather than point-in-time ALFRED release vintages.",
       "Consumers must apply at least a 1-month publication lag (macroLagMonths >= 1) before forecasting.",
       "Missing macro observations (e.g., FRED CPIAUCSL 2025-10) are stored as null and resolved causally via backward carry-forward (<= origin - macroLagMonths) during forecasting."
@@ -4742,7 +4740,7 @@
       "ym": "2026-01",
       "gold": 4753,
       "cpi": 326.588,
-      "m2": 22386.6,
+      "m2": 22386.7,
       "gs10": 4.21
     },
     {
@@ -4770,42 +4768,42 @@
       "ym": "2026-05",
       "gold": 4587,
       "cpi": 333.979,
-      "m2": 22980.9,
+      "m2": 22980.8,
       "gs10": 4.48
     },
     {
       "ym": "2026-06",
       "gold": 4228,
       "cpi": 332.568,
-      "m2": 23077.7,
+      "m2": 23077.6,
       "gs10": 4.47
     },
     {
       "ym": "2026-07",
       "gold": 4073,
       "cpi": 332.813,
-      "m2": 23177.4,
+      "m2": 23177.3,
       "gs10": 4.6
     },
     {
       "ym": "2026-08",
       "gold": 4411,
       "cpi": 334.131,
-      "m2": 23300.9,
+      "m2": 23300.8,
       "gs10": 4.68
     },
     {
       "ym": "2026-09",
       "gold": 4319,
       "cpi": 336.298,
-      "m2": 23413.9,
+      "m2": 23414.3,
       "gs10": 4.99
     },
     {
       "ym": "2026-10",
       "gold": 4105,
       "cpi": 337.476,
-      "m2": null,
+      "m2": 23532.8,
       "gs10": 5.13
     }
   ]

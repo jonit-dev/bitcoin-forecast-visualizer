@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-24T01:44:01.927Z",
+  "generatedAt": "2026-11-24T23:32:09.209Z",
   "sources": {
     "btc": {
       "status": "fresh",
@@ -9,14 +9,14 @@
     },
     "mvrv": {
       "status": "fresh",
-      "latestDate": "2026-11-22",
-      "lagDays": 2,
+      "latestDate": "2026-11-23",
+      "lagDays": 1,
       "required": true
     },
     "onchain": {
       "status": "fresh",
-      "latestDate": "2026-11-22",
-      "lagDays": 2,
+      "latestDate": "2026-11-23",
+      "lagDays": 1,
       "required": true
     },
     "features": {
@@ -39,8 +39,8 @@
     },
     "etf": {
       "status": "available",
-      "latestDate": "2026-11-23",
-      "lagDays": 1,
+      "latestDate": "2026-11-24",
+      "lagDays": 0,
       "required": false
     },
     "macro": {
