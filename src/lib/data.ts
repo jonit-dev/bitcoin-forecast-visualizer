@@ -1,4 +1,4 @@
-import type { OHLCVData } from './api';
+import type { ForecastAssetId, OHLCVData } from './api';
 import { cycleAdjustedPowerLawForecast } from './cycle';
 import {
   basePowerLawPrice,
@@ -96,6 +96,27 @@ export function coefficientStabilityTrustCopy(
   if (stabilityVerdict === 'stable') return 'Long-horizon output is a scenario range backed by the latest coefficient stability check.';
   if (stabilityVerdict === 'unstable') return 'Long-horizon coefficient refits are unstable, so 180+ day output is directional only rather than exact-confidence guidance.';
   return 'Fixed structural coefficients are under review at 180-365 day horizons; treat the output as a scenario range.';
+}
+
+export function assetForecastTrustCopy(
+  assetId: ForecastAssetId,
+  horizonDays: number,
+  stabilityVerdict?: CoefficientStabilityVerdict,
+  coreAssumptions?: CoreAssumptionTrustSummary
+): string {
+  if (assetId === 'btc') {
+    return coefficientStabilityTrustCopy(horizonDays, stabilityVerdict, coreAssumptions);
+  }
+  if (assetId === 'gold') {
+    if (horizonDays < 180) {
+      return 'Amber path = median path. Dotted green bands show calibrated session-volatility range. Scenario sketches stay hidden unless enabled.';
+    }
+    return 'Long-horizon gold blends 1Y momentum into a 4%/yr prior with causal Gold/M2 valuation mean reversion and a session-volatility cone; treat 1Y+ output as a scenario range.';
+  }
+  if (horizonDays < 180) {
+    return 'Amber path = median path. Dotted green bands show calibrated risk range. Scenario sketches stay hidden unless enabled.';
+  }
+  return 'Long-horizon S&P 500 projects session-residual drift with a session-volatility cone; treat 1Y+ output as a scenario range.';
 }
 
 function probabilityVerdict(horizonDays: number, probabilityUp: number): string {
@@ -446,7 +467,8 @@ export function generateHeatmapData(
     counts.fill(0);
     for (let s = 0; s < numSimulations; s++) {
       const logP = Math.log(results[s * sampledCount + di]);
-      const idx = Math.min(numPriceBands - 1, Math.max(0, (logP - logMin) * invBandSize | 0));
+      const idx = Math.floor((logP - logMin) * invBandSize);
+      if (idx < 0 || idx >= numPriceBands) continue;
       counts[idx]++;
     }
 

@@ -278,6 +278,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       showModelLine,
       showScenarios,
       seriesRefs.current.stochasticTraces.length,
+      { useForecastMedianLine: !showBitcoinOverlays, clampCandlesToFloor: showBitcoinOverlays },
     );
 
     seriesRefs.current.candlestick?.setData(seriesData.candleData);

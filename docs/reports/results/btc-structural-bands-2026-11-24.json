@@ -1,0 +1,5084 @@
+{
+  "generatedAt": "2026-11-24T17:10:13.381Z",
+  "gitCommit": "55b56dec6dc87eb89dcb6e1bd8536392be06d44e",
+  "btcData": {
+    "rows": 5971,
+    "firstDate": "2010-07-17",
+    "lastDate": "2026-11-20",
+    "sha256": "daec4e3d67166af39e965611e252635aebdc41d6ab3f8cd0dafb4213bff447e1"
+  },
+  "protocol1Primary": {
+    "label": "Protocol 1 Primary (95% close, train 2011-01-01..2021-12-31)",
+    "trainStartDate": "2011-01-01",
+    "trainEndDate": "2021-12-31",
+    "holdoutStartDate": "2022-01-01",
+    "holdoutEndDate": "2026-11-20",
+    "holdoutRows": 1785,
+    "alpha": 0.05,
+    "mode": "close",
+    "arms": {
+      "B0_incumbent": {
+        "params": {
+          "shipped": true
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.3815588188642425,
+          "meanWidthLog": 1.3815588188642427,
+          "meanPinballL": 0.01708036462110832,
+          "meanPinballU": 0.01745860585049778,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.479180735287224,
+          "meanWidthLog": 1.4791807352872235,
+          "meanPinballL": 0.015583377235404422,
+          "meanPinballU": 0.021396141146776158,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.2262705454250766,
+          "meanWidthLog": 1.2262705454250762,
+          "meanPinballL": 0.019461639185305007,
+          "meanPinballU": 0.011195124450321937,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "inference": null,
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 2165,
+          "firstInversionDate": "2032-11-01",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 48735.25,
+              "center": 58724.51,
+              "peak": 159598.84,
+              "widthRatio": 3.27
+            },
+            "2028-01-01": {
+              "floor": 60843.92,
+              "center": 91612.75,
+              "peak": 190622.7,
+              "widthRatio": 3.13
+            },
+            "2030-01-01": {
+              "floor": 87883.85,
+              "center": 210437.33,
+              "peak": 255860.85,
+              "widthRatio": 2.91
+            },
+            "2035-01-01": {
+              "floor": 192478.83,
+              "center": 213122.05,
+              "peak": 479230.42,
+              "widthRatio": 2.49
+            },
+            "2040-01-01": {
+              "floor": 367092.9,
+              "center": 556730.82,
+              "peak": 803510.78,
+              "widthRatio": 2.19
+            },
+            "2045-01-01": {
+              "floor": 635720.83,
+              "center": 1781394.59,
+              "peak": 1247088.13,
+              "widthRatio": 1.96
+            }
+          }
+        }
+      },
+      "B1_logt_qr": {
+        "params": {
+          "tauL": 0.025,
+          "tauU": 0.975,
+          "interceptL": -39.65676654850153,
+          "slopeL": 5.796377604519456,
+          "intercept50": -40.23751872414245,
+          "slope50": 5.971069587681243,
+          "interceptU": -28.619407711910576,
+          "slopeU": 4.711943362370267
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.9836716169294695,
+          "meanWidthLog": 1.6753552058574166,
+          "meanPinballL": 0.019067793960883095,
+          "meanPinballU": 0.0305239964623536,
+          "coverage": 0.9098039215686274,
+          "belowFloorCount": 161,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.09019607843137255,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -43.58213272166105
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.9394083004163247,
+          "meanWidthLog": 1.7411081237744757,
+          "meanPinballL": 0.016712832066041333,
+          "meanPinballU": 0.031772375444366834,
+          "coverage": 0.9397810218978102,
+          "belowFloorCount": 66,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.060218978102189784,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -31.113680306263248
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.0540817691767876,
+          "meanWidthLog": 1.5707613044973323,
+          "meanPinballL": 0.02281385816515968,
+          "meanPinballU": 0.02853818606426012,
+          "coverage": 0.8621190130624092,
+          "belowFloorCount": 95,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.1378809869375907,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -67.50641013437675
+        },
+        "inference": {
+          "meanWinklerDiff": -0.6021127980652244,
+          "winklerImprPct": -43.58213272166087,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -0.6021127980652244,
+            "lower95": -0.9595017201955947,
+            "upper95": -0.32528227200324844,
+            "pOneSided": 0.9992001599680064
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -0.6021127980652244,
+            "lower95": -0.9009316563713972,
+            "upper95": -0.35361596355910485,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -3.6021650259525106,
+            "pOneSided": 0.9998421740635417,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 3342,
+          "firstInversionDate": "2036-11-07",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 77618,
+              "center": 201455.78,
+              "peak": 351887.63,
+              "widthRatio": 4.53
+            },
+            "2028-01-01": {
+              "floor": 110196.22,
+              "center": 289048.78,
+              "peak": 467878,
+              "widthRatio": 4.25
+            },
+            "2030-01-01": {
+              "floor": 196956.11,
+              "center": 525744.6,
+              "peak": 750155.35,
+              "widthRatio": 3.81
+            },
+            "2035-01-01": {
+              "floor": 679333.05,
+              "center": 1882321.36,
+              "peak": 2052412.46,
+              "widthRatio": 3.02
+            },
+            "2040-01-01": {
+              "floor": 1883257.73,
+              "center": 5381046.75,
+              "peak": 4701580.95,
+              "widthRatio": 2.5
+            },
+            "2045-01-01": {
+              "floor": 4482907.15,
+              "center": 13148259.79,
+              "peak": 9515401.34,
+              "widthRatio": 2.12
+            }
+          }
+        }
+      },
+      "B2_stretched_log_const": {
+        "params": {
+          "gamma": 1,
+          "beta": 0,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -0.9562786934284334,
+          "zU": 1.8154000085777147,
+          "tRef": null,
+          "sMin": null,
+          "innerCvMeanWinkler": 2.9591412621955544,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.8083938932626857,
+          "meanWidthLog": 2.771678702006212,
+          "meanPinballL": 0.014634973493831107,
+          "meanPinballU": 0.055574873837734635,
+          "coverage": 0.9669467787114846,
+          "belowFloorCount": 59,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.03305322128851541,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -103.27718624180054
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.7954394536911664,
+          "meanWidthLog": 2.771678702006167,
+          "meanPinballL": 0.014582784765722306,
+          "meanPinballU": 0.05530320157655641,
+          "coverage": 0.9698905109489051,
+          "belowFloorCount": 33,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.030109489051094892,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -88.9856585475577
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.829000665062794,
+          "meanWidthLog": 2.7716787020061138,
+          "meanPinballL": 0.014717990686874927,
+          "meanPinballU": 0.05600702593969566,
+          "coverage": 0.9622641509433962,
+          "belowFloorCount": 26,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.03773584905660377,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -130.69955285292644
+        },
+        "inference": {
+          "meanWinklerDiff": -1.4268350743983795,
+          "winklerImprPct": -103.27718624179592,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.4268350743983795,
+            "lower95": -1.517974601520304,
+            "upper95": -1.3262646749846834,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.4268350743983795,
+            "lower95": -1.5311648181609396,
+            "upper95": -1.3109214153922886,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -25.12562101914077,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 69767.93,
+              "center": 181535.84,
+              "peak": 1115271.46,
+              "widthRatio": 15.99
+            },
+            "2028-01-01": {
+              "floor": 98563.47,
+              "center": 256461.73,
+              "peak": 1575581.13,
+              "widthRatio": 15.99
+            },
+            "2030-01-01": {
+              "floor": 174729.42,
+              "center": 454645.18,
+              "peak": 2793127.77,
+              "widthRatio": 15.99
+            },
+            "2035-01-01": {
+              "floor": 592249.42,
+              "center": 1541030.39,
+              "peak": 9467371.27,
+              "widthRatio": 15.99
+            },
+            "2040-01-01": {
+              "floor": 1618428.94,
+              "center": 4211145,
+              "peak": 25871308.89,
+              "widthRatio": 15.99
+            },
+            "2045-01-01": {
+              "floor": 3805728.66,
+              "center": 9902489.27,
+              "peak": 60836271.13,
+              "widthRatio": 15.99
+            }
+          }
+        }
+      },
+      "B3_stretched_log_decay": {
+        "params": {
+          "gamma": 1,
+          "beta": 0.5,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -0.7900815571889838,
+          "zU": 1.2700665714938875,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "innerCvMeanWinkler": 2.419074433113387,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 3.6110265708643907,
+          "meanWidthLog": 1.7132454871217957,
+          "meanPinballL": 0.05368070123191624,
+          "meanPinballU": 0.03659496303969335,
+          "coverage": 0.6946778711484594,
+          "belowFloorCount": 545,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.30532212885154064,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -161.37335027349457
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.911341694458715,
+          "meanWidthLog": 1.7618979196316644,
+          "meanPinballL": 0.03571040467519469,
+          "meanPinballU": 0.037073137686273114,
+          "coverage": 0.7673357664233577,
+          "belowFloorCount": 255,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.23266423357664234,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -96.82122846829786
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 4.724023123172974,
+          "meanWidthLog": 1.6358535190074086,
+          "meanPinballL": 0.08226625279384196,
+          "meanPinballU": 0.035834325285482325,
+          "coverage": 0.579100145137881,
+          "belowFloorCount": 290,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.420899854862119,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -285.23498267141616
+        },
+        "inference": {
+          "meanWinklerDiff": -2.229467752000141,
+          "winklerImprPct": -161.37335027349403,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -2.229467752000141,
+            "lower95": -3.974308329176257,
+            "upper95": -0.8717186143622803,
+            "pOneSided": 0.9922015596880623
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -2.229467752000141,
+            "lower95": -4.009625659094346,
+            "upper95": -0.8192146764909999,
+            "pOneSided": 0.994001199760048
+          },
+          "nw180": {
+            "tStat": -2.681815383237861,
+            "pOneSided": 0.9963387602458844,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 98493.43,
+              "center": 181535.84,
+              "peak": 485116.15,
+              "widthRatio": 4.93
+            },
+            "2028-01-01": {
+              "floor": 141527.14,
+              "center": 256461.73,
+              "peak": 666891.08,
+              "widthRatio": 4.71
+            },
+            "2030-01-01": {
+              "floor": 257746,
+              "center": 454645.18,
+              "peak": 1132122.75,
+              "widthRatio": 4.39
+            },
+            "2035-01-01": {
+              "floor": 921007.11,
+              "center": 1541030.39,
+              "peak": 3525071.46,
+              "widthRatio": 3.83
+            },
+            "2040-01-01": {
+              "floor": 2617142.48,
+              "center": 4211145,
+              "peak": 9046253.49,
+              "widthRatio": 3.46
+            },
+            "2045-01-01": {
+              "floor": 6343982.8,
+              "center": 9902489.27,
+              "peak": 20258585.78,
+              "widthRatio": 3.19
+            }
+          }
+        }
+      },
+      "B4_logt_decay": {
+        "params": {
+          "gamma": 1,
+          "beta": 0.5,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -0.7900815571889838,
+          "zU": 1.2700665714938875,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "innerCvMeanWinkler": 2.419074433113387,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 3.6110265708643907,
+          "meanWidthLog": 1.7132454871217957,
+          "meanPinballL": 0.05368070123191624,
+          "meanPinballU": 0.03659496303969335,
+          "coverage": 0.6946778711484594,
+          "belowFloorCount": 545,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.30532212885154064,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -161.37335027349457
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.911341694458715,
+          "meanWidthLog": 1.7618979196316644,
+          "meanPinballL": 0.03571040467519469,
+          "meanPinballU": 0.037073137686273114,
+          "coverage": 0.7673357664233577,
+          "belowFloorCount": 255,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.23266423357664234,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -96.82122846829786
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 4.724023123172974,
+          "meanWidthLog": 1.6358535190074086,
+          "meanPinballL": 0.08226625279384196,
+          "meanPinballU": 0.035834325285482325,
+          "coverage": 0.579100145137881,
+          "belowFloorCount": 290,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.420899854862119,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -285.23498267141616
+        },
+        "inference": {
+          "meanWinklerDiff": -2.229467752000141,
+          "winklerImprPct": -161.37335027349403,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -2.229467752000141,
+            "lower95": -3.9215290152574056,
+            "upper95": -0.8707425922978064,
+            "pOneSided": 0.994001199760048
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -2.229467752000141,
+            "lower95": -3.9657566250111946,
+            "upper95": -0.8425194294901963,
+            "pOneSided": 0.993001399720056
+          },
+          "nw180": {
+            "tStat": -2.681815383237861,
+            "pOneSided": 0.9963387602458844,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 98493.43,
+              "center": 181535.84,
+              "peak": 485116.15,
+              "widthRatio": 4.93
+            },
+            "2028-01-01": {
+              "floor": 141527.14,
+              "center": 256461.73,
+              "peak": 666891.08,
+              "widthRatio": 4.71
+            },
+            "2030-01-01": {
+              "floor": 257746,
+              "center": 454645.18,
+              "peak": 1132122.75,
+              "widthRatio": 4.39
+            },
+            "2035-01-01": {
+              "floor": 921007.11,
+              "center": 1541030.39,
+              "peak": 3525071.46,
+              "widthRatio": 3.83
+            },
+            "2040-01-01": {
+              "floor": 2617142.48,
+              "center": 4211145,
+              "peak": 9046253.49,
+              "widthRatio": 3.46
+            },
+            "2045-01-01": {
+              "floor": 6343982.8,
+              "center": 9902489.27,
+              "peak": 20258585.78,
+              "widthRatio": 3.19
+            }
+          }
+        }
+      },
+      "B5_stretched_log_rvol": {
+        "params": {
+          "gamma": 1,
+          "windowDays": 730,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -26.168749699504627,
+          "zU": 32.48883299876367,
+          "frozenOriginVol": 0.04198466779359889,
+          "innerCvMeanWinkler": 3.152798525933148,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.4632631562971157,
+          "meanWidthLog": 2.462719123162398,
+          "meanPinballL": 0.01729088377276486,
+          "meanPinballU": 0.04429069513466178,
+          "coverage": 0.9994397759103641,
+          "belowFloorCount": 1,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.0005602240896358543,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -78.29593084731094
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.4627191231623744,
+          "meanWidthLog": 2.4627191231623744,
+          "meanPinballL": 0.01754895520557507,
+          "meanPinballU": 0.044019022873483624,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -66.49210366332747
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.4641285558843573,
+          "meanWidthLog": 2.462719123162339,
+          "meanPinballL": 0.01688036666048619,
+          "meanPinballU": 0.044722847236622974,
+          "coverage": 0.9985486211901307,
+          "belowFloorCount": 1,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.001451378809869376,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -100.94493544490928
+        },
+        "inference": {
+          "meanWinklerDiff": -1.0817043374328217,
+          "winklerImprPct": -78.29593084730722,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.0817043374328217,
+            "lower95": -1.1740746889454061,
+            "upper95": -0.974331817633287,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.0817043374328217,
+            "lower95": -1.1977036180867169,
+            "upper95": -0.9447690958872866,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -20.293120510967736,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 60507.47,
+              "center": 181535.84,
+              "peak": 710156.92,
+              "widthRatio": 11.74
+            },
+            "2028-01-01": {
+              "floor": 85480.92,
+              "center": 256461.73,
+              "peak": 1003262.34,
+              "widthRatio": 11.74
+            },
+            "2030-01-01": {
+              "floor": 151537.18,
+              "center": 454645.18,
+              "peak": 1778543.7,
+              "widthRatio": 11.74
+            },
+            "2035-01-01": {
+              "floor": 513638.8,
+              "center": 1541030.39,
+              "peak": 6028415.07,
+              "widthRatio": 11.74
+            },
+            "2040-01-01": {
+              "floor": 1403611.16,
+              "center": 4211145,
+              "peak": 16473737.42,
+              "widthRatio": 11.74
+            },
+            "2045-01-01": {
+              "floor": 3300585.59,
+              "center": 9902489.27,
+              "peak": 38737922.42,
+              "widthRatio": 11.74
+            }
+          }
+        }
+      },
+      "B6_shipped_base_anchored": {
+        "params": {
+          "beta": 0.75,
+          "zL": -1.6720248787403227,
+          "zU": 0.8789071095639875,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "sameVintageCenterline": true,
+          "innerCvMeanWinkler": 5.4933723456210535,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.9206259924806899,
+          "meanWidthLog": 1.9206259924806899,
+          "meanPinballL": 0.029715894591345993,
+          "meanPinballU": 0.018299755220671243,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -39.01876389595964
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.0010487692095698,
+          "meanWidthLog": 2.0010487692095698,
+          "meanPinballL": 0.02820624570967783,
+          "meanPinballU": 0.021819973520561448,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -35.280883631912
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.7926965827639196,
+          "meanWidthLog": 1.7926965827639196,
+          "meanPinballL": 0.032117309938673066,
+          "meanPinballU": 0.012700104630424992,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -46.190951862298554
+        },
+        "inference": {
+          "meanWinklerDiff": -0.539067173616447,
+          "winklerImprPct": -39.0187638959596,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -0.539067173616447,
+            "lower95": -0.5744122893174939,
+            "upper95": -0.49779262822162823,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -0.539067173616447,
+            "lower95": -0.5842936709859017,
+            "upper95": -0.48702585355265005,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -27.58490236372711,
+            "pOneSided": 1,
+            "lag": 180
+          }
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 30685.27,
+              "center": 95126.76,
+              "peak": 172422.88,
+              "widthRatio": 5.62
+            },
+            "2028-01-01": {
+              "floor": 40100.09,
+              "center": 118761.78,
+              "peak": 210154.73,
+              "widthRatio": 5.24
+            },
+            "2030-01-01": {
+              "floor": 62175.35,
+              "center": 171541.26,
+              "peak": 292449.52,
+              "widthRatio": 4.7
+            },
+            "2035-01-01": {
+              "floor": 155494.21,
+              "center": 375701.12,
+              "peak": 597359.15,
+              "widthRatio": 3.84
+            },
+            "2040-01-01": {
+              "floor": 325278.38,
+              "center": 716531.84,
+              "peak": 1085236.93,
+              "widthRatio": 3.34
+            },
+            "2045-01-01": {
+              "floor": 602995.16,
+              "center": 1240869.06,
+              "peak": 1813311.41,
+              "widthRatio": 3.01
+            }
+          }
+        }
+      },
+      "B5_dynamic_lag1_diag": {
+        "params": {
+          "diagnostic": "B5 with daily lagged rvol"
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.8562526049425445,
+          "meanWidthLog": 1.7496643521408342,
+          "meanPinballL": 0.036989159056244655,
+          "meanPinballU": 0.034417156067319044,
+          "coverage": 0.8257703081232493,
+          "belowFloorCount": 311,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.1742296918767507,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -106.7412958422302
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.9536220060617862,
+          "meanWidthLog": 1.9354088475630897,
+          "meanPinballL": 0.01212309627153665,
+          "meanPinballU": 0.036717453880008015,
+          "coverage": 0.9744525547445255,
+          "belowFloorCount": 28,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.025547445255474453,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -32.07459774565251
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 4.292077186035886,
+          "meanWidthLog": 1.4541985074633386,
+          "meanPinballL": 0.07654388302146957,
+          "meanPinballU": 0.030758046629427667,
+          "coverage": 0.5892597968069666,
+          "belowFloorCount": 283,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.4107402031930334,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -250.01062384223482
+        },
+        "inference": {
+          "meanWinklerDiff": -1.4746937860783007,
+          "winklerImprPct": -106.74129584223009,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.4746937860783007,
+            "lower95": -3.0953327967981554,
+            "upper95": -0.39059164438424265,
+            "pOneSided": 0.9642071585682863
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.4746937860783007,
+            "lower95": -3.31260985587568,
+            "upper95": -0.3497630218143405,
+            "pOneSided": 0.9472105578884223
+          },
+          "nw180": {
+            "tStat": -1.9615389445364428,
+            "pOneSided": 0.97509197575514,
+            "lag": 180
+          }
+        },
+        "structuralAudit": null
+      }
+    }
+  },
+  "protocol1Extreme98": {
+    "label": "Protocol 1 Secondary (98% extreme close, train 2011-01-01..2021-12-31)",
+    "trainStartDate": "2011-01-01",
+    "trainEndDate": "2021-12-31",
+    "holdoutStartDate": "2022-01-01",
+    "holdoutEndDate": "2026-11-20",
+    "holdoutRows": 1785,
+    "alpha": 0.02,
+    "mode": "close",
+    "arms": {
+      "B0_incumbent": {
+        "params": {
+          "shipped": true
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.3815588188642425,
+          "meanWidthLog": 1.3815588188642427,
+          "meanPinballL": 0.006832145848443335,
+          "meanPinballU": 0.006983442340199109,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.479180735287224,
+          "meanWidthLog": 1.4791807352872235,
+          "meanPinballL": 0.006233350894161766,
+          "meanPinballU": 0.008558456458710463,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.2262705454250766,
+          "meanWidthLog": 1.2262705454250762,
+          "meanPinballL": 0.007784655674122004,
+          "meanPinballU": 0.004478049780128769,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "inference": null,
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 2165,
+          "firstInversionDate": "2032-11-01",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 48735.25,
+              "center": 58724.51,
+              "peak": 159598.84,
+              "widthRatio": 3.27
+            },
+            "2028-01-01": {
+              "floor": 60843.92,
+              "center": 91612.75,
+              "peak": 190622.7,
+              "widthRatio": 3.13
+            },
+            "2030-01-01": {
+              "floor": 87883.85,
+              "center": 210437.33,
+              "peak": 255860.85,
+              "widthRatio": 2.91
+            },
+            "2035-01-01": {
+              "floor": 192478.83,
+              "center": 213122.05,
+              "peak": 479230.42,
+              "widthRatio": 2.49
+            },
+            "2040-01-01": {
+              "floor": 367092.9,
+              "center": 556730.82,
+              "peak": 803510.78,
+              "widthRatio": 2.19
+            },
+            "2045-01-01": {
+              "floor": 635720.83,
+              "center": 1781394.59,
+              "peak": 1247088.13,
+              "widthRatio": 1.96
+            }
+          }
+        }
+      },
+      "B1_logt_qr": {
+        "params": {
+          "tauL": 0.01,
+          "tauU": 0.99,
+          "interceptL": -38.75543501715839,
+          "slopeL": 5.668103766505061,
+          "intercept50": -40.23751872414245,
+          "slope50": 5.971069587681243,
+          "interceptU": -28.488111745599127,
+          "slopeU": 4.7068026026385645
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.9710183276869593,
+          "meanWidthLog": 1.9683369093152803,
+          "meanPinballL": 0.006631430742450515,
+          "meanPinballU": 0.013078752534419065,
+          "coverage": 0.9994397759103641,
+          "belowFloorCount": 1,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.0005602240896358543,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -42.66626225203369
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.0266238520034987,
+          "meanWidthLog": 2.0266238520034987,
+          "meanPinballL": 0.006685017376217699,
+          "meanPinballU": 0.013581221143817273,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -37.00988686889393
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.88256599873061,
+          "meanWidthLog": 1.875619218188598,
+          "meanPinballL": 0.006546189885253374,
+          "meanPinballU": 0.012279470102052732,
+          "coverage": 0.9985486211901307,
+          "belowFloorCount": 1,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.001451378809869376,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -53.51962955923677
+        },
+        "inference": {
+          "meanWinklerDiff": -0.5894595088227154,
+          "winklerImprPct": -42.66626225203359,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -0.5894595088227154,
+            "lower95": -0.637006670764959,
+            "upper95": -0.532118894882338,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -0.5894595088227154,
+            "lower95": -0.6513535722210622,
+            "upper95": -0.5177905980516919,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -20.358147342847747,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 2645,
+          "firstInversionDate": "2038-10-05",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 61951.55,
+              "center": 201455.78,
+              "peak": 383542.56,
+              "widthRatio": 6.19
+            },
+            "2028-01-01": {
+              "floor": 87274.66,
+              "center": 289048.78,
+              "peak": 509808.65,
+              "widthRatio": 5.84
+            },
+            "2030-01-01": {
+              "floor": 153996.09,
+              "center": 525744.6,
+              "peak": 816962.47,
+              "widthRatio": 5.31
+            },
+            "2035-01-01": {
+              "floor": 516801.04,
+              "center": 1882321.36,
+              "peak": 2232742.53,
+              "widthRatio": 4.32
+            },
+            "2040-01-01": {
+              "floor": 1400717.74,
+              "center": 5381046.75,
+              "peak": 5110050.38,
+              "widthRatio": 3.65
+            },
+            "2045-01-01": {
+              "floor": 3270885.56,
+              "center": 13148259.79,
+              "peak": 10334139.65,
+              "widthRatio": 3.16
+            }
+          }
+        }
+      },
+      "B2_stretched_log_const": {
+        "params": {
+          "gamma": 1,
+          "beta": 0,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -1.0289217164754831,
+          "zU": 2.025556486010782,
+          "tRef": null,
+          "sMin": null,
+          "innerCvMeanWinkler": 3.105475271724082,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 3.065351318120187,
+          "meanWidthLog": 3.0544782024862793,
+          "meanPinballL": 0.006321998871777259,
+          "meanPinballU": 0.02433151430942447,
+          "coverage": 0.9971988795518207,
+          "belowFloorCount": 5,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.0028011204481792717,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -121.87628034832159
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 3.054478202486279,
+          "meanWidthLog": 3.054478202486279,
+          "meanPinballL": 0.006321936619909441,
+          "meanPinballU": 0.024222845404953244,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -106.49797077658447
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 3.082647304672817,
+          "meanWidthLog": 3.0544782024862784,
+          "meanPinballL": 0.006322097896519096,
+          "meanPinballU": 0.02450437515020897,
+          "coverage": 0.9927431059506531,
+          "belowFloorCount": 5,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.00725689404934688,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -151.3839475451351
+        },
+        "inference": {
+          "meanWinklerDiff": -1.683792499255928,
+          "winklerImprPct": -121.87628034832039,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.683792499255928,
+            "lower95": -1.7770628599634146,
+            "upper95": -1.5781039052664678,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.683792499255928,
+            "lower95": -1.7951107304358085,
+            "upper95": -1.5508013624748624,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -29.99011089773296,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 64879.48,
+              "center": 181535.84,
+              "peak": 1376101.24,
+              "widthRatio": 21.21
+            },
+            "2028-01-01": {
+              "floor": 91657.4,
+              "center": 256461.73,
+              "peak": 1944064.05,
+              "widthRatio": 21.21
+            },
+            "2030-01-01": {
+              "floor": 162486.61,
+              "center": 454645.18,
+              "peak": 3446359.68,
+              "widthRatio": 21.21
+            },
+            "2035-01-01": {
+              "floor": 550752.12,
+              "center": 1541030.39,
+              "peak": 11681515.97,
+              "widthRatio": 21.21
+            },
+            "2040-01-01": {
+              "floor": 1505030.05,
+              "center": 4211145,
+              "peak": 31921860.82,
+              "widthRatio": 21.21
+            },
+            "2045-01-01": {
+              "floor": 3539071.66,
+              "center": 9902489.27,
+              "peak": 75064117.87,
+              "widthRatio": 21.21
+            }
+          }
+        }
+      },
+      "B3_stretched_log_decay": {
+        "params": {
+          "gamma": 1,
+          "beta": 0.5,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -0.8422980919540497,
+          "zU": 1.3999862101264557,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "innerCvMeanWinkler": 2.7738633744397645,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 5.413956312245599,
+          "meanWidthLog": 1.8647122543753882,
+          "meanPinballL": 0.03842114960398835,
+          "meanPinballU": 0.01571841351846764,
+          "coverage": 0.7434173669467787,
+          "belowFloorCount": 458,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.25658263305322127,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -291.8730233068416
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 3.895523018585076,
+          "meanWidthLog": 1.9176660124843514,
+          "meanPinballL": 0.02301486500309717,
+          "meanPinballU": 0.01594036518275361,
+          "coverage": 0.8302919708029197,
+          "belowFloorCount": 186,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.16970802919708028,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -163.3567978309731
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 7.829345121900075,
+          "meanWidthLog": 1.780478119560551,
+          "meanPinballL": 0.0629280986933595,
+          "meanPinballU": 0.015365352525641253,
+          "coverage": 0.6052249637155298,
+          "belowFloorCount": 272,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.39477503628447025,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -538.4680078233549
+        },
+        "inference": {
+          "meanWinklerDiff": -4.032397493381364,
+          "winklerImprPct": -291.87302330684213,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -4.032397493381364,
+            "lower95": -7.517734484671957,
+            "upper95": -1.3843922433811262,
+            "pOneSided": 0.9876024795040992
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -4.032397493381364,
+            "lower95": -7.481925588113274,
+            "upper95": -1.2900232378407306,
+            "pOneSided": 0.9874025194961008
+          },
+          "nw180": {
+            "tStat": -2.42582836728296,
+            "pOneSided": 0.9923632552560306,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 94592.5,
+              "center": 181535.84,
+              "peak": 536430.12,
+              "widthRatio": 5.67
+            },
+            "2028-01-01": {
+              "floor": 136074.39,
+              "center": 256461.73,
+              "peak": 735377,
+              "widthRatio": 5.4
+            },
+            "2030-01-01": {
+              "floor": 248257.29,
+              "center": 454645.18,
+              "peak": 1242866.17,
+              "widthRatio": 5.01
+            },
+            "2035-01-01": {
+              "floor": 890202.21,
+              "center": 1541030.39,
+              "peak": 3836434.66,
+              "widthRatio": 4.31
+            },
+            "2040-01-01": {
+              "floor": 2536150.12,
+              "center": 4211145,
+              "peak": 9782215.6,
+              "widthRatio": 3.86
+            },
+            "2045-01-01": {
+              "floor": 6160008.97,
+              "center": 9902489.27,
+              "peak": 21797595.43,
+              "widthRatio": 3.54
+            }
+          }
+        }
+      },
+      "B4_logt_decay": {
+        "params": {
+          "gamma": 1,
+          "beta": 0.5,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -0.8422980919540497,
+          "zU": 1.3999862101264557,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "innerCvMeanWinkler": 2.7738633744397645,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 5.413956312245599,
+          "meanWidthLog": 1.8647122543753882,
+          "meanPinballL": 0.03842114960398835,
+          "meanPinballU": 0.01571841351846764,
+          "coverage": 0.7434173669467787,
+          "belowFloorCount": 458,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.25658263305322127,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -291.8730233068416
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 3.895523018585076,
+          "meanWidthLog": 1.9176660124843514,
+          "meanPinballL": 0.02301486500309717,
+          "meanPinballU": 0.01594036518275361,
+          "coverage": 0.8302919708029197,
+          "belowFloorCount": 186,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.16970802919708028,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -163.3567978309731
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 7.829345121900075,
+          "meanWidthLog": 1.780478119560551,
+          "meanPinballL": 0.0629280986933595,
+          "meanPinballU": 0.015365352525641253,
+          "coverage": 0.6052249637155298,
+          "belowFloorCount": 272,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.39477503628447025,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -538.4680078233549
+        },
+        "inference": {
+          "meanWinklerDiff": -4.032397493381364,
+          "winklerImprPct": -291.87302330684213,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -4.032397493381364,
+            "lower95": -7.624930547874931,
+            "upper95": -1.3686690884474884,
+            "pOneSided": 0.9854029194161168
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -4.032397493381364,
+            "lower95": -7.325210775722428,
+            "upper95": -1.2535396800176486,
+            "pOneSided": 0.9892021595680864
+          },
+          "nw180": {
+            "tStat": -2.42582836728296,
+            "pOneSided": 0.9923632552560306,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 94592.5,
+              "center": 181535.84,
+              "peak": 536430.12,
+              "widthRatio": 5.67
+            },
+            "2028-01-01": {
+              "floor": 136074.39,
+              "center": 256461.73,
+              "peak": 735377,
+              "widthRatio": 5.4
+            },
+            "2030-01-01": {
+              "floor": 248257.29,
+              "center": 454645.18,
+              "peak": 1242866.17,
+              "widthRatio": 5.01
+            },
+            "2035-01-01": {
+              "floor": 890202.21,
+              "center": 1541030.39,
+              "peak": 3836434.66,
+              "widthRatio": 4.31
+            },
+            "2040-01-01": {
+              "floor": 2536150.12,
+              "center": 4211145,
+              "peak": 9782215.6,
+              "widthRatio": 3.86
+            },
+            "2045-01-01": {
+              "floor": 6160008.97,
+              "center": 9902489.27,
+              "peak": 21797595.43,
+              "widthRatio": 3.54
+            }
+          }
+        }
+      },
+      "B5_stretched_log_rvol": {
+        "params": {
+          "gamma": 1,
+          "windowDays": 730,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -27.222192281402794,
+          "zU": 36.160406408258545,
+          "frozenOriginVol": 0.04198466779359889,
+          "innerCvMeanWinkler": 3.950575770616712,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.661097349880411,
+          "meanWidthLog": 2.661097349880411,
+          "meanPinballL": 0.0073531975461650235,
+          "meanPinballU": 0.01925777595263929,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -92.61556681807126
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.661097349880462,
+          "meanWidthLog": 2.661097349880462,
+          "meanPinballL": 0.0074618664506362845,
+          "meanPinballU": 0.019149107048168024,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -79.90346185543962
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.6610973498804444,
+          "meanWidthLog": 2.6610973498804444,
+          "meanPinballL": 0.007180336705380579,
+          "meanPinballU": 0.019430636793423724,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -117.00736104347978
+        },
+        "inference": {
+          "meanWinklerDiff": -1.2795385310161858,
+          "winklerImprPct": -92.61556681807251,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.2795385310161858,
+            "lower95": -1.370308744328734,
+            "upper95": -1.1710140004042973,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.2795385310161858,
+            "lower95": -1.3934891315531672,
+            "upper95": -1.1470508219536273,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -24.0486548603359,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 57889.64,
+              "center": 181535.84,
+              "peak": 828515.67,
+              "widthRatio": 14.31
+            },
+            "2028-01-01": {
+              "floor": 81782.62,
+              "center": 256461.73,
+              "peak": 1170471.69,
+              "widthRatio": 14.31
+            },
+            "2030-01-01": {
+              "floor": 144980.99,
+              "center": 454645.18,
+              "peak": 2074965.8,
+              "widthRatio": 14.31
+            },
+            "2035-01-01": {
+              "floor": 491416.41,
+              "center": 1541030.39,
+              "peak": 7033144.65,
+              "widthRatio": 14.31
+            },
+            "2040-01-01": {
+              "floor": 1342884.46,
+              "center": 4211145,
+              "peak": 19219343.22,
+              "widthRatio": 14.31
+            },
+            "2045-01-01": {
+              "floor": 3157787.01,
+              "center": 9902489.27,
+              "peak": 45194202.6,
+              "widthRatio": 14.31
+            }
+          }
+        }
+      },
+      "B6_shipped_base_anchored": {
+        "params": {
+          "beta": 0.5,
+          "zL": -2.123814672655507,
+          "zU": 0.9358368015350468,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "sameVintageCenterline": true,
+          "innerCvMeanWinkler": 6.250196912856839,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.5444452305834284,
+          "meanWidthLog": 2.5444452305834284,
+          "meanPinballL": 0.016959404465311773,
+          "meanPinballU": 0.008485047840522578,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -84.17205231082208
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.6167019216335787,
+          "meanWidthLog": 2.6167019216335787,
+          "meanPinballL": 0.016329968426622554,
+          "meanPinballU": 0.009837050789713258,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -76.90210933726591
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.429505704616878,
+          "meanWidthLog": 2.429505704616878,
+          "meanPinballL": 0.017960655406390743,
+          "meanPinballU": 0.006334401639778055,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -98.12150864104052
+        },
+        "inference": {
+          "meanWinklerDiff": -1.1628864117191917,
+          "winklerImprPct": -84.17205231082251,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.1628864117191917,
+            "lower95": -1.2033167864328327,
+            "upper95": -1.1167093868747047,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.1628864117191917,
+            "lower95": -1.2142250754154023,
+            "upper95": -1.1037381457082034,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -51.06078767570699,
+            "pOneSided": 1,
+            "lag": 180
+          }
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 18385.07,
+              "center": 95126.76,
+              "peak": 196267.21,
+              "widthRatio": 10.68
+            },
+            "2028-01-01": {
+              "floor": 24024.62,
+              "center": 118761.78,
+              "peak": 240153.78,
+              "widthRatio": 10
+            },
+            "2030-01-01": {
+              "floor": 37308.27,
+              "center": 171541.26,
+              "peak": 335985.33,
+              "widthRatio": 9.01
+            },
+            "2035-01-01": {
+              "floor": 94172.38,
+              "center": 375701.12,
+              "peak": 691243.67,
+              "widthRatio": 7.34
+            },
+            "2040-01-01": {
+              "floor": 199502.34,
+              "center": 716531.84,
+              "peak": 1258685.24,
+              "widthRatio": 6.31
+            },
+            "2045-01-01": {
+              "floor": 374882.91,
+              "center": 1240869.06,
+              "peak": 2102731.23,
+              "widthRatio": 5.61
+            }
+          }
+        }
+      },
+      "B5_dynamic_lag1_diag": {
+        "params": {
+          "diagnostic": "B5 with daily lagged rvol"
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 4.245950163144198,
+          "meanWidthLog": 1.8906042215173409,
+          "meanPinballL": 0.02759746602905192,
+          "meanPinballU": 0.014862035602390054,
+          "coverage": 0.8504201680672269,
+          "belowFloorCount": 267,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.1495798319327731,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -207.33039412934485
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.0951575910407954,
+          "meanWidthLog": 2.091310903767139,
+          "meanPinballL": 0.005053157518641603,
+          "meanPinballU": 0.0158984183917664,
+          "coverage": 0.9945255474452555,
+          "belowFloorCount": 6,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.005474452554744526,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -41.643109665970755
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 7.667239944022757,
+          "meanWidthLog": 1.5713378590416127,
+          "meanPinballL": 0.06345894952311538,
+          "meanPinballU": 0.013213449917112173,
+          "coverage": 0.6211901306240929,
+          "belowFloorCount": 261,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.3788098693759071,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -525.2486429383307
+        },
+        "inference": {
+          "meanWinklerDiff": -2.8643913442799525,
+          "winklerImprPct": -207.33039412934465,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -2.8643913442799525,
+            "lower95": -6.520317045365407,
+            "upper95": -0.533508270934726,
+            "pOneSided": 0.9458108378324335
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -2.8643913442799525,
+            "lower95": -7.074409462766695,
+            "upper95": -0.4697365796579112,
+            "pOneSided": 0.9312137572485503
+          },
+          "nw180": {
+            "tStat": -1.7143813939712116,
+            "pOneSided": 0.9567706815106327,
+            "lag": 180
+          }
+        },
+        "structuralAudit": null
+      }
+    }
+  },
+  "protocol1Ohlc": {
+    "label": "Protocol 1 Secondary (95% OHLC low/high, train 2011-01-01..2021-12-31)",
+    "trainStartDate": "2011-01-01",
+    "trainEndDate": "2021-12-31",
+    "holdoutStartDate": "2022-01-01",
+    "holdoutEndDate": "2026-11-20",
+    "holdoutRows": 1785,
+    "alpha": 0.05,
+    "mode": "ohlc",
+    "arms": {
+      "B0_incumbent": {
+        "params": {
+          "shipped": true
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.3815588188642425,
+          "meanWidthLog": 1.3815588188642427,
+          "meanPinballL": 0.016617213929287063,
+          "meanPinballU": 0.017031767779362522,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.479180735287224,
+          "meanWidthLog": 1.4791807352872235,
+          "meanPinballL": 0.015057730826034491,
+          "meanPinballU": 0.020918224189927958,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.2262705454250766,
+          "meanWidthLog": 1.2262705454250762,
+          "meanPinballL": 0.01909790112981654,
+          "meanPinballU": 0.010849538133528402,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "inference": null,
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 2165,
+          "firstInversionDate": "2032-11-01",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 48735.25,
+              "center": 58724.51,
+              "peak": 159598.84,
+              "widthRatio": 3.27
+            },
+            "2028-01-01": {
+              "floor": 60843.92,
+              "center": 91612.75,
+              "peak": 190622.7,
+              "widthRatio": 3.13
+            },
+            "2030-01-01": {
+              "floor": 87883.85,
+              "center": 210437.33,
+              "peak": 255860.85,
+              "widthRatio": 2.91
+            },
+            "2035-01-01": {
+              "floor": 192478.83,
+              "center": 213122.05,
+              "peak": 479230.42,
+              "widthRatio": 2.49
+            },
+            "2040-01-01": {
+              "floor": 367092.9,
+              "center": 556730.82,
+              "peak": 803510.78,
+              "widthRatio": 2.19
+            },
+            "2045-01-01": {
+              "floor": 635720.83,
+              "center": 1781394.59,
+              "peak": 1247088.13,
+              "widthRatio": 1.96
+            }
+          }
+        }
+      },
+      "B1_logt_qr": {
+        "params": {
+          "tauL": 0.025,
+          "tauU": 0.975,
+          "interceptL": -39.65676654850153,
+          "slopeL": 5.796377604519456,
+          "intercept50": -40.23751872414245,
+          "slope50": 5.971069587681243,
+          "interceptU": -28.619407711910576,
+          "slopeU": 4.711943362370267
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.0330691434706565,
+          "meanWidthLog": 1.6753552058574166,
+          "meanPinballL": 0.019839581432591492,
+          "meanPinballU": 0.030097158391218383,
+          "coverage": 0.9064425770308123,
+          "belowFloorCount": 167,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.09355742296918768,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -47.157624830045975
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.9770960120663474,
+          "meanWidthLog": 1.7411081237744757,
+          "meanPinballL": 0.01712937844792197,
+          "meanPinballU": 0.031294458487518606,
+          "coverage": 0.9361313868613139,
+          "belowFloorCount": 70,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.06386861313868614,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -33.66155770562003
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.122106229129757,
+          "meanWidthLog": 1.5707613044973323,
+          "meanPinballL": 0.024150731608495422,
+          "meanPinballU": 0.028192599747466577,
+          "coverage": 0.8592162554426706,
+          "belowFloorCount": 97,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.14078374455732948,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -73.05367376284377
+        },
+        "inference": {
+          "meanWinklerDiff": -0.6515103246064117,
+          "winklerImprPct": -47.15762483004581,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -0.6515103246064117,
+            "lower95": -1.0660431245245008,
+            "upper95": -0.32895876614046365,
+            "pOneSided": 0.9978004399120176
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -0.6515103246064117,
+            "lower95": -0.9980624760026019,
+            "upper95": -0.35566460018974533,
+            "pOneSided": 0.9998000399920016
+          },
+          "nw180": {
+            "tStat": -3.378257996888549,
+            "pOneSided": 0.9996352138479162,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 3342,
+          "firstInversionDate": "2036-11-07",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 77618,
+              "center": 201455.78,
+              "peak": 351887.63,
+              "widthRatio": 4.53
+            },
+            "2028-01-01": {
+              "floor": 110196.22,
+              "center": 289048.78,
+              "peak": 467878,
+              "widthRatio": 4.25
+            },
+            "2030-01-01": {
+              "floor": 196956.11,
+              "center": 525744.6,
+              "peak": 750155.35,
+              "widthRatio": 3.81
+            },
+            "2035-01-01": {
+              "floor": 679333.05,
+              "center": 1882321.36,
+              "peak": 2052412.46,
+              "widthRatio": 3.02
+            },
+            "2040-01-01": {
+              "floor": 1883257.73,
+              "center": 5381046.75,
+              "peak": 4701580.95,
+              "widthRatio": 2.5
+            },
+            "2045-01-01": {
+              "floor": 4482907.15,
+              "center": 13148259.79,
+              "peak": 9515401.34,
+              "widthRatio": 2.12
+            }
+          }
+        }
+      },
+      "B2_stretched_log_const": {
+        "params": {
+          "gamma": 1,
+          "beta": 0,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -0.9562786934284334,
+          "zU": 1.8154000085777147,
+          "tRef": null,
+          "sMin": null,
+          "innerCvMeanWinkler": 2.9591412621955544,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.826482860669774,
+          "meanWidthLog": 2.771678702006212,
+          "meanPinballL": 0.014624046987186981,
+          "meanPinballU": 0.05514803576659944,
+          "coverage": 0.9546218487394958,
+          "belowFloorCount": 81,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.0453781512605042,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -104.58650200600079
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.8114408570683325,
+          "meanWidthLog": 2.771678702006167,
+          "meanPinballL": 0.014457173440781509,
+          "meanPinballU": 0.054825284619708176,
+          "coverage": 0.9607664233576643,
+          "belowFloorCount": 43,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.03923357664233577,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -90.0674332756513
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.850410343902095,
+          "meanWidthLog": 2.7716787020061138,
+          "meanPinballL": 0.014889494602369014,
+          "meanPinballU": 0.05566143962290222,
+          "coverage": 0.9448476052249637,
+          "belowFloorCount": 38,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.055152394775036286,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -132.44547090658722
+        },
+        "inference": {
+          "meanWinklerDiff": -1.4449240418054676,
+          "winklerImprPct": -104.58650200599615,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.4449240418054676,
+            "lower95": -1.5403221533411466,
+            "upper95": -1.3423995364408547,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.4449240418054676,
+            "lower95": -1.5479210121348994,
+            "upper95": -1.3394327561047001,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -24.360654070563797,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 69767.93,
+              "center": 181535.84,
+              "peak": 1115271.46,
+              "widthRatio": 15.99
+            },
+            "2028-01-01": {
+              "floor": 98563.47,
+              "center": 256461.73,
+              "peak": 1575581.13,
+              "widthRatio": 15.99
+            },
+            "2030-01-01": {
+              "floor": 174729.42,
+              "center": 454645.18,
+              "peak": 2793127.77,
+              "widthRatio": 15.99
+            },
+            "2035-01-01": {
+              "floor": 592249.42,
+              "center": 1541030.39,
+              "peak": 9467371.27,
+              "widthRatio": 15.99
+            },
+            "2040-01-01": {
+              "floor": 1618428.94,
+              "center": 4211145,
+              "peak": 25871308.89,
+              "widthRatio": 15.99
+            },
+            "2045-01-01": {
+              "floor": 3805728.66,
+              "center": 9902489.27,
+              "peak": 60836271.13,
+              "widthRatio": 15.99
+            }
+          }
+        }
+      },
+      "B3_stretched_log_decay": {
+        "params": {
+          "gamma": 1,
+          "beta": 0.5,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -0.7900815571889838,
+          "zU": 1.2700665714938875,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "innerCvMeanWinkler": 2.419074433113387,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 3.8004618637806047,
+          "meanWidthLog": 1.7132454871217957,
+          "meanPinballL": 0.057953432863000365,
+          "meanPinballU": 0.03616812496855817,
+          "coverage": 0.6778711484593838,
+          "belowFloorCount": 575,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.32212885154061627,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -175.0850569579733
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 3.0806304819798167,
+          "meanWidthLog": 1.7618979196316644,
+          "meanPinballL": 0.039416977953852225,
+          "meanPinballU": 0.03659522072942496,
+          "coverage": 0.7408759124087592,
+          "belowFloorCount": 284,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.2591240875912409,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -108.265995391133
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 4.945505687370826,
+          "meanWidthLog": 1.6358535190074086,
+          "meanPinballL": 0.08743957884329986,
+          "meanPinballU": 0.03548873896868881,
+          "coverage": 0.5776487663280117,
+          "belowFloorCount": 291,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.4223512336719884,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -303.2964589927834
+        },
+        "inference": {
+          "meanWinklerDiff": -2.418903044916356,
+          "winklerImprPct": -175.08505695797288,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -2.418903044916356,
+            "lower95": -4.277705486978467,
+            "upper95": -0.94563000470264,
+            "pOneSided": 0.993001399720056
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -2.418903044916356,
+            "lower95": -4.296259999207876,
+            "upper95": -0.882041720856885,
+            "pOneSided": 0.9946010797840432
+          },
+          "nw180": {
+            "tStat": -2.7271773282380933,
+            "pOneSided": 0.9968060121676205,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 98493.43,
+              "center": 181535.84,
+              "peak": 485116.15,
+              "widthRatio": 4.93
+            },
+            "2028-01-01": {
+              "floor": 141527.14,
+              "center": 256461.73,
+              "peak": 666891.08,
+              "widthRatio": 4.71
+            },
+            "2030-01-01": {
+              "floor": 257746,
+              "center": 454645.18,
+              "peak": 1132122.75,
+              "widthRatio": 4.39
+            },
+            "2035-01-01": {
+              "floor": 921007.11,
+              "center": 1541030.39,
+              "peak": 3525071.46,
+              "widthRatio": 3.83
+            },
+            "2040-01-01": {
+              "floor": 2617142.48,
+              "center": 4211145,
+              "peak": 9046253.49,
+              "widthRatio": 3.46
+            },
+            "2045-01-01": {
+              "floor": 6343982.8,
+              "center": 9902489.27,
+              "peak": 20258585.78,
+              "widthRatio": 3.19
+            }
+          }
+        }
+      },
+      "B4_logt_decay": {
+        "params": {
+          "gamma": 1,
+          "beta": 0.5,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -0.7900815571889838,
+          "zU": 1.2700665714938875,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "innerCvMeanWinkler": 2.419074433113387,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 3.8004618637806047,
+          "meanWidthLog": 1.7132454871217957,
+          "meanPinballL": 0.057953432863000365,
+          "meanPinballU": 0.03616812496855817,
+          "coverage": 0.6778711484593838,
+          "belowFloorCount": 575,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.32212885154061627,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -175.0850569579733
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 3.0806304819798167,
+          "meanWidthLog": 1.7618979196316644,
+          "meanPinballL": 0.039416977953852225,
+          "meanPinballU": 0.03659522072942496,
+          "coverage": 0.7408759124087592,
+          "belowFloorCount": 284,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.2591240875912409,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -108.265995391133
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 4.945505687370826,
+          "meanWidthLog": 1.6358535190074086,
+          "meanPinballL": 0.08743957884329986,
+          "meanPinballU": 0.03548873896868881,
+          "coverage": 0.5776487663280117,
+          "belowFloorCount": 291,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.4223512336719884,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -303.2964589927834
+        },
+        "inference": {
+          "meanWinklerDiff": -2.418903044916356,
+          "winklerImprPct": -175.08505695797288,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -2.418903044916356,
+            "lower95": -4.231716474653993,
+            "upper95": -0.9477038618686666,
+            "pOneSided": 0.9946010797840432
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -2.418903044916356,
+            "lower95": -4.270569651320827,
+            "upper95": -0.9115799390506323,
+            "pOneSided": 0.9944011197760448
+          },
+          "nw180": {
+            "tStat": -2.7271773282380933,
+            "pOneSided": 0.9968060121676205,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 98493.43,
+              "center": 181535.84,
+              "peak": 485116.15,
+              "widthRatio": 4.93
+            },
+            "2028-01-01": {
+              "floor": 141527.14,
+              "center": 256461.73,
+              "peak": 666891.08,
+              "widthRatio": 4.71
+            },
+            "2030-01-01": {
+              "floor": 257746,
+              "center": 454645.18,
+              "peak": 1132122.75,
+              "widthRatio": 4.39
+            },
+            "2035-01-01": {
+              "floor": 921007.11,
+              "center": 1541030.39,
+              "peak": 3525071.46,
+              "widthRatio": 3.83
+            },
+            "2040-01-01": {
+              "floor": 2617142.48,
+              "center": 4211145,
+              "peak": 9046253.49,
+              "widthRatio": 3.46
+            },
+            "2045-01-01": {
+              "floor": 6343982.8,
+              "center": 9902489.27,
+              "peak": 20258585.78,
+              "widthRatio": 3.19
+            }
+          }
+        }
+      },
+      "B5_stretched_log_rvol": {
+        "params": {
+          "gamma": 1,
+          "windowDays": 730,
+          "intercept": -38.08986387463021,
+          "slope": 5.7147250913985586,
+          "zL": -26.168749699504627,
+          "zU": 32.48883299876367,
+          "frozenOriginVol": 0.04198466779359889,
+          "innerCvMeanWinkler": 3.152798525933148,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.46355196588467,
+          "meanWidthLog": 2.462719123162398,
+          "meanPinballL": 0.016834953320632447,
+          "meanPinballU": 0.0438638570635266,
+          "coverage": 0.9994397759103641,
+          "belowFloorCount": 1,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.0005602240896358543,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -78.3168354648785
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.4627191231623744,
+          "meanWidthLog": 2.4627191231623744,
+          "meanPinballL": 0.017023308796205158,
+          "meanPinballU": 0.04354110591663551,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -66.49210366332747
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.4648767781104595,
+          "meanWidthLog": 2.462719123162339,
+          "meanPinballL": 0.01653533416065028,
+          "meanPinballU": 0.044377260919829443,
+          "coverage": 0.9985486211901307,
+          "belowFloorCount": 1,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.001451378809869376,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -101.0059515256505
+        },
+        "inference": {
+          "meanWinklerDiff": -1.0819931470203759,
+          "winklerImprPct": -78.31683546487476,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.0819931470203759,
+            "lower95": -1.1741656890529562,
+            "upper95": -0.9749094368083956,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.0819931470203759,
+            "lower95": -1.1977935501711017,
+            "upper95": -0.9453467150623952,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -20.27797116472388,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 60507.47,
+              "center": 181535.84,
+              "peak": 710156.92,
+              "widthRatio": 11.74
+            },
+            "2028-01-01": {
+              "floor": 85480.92,
+              "center": 256461.73,
+              "peak": 1003262.34,
+              "widthRatio": 11.74
+            },
+            "2030-01-01": {
+              "floor": 151537.18,
+              "center": 454645.18,
+              "peak": 1778543.7,
+              "widthRatio": 11.74
+            },
+            "2035-01-01": {
+              "floor": 513638.8,
+              "center": 1541030.39,
+              "peak": 6028415.07,
+              "widthRatio": 11.74
+            },
+            "2040-01-01": {
+              "floor": 1403611.16,
+              "center": 4211145,
+              "peak": 16473737.42,
+              "widthRatio": 11.74
+            },
+            "2045-01-01": {
+              "floor": 3300585.59,
+              "center": 9902489.27,
+              "peak": 38737922.42,
+              "widthRatio": 11.74
+            }
+          }
+        }
+      },
+      "B6_shipped_base_anchored": {
+        "params": {
+          "beta": 0.75,
+          "zL": -1.6720248787403227,
+          "zU": 0.8789071095639875,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "sameVintageCenterline": true,
+          "innerCvMeanWinkler": 5.4933723456210535,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.9206259924806899,
+          "meanWidthLog": 1.9206259924806899,
+          "meanPinballL": 0.029252743899524748,
+          "meanPinballU": 0.01787291714953602,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -39.01876389595964
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.0010487692095698,
+          "meanWidthLog": 2.0010487692095698,
+          "meanPinballL": 0.02768059930030796,
+          "meanPinballU": 0.02134205656371323,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -35.280883631912
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.7926965827639196,
+          "meanWidthLog": 1.7926965827639196,
+          "meanPinballL": 0.031753571883184624,
+          "meanPinballU": 0.012354518313631449,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -46.190951862298554
+        },
+        "inference": {
+          "meanWinklerDiff": -0.539067173616447,
+          "winklerImprPct": -39.0187638959596,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -0.539067173616447,
+            "lower95": -0.5744122893174939,
+            "upper95": -0.49779262822162823,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -0.539067173616447,
+            "lower95": -0.5842936709859017,
+            "upper95": -0.48702585355265005,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -27.58490236372711,
+            "pOneSided": 1,
+            "lag": 180
+          }
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 30685.27,
+              "center": 95126.76,
+              "peak": 172422.88,
+              "widthRatio": 5.62
+            },
+            "2028-01-01": {
+              "floor": 40100.09,
+              "center": 118761.78,
+              "peak": 210154.73,
+              "widthRatio": 5.24
+            },
+            "2030-01-01": {
+              "floor": 62175.35,
+              "center": 171541.26,
+              "peak": 292449.52,
+              "widthRatio": 4.7
+            },
+            "2035-01-01": {
+              "floor": 155494.21,
+              "center": 375701.12,
+              "peak": 597359.15,
+              "widthRatio": 3.84
+            },
+            "2040-01-01": {
+              "floor": 325278.38,
+              "center": 716531.84,
+              "peak": 1085236.93,
+              "widthRatio": 3.34
+            },
+            "2045-01-01": {
+              "floor": 602995.16,
+              "center": 1240869.06,
+              "peak": 1813311.41,
+              "widthRatio": 3.01
+            }
+          }
+        }
+      },
+      "B5_dynamic_lag1_diag": {
+        "params": {
+          "diagnostic": "B5 with daily lagged rvol"
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.9491094966112157,
+          "meanWidthLog": 1.7496643521408342,
+          "meanPinballL": 0.03884743065614014,
+          "meanPinballU": 0.03399031799618382,
+          "coverage": 0.8117647058823529,
+          "belowFloorCount": 336,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.18823529411764706,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -113.46246401840725
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.9685122851382955,
+          "meanWidthLog": 1.9354088475630897,
+          "meanPinballL": 0.01196970683907947,
+          "meanPinballU": 0.03623953692315983,
+          "coverage": 0.9562043795620438,
+          "belowFloorCount": 48,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.043795620437956206,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -33.081254925623014
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 4.5089564396798965,
+          "meanWidthLog": 1.4541985074633386,
+          "meanPinballL": 0.08160212630708141,
+          "meanPinballU": 0.030412460312634098,
+          "coverage": 0.5820029027576198,
+          "belowFloorCount": 288,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.41799709724238027,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -267.69670905835085
+        },
+        "inference": {
+          "meanWinklerDiff": -1.567550677746972,
+          "winklerImprPct": -113.46246401840716,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.567550677746972,
+            "lower95": -3.293993800812214,
+            "upper95": -0.4003712285417829,
+            "pOneSided": 0.9646070785842832
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.567550677746972,
+            "lower95": -3.5238891389736,
+            "upper95": -0.36444010099277796,
+            "pOneSided": 0.946010797840432
+          },
+          "nw180": {
+            "tStat": -1.9636580281904978,
+            "pOneSided": 0.9752151875692583,
+            "lag": 180
+          }
+        },
+        "structuralAudit": null
+      }
+    }
+  },
+  "protocol1Train2013": {
+    "label": "Sensitivity (95% close, train 2013-01-01..2021-12-31)",
+    "trainStartDate": "2013-01-01",
+    "trainEndDate": "2021-12-31",
+    "holdoutStartDate": "2022-01-01",
+    "holdoutEndDate": "2026-11-20",
+    "holdoutRows": 1785,
+    "alpha": 0.05,
+    "mode": "close",
+    "arms": {
+      "B0_incumbent": {
+        "params": {
+          "shipped": true
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.3815588188642425,
+          "meanWidthLog": 1.3815588188642427,
+          "meanPinballL": 0.01708036462110832,
+          "meanPinballU": 0.01745860585049778,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.479180735287224,
+          "meanWidthLog": 1.4791807352872235,
+          "meanPinballL": 0.015583377235404422,
+          "meanPinballU": 0.021396141146776158,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.2262705454250766,
+          "meanWidthLog": 1.2262705454250762,
+          "meanPinballL": 0.019461639185305007,
+          "meanPinballU": 0.011195124450321937,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "inference": null,
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 2165,
+          "firstInversionDate": "2032-11-01",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 48735.25,
+              "center": 58724.51,
+              "peak": 159598.84,
+              "widthRatio": 3.27
+            },
+            "2028-01-01": {
+              "floor": 60843.92,
+              "center": 91612.75,
+              "peak": 190622.7,
+              "widthRatio": 3.13
+            },
+            "2030-01-01": {
+              "floor": 87883.85,
+              "center": 210437.33,
+              "peak": 255860.85,
+              "widthRatio": 2.91
+            },
+            "2035-01-01": {
+              "floor": 192478.83,
+              "center": 213122.05,
+              "peak": 479230.42,
+              "widthRatio": 2.49
+            },
+            "2040-01-01": {
+              "floor": 367092.9,
+              "center": 556730.82,
+              "peak": 803510.78,
+              "widthRatio": 2.19
+            },
+            "2045-01-01": {
+              "floor": 635720.83,
+              "center": 1781394.59,
+              "peak": 1247088.13,
+              "widthRatio": 1.96
+            }
+          }
+        }
+      },
+      "B1_logt_qr": {
+        "params": {
+          "tauL": 0.025,
+          "tauU": 0.975,
+          "interceptL": -44.976674422788896,
+          "slopeL": 6.4657911323812725,
+          "intercept50": -35.08444579225952,
+          "slope50": 5.341674429949653,
+          "interceptU": -27.972981908933374,
+          "slopeU": 4.633462748013517
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 7.346660203068355,
+          "meanWidthLog": 1.1850616366620739,
+          "meanPinballL": 0.1539200919726139,
+          "meanPinballU": 0.02974641310409518,
+          "coverage": 0.4733893557422969,
+          "belowFloorCount": 940,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.5266106442577031,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -431.7660097242857
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 5.837225428632906,
+          "meanWidthLog": 1.2961619073577477,
+          "meanPinballL": 0.11481687999888025,
+          "meanPinballU": 0.031113755716942547,
+          "coverage": 0.479014598540146,
+          "belowFloorCount": 571,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.5209854014598541,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -294.6255713977675
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 9.747734967627498,
+          "meanWidthLog": 1.0083331944524092,
+          "meanPinballL": 0.2161220082617455,
+          "meanPinballU": 0.02757136592894175,
+          "coverage": 0.4644412191582003,
+          "belowFloorCount": 369,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.5355587808417998,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -694.9090030739118
+        },
+        "inference": {
+          "meanWinklerDiff": -5.9651013842041065,
+          "winklerImprPct": -431.7660097242853,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -5.9651013842041065,
+            "lower95": -10.503923974955276,
+            "upper95": -2.275022526871107,
+            "pOneSided": 0.9958008398320336
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -5.9651013842041065,
+            "lower95": -10.514363828933412,
+            "upper95": -1.8009254631682983,
+            "pOneSided": 0.9948010397920416
+          },
+          "nw180": {
+            "tStat": -2.806511435893229,
+            "pOneSided": 0.9974958822823367,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 6877,
+          "firstInversionDate": "2027-03-05",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 135928.43,
+              "center": 138370.33,
+              "peak": 337090.43,
+              "widthRatio": 2.48
+            },
+            "2028-01-01": {
+              "floor": 200952.01,
+              "center": 191120.56,
+              "peak": 446081.56,
+              "widthRatio": 2.22
+            },
+            "2030-01-01": {
+              "floor": 384079.9,
+              "center": 326381.74,
+              "peak": 709607.39,
+              "widthRatio": 1.85
+            },
+            "2035-01-01": {
+              "floor": 1528390.85,
+              "center": 1021545.29,
+              "peak": 1909198.75,
+              "widthRatio": 1.25
+            },
+            "2040-01-01": {
+              "floor": 4766534.74,
+              "center": 2614246.85,
+              "peak": 4313548.84,
+              "widthRatio": 0.9
+            },
+            "2045-01-01": {
+              "floor": 12541555.28,
+              "center": 5813663.07,
+              "peak": 8628160.65,
+              "widthRatio": 0.69
+            }
+          }
+        }
+      },
+      "B2_stretched_log_const": {
+        "params": {
+          "gamma": 1,
+          "beta": 0,
+          "intercept": -36.427912442488285,
+          "slope": 5.5119988496498795,
+          "zL": -1.0472232884471586,
+          "zU": 1.5753406282229192,
+          "tRef": null,
+          "sMin": null,
+          "innerCvMeanWinkler": 4.1320899608938975,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.6225639166701185,
+          "meanWidthLog": 2.6225639166701185,
+          "meanPinballL": 0.018195700964902063,
+          "meanPinballU": 0.04736839695185,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -89.82643958844159
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.6225639166700625,
+          "meanWidthLog": 2.6225639166700625,
+          "meanPinballL": 0.018160073774088622,
+          "meanPinballU": 0.047404024142663474,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -77.29840945777455
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.6225639166700634,
+          "meanWidthLog": 2.6225639166700634,
+          "meanPinballL": 0.018252373535484843,
+          "meanPinballU": 0.047311724381267135,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -113.86503381771868
+        },
+        "inference": {
+          "meanWinklerDiff": -1.2410050978058338,
+          "winklerImprPct": -89.82643958843853,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.2410050978058338,
+            "lower95": -1.3337357995707144,
+            "upper95": -1.137083019727188,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.2410050978058338,
+            "lower95": -1.3578466084277219,
+            "upper95": -1.1035889232011413,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -23.324427169338886,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 56565.6,
+              "center": 161196.54,
+              "peak": 778964.11,
+              "widthRatio": 13.77
+            },
+            "2028-01-01": {
+              "floor": 78938.58,
+              "center": 224953.42,
+              "peak": 1087062.07,
+              "widthRatio": 13.77
+            },
+            "2030-01-01": {
+              "floor": 137125.63,
+              "center": 390770.64,
+              "peak": 1888355.12,
+              "widthRatio": 13.77
+            },
+            "2035-01-01": {
+              "floor": 445093.15,
+              "center": 1268394.08,
+              "peak": 6129371.53,
+              "widthRatio": 13.77
+            },
+            "2040-01-01": {
+              "floor": 1173686.7,
+              "center": 3344686.99,
+              "peak": 16162823.2,
+              "widthRatio": 13.77
+            },
+            "2045-01-01": {
+              "floor": 2677461.11,
+              "center": 7630033.89,
+              "peak": 36871279.52,
+              "widthRatio": 13.77
+            }
+          }
+        }
+      },
+      "B3_stretched_log_decay": {
+        "params": {
+          "gamma": 1,
+          "beta": 0,
+          "intercept": -36.427912442488285,
+          "slope": 5.5119988496498795,
+          "zL": -1.0268869197847823,
+          "zU": 1.5447485776661887,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "innerCvMeanWinkler": 4.1320899608938975,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.6225639166701185,
+          "meanWidthLog": 2.6225639166701185,
+          "meanPinballL": 0.018195700964902063,
+          "meanPinballU": 0.04736839695185,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -89.82643958844159
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.6225639166700625,
+          "meanWidthLog": 2.6225639166700625,
+          "meanPinballL": 0.018160073774088622,
+          "meanPinballU": 0.047404024142663474,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -77.29840945777455
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.6225639166700634,
+          "meanWidthLog": 2.6225639166700634,
+          "meanPinballL": 0.018252373535484843,
+          "meanPinballU": 0.047311724381267135,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -113.86503381771868
+        },
+        "inference": {
+          "meanWinklerDiff": -1.2410050978058338,
+          "winklerImprPct": -89.82643958843853,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.2410050978058338,
+            "lower95": -1.3337357995707144,
+            "upper95": -1.137083019727188,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.2410050978058338,
+            "lower95": -1.3578466084277219,
+            "upper95": -1.1035889232011413,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -23.324427169338886,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 56565.6,
+              "center": 161196.54,
+              "peak": 778964.11,
+              "widthRatio": 13.77
+            },
+            "2028-01-01": {
+              "floor": 78938.58,
+              "center": 224953.42,
+              "peak": 1087062.07,
+              "widthRatio": 13.77
+            },
+            "2030-01-01": {
+              "floor": 137125.63,
+              "center": 390770.64,
+              "peak": 1888355.12,
+              "widthRatio": 13.77
+            },
+            "2035-01-01": {
+              "floor": 445093.15,
+              "center": 1268394.08,
+              "peak": 6129371.53,
+              "widthRatio": 13.77
+            },
+            "2040-01-01": {
+              "floor": 1173686.7,
+              "center": 3344686.99,
+              "peak": 16162823.2,
+              "widthRatio": 13.77
+            },
+            "2045-01-01": {
+              "floor": 2677461.11,
+              "center": 7630033.89,
+              "peak": 36871279.52,
+              "widthRatio": 13.77
+            }
+          }
+        }
+      },
+      "B4_logt_decay": {
+        "params": {
+          "gamma": 1,
+          "beta": 0,
+          "intercept": -36.427912442488285,
+          "slope": 5.5119988496498795,
+          "zL": -1.0268869197847823,
+          "zU": 1.5447485776661887,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "innerCvMeanWinkler": 4.1320899608938975,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.6225639166701185,
+          "meanWidthLog": 2.6225639166701185,
+          "meanPinballL": 0.018195700964902063,
+          "meanPinballU": 0.04736839695185,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -89.82643958844159
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.6225639166700625,
+          "meanWidthLog": 2.6225639166700625,
+          "meanPinballL": 0.018160073774088622,
+          "meanPinballU": 0.047404024142663474,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -77.29840945777455
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.6225639166700634,
+          "meanWidthLog": 2.6225639166700634,
+          "meanPinballL": 0.018252373535484843,
+          "meanPinballU": 0.047311724381267135,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -113.86503381771868
+        },
+        "inference": {
+          "meanWinklerDiff": -1.2410050978058338,
+          "winklerImprPct": -89.82643958843853,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.2410050978058338,
+            "lower95": -1.3321088383074084,
+            "upper95": -1.1370125112865659,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.2410050978058338,
+            "lower95": -1.357429570666547,
+            "upper95": -1.1114786903171352,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -23.324427169338886,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 56565.6,
+              "center": 161196.54,
+              "peak": 778964.11,
+              "widthRatio": 13.77
+            },
+            "2028-01-01": {
+              "floor": 78938.58,
+              "center": 224953.42,
+              "peak": 1087062.07,
+              "widthRatio": 13.77
+            },
+            "2030-01-01": {
+              "floor": 137125.63,
+              "center": 390770.64,
+              "peak": 1888355.12,
+              "widthRatio": 13.77
+            },
+            "2035-01-01": {
+              "floor": 445093.15,
+              "center": 1268394.08,
+              "peak": 6129371.53,
+              "widthRatio": 13.77
+            },
+            "2040-01-01": {
+              "floor": 1173686.7,
+              "center": 3344686.99,
+              "peak": 16162823.2,
+              "widthRatio": 13.77
+            },
+            "2045-01-01": {
+              "floor": 2677461.11,
+              "center": 7630033.89,
+              "peak": 36871279.52,
+              "widthRatio": 13.77
+            }
+          }
+        }
+      },
+      "B5_stretched_log_rvol": {
+        "params": {
+          "gamma": 1,
+          "windowDays": 730,
+          "intercept": -36.427912442488285,
+          "slope": 5.5119988496498795,
+          "zL": -28.23361613277103,
+          "zU": 31.034757471634887,
+          "frozenOriginVol": 0.04198466779359889,
+          "innerCvMeanWinkler": 6.329298316342032,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.488362976448011,
+          "meanWidthLog": 2.488362976448011,
+          "meanPinballL": 0.021649593602382798,
+          "meanPinballU": 0.0405594808088144,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -80.11270620339236
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 2.4883629764479447,
+          "meanWidthLog": 2.4883629764479447,
+          "meanPinballL": 0.021613966411569315,
+          "meanPinballU": 0.04059510799962787,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -68.22575612876408
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.4883629764478883,
+          "meanWidthLog": 2.4883629764478883,
+          "meanPinballL": 0.02170626617296555,
+          "meanPinballU": 0.04050280823823167,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -102.92120574300489
+        },
+        "inference": {
+          "meanWinklerDiff": -1.1068041575836447,
+          "winklerImprPct": -80.11270620338342,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -1.1068041575836447,
+            "lower95": -1.1997185422309466,
+            "upper95": -0.9989632436003164,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -1.1068041575836447,
+            "lower95": -1.223177540471628,
+            "upper95": -0.9694614241328908,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -20.80214900802952,
+            "pOneSided": 1,
+            "lag": 180
+          },
+          "holmP": 1
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 49266.55,
+              "center": 161196.54,
+              "peak": 593245.51,
+              "widthRatio": 12.04
+            },
+            "2028-01-01": {
+              "floor": 68752.59,
+              "center": 224953.42,
+              "peak": 827887.55,
+              "widthRatio": 12.04
+            },
+            "2030-01-01": {
+              "floor": 119431.36,
+              "center": 390770.64,
+              "peak": 1438138.4,
+              "widthRatio": 12.04
+            },
+            "2035-01-01": {
+              "floor": 387659.69,
+              "center": 1268394.08,
+              "peak": 4668022.69,
+              "widthRatio": 12.04
+            },
+            "2040-01-01": {
+              "floor": 1022237.77,
+              "center": 3344686.99,
+              "peak": 12309324.88,
+              "widthRatio": 12.04
+            },
+            "2045-01-01": {
+              "floor": 2331969.74,
+              "center": 7630033.89,
+              "peak": 28080524.83,
+              "widthRatio": 12.04
+            }
+          }
+        }
+      },
+      "B6_shipped_base_anchored": {
+        "params": {
+          "beta": 1.25,
+          "zL": -1.4227001013685248,
+          "zU": 1.027198508550469,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "sameVintageCenterline": true,
+          "innerCvMeanWinkler": 5.0491369037672875,
+          "innerCvFolds": 6
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.521720804812068,
+          "meanWidthLog": 1.521720804812068,
+          "meanPinballL": 0.02033599091542924,
+          "meanPinballU": 0.017707029204872504,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -10.145205838072858
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.6232469147043005,
+          "meanWidthLog": 1.6232469147043005,
+          "meanPinballL": 0.018982452161467114,
+          "meanPinballU": 0.0215987207061404,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -9.739592734021251
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.3602220871895891,
+          "meanWidthLog": 1.3602220871895896,
+          "meanPinballL": 0.02248908013798715,
+          "meanPinballU": 0.011516472041752573,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -10.923490111073274
+        },
+        "inference": {
+          "meanWinklerDiff": -0.1401619859478241,
+          "winklerImprPct": -10.145205838072755,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -0.1401619859478241,
+            "lower95": -0.1667849070154186,
+            "upper95": -0.1133633993638049,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -0.1401619859478241,
+            "lower95": -0.17432194193312864,
+            "upper95": -0.10485532541914716,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -10.798758823159803,
+            "pOneSided": 1,
+            "lag": 180
+          }
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 45198.27,
+              "center": 95126.76,
+              "peak": 162795.1,
+              "widthRatio": 3.6
+            },
+            "2028-01-01": {
+              "floor": 59083.68,
+              "center": 118761.78,
+              "peak": 196605.47,
+              "widthRatio": 3.33
+            },
+            "2030-01-01": {
+              "floor": 91327.01,
+              "center": 171541.26,
+              "peak": 270415.65,
+              "widthRatio": 2.96
+            },
+            "2035-01-01": {
+              "floor": 224213.05,
+              "center": 375701.12,
+              "peak": 545384.8,
+              "widthRatio": 2.43
+            },
+            "2040-01-01": {
+              "floor": 457922.25,
+              "center": 716531.84,
+              "peak": 989977.01,
+              "widthRatio": 2.16
+            },
+            "2045-01-01": {
+              "floor": 828509.29,
+              "center": 1240869.06,
+              "peak": 1661064.5,
+              "widthRatio": 2
+            }
+          }
+        }
+      },
+      "B5_dynamic_lag1_diag": {
+        "params": {
+          "diagnostic": "B5 with daily lagged rvol"
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 2.101219167848394,
+          "meanWidthLog": 1.7678832937664717,
+          "meanPinballL": 0.021402635724241448,
+          "meanPinballU": 0.03112784347196842,
+          "coverage": 0.9322128851540616,
+          "belowFloorCount": 121,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.06778711484593837,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -52.09046036677416
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.9555619133624509,
+          "meanWidthLog": 1.9555619133624516,
+          "meanPinballL": 0.015268718610991789,
+          "meanPinballU": 0.03362032922306958,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -32.20574516086599
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 2.332917790368845,
+          "meanWidthLog": 1.4693408161507995,
+          "meanPinballL": 0.03115992622659503,
+          "meanPinballU": 0.027163018532626072,
+          "coverage": 0.8243831640058055,
+          "belowFloorCount": 121,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0.17561683599419448,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -90.24495035556434
+        },
+        "inference": {
+          "meanWinklerDiff": -0.7196603489841502,
+          "winklerImprPct": -52.090460366774074,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -0.7196603489841502,
+            "lower95": -1.25627947219654,
+            "upper95": -0.35542351689555973,
+            "pOneSided": 0.9916016796640672
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -0.7196603489841502,
+            "lower95": -1.2974176074419193,
+            "upper95": -0.3253602909675314,
+            "pOneSided": 0.9934013197360528
+          },
+          "nw180": {
+            "tStat": -2.96034792628047,
+            "pOneSided": 0.9984634722671041,
+            "lag": 180
+          }
+        },
+        "structuralAudit": null
+      }
+    }
+  },
+  "protocol1B6_2015": {
+    "label": "Diagnostic B6 (95% close, train 2015-01-01..2021-12-31)",
+    "trainStartDate": "2015-01-01",
+    "trainEndDate": "2021-12-31",
+    "holdoutStartDate": "2022-01-01",
+    "holdoutEndDate": "2026-11-20",
+    "holdoutRows": 1785,
+    "alpha": 0.05,
+    "mode": "close",
+    "arms": {
+      "B0_incumbent": {
+        "params": {
+          "shipped": true
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.3815588188642425,
+          "meanWidthLog": 1.3815588188642427,
+          "meanPinballL": 0.01708036462110832,
+          "meanPinballU": 0.01745860585049778,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.479180735287224,
+          "meanWidthLog": 1.4791807352872235,
+          "meanPinballL": 0.015583377235404422,
+          "meanPinballU": 0.021396141146776158,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.2262705454250766,
+          "meanWidthLog": 1.2262705454250762,
+          "meanPinballL": 0.019461639185305007,
+          "meanPinballU": 0.011195124450321937,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": 0
+        },
+        "inference": null,
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 2165,
+          "firstInversionDate": "2032-11-01",
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 48735.25,
+              "center": 58724.51,
+              "peak": 159598.84,
+              "widthRatio": 3.27
+            },
+            "2028-01-01": {
+              "floor": 60843.92,
+              "center": 91612.75,
+              "peak": 190622.7,
+              "widthRatio": 3.13
+            },
+            "2030-01-01": {
+              "floor": 87883.85,
+              "center": 210437.33,
+              "peak": 255860.85,
+              "widthRatio": 2.91
+            },
+            "2035-01-01": {
+              "floor": 192478.83,
+              "center": 213122.05,
+              "peak": 479230.42,
+              "widthRatio": 2.49
+            },
+            "2040-01-01": {
+              "floor": 367092.9,
+              "center": 556730.82,
+              "peak": 803510.78,
+              "widthRatio": 2.19
+            },
+            "2045-01-01": {
+              "floor": 635720.83,
+              "center": 1781394.59,
+              "peak": 1247088.13,
+              "widthRatio": 1.96
+            }
+          }
+        }
+      },
+      "B6_shipped_base_anchored": {
+        "params": {
+          "beta": 1.25,
+          "zL": -1.4283498478720953,
+          "zU": 1.0575966008729212,
+          "tRef": 3650,
+          "sMin": 0.2,
+          "sameVintageCenterline": true,
+          "innerCvMeanWinkler": 5.30205079984498,
+          "innerCvFolds": 4
+        },
+        "fullHoldout": {
+          "n": 1785,
+          "meanWinkler": 1.5441114237903313,
+          "meanWidthLog": 1.5441114237903313,
+          "meanPinballL": 0.02042372247258003,
+          "meanPinballU": 0.018179063122178228,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -11.765883776104502
+        },
+        "sub2022_2024": {
+          "n": 1096,
+          "meanWinkler": 1.6471313901349114,
+          "meanWidthLog": 1.6471313901349114,
+          "meanPinballL": 0.019076036989260053,
+          "meanPinballU": 0.022102247764112737,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -11.354302475760347
+        },
+        "sub2025_2026": {
+          "n": 689,
+          "meanWinkler": 1.380236412014333,
+          "meanWidthLog": 1.380236412014333,
+          "meanPinballL": 0.0225675008321137,
+          "meanPinballU": 0.011938409468244643,
+          "coverage": 1,
+          "belowFloorCount": 0,
+          "abovePeakCount": 0,
+          "belowFloorRate": 0,
+          "abovePeakRate": 0,
+          "winklerImprPctVsB0": -12.555619733644118
+        },
+        "inference": {
+          "meanWinklerDiff": -0.16255260492608664,
+          "winklerImprPct": -11.76588377610434,
+          "boot180": {
+            "blockLength": 180,
+            "observedMean": -0.16255260492608664,
+            "lower95": -0.18891997165588195,
+            "upper95": -0.13612467685125326,
+            "pOneSided": 1
+          },
+          "boot365": {
+            "blockLength": 365,
+            "observedMean": -0.16255260492608664,
+            "lower95": -0.19655124210248084,
+            "upper95": -0.127900277016702,
+            "pOneSided": 1
+          },
+          "nw180": {
+            "tStat": -12.734582419535503,
+            "pOneSided": 1,
+            "lag": 180
+          }
+        },
+        "structuralAudit": {
+          "totalCheckedDays": 12784,
+          "inversionCount": 0,
+          "firstInversionDate": null,
+          "checkpoints": {
+            "2026-11-20": {
+              "floor": 45064.9,
+              "center": 95126.76,
+              "peak": 165404.21,
+              "widthRatio": 3.67
+            },
+            "2028-01-01": {
+              "floor": 58920.1,
+              "center": 118761.78,
+              "peak": 199560.28,
+              "widthRatio": 3.39
+            },
+            "2030-01-01": {
+              "floor": 91098.67,
+              "center": 171541.26,
+              "peak": 274082.5,
+              "widthRatio": 3.01
+            },
+            "2035-01-01": {
+              "floor": 223753.91,
+              "center": 375701.12,
+              "peak": 551433.32,
+              "widthRatio": 2.46
+            },
+            "2040-01-01": {
+              "floor": 457108.8,
+              "center": 716531.84,
+              "peak": 999492.84,
+              "widthRatio": 2.19
+            },
+            "2045-01-01": {
+              "floor": 827181.35,
+              "center": 1240869.06,
+              "peak": 1675462.8,
+              "widthRatio": 2.03
+            }
+          }
+        }
+      }
+    }
+  },
+  "protocol2WalkForward": {
+    "originCount": 37,
+    "firstOrigin": "2017-01-01",
+    "lastOrigin": "2025-11-15",
+    "spacingDays": 90,
+    "horizonDays": 365,
+    "pooled2017_2026": {
+      "B0_incumbent": {
+        "origins": 37,
+        "meanWinkler": 1.9758717346346062,
+        "winklerImprPctVsB0": 0,
+        "meanCoverage": 0.9711958533876341,
+        "meanWidthLog": 1.8940917135417734,
+        "originWinRateVsB0": 0,
+        "boot4Q": null
+      },
+      "B1_logt_qr": {
+        "origins": 37,
+        "meanWinkler": 2.135374362320008,
+        "winklerImprPctVsB0": -8.072519328533145,
+        "meanCoverage": 0.9608293224731581,
+        "meanWidthLog": 2.0076359540183324,
+        "originWinRateVsB0": 0.35135135135135137,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -0.1595026276854021,
+          "lower95": -0.36037107324432616,
+          "upper95": 0.0502239654220569,
+          "pOneSided": 0.9378124375124975
+        }
+      },
+      "B2_stretched_log_const": {
+        "origins": 37,
+        "meanWinkler": 2.8263479201237334,
+        "winklerImprPctVsB0": -43.043086784497376,
+        "meanCoverage": 0.9873380229544612,
+        "meanWidthLog": 2.805913067556311,
+        "originWinRateVsB0": 0,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -0.850476185489127,
+          "lower95": -1.1169871031849745,
+          "upper95": -0.591032794184852,
+          "pOneSided": 1
+        }
+      },
+      "B3_stretched_log_decay": {
+        "origins": 37,
+        "meanWinkler": 3.31355724666751,
+        "winklerImprPctVsB0": -67.70102980800417,
+        "meanCoverage": 0.8738985560903368,
+        "meanWidthLog": 1.8839515107796165,
+        "originWinRateVsB0": 0.3783783783783784,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -1.337685512032905,
+          "lower95": -3.0349569389508546,
+          "upper95": -0.16070556540328904,
+          "pOneSided": 0.9464107178564287
+        }
+      },
+      "B4_logt_decay": {
+        "origins": 37,
+        "meanWinkler": 3.16798079094122,
+        "winklerImprPctVsB0": -60.333322017335725,
+        "meanCoverage": 0.867604590892262,
+        "meanWidthLog": 1.8779841978429888,
+        "originWinRateVsB0": 0.3783783783783784,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -1.1921090563066155,
+          "lower95": -2.606776352508112,
+          "upper95": -0.16393828349023312,
+          "pOneSided": 0.9538092381523695
+        }
+      },
+      "B5_stretched_log_rvol": {
+        "origins": 37,
+        "meanWinkler": 3.356464966482179,
+        "winklerImprPctVsB0": -69.87261407952086,
+        "meanCoverage": 0.9205479452054793,
+        "meanWidthLog": 2.052387826610923,
+        "originWinRateVsB0": 0.13513513513513514,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -1.380593231847574,
+          "lower95": -3.3978183619219733,
+          "upper95": -0.23483145113350165,
+          "pOneSided": 0.9304139172165566
+        }
+      },
+      "B6_shipped_base_anchored": {
+        "origins": 37,
+        "meanWinkler": 3.5980008754362403,
+        "winklerImprPctVsB0": -82.0968847505484,
+        "meanCoverage": 0.8651610514624214,
+        "meanWidthLog": 1.5694026958788967,
+        "originWinRateVsB0": 0.21621621621621623,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -1.6221291408016343,
+          "lower95": -3.6469492129326566,
+          "upper95": -0.10421390753842398,
+          "pOneSided": 0.944011197760448
+        }
+      }
+    },
+    "pre2022_2017_2021": {
+      "B0_incumbent": {
+        "origins": 21,
+        "meanWinkler": 2.4496043159732497,
+        "winklerImprPctVsB0": 0,
+        "meanCoverage": 0.9492498369210697,
+        "meanWidthLog": 2.3055157073811157,
+        "originWinRateVsB0": 0,
+        "boot4Q": null
+      },
+      "B1_logt_qr": {
+        "origins": 21,
+        "meanWinkler": 2.360899167440721,
+        "winklerImprPctVsB0": 3.6212031450999937,
+        "meanCoverage": 0.9744292237442923,
+        "meanWidthLog": 2.2480012874770248,
+        "originWinRateVsB0": 0.6190476190476191,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": 0.08870514853252873,
+          "lower95": -0.06054823608203052,
+          "upper95": 0.28469540740246996,
+          "pOneSided": 0.16516696660667868
+        }
+      },
+      "B2_stretched_log_const": {
+        "origins": 21,
+        "meanWinkler": 2.935284277359056,
+        "winklerImprPctVsB0": -19.826874006500162,
+        "meanCoverage": 0.9932159165035876,
+        "meanWidthLog": 2.9159300581515595,
+        "originWinRateVsB0": 0,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -0.4856799613858063,
+          "lower95": -0.6225353652590195,
+          "upper95": -0.3618923643825091,
+          "pOneSided": 1
+        }
+      },
+      "B3_stretched_log_decay": {
+        "origins": 21,
+        "meanWinkler": 4.054535675616204,
+        "winklerImprPctVsB0": -65.51798383018854,
+        "meanCoverage": 0.8848010437051533,
+        "meanWidthLog": 2.0071616291418093,
+        "originWinRateVsB0": 0.6666666666666666,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -1.604931359642956,
+          "lower95": -4.52184493539593,
+          "upper95": 0.28815159872847906,
+          "pOneSided": 0.8858228354329134
+        }
+      },
+      "B4_logt_decay": {
+        "origins": 21,
+        "meanWinkler": 3.7051017771607437,
+        "winklerImprPctVsB0": -51.25307189413053,
+        "meanCoverage": 0.8905414220482714,
+        "meanWidthLog": 2.010904056458942,
+        "originWinRateVsB0": 0.6666666666666666,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -1.2554974611874945,
+          "lower95": -3.709922430855901,
+          "upper95": 0.30106618167914545,
+          "pOneSided": 0.8704259148170366
+        }
+      },
+      "B5_stretched_log_rvol": {
+        "origins": 21,
+        "meanWinkler": 4.473846385735953,
+        "winklerImprPctVsB0": -82.63547122950159,
+        "meanCoverage": 0.8885844748858447,
+        "meanWidthLog": 2.300005497803827,
+        "originWinRateVsB0": 0.23809523809523808,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -2.0242420697627046,
+          "lower95": -5.243987347357224,
+          "upper95": -0.06228872793764075,
+          "pOneSided": 0.9168166366726654
+        }
+      },
+      "B6_shipped_base_anchored": {
+        "origins": 21,
+        "meanWinkler": 5.168713005828353,
+        "winklerImprPctVsB0": -111.00195538211963,
+        "meanCoverage": 0.763600782778865,
+        "meanWidthLog": 1.594759118644719,
+        "originWinRateVsB0": 0.38095238095238093,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -2.719108689855105,
+          "lower95": -6.121689764874154,
+          "upper95": -0.2089022753988742,
+          "pOneSided": 0.9500099980003999
+        }
+      }
+    },
+    "post2022_2022_2026": {
+      "B0_incumbent": {
+        "origins": 16,
+        "meanWinkler": 1.3540977216276358,
+        "winklerImprPctVsB0": 0,
+        "meanCoverage": 1,
+        "meanWidthLog": 1.3540977216276358,
+        "originWinRateVsB0": 0,
+        "boot4Q": null
+      },
+      "B1_logt_qr": {
+        "origins": 16,
+        "meanWinkler": 1.8393730555990722,
+        "winklerImprPctVsB0": -35.8375415762558,
+        "meanCoverage": 0.9429794520547944,
+        "meanWidthLog": 1.6921564538537992,
+        "originWinRateVsB0": 0,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -0.48527533397143635,
+          "lower95": -0.627256183926395,
+          "upper95": -0.38723812017850845,
+          "pOneSided": 1
+        }
+      },
+      "B2_stretched_log_const": {
+        "origins": 16,
+        "meanWinkler": 2.6833689512523713,
+        "winklerImprPctVsB0": -98.16656570597738,
+        "meanCoverage": 0.9796232876712329,
+        "meanWidthLog": 2.6615157674000467,
+        "originWinRateVsB0": 0,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -1.3292712296247355,
+          "lower95": -1.3625707840518824,
+          "upper95": -1.2933247891737998,
+          "pOneSided": 1
+        }
+      },
+      "B3_stretched_log_decay": {
+        "origins": 16,
+        "meanWinkler": 2.341023058672349,
+        "winklerImprPctVsB0": -72.88435105395654,
+        "meanCoverage": 0.8595890410958904,
+        "meanWidthLog": 1.7222382304292378,
+        "originWinRateVsB0": 0,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -0.9869253370447132,
+          "lower95": -1.7723230609369378,
+          "upper95": -0.43208546560851824,
+          "pOneSided": 0.9952009598080384
+        }
+      },
+      "B4_logt_decay": {
+        "origins": 16,
+        "meanWinkler": 2.463009496528098,
+        "winklerImprPctVsB0": -81.89303897266306,
+        "meanCoverage": 0.8375,
+        "meanWidthLog": 1.7035268834095503,
+        "originWinRateVsB0": 0,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -1.108911774900462,
+          "lower95": -1.9579545878319957,
+          "upper95": -0.41294643586919577,
+          "pOneSided": 0.9954009198160368
+        }
+      },
+      "B5_stretched_log_rvol": {
+        "origins": 16,
+        "meanWinkler": 1.889901853711601,
+        "winklerImprPctVsB0": -39.56908896057551,
+        "meanCoverage": 0.9624999999999999,
+        "meanWidthLog": 1.7273896331702359,
+        "originWinRateVsB0": 0,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -0.5358041320839648,
+          "lower95": -0.832198443328023,
+          "upper95": -0.2554291217850169,
+          "pOneSided": 1
+        }
+      },
+      "B6_shipped_base_anchored": {
+        "origins": 16,
+        "meanWinkler": 1.5364412042965903,
+        "winklerImprPctVsB0": -13.466050474538594,
+        "meanCoverage": 0.9984589041095892,
+        "meanWidthLog": 1.5361223909987558,
+        "originWinRateVsB0": 0,
+        "boot4Q": {
+          "blockLength": 4,
+          "observedMean": -0.18234348266895403,
+          "lower95": -0.2785644135185459,
+          "upper95": -0.09689700424593627,
+          "pOneSided": 1
+        }
+      }
+    }
+  },
+  "latestFitStructuralAudits": {
+    "B0_incumbent": {
+      "params": {
+        "shipped": true
+      },
+      "audit": {
+        "totalCheckedDays": 12784,
+        "inversionCount": 2165,
+        "firstInversionDate": "2032-11-01",
+        "checkpoints": {
+          "2026-11-20": {
+            "floor": 48735.25,
+            "center": 58724.51,
+            "peak": 159598.84,
+            "widthRatio": 3.27
+          },
+          "2028-01-01": {
+            "floor": 60843.92,
+            "center": 91612.75,
+            "peak": 190622.7,
+            "widthRatio": 3.13
+          },
+          "2030-01-01": {
+            "floor": 87883.85,
+            "center": 210437.33,
+            "peak": 255860.85,
+            "widthRatio": 2.91
+          },
+          "2035-01-01": {
+            "floor": 192478.83,
+            "center": 213122.05,
+            "peak": 479230.42,
+            "widthRatio": 2.49
+          },
+          "2040-01-01": {
+            "floor": 367092.9,
+            "center": 556730.82,
+            "peak": 803510.78,
+            "widthRatio": 2.19
+          },
+          "2045-01-01": {
+            "floor": 635720.83,
+            "center": 1781394.59,
+            "peak": 1247088.13,
+            "widthRatio": 1.96
+          }
+        }
+      }
+    },
+    "B1_logt_qr": {
+      "params": {
+        "tauL": 0.025,
+        "tauU": 0.975,
+        "interceptL": -39.06818917548462,
+        "slopeL": 5.716935686836767,
+        "intercept50": -37.97076374944142,
+        "slope50": 5.664458872437734,
+        "interceptU": -27.638556062446334,
+        "slopeU": 4.583734116652558
+      },
+      "audit": {
+        "totalCheckedDays": 12784,
+        "inversionCount": 0,
+        "firstInversionDate": null,
+        "checkpoints": {
+          "2026-11-20": {
+            "floor": 69584.79,
+            "center": 131499.97,
+            "peak": 304281.34,
+            "widthRatio": 4.37
+          },
+          "2028-01-01": {
+            "floor": 98317.89,
+            "center": 185210.63,
+            "peak": 401455.45,
+            "widthRatio": 4.08
+          },
+          "2030-01-01": {
+            "floor": 174332.67,
+            "center": 326684.74,
+            "peak": 635444.33,
+            "widthRatio": 3.65
+          },
+          "2035-01-01": {
+            "floor": 591183.7,
+            "center": 1095479.86,
+            "peak": 1691598.67,
+            "widthRatio": 2.86
+          },
+          "2040-01-01": {
+            "floor": 1616145.03,
+            "center": 2967243.52,
+            "peak": 3788626.43,
+            "widthRatio": 2.34
+          },
+          "2045-01-01": {
+            "floor": 3801615.24,
+            "center": 6925179.98,
+            "peak": 7522010.06,
+            "widthRatio": 1.98
+          }
+        }
+      }
+    },
+    "B2_stretched_log_const": {
+      "params": {
+        "gamma": 1,
+        "beta": 0,
+        "intercept": -36.365792709517976,
+        "slope": 5.4852472230022755,
+        "zL": -0.974021745050602,
+        "zU": 1.5537716917553646,
+        "tRef": null,
+        "sMin": null,
+        "innerCvMeanWinkler": 2.8296151594272647,
+        "innerCvFolds": 11
+      },
+      "audit": {
+        "totalCheckedDays": 12784,
+        "inversionCount": 0,
+        "firstInversionDate": null,
+        "checkpoints": {
+          "2026-11-20": {
+            "floor": 51199.6,
+            "center": 135605.98,
+            "peak": 641317.81,
+            "widthRatio": 12.53
+          },
+          "2028-01-01": {
+            "floor": 71334.73,
+            "center": 188935.37,
+            "peak": 893527.12,
+            "widthRatio": 12.53
+          },
+          "2030-01-01": {
+            "floor": 123585.17,
+            "center": 327324.58,
+            "peak": 1548007.61,
+            "widthRatio": 12.53
+          },
+          "2035-01-01": {
+            "floor": 398856.76,
+            "center": 1056402.03,
+            "peak": 4996014.58,
+            "widthRatio": 12.53
+          },
+          "2040-01-01": {
+            "floor": 1046825.96,
+            "center": 2772597.02,
+            "peak": 13112370.84,
+            "widthRatio": 12.53
+          },
+          "2045-01-01": {
+            "floor": 2378521.83,
+            "center": 6299693.37,
+            "peak": 29792975.74,
+            "widthRatio": 12.53
+          }
+        }
+      }
+    },
+    "B3_stretched_log_decay": {
+      "params": {
+        "gamma": 0.35,
+        "beta": 0.5,
+        "intercept": -115.95946770361931,
+        "slope": 59.67218295258241,
+        "zL": -0.7779100542706208,
+        "zU": 1.272556778829198,
+        "tRef": 3650,
+        "sMin": 0.2,
+        "innerCvMeanWinkler": 2.2618962550077097,
+        "innerCvFolds": 11
+      },
+      "audit": {
+        "totalCheckedDays": 12784,
+        "inversionCount": 0,
+        "firstInversionDate": null,
+        "checkpoints": {
+          "2026-11-20": {
+            "floor": 66308.76,
+            "center": 121069.57,
+            "peak": 324156.96,
+            "widthRatio": 4.89
+          },
+          "2028-01-01": {
+            "floor": 91643.29,
+            "center": 164553.11,
+            "peak": 428698.72,
+            "widthRatio": 4.68
+          },
+          "2030-01-01": {
+            "floor": 156011.1,
+            "center": 272796.65,
+            "peak": 680513.62,
+            "widthRatio": 4.36
+          },
+          "2035-01-01": {
+            "floor": 476994.03,
+            "center": 791803.32,
+            "peak": 1814172.71,
+            "widthRatio": 3.8
+          },
+          "2040-01-01": {
+            "floor": 1177881.26,
+            "center": 1881447.09,
+            "peak": 4047731.09,
+            "widthRatio": 3.44
+          },
+          "2045-01-01": {
+            "floor": 2512954.32,
+            "center": 3895721.03,
+            "peak": 7981088.07,
+            "widthRatio": 3.18
+          }
+        }
+      }
+    },
+    "B4_logt_decay": {
+      "params": {
+        "gamma": 1,
+        "beta": 0.25,
+        "intercept": -36.365792709517976,
+        "slope": 5.4852472230022755,
+        "zL": -0.78203063203055,
+        "zU": 1.324689854532893,
+        "tRef": 3650,
+        "sMin": 0.2,
+        "innerCvMeanWinkler": 2.4502482867275295,
+        "innerCvFolds": 11
+      },
+      "audit": {
+        "totalCheckedDays": 12784,
+        "inversionCount": 0,
+        "firstInversionDate": null,
+        "checkpoints": {
+          "2026-11-20": {
+            "floor": 67742.28,
+            "center": 135605.98,
+            "peak": 439395.59,
+            "widthRatio": 6.49
+          },
+          "2028-01-01": {
+            "floor": 95320.17,
+            "center": 188935.37,
+            "peak": 602035.75,
+            "widthRatio": 6.32
+          },
+          "2030-01-01": {
+            "floor": 167807.38,
+            "center": 327324.58,
+            "peak": 1015071.12,
+            "widthRatio": 6.05
+          },
+          "2035-01-01": {
+            "floor": 559631.6,
+            "center": 1056402.03,
+            "peak": 3099023.35,
+            "widthRatio": 5.54
+          },
+          "2040-01-01": {
+            "floor": 1506943.07,
+            "center": 2772597.02,
+            "peak": 7787842.08,
+            "widthRatio": 5.17
+          },
+          "2045-01-01": {
+            "floor": 3496230.58,
+            "center": 6299693.37,
+            "peak": 17079890.39,
+            "widthRatio": 4.89
+          }
+        }
+      }
+    },
+    "B5_stretched_log_rvol": {
+      "params": {
+        "gamma": 0.5,
+        "windowDays": 730,
+        "intercept": -79.22622636725566,
+        "slope": 30.6891227653727,
+        "zL": -24.742074709101953,
+        "zU": 29.75934342803576,
+        "frozenOriginVol": 0.022987791894054036,
+        "innerCvMeanWinkler": 2.63253125584771,
+        "innerCvFolds": 11
+      },
+      "audit": {
+        "totalCheckedDays": 12784,
+        "inversionCount": 0,
+        "firstInversionDate": null,
+        "checkpoints": {
+          "2026-11-20": {
+            "floor": 70382.37,
+            "center": 124301.31,
+            "peak": 246363.99,
+            "widthRatio": 3.5
+          },
+          "2028-01-01": {
+            "floor": 96200.93,
+            "center": 169899.09,
+            "peak": 336738.37,
+            "widthRatio": 3.5
+          },
+          "2030-01-01": {
+            "floor": 161080.42,
+            "center": 284481.84,
+            "peak": 563840.29,
+            "widthRatio": 3.5
+          },
+          "2035-01-01": {
+            "floor": 478835.72,
+            "center": 845664.95,
+            "peak": 1676099.82,
+            "widthRatio": 3.5
+          },
+          "2040-01-01": {
+            "floor": 1163349.82,
+            "center": 2054575.56,
+            "peak": 4072149.04,
+            "widthRatio": 3.5
+          },
+          "2045-01-01": {
+            "floor": 2459070,
+            "center": 4342928.52,
+            "peak": 8607642.66,
+            "widthRatio": 3.5
+          }
+        }
+      }
+    },
+    "B6_shipped_base_anchored": {
+      "params": {
+        "beta": 1.25,
+        "zL": -1.4032916831216393,
+        "zU": 0.8949391036535995,
+        "tRef": 3650,
+        "sMin": 0.2,
+        "sameVintageCenterline": true,
+        "innerCvMeanWinkler": 3.691634502542344,
+        "innerCvFolds": 11
+      },
+      "audit": {
+        "totalCheckedDays": 12784,
+        "inversionCount": 0,
+        "firstInversionDate": null,
+        "checkpoints": {
+          "2026-11-20": {
+            "floor": 45659.45,
+            "center": 95126.76,
+            "peak": 151913.81,
+            "widthRatio": 3.33
+          },
+          "2028-01-01": {
+            "floor": 59649.11,
+            "center": 118761.78,
+            "peak": 184250.29,
+            "widthRatio": 3.09
+          },
+          "2030-01-01": {
+            "floor": 92115.77,
+            "center": 171541.26,
+            "peak": 255024.1,
+            "widthRatio": 2.77
+          },
+          "2035-01-01": {
+            "floor": 225797.52,
+            "center": 375701.12,
+            "peak": 519831.14,
+            "widthRatio": 2.3
+          },
+          "2040-01-01": {
+            "floor": 460727.72,
+            "center": 716531.84,
+            "peak": 949617.94,
+            "widthRatio": 2.06
+          },
+          "2045-01-01": {
+            "floor": 833087.42,
+            "center": 1240869.06,
+            "peak": 1599845.4,
+            "widthRatio": 1.92
+          }
+        }
+      }
+    }
+  },
+  "cycleDiagnosticsLocked": [
+    {
+      "label": "2013 Peak",
+      "date": "2013-11-29",
+      "kind": "peak",
+      "t": 1791,
+      "actualClose": 1206.93,
+      "actualExtreme": 1241.92,
+      "predictions": {
+        "B0_incumbent": {
+          "floor": 35.27,
+          "center": 1065.85,
+          "peak": 3568.34,
+          "extremeRatio": 0.348,
+          "closeRatio": 0.338
+        },
+        "B1_logt_qr": {
+          "floor": 43,
+          "center": 89.03,
+          "peak": 792.78,
+          "extremeRatio": 1.567,
+          "closeRatio": 1.522
+        },
+        "B2_stretched_log_const": {
+          "floor": 42.96,
+          "center": 111.77,
+          "peak": 686.67,
+          "extremeRatio": 1.809,
+          "closeRatio": 1.758
+        },
+        "B3_stretched_log_decay": {
+          "floor": 35.79,
+          "center": 111.77,
+          "peak": 697.34,
+          "extremeRatio": 1.781,
+          "closeRatio": 1.731
+        },
+        "B4_logt_decay": {
+          "floor": 35.79,
+          "center": 111.77,
+          "peak": 697.34,
+          "extremeRatio": 1.781,
+          "closeRatio": 1.731
+        },
+        "B5_stretched_log_rvol": {
+          "floor": 37.25,
+          "center": 111.77,
+          "peak": 437.24,
+          "extremeRatio": 2.84,
+          "closeRatio": 2.76
+        },
+        "B6_shipped_base_anchored": {
+          "floor": 46.69,
+          "center": 824.75,
+          "peak": 3731.18,
+          "extremeRatio": 0.333,
+          "closeRatio": 0.323
+        }
+      }
+    },
+    {
+      "label": "2015 Low",
+      "date": "2015-01-14",
+      "kind": "trough",
+      "t": 2202,
+      "actualClose": 164.92,
+      "actualExtreme": 157.29,
+      "predictions": {
+        "B0_incumbent": {
+          "floor": 118.05,
+          "center": 985.45,
+          "peak": 6547.26,
+          "extremeRatio": 1.332,
+          "closeRatio": 1.397
+        },
+        "B1_logt_qr": {
+          "floor": 142.4,
+          "center": 305.68,
+          "peak": 2098.53,
+          "extremeRatio": 1.105,
+          "closeRatio": 1.158
+        },
+        "B2_stretched_log_const": {
+          "floor": 139.88,
+          "center": 363.97,
+          "peak": 2236.06,
+          "extremeRatio": 1.124,
+          "closeRatio": 1.179
+        },
+        "B3_stretched_log_decay": {
+          "floor": 130.02,
+          "center": 363.97,
+          "peak": 1904.27,
+          "extremeRatio": 1.21,
+          "closeRatio": 1.268
+        },
+        "B4_logt_decay": {
+          "floor": 130.02,
+          "center": 363.97,
+          "peak": 1904.27,
+          "extremeRatio": 1.21,
+          "closeRatio": 1.268
+        },
+        "B5_stretched_log_rvol": {
+          "floor": 121.31,
+          "center": 363.97,
+          "peak": 1423.82,
+          "extremeRatio": 1.297,
+          "closeRatio": 1.359
+        },
+        "B6_shipped_base_anchored": {
+          "floor": 149.6,
+          "center": 1760.42,
+          "peak": 6433.28,
+          "extremeRatio": 1.051,
+          "closeRatio": 1.102
+        }
+      }
+    },
+    {
+      "label": "2017 Peak",
+      "date": "2017-12-17",
+      "kind": "peak",
+      "t": 3270,
+      "actualClose": 19065.71,
+      "actualExtreme": 19870.62,
+      "predictions": {
+        "B0_incumbent": {
+          "floor": 1191.67,
+          "center": 9464.37,
+          "peak": 20921.18,
+          "extremeRatio": 0.95,
+          "closeRatio": 0.911
+        },
+        "B1_logt_qr": {
+          "floor": 1409.06,
+          "center": 3240.98,
+          "peak": 13523.81,
+          "extremeRatio": 1.469,
+          "closeRatio": 1.41
+        },
+        "B2_stretched_log_const": {
+          "floor": 1340.14,
+          "center": 3487.04,
+          "peak": 21422.73,
+          "extremeRatio": 0.928,
+          "closeRatio": 0.89
+        },
+        "B3_stretched_log_decay": {
+          "floor": 1491.08,
+          "center": 3487.04,
+          "peak": 13663.37,
+          "extremeRatio": 1.454,
+          "closeRatio": 1.395
+        },
+        "B4_logt_decay": {
+          "floor": 1491.08,
+          "center": 3487.04,
+          "peak": 13663.37,
+          "extremeRatio": 1.454,
+          "closeRatio": 1.395
+        },
+        "B5_stretched_log_rvol": {
+          "floor": 1162.26,
+          "center": 3487.04,
+          "peak": 13641.07,
+          "extremeRatio": 1.457,
+          "closeRatio": 1.398
+        },
+        "B6_shipped_base_anchored": {
+          "floor": 1185.98,
+          "center": 7514.52,
+          "peak": 19832.79,
+          "extremeRatio": 1.002,
+          "closeRatio": 0.961
+        }
+      }
+    },
+    {
+      "label": "2018 Low",
+      "date": "2018-12-15",
+      "kind": "trough",
+      "t": 3633,
+      "actualClose": 3232.51,
+      "actualExtreme": 3169.53,
+      "predictions": {
+        "B0_incumbent": {
+          "floor": 2205.3,
+          "center": 6517.05,
+          "peak": 28503.62,
+          "extremeRatio": 1.437,
+          "closeRatio": 1.466
+        },
+        "B1_logt_qr": {
+          "floor": 2593.75,
+          "center": 6076.59,
+          "peak": 22208.44,
+          "extremeRatio": 1.222,
+          "closeRatio": 1.246
+        },
+        "B2_stretched_log_const": {
+          "floor": 2445.76,
+          "center": 6363.86,
+          "peak": 39096.56,
+          "extremeRatio": 1.296,
+          "closeRatio": 1.322
+        },
+        "B3_stretched_log_decay": {
+          "floor": 2837.99,
+          "center": 6363.86,
+          "peak": 23307.23,
+          "extremeRatio": 1.117,
+          "closeRatio": 1.139
+        },
+        "B4_logt_decay": {
+          "floor": 2837.99,
+          "center": 6363.86,
+          "peak": 23307.23,
+          "extremeRatio": 1.117,
+          "closeRatio": 1.139
+        },
+        "B5_stretched_log_rvol": {
+          "floor": 2121.13,
+          "center": 6363.86,
+          "peak": 24895.01,
+          "extremeRatio": 1.494,
+          "closeRatio": 1.524
+        },
+        "B6_shipped_base_anchored": {
+          "floor": 1998.32,
+          "center": 11058.45,
+          "peak": 27181.35,
+          "extremeRatio": 1.586,
+          "closeRatio": 1.618
+        }
+      }
+    },
+    {
+      "label": "2021 Peak",
+      "date": "2021-11-10",
+      "kind": "peak",
+      "t": 4694,
+      "actualClose": 64926.06,
+      "actualExtreme": 68978.64,
+      "predictions": {
+        "B0_incumbent": {
+          "floor": 9865.25,
+          "center": 37385.94,
+          "peak": 60509.38,
+          "extremeRatio": 1.14,
+          "closeRatio": 1.073
+        },
+        "B1_logt_qr": {
+          "floor": 11453.42,
+          "center": 28061.24,
+          "peak": 74276.64,
+          "extremeRatio": 0.929,
+          "closeRatio": 0.874
+        },
+        "B2_stretched_log_const": {
+          "floor": 10576.33,
+          "center": 27519.57,
+          "peak": 169067.41,
+          "extremeRatio": 0.408,
+          "closeRatio": 0.384
+        },
+        "B3_stretched_log_decay": {
+          "floor": 13470.49,
+          "center": 27519.57,
+          "peak": 86773.33,
+          "extremeRatio": 0.795,
+          "closeRatio": 0.748
+        },
+        "B4_logt_decay": {
+          "floor": 13470.49,
+          "center": 27519.57,
+          "peak": 86773.33,
+          "extremeRatio": 0.795,
+          "closeRatio": 0.748
+        },
+        "B5_stretched_log_rvol": {
+          "floor": 9172.51,
+          "center": 27519.57,
+          "peak": 107654.86,
+          "extremeRatio": 0.641,
+          "closeRatio": 0.603
+        },
+        "B6_shipped_base_anchored": {
+          "floor": 6815.82,
+          "center": 28320.82,
+          "peak": 59878.23,
+          "extremeRatio": 1.152,
+          "closeRatio": 1.084
+        }
+      }
+    },
+    {
+      "label": "2022 Low",
+      "date": "2022-11-21",
+      "kind": "trough",
+      "t": 5070,
+      "actualClose": 15760.19,
+      "actualExtreme": 15480.69,
+      "predictions": {
+        "B0_incumbent": {
+          "floor": 15480.23,
+          "center": 23197.72,
+          "peak": 75882.07,
+          "extremeRatio": 1,
+          "closeRatio": 1.018
+        },
+        "B1_logt_qr": {
+          "floor": 17902.36,
+          "center": 44455.76,
+          "peak": 106791.53,
+          "extremeRatio": 0.865,
+          "closeRatio": 0.88
+        },
+        "B2_stretched_log_const": {
+          "floor": 16427.74,
+          "center": 42744.89,
+          "peak": 262604.68,
+          "extremeRatio": 0.942,
+          "closeRatio": 0.959
+        },
+        "B3_stretched_log_decay": {
+          "floor": 21466.82,
+          "center": 42744.89,
+          "peak": 129335.61,
+          "extremeRatio": 0.721,
+          "closeRatio": 0.734
+        },
+        "B4_logt_decay": {
+          "floor": 21466.82,
+          "center": 42744.89,
+          "peak": 129335.61,
+          "extremeRatio": 0.721,
+          "closeRatio": 0.734
+        },
+        "B5_stretched_log_rvol": {
+          "floor": 14247.24,
+          "center": 42744.89,
+          "peak": 167215.37,
+          "extremeRatio": 1.087,
+          "closeRatio": 1.106
+        },
+        "B6_shipped_base_anchored": {
+          "floor": 9752.34,
+          "center": 37577.56,
+          "peak": 76360.24,
+          "extremeRatio": 1.587,
+          "closeRatio": 1.616
+        }
+      }
+    },
+    {
+      "label": "2025 Peak",
+      "date": "2025-10-06",
+      "kind": "peak",
+      "t": 6120,
+      "actualClose": 125071.8,
+      "actualExtreme": 125894.27,
+      "predictions": {
+        "B0_incumbent": {
+          "floor": 38413.5,
+          "center": 102745.47,
+          "peak": 131914.73,
+          "extremeRatio": 0.954,
+          "closeRatio": 0.948
+        },
+        "B1_logt_qr": {
+          "floor": 53299.88,
+          "center": 136780.41,
+          "peak": 259243.21,
+          "extremeRatio": 0.486,
+          "closeRatio": 0.482
+        },
+        "B2_stretched_log_const": {
+          "floor": 48163.62,
+          "center": 125321.52,
+          "peak": 769916.94,
+          "extremeRatio": 0.164,
+          "closeRatio": 0.162
+        },
+        "B3_stretched_log_decay": {
+          "floor": 66726.02,
+          "center": 125321.52,
+          "peak": 345184.26,
+          "extremeRatio": 0.365,
+          "closeRatio": 0.362
+        },
+        "B4_logt_decay": {
+          "floor": 66726.02,
+          "center": 125321.52,
+          "peak": 345184.26,
+          "extremeRatio": 0.365,
+          "closeRatio": 0.362
+        },
+        "B5_stretched_log_rvol": {
+          "floor": 41770.75,
+          "center": 125321.52,
+          "peak": 490250.01,
+          "extremeRatio": 0.257,
+          "closeRatio": 0.255
+        },
+        "B6_shipped_base_anchored": {
+          "floor": 22970.76,
+          "center": 74979.65,
+          "peak": 139639.34,
+          "extremeRatio": 0.902,
+          "closeRatio": 0.896
+        }
+      }
+    },
+    {
+      "label": "2026 Low",
+      "date": "2026-06-25",
+      "kind": "trough",
+      "t": 6382,
+      "actualClose": 59775.39,
+      "actualExtreme": 58243.98,
+      "predictions": {
+        "B0_incumbent": {
+          "floor": 44802.4,
+          "center": 76270.23,
+          "peak": 149203.45,
+          "extremeRatio": 1.3,
+          "closeRatio": 1.334
+        },
+        "B1_logt_qr": {
+          "floor": 67959.71,
+          "center": 175682.9,
+          "peak": 315856.7,
+          "extremeRatio": 0.857,
+          "closeRatio": 0.88
+        },
+        "B2_stretched_log_const": {
+          "floor": 61200.9,
+          "center": 159244.48,
+          "peak": 978323.77,
+          "extremeRatio": 0.952,
+          "closeRatio": 0.977
+        },
+        "B3_stretched_log_decay": {
+          "floor": 85832.38,
+          "center": 159244.48,
+          "peak": 430073.05,
+          "extremeRatio": 0.679,
+          "closeRatio": 0.696
+        },
+        "B4_logt_decay": {
+          "floor": 85832.38,
+          "center": 159244.48,
+          "peak": 430073.05,
+          "extremeRatio": 0.679,
+          "closeRatio": 0.696
+        },
+        "B5_stretched_log_rvol": {
+          "floor": 53077.57,
+          "center": 159244.48,
+          "peak": 622954.52,
+          "extremeRatio": 1.097,
+          "closeRatio": 1.126
+        },
+        "B6_shipped_base_anchored": {
+          "floor": 27707.98,
+          "center": 87450.2,
+          "peak": 160008.93,
+          "extremeRatio": 2.102,
+          "closeRatio": 2.157
+        }
+      }
+    }
+  ],
+  "gateResults": [
+    {
+      "arm": "B1_logt_qr",
+      "causal": true,
+      "passed": false,
+      "checks": {
+        "zeroInversions": false,
+        "minGain5Pct": false,
+        "positiveBoot180": false,
+        "holmSig": false,
+        "positiveSub22_24": false,
+        "positiveSub25_26": false,
+        "positiveWf": false,
+        "validCov": true
+      },
+      "summary": {
+        "holdoutWinklerImprPct": -43.58213272166105,
+        "boot180Lower95": -0.9595017201955947,
+        "holmP": 1,
+        "nwOneSidedP": 0.9998421740635417,
+        "sub22_24Pct": -31.113680306263248,
+        "sub25_26Pct": -67.50641013437675,
+        "wf2017_2026Pct": -8.072519328533145,
+        "coverage": 0.9098039215686274,
+        "inversionsThrough2045": 3342
+      }
+    },
+    {
+      "arm": "B2_stretched_log_const",
+      "causal": true,
+      "passed": false,
+      "checks": {
+        "zeroInversions": true,
+        "minGain5Pct": false,
+        "positiveBoot180": false,
+        "holmSig": false,
+        "positiveSub22_24": false,
+        "positiveSub25_26": false,
+        "positiveWf": false,
+        "validCov": true
+      },
+      "summary": {
+        "holdoutWinklerImprPct": -103.27718624180054,
+        "boot180Lower95": -1.517974601520304,
+        "holmP": 1,
+        "nwOneSidedP": 1,
+        "sub22_24Pct": -88.9856585475577,
+        "sub25_26Pct": -130.69955285292644,
+        "wf2017_2026Pct": -43.043086784497376,
+        "coverage": 0.9669467787114846,
+        "inversionsThrough2045": 0
+      }
+    },
+    {
+      "arm": "B3_stretched_log_decay",
+      "causal": true,
+      "passed": false,
+      "checks": {
+        "zeroInversions": true,
+        "minGain5Pct": false,
+        "positiveBoot180": false,
+        "holmSig": false,
+        "positiveSub22_24": false,
+        "positiveSub25_26": false,
+        "positiveWf": false,
+        "validCov": false
+      },
+      "summary": {
+        "holdoutWinklerImprPct": -161.37335027349457,
+        "boot180Lower95": -3.974308329176257,
+        "holmP": 1,
+        "nwOneSidedP": 0.9963387602458844,
+        "sub22_24Pct": -96.82122846829786,
+        "sub25_26Pct": -285.23498267141616,
+        "wf2017_2026Pct": -67.70102980800417,
+        "coverage": 0.6946778711484594,
+        "inversionsThrough2045": 0
+      }
+    },
+    {
+      "arm": "B4_logt_decay",
+      "causal": true,
+      "passed": false,
+      "checks": {
+        "zeroInversions": true,
+        "minGain5Pct": false,
+        "positiveBoot180": false,
+        "holmSig": false,
+        "positiveSub22_24": false,
+        "positiveSub25_26": false,
+        "positiveWf": false,
+        "validCov": false
+      },
+      "summary": {
+        "holdoutWinklerImprPct": -161.37335027349457,
+        "boot180Lower95": -3.9215290152574056,
+        "holmP": 1,
+        "nwOneSidedP": 0.9963387602458844,
+        "sub22_24Pct": -96.82122846829786,
+        "sub25_26Pct": -285.23498267141616,
+        "wf2017_2026Pct": -60.333322017335725,
+        "coverage": 0.6946778711484594,
+        "inversionsThrough2045": 0
+      }
+    },
+    {
+      "arm": "B5_stretched_log_rvol",
+      "causal": true,
+      "passed": false,
+      "checks": {
+        "zeroInversions": true,
+        "minGain5Pct": false,
+        "positiveBoot180": false,
+        "holmSig": false,
+        "positiveSub22_24": false,
+        "positiveSub25_26": false,
+        "positiveWf": false,
+        "validCov": false
+      },
+      "summary": {
+        "holdoutWinklerImprPct": -78.29593084731094,
+        "boot180Lower95": -1.1740746889454061,
+        "holmP": 1,
+        "nwOneSidedP": 1,
+        "sub22_24Pct": -66.49210366332747,
+        "sub25_26Pct": -100.94493544490928,
+        "wf2017_2026Pct": -69.87261407952086,
+        "coverage": 0.9994397759103641,
+        "inversionsThrough2045": 0
+      }
+    },
+    {
+      "arm": "B6_shipped_base_anchored",
+      "causal": false,
+      "passed": false,
+      "checks": {
+        "zeroInversions": true,
+        "minGain5Pct": false,
+        "positiveBoot180": false,
+        "holmSig": false,
+        "positiveSub22_24": false,
+        "positiveSub25_26": false,
+        "positiveWf": false,
+        "validCov": false
+      },
+      "summary": {
+        "holdoutWinklerImprPct": -39.01876389595964,
+        "boot180Lower95": -0.5744122893174939,
+        "holmP": null,
+        "nwOneSidedP": 1,
+        "sub22_24Pct": -35.280883631912,
+        "sub25_26Pct": -46.190951862298554,
+        "wf2017_2026Pct": -82.0968847505484,
+        "coverage": 1,
+        "inversionsThrough2045": 0
+      }
+    }
+  ]
+}

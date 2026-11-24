@@ -71,7 +71,7 @@ export function buildLegendFromRow(row: any): LegendData {
  * Shocks are seeded by calendar date, so every horizon draws the same candles,
  * and the gap to the median decays (30-day half-life), so the path stays near
  * the most probable price instead of wandering like a free random walk. */
-export function projectCandles(historical: any[], forecast: any[]) {
+export function projectCandles(historical: any[], forecast: any[], clampToFloor = true) {
   const closes = historical.slice(-PROJECTION_VOL_WINDOW - 1).map((d: any) => d.close);
   const returns = closes.slice(1).map((close: number, index: number) => Math.log(close / closes[index]));
   const mean = returns.reduce((sum: number, value: number) => sum + value, 0) / Math.max(1, returns.length);
@@ -81,7 +81,8 @@ export function projectCandles(historical: any[], forecast: any[]) {
   return forecast.map((d: any) => {
     const rng = mulberry32(hashStringSeed(`projected-candle|${d.date}`));
     gap = PROJECTION_GAP_DECAY * gap + dailyVol * normalFromRng(rng);
-    const close = projectTraceAboveLowerBound(d.close * Math.exp(gap), d.floorPriceModel);
+    const rawClose = d.close * Math.exp(gap);
+    const close = clampToFloor ? projectTraceAboveLowerBound(rawClose, d.floorPriceModel) : rawClose;
     gap = Math.log(close / d.close);
     const candle = {
       time: d.date,
@@ -111,7 +112,10 @@ export function buildChartSeriesData(
   showModelLine: boolean,
   showScenarios: boolean,
   traceCount: number,
+  options: { useForecastMedianLine?: boolean; clampCandlesToFloor?: boolean } = {},
 ) {
+  const useForecastMedianLine = options.useForecastMedianLine ?? false;
+  const clampCandlesToFloor = options.clampCandlesToFloor ?? true;
   const { isInPlayback, historical, forecast } = splitPlaybackData(data, playbackIndex);
   const candleData = historical.map((d: any) => ({ time: d.date, open: d.open, high: d.high, low: d.low, close: d.close }));
   const volumeData = historical.map((d: any, index: number) => ({
@@ -125,14 +129,22 @@ export function buildChartSeriesData(
   const lastHist = historical[historical.length - 1];
 
   const forecastData = lastHist && forecast.length > 0
-    ? [{ time: lastHist.date, open: lastHist.close, high: lastHist.close, low: lastHist.close, close: lastHist.close }, ...projectCandles(historical, forecast)]
+    ? [{ time: lastHist.date, open: lastHist.close, high: lastHist.close, low: lastHist.close, close: lastHist.close }, ...projectCandles(historical, forecast, clampCandlesToFloor)]
     : [];
 
-  // The same model line as history, continued through the forecast.
+  // The same model line as history, continued through the forecast for BTC,
+  // or anchored at spot along the declared forecast median for generic assets.
   const modelProjectionData = lastHist && forecast.length > 0
-    ? [lastHist, ...forecast]
-      .filter((d: any) => d.powerLawModel != null && d.powerLawModel > 0)
-      .map((d: any) => ({ time: d.date, value: d.powerLawModel }))
+    ? useForecastMedianLine
+      ? [
+          { time: lastHist.date, value: lastHist.close },
+          ...forecast
+            .filter((d: any) => (d.forecast ?? d.close) != null && (d.forecast ?? d.close) > 0)
+            .map((d: any) => ({ time: d.date, value: d.forecast ?? d.close })),
+        ]
+      : [lastHist, ...forecast]
+        .filter((d: any) => d.powerLawModel != null && d.powerLawModel > 0)
+        .map((d: any) => ({ time: d.date, value: d.powerLawModel }))
     : [];
   const forecastUpperData = lastHist && forecast.length > 0
     ? [{ time: lastHist.date, value: lastHist.close }, ...forecast.map((d: any) => ({ time: d.date, value: d.forecastUpper }))]

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { countUsMarketSessionsAfter } from '../../../shared/us-market-calendar.mjs';
 import { loadMarketData } from '../api';
 import { GOLD_365_V2_GOLDEN } from '../gold365V2';
+import { computeGoldM2MeanReversion } from '../goldLongAnchor';
 import {
   GOLD_VOL_TERM_STRUCTURE,
   SP500_VIX_TERM_STRUCTURE,
@@ -118,18 +119,36 @@ describe('session volatility term structure', () => {
     }
   }, 30_000);
 
-  it('decays gold momentum to a 4% long-run drift after one year', () => {
+  it('decays gold momentum to a 4% long-run prior with causal Gold/M2 mean reversion after one year', () => {
     const gold = loadMarketData('gold');
     const { drift } = computeGoldModelInputs(gold.ohlcv);
+    const mr = computeGoldM2MeanReversion(gold.ohlcv)!;
     const last = gold.ohlcv.at(-1)!;
-    const expectedLogReturn = drift * 365 + Math.log(1.04) * (3650 - 365) / 365;
+    const extraDays = 3650 - 365;
+    const expectedLogReturn =
+      drift * 365 +
+      (Math.log(1.04) / 365) * extraDays -
+      mr.amplitude * (1 - Math.exp(-extraDays / mr.decayDays));
     const summary = buildMarketForecastSummary('gold', gold, 3650, Z95).probabilityForecast!;
     expect(Math.log(summary.median / last.close)).toBeCloseTo(expectedLogReturn, 6);
+
+    // Fails closed cleanly to pure +4%/yr when M2 is stale relative to origin date.
+    const staleGold = {
+      ...gold,
+      ohlcv: [...gold.ohlcv.slice(0, -1), { ...last, date: '2099-01-04' }],
+    };
+    const staleSummary = buildMarketForecastSummary('gold', staleGold, 3650, Z95).probabilityForecast!;
+    const staleBaseline = computeGoldModelInputs(staleGold.ohlcv);
+    expect(Math.log(staleSummary.median / last.close)).toBeCloseTo(
+      staleBaseline.drift * 365 + (Math.log(1.04) / 365) * extraDays,
+      6
+    );
   });
 
   it('keeps the gold ten-year primary path on the capped reference drift', () => {
     const gold = loadMarketData('gold');
     const { drift } = computeGoldModelInputs(gold.ohlcv);
+    const mr = computeGoldM2MeanReversion(gold.ohlcv)!;
     const last = gold.ohlcv.at(-1)!;
     const rows = buildMarketForecast('gold', gold, 3650, Z95).displayData.filter((row) => row.isForecast);
     const terminal = rows.at(-1)!;
@@ -137,7 +156,13 @@ describe('session volatility term structure', () => {
     console.log('gold 3650 terminal candle/median ratio', ratio);
     expect(ratio).toBeGreaterThan(0.6);
     expect(ratio).toBeLessThan(1.6);
-    const cappedReference = last.close * Math.exp(drift * 365 + Math.log(1.04) * (3650 - 365) / 365);
+    const cappedReference =
+      last.close *
+      Math.exp(
+        drift * 365 +
+          (Math.log(1.04) / 365) * (3650 - 365) -
+          mr.amplitude * (1 - Math.exp(-(3650 - 365) / mr.decayDays))
+      );
     expect(terminal.traceReference / cappedReference).toBeCloseTo(1, 6);
   }, 60_000);
 

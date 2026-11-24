@@ -7,6 +7,7 @@ import {
   relativeVolumeForIndex,
   visibleRangeForTimeRange,
 } from '../chart/dataTransforms';
+import { assetForecastTrustCopy } from '../../lib/data';
 
 const rows = [
   {
@@ -185,5 +186,30 @@ describe('Chart data transforms', () => {
     expect(mvrvZScoreColor(-0.1)).toBe('rgba(16,185,129,0.95)');
     expect(visibleRangeForTimeRange('ALL', rows)).toBeNull();
     expect(visibleRangeForTimeRange('1M', rows)).toEqual({ from: '2024-01-01', to: '2024-01-05' });
+  });
+
+  it('uses the forecast median line and leaves candles unclamped for generic assets without BTC trust copy', () => {
+    const genericRows = [
+      { date: '2024-01-01', open: 100, high: 102, low: 98, close: 100, volume: 1000, sma20: null, sma50: null, powerLawModel: 130, floorPriceModel: 120, peakPriceModel: 160 },
+      { date: '2024-01-02', open: 100, high: 102, low: 98, close: 100, volume: 1000, sma20: null, sma50: null, powerLawModel: 130, floorPriceModel: 120, peakPriceModel: 160 },
+      { date: '2024-01-03', isForecast: true, open: 100, high: 101, low: 99, close: 100.5, forecast: 100.5, powerLawModel: 128, floorPriceModel: 118, peakPriceModel: 158 },
+      { date: '2024-01-04', isForecast: true, open: 100.5, high: 102, low: 99, close: 101, forecast: 101, powerLawModel: 126, floorPriceModel: 116, peakPriceModel: 156 },
+    ];
+    const series = buildChartSeriesData(genericRows, null, true, false, 12, {
+      useForecastMedianLine: true,
+      clampCandlesToFloor: false,
+    });
+    expect(series.modelProjectionData).toEqual([
+      { time: '2024-01-02', value: 100 },
+      { time: '2024-01-03', value: 100.5 },
+      { time: '2024-01-04', value: 101 },
+    ]);
+    // Projected candles stay near median (~100), not bounced above floorPriceModel (118/116).
+    expect(series.forecastData[1].close).toBeLessThan(115);
+    expect(series.forecastData[2].close).toBeLessThan(115);
+
+    expect(assetForecastTrustCopy('gold', 3650)).not.toContain('Fixed structural coefficients');
+    expect(assetForecastTrustCopy('sp500', 3650)).not.toContain('Fixed structural coefficients');
+    expect(assetForecastTrustCopy('btc', 365)).toContain('Fixed structural coefficients');
   });
 });

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadMarketData } from '../api';
 import {
   buildGenericModelInputs,
+  buildMarketForecast,
   buildMarketForecastSummary,
   genericHeatmapDriftIncrements,
   genericHeatmapLogVarianceIncrements,
@@ -71,4 +72,13 @@ describe('heatmap distribution agrees with its summary', () => {
       expect(Math.abs(sampledLogWidth / (Z95 * interval.sigma) - 1)).toBeLessThan(0.12);
     }
   }, 60_000);
+
+  it('does not clamp out-of-range tails into a saturated bottom stripe on 10Y gold heatmaps', () => {
+    const forecast = buildMarketForecast('gold', gold, 3650, Z95);
+    const minLow = Math.min(...forecast.heatmapData.map((cell) => cell.priceLow));
+    const saturatedBottomCells = forecast.heatmapData.filter(
+      (cell) => cell.priceLow <= minLow * 1.01 && cell.density >= 0.9
+    );
+    expect(saturatedBottomCells.length).toBeLessThanOrEqual(5);
+  }, 30_000);
 });

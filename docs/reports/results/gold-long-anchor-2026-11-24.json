@@ -1,0 +1,1611 @@
+{
+  "reportDate": "2026-11-24",
+  "gitCommit": "55b56de",
+  "dataset": {
+    "path": "src/data/gold-long-horizon-monthly.json",
+    "sha256": "aad0a6af5f8fdbcc24daea1da4c687786be935682deaef6ff0524d2d70a414f1",
+    "metadata": {
+      "fetchedAt": "2026-11-24T18:02:15.446Z",
+      "rowCount": 682,
+      "firstMonth": "1970-01",
+      "lastMonth": "2026-10",
+      "lastFullAllFourMonth": "2026-09",
+      "missingMonths": {
+        "cpi": [
+          "2025-10"
+        ],
+        "m2": [
+          "2026-10"
+        ],
+        "gs10": []
+      },
+      "sources": {
+        "gold": "https://datahub.io/core/gold-prices/_r/-/data/monthly.csv",
+        "cpi": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL",
+        "m2": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=M2SL",
+        "gs10": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GS10"
+      },
+      "csvSha256": {
+        "gold": "f20720f3413b3dd114cd116951516f0fab577ff8c91e102a3a92549582ea9608",
+        "cpi": "c9be2d4909ffd28d91f07df5d113151b0fe7ba602144ee6fd453d3bc8426efde",
+        "m2": "626dcc3e6eb180613a0e7ac648de289c10fa2a73a42f674e98296a58430d5a84",
+        "gs10": "018e609eb98c52ec8d2cf0ea9f8e1450c24974c31cca455cc19717a77703af78"
+      },
+      "caveats": [
+        "Research-only monthly dataset; do not import into browser UI bundles.",
+        "FRED CPIAUCSL, M2SL, and GS10 are latest-revised series rather than point-in-time ALFRED release vintages.",
+        "Consumers must apply at least a 1-month publication lag (macroLagMonths >= 1) before forecasting.",
+        "Missing macro observations (e.g., FRED CPIAUCSL 2025-10) are stored as null and resolved causally via backward carry-forward (<= origin - macroLagMonths) during forecasting."
+      ]
+    }
+  },
+  "protocol": {
+    "anchorStartYm": "1972-01",
+    "devOriginStartYm": "1975-01",
+    "devTargetEndYm": "2003-12",
+    "holdoutOriginStartYm": "2004-01",
+    "horizonsMonths": [
+      12,
+      24,
+      60,
+      120
+    ],
+    "primaryMacroLagMonths": 1,
+    "sensitivityMacroLagMonths": 2,
+    "bootstrapReps": 5000,
+    "bootstrapSeed": 20261124,
+    "promotionGate": {
+      "deltaMale120mMax": -0.05,
+      "deltaBootCi95High120mMaxExclusive": 0,
+      "holmBootP120mMaxExclusive": 0.05,
+      "deltaMale60mMax": 0.03,
+      "requiresLag2Consistency": true
+    },
+    "armDescriptions": {
+      "G0_incumbent": "Current production gold rule (1Y capped momentum -> +4%/yr long drift)",
+      "G1_power_law_1971": "Causal log-log power law anchored at 1971-08-15 (+ dev-selected mean reversion)",
+      "G2_exponential_mr": "Causal log-linear exponential trend since 1972-01 (+ dev-selected MR)",
+      "G3_erb_harvey_cpi_mr": "Erb & Harvey causal Gold/CPI real-price mean reversion + CPI drift",
+      "G4a_m2_ratio_mr": "Causal Gold/M2 ratio mean reversion + causal M2 growth drift",
+      "G4b_m2_cpi_coint": "Causal 2-factor M2 + CPI cointegration ridge regression + residual MR",
+      "G5_real_rate_cpi_drift": "1Y momentum then causal 5Y CPI + real-10Y rate (GS10 - YoY CPI) ridge drift"
+    }
+  },
+  "devSelection": {
+    "12": {
+      "G0_incumbent": {
+        "params": {},
+        "devMale": 0.17264341836196798,
+        "nDev": 336
+      },
+      "G1_power_law_1971": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.16461962010096579,
+        "nDev": 336
+      },
+      "G2_exponential_mr": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.1927970727352571,
+        "nDev": 336
+      },
+      "G3_erb_harvey_cpi_mr": {
+        "params": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.1687070519196298,
+        "nDev": 336
+      },
+      "G4a_m2_ratio_mr": {
+        "params": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.1726257552775562,
+        "nDev": 336
+      },
+      "G4b_m2_cpi_coint": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.1949838669754262,
+        "nDev": 336
+      },
+      "G5_real_rate_cpi_drift": {
+        "params": {
+          "ridge": 1
+        },
+        "devMale": 0.17264341836196798,
+        "nDev": 336
+      }
+    },
+    "24": {
+      "G0_incumbent": {
+        "params": {},
+        "devMale": 0.258710645994117,
+        "nDev": 324
+      },
+      "G1_power_law_1971": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.24898809309060238,
+        "nDev": 324
+      },
+      "G2_exponential_mr": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.32630394377620414,
+        "nDev": 324
+      },
+      "G3_erb_harvey_cpi_mr": {
+        "params": {
+          "lambda": 0.25,
+          "tau": 60
+        },
+        "devMale": 0.2647802569050021,
+        "nDev": 324
+      },
+      "G4a_m2_ratio_mr": {
+        "params": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.2791908076824988,
+        "nDev": 324
+      },
+      "G4b_m2_cpi_coint": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.33101142042944415,
+        "nDev": 324
+      },
+      "G5_real_rate_cpi_drift": {
+        "params": {
+          "ridge": 100
+        },
+        "devMale": 0.26378178271611463,
+        "nDev": 324
+      }
+    },
+    "60": {
+      "G0_incumbent": {
+        "params": {},
+        "devMale": 0.3967944295873591,
+        "nDev": 288
+      },
+      "G1_power_law_1971": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.36316725272946265,
+        "nDev": 288
+      },
+      "G2_exponential_mr": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.6135714850398813,
+        "nDev": 288
+      },
+      "G3_erb_harvey_cpi_mr": {
+        "params": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.4697782364832871,
+        "nDev": 288
+      },
+      "G4a_m2_ratio_mr": {
+        "params": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.5257065094322694,
+        "nDev": 288
+      },
+      "G4b_m2_cpi_coint": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.5983101273913989,
+        "nDev": 288
+      },
+      "G5_real_rate_cpi_drift": {
+        "params": {
+          "ridge": 100
+        },
+        "devMale": 0.48791184845093505,
+        "nDev": 288
+      }
+    },
+    "120": {
+      "G0_incumbent": {
+        "params": {},
+        "devMale": 0.5111590832777622,
+        "nDev": 228
+      },
+      "G1_power_law_1971": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 0.5005439177480955,
+        "nDev": 228
+      },
+      "G2_exponential_mr": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 1.5406083691151624,
+        "nDev": 228
+      },
+      "G3_erb_harvey_cpi_mr": {
+        "params": {
+          "lambda": 1,
+          "tau": 36
+        },
+        "devMale": 0.6260941682723662,
+        "nDev": 228
+      },
+      "G4a_m2_ratio_mr": {
+        "params": {
+          "lambda": 1,
+          "tau": 36
+        },
+        "devMale": 0.797691678478528,
+        "nDev": 228
+      },
+      "G4b_m2_cpi_coint": {
+        "params": {
+          "tau": null
+        },
+        "devMale": 1.3548776003756904,
+        "nDev": 228
+      },
+      "G5_real_rate_cpi_drift": {
+        "params": {
+          "ridge": 100
+        },
+        "devMale": 0.8090891146311353,
+        "nDev": 228
+      }
+    }
+  },
+  "holdoutResults": {
+    "12": [
+      {
+        "armId": "G0_incumbent",
+        "horizonMonths": 12,
+        "selectedParams": {},
+        "devMale": 0.17264341836196798,
+        "nDev": 336,
+        "n": 262,
+        "male": 0.1367359811198004,
+        "rmsle": 0.16467678781823908,
+        "bias": -0.03981952240476772,
+        "hitRate": 0.6946564885496184,
+        "deltaMaleVsG0": 0,
+        "deltaBootCi95Low": null,
+        "deltaBootCi95High": null,
+        "bootPOneSided": null,
+        "holmBootP": null,
+        "nwDmT": null,
+        "nwPOneSided": null,
+        "holmNwP": null
+      },
+      {
+        "armId": "G1_power_law_1971",
+        "horizonMonths": 12,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.16461962010096579,
+        "nDev": 336,
+        "n": 262,
+        "male": 0.14965421995951553,
+        "rmsle": 0.18889403673702604,
+        "bias": -0.09546573728569382,
+        "hitRate": 0.7137404580152672,
+        "deltaMaleVsG0": 0.01291823883971513,
+        "deltaBootCi95Low": -0.015330173260190596,
+        "deltaBootCi95High": 0.04132556146842067,
+        "bootPOneSided": 0.8160367926414717,
+        "holmBootP": 1,
+        "nwDmT": -0.9143954801512071,
+        "nwPOneSided": 0.8197454857896589,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G2_exponential_mr",
+        "horizonMonths": 12,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.1927970727352571,
+        "nDev": 336,
+        "n": 262,
+        "male": 0.1428502914314621,
+        "rmsle": 0.1780602665628729,
+        "bias": -0.06855411711584916,
+        "hitRate": 0.7137404580152672,
+        "deltaMaleVsG0": 0.006114310311661708,
+        "deltaBootCi95Low": -0.01839479162034886,
+        "deltaBootCi95High": 0.030510093464473368,
+        "bootPOneSided": 0.6848630273945211,
+        "holmBootP": 1,
+        "nwDmT": -0.4920688987089828,
+        "nwPOneSided": 0.6886646782816521,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G3_erb_harvey_cpi_mr",
+        "horizonMonths": 12,
+        "selectedParams": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.1687070519196298,
+        "nDev": 336,
+        "n": 262,
+        "male": 0.1418263029330686,
+        "rmsle": 0.17999927965913284,
+        "bias": -0.0802353955564017,
+        "hitRate": 0.7137404580152672,
+        "deltaMaleVsG0": 0.0050903218132682115,
+        "deltaBootCi95Low": -0.021212513494770168,
+        "deltaBootCi95High": 0.031614434176920496,
+        "bootPOneSided": 0.6548690261947611,
+        "holmBootP": 1,
+        "nwDmT": -0.3817733697401624,
+        "nwPOneSided": 0.6486852071675109,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G4a_m2_ratio_mr",
+        "horizonMonths": 12,
+        "selectedParams": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.1726257552775562,
+        "nDev": 336,
+        "n": 262,
+        "male": 0.13492371279961873,
+        "rmsle": 0.16718537525759186,
+        "bias": -0.04131745869026911,
+        "hitRate": 0.7137404580152672,
+        "deltaMaleVsG0": -0.0018122683201816647,
+        "deltaBootCi95Low": -0.024361804312314043,
+        "deltaBootCi95High": 0.021607192471517222,
+        "bootPOneSided": 0.4443111377724455,
+        "holmBootP": 1,
+        "nwDmT": 0.15542561108620953,
+        "nwPOneSided": 0.43824288495171215,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G4b_m2_cpi_coint",
+        "horizonMonths": 12,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.1949838669754262,
+        "nDev": 336,
+        "n": 262,
+        "male": 0.14279538720742738,
+        "rmsle": 0.1774584725008945,
+        "bias": -0.06427427346620057,
+        "hitRate": 0.7137404580152672,
+        "deltaMaleVsG0": 0.006059406087626978,
+        "deltaBootCi95Low": -0.018264648418976615,
+        "deltaBootCi95High": 0.03032865232932561,
+        "bootPOneSided": 0.6878624275144971,
+        "holmBootP": 1,
+        "nwDmT": -0.492497212383721,
+        "nwPOneSided": 0.6888160513587003,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G5_real_rate_cpi_drift",
+        "horizonMonths": 12,
+        "selectedParams": {
+          "ridge": 1
+        },
+        "devMale": 0.17264341836196798,
+        "nDev": 336,
+        "n": 262,
+        "male": 0.1367359811198004,
+        "rmsle": 0.16467678781823908,
+        "bias": -0.03981952240476772,
+        "hitRate": 0.6946564885496184,
+        "deltaMaleVsG0": 0,
+        "deltaBootCi95Low": 0,
+        "deltaBootCi95High": 0,
+        "bootPOneSided": 1,
+        "holmBootP": 1,
+        "nwDmT": 0,
+        "nwPOneSided": 1,
+        "holmNwP": 1
+      }
+    ],
+    "24": [
+      {
+        "armId": "G0_incumbent",
+        "horizonMonths": 24,
+        "selectedParams": {},
+        "devMale": 0.258710645994117,
+        "nDev": 324,
+        "n": 250,
+        "male": 0.21977687092534898,
+        "rmsle": 0.2794342341368093,
+        "bias": -0.10629032235790715,
+        "hitRate": 0.78,
+        "deltaMaleVsG0": 0,
+        "deltaBootCi95Low": null,
+        "deltaBootCi95High": null,
+        "bootPOneSided": null,
+        "holmBootP": null,
+        "nwDmT": null,
+        "nwPOneSided": null,
+        "holmNwP": null
+      },
+      {
+        "armId": "G1_power_law_1971",
+        "horizonMonths": 24,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.24898809309060238,
+        "nDev": 324,
+        "n": 250,
+        "male": 0.26345114784841667,
+        "rmsle": 0.3170432639114017,
+        "bias": -0.18141721568964658,
+        "hitRate": 0.796,
+        "deltaMaleVsG0": 0.04367427692306769,
+        "deltaBootCi95Low": 0.0009215640092578634,
+        "deltaBootCi95High": 0.0849678139483231,
+        "bootPOneSided": 0.9832033593281344,
+        "holmBootP": 1,
+        "nwDmT": -2.040654198641412,
+        "nwPOneSided": 0.9793574620194724,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G2_exponential_mr",
+        "horizonMonths": 24,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.32630394377620414,
+        "nDev": 324,
+        "n": 250,
+        "male": 0.24352118813869653,
+        "rmsle": 0.29342985083131473,
+        "bias": -0.12801557238583033,
+        "hitRate": 0.796,
+        "deltaMaleVsG0": 0.02374431721334755,
+        "deltaBootCi95Low": -0.010773168346546382,
+        "deltaBootCi95High": 0.058835856808894534,
+        "bootPOneSided": 0.8958208358328335,
+        "holmBootP": 1,
+        "nwDmT": -1.2945948719675293,
+        "nwPOneSided": 0.902269920722732,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G3_erb_harvey_cpi_mr",
+        "horizonMonths": 24,
+        "selectedParams": {
+          "lambda": 0.25,
+          "tau": 60
+        },
+        "devMale": 0.2647802569050021,
+        "nDev": 324,
+        "n": 250,
+        "male": 0.24531482826986956,
+        "rmsle": 0.29834618776676664,
+        "bias": -0.16654520505742482,
+        "hitRate": 0.796,
+        "deltaMaleVsG0": 0.02553795734452058,
+        "deltaBootCi95Low": -0.010385389469059347,
+        "deltaBootCi95High": 0.05895426656314492,
+        "bootPOneSided": 0.9300139972005599,
+        "holmBootP": 1,
+        "nwDmT": -1.4145523670404,
+        "nwPOneSided": 0.9214000569110281,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G4a_m2_ratio_mr",
+        "horizonMonths": 24,
+        "selectedParams": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.2791908076824988,
+        "nDev": 324,
+        "n": 250,
+        "male": 0.21895947612808,
+        "rmsle": 0.2640959192699734,
+        "bias": -0.07207078695512159,
+        "hitRate": 0.796,
+        "deltaMaleVsG0": -0.0008173947972689721,
+        "deltaBootCi95Low": -0.029014966737010577,
+        "deltaBootCi95High": 0.031708949126939945,
+        "bootPOneSided": 0.5038992201559688,
+        "holmBootP": 1,
+        "nwDmT": 0.05136354460901098,
+        "nwPOneSided": 0.4795178490975339,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G4b_m2_cpi_coint",
+        "horizonMonths": 24,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.33101142042944415,
+        "nDev": 324,
+        "n": 250,
+        "male": 0.24301703083427864,
+        "rmsle": 0.291935120340342,
+        "bias": -0.11931101394881549,
+        "hitRate": 0.796,
+        "deltaMaleVsG0": 0.023240159908929664,
+        "deltaBootCi95Low": -0.010481062547618806,
+        "deltaBootCi95High": 0.058254219129140035,
+        "bootPOneSided": 0.8930213957208558,
+        "holmBootP": 1,
+        "nwDmT": -1.2806308362790835,
+        "nwPOneSided": 0.8998382495831242,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G5_real_rate_cpi_drift",
+        "horizonMonths": 24,
+        "selectedParams": {
+          "ridge": 100
+        },
+        "devMale": 0.26378178271611463,
+        "nDev": 324,
+        "n": 250,
+        "male": 0.22275270936495775,
+        "rmsle": 0.27991235476244125,
+        "bias": -0.10766613044424996,
+        "hitRate": 0.752,
+        "deltaMaleVsG0": 0.0029758384396087745,
+        "deltaBootCi95Low": -0.004984260091161044,
+        "deltaBootCi95High": 0.011253685001896085,
+        "bootPOneSided": 0.744251149770046,
+        "holmBootP": 1,
+        "nwDmT": -0.6847327723518465,
+        "nwPOneSided": 0.7532437853731859,
+        "holmNwP": 1
+      }
+    ],
+    "60": [
+      {
+        "armId": "G0_incumbent",
+        "horizonMonths": 60,
+        "selectedParams": {},
+        "devMale": 0.3967944295873591,
+        "nDev": 288,
+        "n": 214,
+        "male": 0.3847061778798876,
+        "rmsle": 0.4462394424872209,
+        "bias": -0.19290338267762533,
+        "hitRate": 0.780373831775701,
+        "deltaMaleVsG0": 0,
+        "deltaBootCi95Low": null,
+        "deltaBootCi95High": null,
+        "bootPOneSided": null,
+        "holmBootP": null,
+        "nwDmT": null,
+        "nwPOneSided": null,
+        "holmNwP": null
+      },
+      {
+        "armId": "G1_power_law_1971",
+        "horizonMonths": 60,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.36316725272946265,
+        "nDev": 288,
+        "n": 214,
+        "male": 0.4582067298935194,
+        "rmsle": 0.5385402484748978,
+        "bias": -0.3500879179474073,
+        "hitRate": 0.7850467289719626,
+        "deltaMaleVsG0": 0.07350055201363181,
+        "deltaBootCi95Low": -0.0520495735694008,
+        "deltaBootCi95High": 0.1806634932351607,
+        "bootPOneSided": 0.8910217956408718,
+        "holmBootP": 1,
+        "nwDmT": -1.2530351859528237,
+        "nwPOneSided": 0.8949034804886002,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G2_exponential_mr",
+        "horizonMonths": 60,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.6135714850398813,
+        "nDev": 288,
+        "n": 214,
+        "male": 0.4005081526559245,
+        "rmsle": 0.47670746714869994,
+        "bias": -0.22011741412801583,
+        "hitRate": 0.7850467289719626,
+        "deltaMaleVsG0": 0.015801974776036898,
+        "deltaBootCi95Low": -0.038960153703719316,
+        "deltaBootCi95High": 0.07983886837796449,
+        "bootPOneSided": 0.6964607078584283,
+        "holmBootP": 1,
+        "nwDmT": -0.501246188623307,
+        "nwPOneSided": 0.6919010664243556,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G3_erb_harvey_cpi_mr",
+        "horizonMonths": 60,
+        "selectedParams": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.4697782364832871,
+        "nDev": 288,
+        "n": 214,
+        "male": 0.39608180794234416,
+        "rmsle": 0.4580461762430173,
+        "bias": -0.25094171483009053,
+        "hitRate": 0.7850467289719626,
+        "deltaMaleVsG0": 0.011375630062456565,
+        "deltaBootCi95Low": -0.05034095827676697,
+        "deltaBootCi95High": 0.06329778821583383,
+        "bootPOneSided": 0.6274745050989802,
+        "holmBootP": 1,
+        "nwDmT": -0.3807513685120158,
+        "nwPOneSided": 0.6483060693238756,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G4a_m2_ratio_mr",
+        "horizonMonths": 60,
+        "selectedParams": {
+          "lambda": 0.25,
+          "tau": 120
+        },
+        "devMale": 0.5257065094322694,
+        "nDev": 288,
+        "n": 214,
+        "male": 0.32710705506571447,
+        "rmsle": 0.39174187791374265,
+        "bias": -0.07739856856436253,
+        "hitRate": 0.7850467289719626,
+        "deltaMaleVsG0": -0.05759912281417312,
+        "deltaBootCi95Low": -0.12024921759332696,
+        "deltaBootCi95High": 0.013911602384110851,
+        "bootPOneSided": 0.04259148170365927,
+        "holmBootP": 0.2555488902219556,
+        "nwDmT": 1.6861655761980332,
+        "nwPOneSided": 0.045881930434122475,
+        "holmNwP": 0.27529158260473485
+      },
+      {
+        "armId": "G4b_m2_cpi_coint",
+        "horizonMonths": 60,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.5983101273913989,
+        "nDev": 288,
+        "n": 214,
+        "male": 0.39419590103377816,
+        "rmsle": 0.47165216640764496,
+        "bias": -0.19897561256274862,
+        "hitRate": 0.7850467289719626,
+        "deltaMaleVsG0": 0.009489723153890572,
+        "deltaBootCi95Low": -0.04648990036764312,
+        "deltaBootCi95High": 0.07020985732836725,
+        "bootPOneSided": 0.6306738652269546,
+        "holmBootP": 1,
+        "nwDmT": -0.29621646446731126,
+        "nwPOneSided": 0.616467544157681,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G5_real_rate_cpi_drift",
+        "horizonMonths": 60,
+        "selectedParams": {
+          "ridge": 100
+        },
+        "devMale": 0.48791184845093505,
+        "nDev": 288,
+        "n": 214,
+        "male": 0.39621955569562933,
+        "rmsle": 0.46792545614511377,
+        "bias": -0.16029883148777047,
+        "hitRate": 0.7850467289719626,
+        "deltaMaleVsG0": 0.011513377815741743,
+        "deltaBootCi95Low": -0.018507249109525392,
+        "deltaBootCi95High": 0.04723330575292996,
+        "bootPOneSided": 0.7506498700259948,
+        "holmBootP": 1,
+        "nwDmT": -0.6061101470949471,
+        "nwPOneSided": 0.7277792434750614,
+        "holmNwP": 1
+      }
+    ],
+    "120": [
+      {
+        "armId": "G0_incumbent",
+        "horizonMonths": 120,
+        "selectedParams": {},
+        "devMale": 0.5111590832777622,
+        "nDev": 228,
+        "n": 154,
+        "male": 0.36926981206621057,
+        "rmsle": 0.46143078047992936,
+        "bias": -0.18687628900377895,
+        "hitRate": 0.987012987012987,
+        "deltaMaleVsG0": 0,
+        "deltaBootCi95Low": null,
+        "deltaBootCi95High": null,
+        "bootPOneSided": null,
+        "holmBootP": null,
+        "nwDmT": null,
+        "nwPOneSided": null,
+        "holmNwP": null
+      },
+      {
+        "armId": "G1_power_law_1971",
+        "horizonMonths": 120,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 0.5005439177480955,
+        "nDev": 228,
+        "n": 154,
+        "male": 0.5029298062725834,
+        "rmsle": 0.6196518826264726,
+        "bias": -0.4883560382923625,
+        "hitRate": 0.987012987012987,
+        "deltaMaleVsG0": 0.13365999420637287,
+        "deltaBootCi95Low": 0.024701782359009074,
+        "deltaBootCi95High": 0.24342987392569038,
+        "bootPOneSided": 1,
+        "holmBootP": 1,
+        "nwDmT": -1.5114465334316807,
+        "nwPOneSided": 0.9346626130374165,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G2_exponential_mr",
+        "horizonMonths": 120,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 1.5406083691151624,
+        "nDev": 228,
+        "n": 154,
+        "male": 0.36067499554383325,
+        "rmsle": 0.4635920252226065,
+        "bias": -0.24660880439384741,
+        "hitRate": 0.987012987012987,
+        "deltaMaleVsG0": -0.008594816522377313,
+        "deltaBootCi95Low": -0.070716839505028,
+        "deltaBootCi95High": 0.05419608197799316,
+        "bootPOneSided": 0.3749250149970006,
+        "holmBootP": 1,
+        "nwDmT": 0.14693466981754752,
+        "nwPOneSided": 0.4415917732236607,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G3_erb_harvey_cpi_mr",
+        "horizonMonths": 120,
+        "selectedParams": {
+          "lambda": 1,
+          "tau": 36
+        },
+        "devMale": 0.6260941682723662,
+        "nDev": 228,
+        "n": 154,
+        "male": 0.5874635727758555,
+        "rmsle": 0.6633923839592648,
+        "bias": -0.5874635727758555,
+        "hitRate": 0.44155844155844154,
+        "deltaMaleVsG0": 0.2181937607096449,
+        "deltaBootCi95Low": 0.13262542957658421,
+        "deltaBootCi95High": 0.30558826153050095,
+        "bootPOneSided": 1,
+        "holmBootP": 1,
+        "nwDmT": -2.628421221485522,
+        "nwPOneSided": 0.9957108501432899,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G4a_m2_ratio_mr",
+        "horizonMonths": 120,
+        "selectedParams": {
+          "lambda": 1,
+          "tau": 36
+        },
+        "devMale": 0.797691678478528,
+        "nDev": 228,
+        "n": 154,
+        "male": 0.21324340566613137,
+        "rmsle": 0.24210556316794932,
+        "bias": 0.11406759871220226,
+        "hitRate": 0.987012987012987,
+        "deltaMaleVsG0": -0.1560264064000792,
+        "deltaBootCi95Low": -0.28970983941909334,
+        "deltaBootCi95High": -0.026322878698448366,
+        "bootPOneSided": 0.0001999600079984003,
+        "holmBootP": 0.0011997600479904018,
+        "nwDmT": 1.7305623806915467,
+        "nwPOneSided": 0.04176488584538851,
+        "holmNwP": 0.25058931507233106
+      },
+      {
+        "armId": "G4b_m2_cpi_coint",
+        "horizonMonths": 120,
+        "selectedParams": {
+          "tau": null
+        },
+        "devMale": 1.3548776003756904,
+        "nDev": 228,
+        "n": 154,
+        "male": 0.3548537991953893,
+        "rmsle": 0.4545922896520509,
+        "bias": -0.20996478647193292,
+        "hitRate": 0.987012987012987,
+        "deltaMaleVsG0": -0.014416012870821282,
+        "deltaBootCi95Low": -0.07663861007626675,
+        "deltaBootCi95High": 0.047227779775523386,
+        "bootPOneSided": 0.3225354929014197,
+        "holmBootP": 1,
+        "nwDmT": 0.25263982751079433,
+        "nwPOneSided": 0.4002733312533948,
+        "holmNwP": 1
+      },
+      {
+        "armId": "G5_real_rate_cpi_drift",
+        "horizonMonths": 120,
+        "selectedParams": {
+          "ridge": 100
+        },
+        "devMale": 0.8090891146311353,
+        "nDev": 228,
+        "n": 154,
+        "male": 0.4663596920225791,
+        "rmsle": 0.5794874447966158,
+        "bias": -0.37820281606800543,
+        "hitRate": 0.987012987012987,
+        "deltaMaleVsG0": 0.09708987995636853,
+        "deltaBootCi95Low": 0.024735912870678854,
+        "deltaBootCi95High": 0.17069605273120766,
+        "bootPOneSided": 1,
+        "holmBootP": 1,
+        "nwDmT": -1.5495471416747977,
+        "nwPOneSided": 0.9393748608092922,
+        "holmNwP": 1
+      }
+    ]
+  },
+  "subPeriods": {
+    "60": [
+      {
+        "label": "2004-01..2009-12",
+        "originStartYm": "2004-01",
+        "originEndYm": "2009-12",
+        "n": 72,
+        "maleByArm": {
+          "G0_incumbent": 0.48939775497867644,
+          "G1_power_law_1971": 0.6810898049534577,
+          "G2_exponential_mr": 0.5989892855204445,
+          "G3_erb_harvey_cpi_mr": 0.5324984349095209,
+          "G4a_m2_ratio_mr": 0.40958945890200477,
+          "G4b_m2_cpi_coint": 0.5907497265068411,
+          "G5_real_rate_cpi_drift": 0.5066414840227742
+        },
+        "deltaVsG0ByArm": {
+          "G0_incumbent": 0,
+          "G1_power_law_1971": 0.1916920499747813,
+          "G2_exponential_mr": 0.10959153054176807,
+          "G3_erb_harvey_cpi_mr": 0.04310067993084443,
+          "G4a_m2_ratio_mr": -0.07980829607667167,
+          "G4b_m2_cpi_coint": 0.10135197152816466,
+          "G5_real_rate_cpi_drift": 0.017243729044097766
+        }
+      },
+      {
+        "label": "2010-01..2015-12",
+        "originStartYm": "2010-01",
+        "originEndYm": "2015-12",
+        "n": 72,
+        "maleByArm": {
+          "G0_incumbent": 0.3374407920204709,
+          "G1_power_law_1971": 0.22919948159509682,
+          "G2_exponential_mr": 0.29698449336493815,
+          "G3_erb_harvey_cpi_mr": 0.25971848323439045,
+          "G4a_m2_ratio_mr": 0.36881493415526473,
+          "G4b_m2_cpi_coint": 0.3138145579113657,
+          "G5_real_rate_cpi_drift": 0.39244903034373496
+        },
+        "deltaVsG0ByArm": {
+          "G0_incumbent": 0,
+          "G1_power_law_1971": -0.10824131042537408,
+          "G2_exponential_mr": -0.04045629865553274,
+          "G3_erb_harvey_cpi_mr": -0.07772230878608044,
+          "G4a_m2_ratio_mr": 0.031374142134793837,
+          "G4b_m2_cpi_coint": -0.023626234109105193,
+          "G5_real_rate_cpi_drift": 0.05500823832326407
+        }
+      },
+      {
+        "label": "2016-01..maxMatured",
+        "originStartYm": "2016-01",
+        "originEndYm": "2021-10",
+        "n": 70,
+        "maleByArm": {
+          "G0_incumbent": 0.32563923831939,
+          "G1_power_law_1971": 0.46450587951024624,
+          "G2_exponential_mr": 0.302837608408861,
+          "G3_erb_harvey_cpi_mr": 0.39602698276142967,
+          "G4a_m2_ratio_mr": 0.1993684783419927,
+          "G4b_m2_cpi_coint": 0.27470420490168096,
+          "G5_real_rate_cpi_drift": 0.286520969778228
+        },
+        "deltaVsG0ByArm": {
+          "G0_incumbent": 0,
+          "G1_power_law_1971": 0.13886664119085623,
+          "G2_exponential_mr": -0.02280162991052903,
+          "G3_erb_harvey_cpi_mr": 0.07038774444203966,
+          "G4a_m2_ratio_mr": -0.1262707599773973,
+          "G4b_m2_cpi_coint": -0.05093503341770905,
+          "G5_real_rate_cpi_drift": -0.039118268541162016
+        }
+      }
+    ],
+    "120": [
+      {
+        "label": "2004-01..2009-12",
+        "originStartYm": "2004-01",
+        "originEndYm": "2009-12",
+        "n": 72,
+        "maleByArm": {
+          "G0_incumbent": 0.2984329997545125,
+          "G1_power_law_1971": 0.5760283398554842,
+          "G2_exponential_mr": 0.3975696083423513,
+          "G3_erb_harvey_cpi_mr": 0.367166390676651,
+          "G4a_m2_ratio_mr": 0.22498902496184947,
+          "G4b_m2_cpi_coint": 0.3843980222139442,
+          "G5_real_rate_cpi_drift": 0.4948434581512908
+        },
+        "deltaVsG0ByArm": {
+          "G0_incumbent": 0,
+          "G1_power_law_1971": 0.2775953401009717,
+          "G2_exponential_mr": 0.09913660858783879,
+          "G3_erb_harvey_cpi_mr": 0.06873339092213854,
+          "G4a_m2_ratio_mr": -0.07344397479266301,
+          "G4b_m2_cpi_coint": 0.08596502245943172,
+          "G5_real_rate_cpi_drift": 0.19641045839677834
+        }
+      },
+      {
+        "label": "2010-01..2015-12",
+        "originStartYm": "2010-01",
+        "originEndYm": "2015-12",
+        "n": 72,
+        "maleByArm": {
+          "G0_incumbent": 0.36638098165315613,
+          "G1_power_law_1971": 0.34089174679383943,
+          "G2_exponential_mr": 0.25991958118406044,
+          "G3_erb_harvey_cpi_mr": 0.6965901515420614,
+          "G4a_m2_ratio_mr": 0.16684404689897442,
+          "G4b_m2_cpi_coint": 0.2685550824423116,
+          "G5_real_rate_cpi_drift": 0.3646674983855765
+        },
+        "deltaVsG0ByArm": {
+          "G0_incumbent": 0,
+          "G1_power_law_1971": -0.0254892348593167,
+          "G2_exponential_mr": -0.10646140046909569,
+          "G3_erb_harvey_cpi_mr": 0.33020916988890525,
+          "G4a_m2_ratio_mr": -0.19953693475418172,
+          "G4b_m2_cpi_coint": -0.09782589921084456,
+          "G5_real_rate_cpi_drift": -0.0017134832675796408
+        }
+      },
+      {
+        "label": "2016-01..maxMatured",
+        "originStartYm": "2016-01",
+        "originEndYm": "2016-10",
+        "n": 10,
+        "maleByArm": {
+          "G0_incumbent": 0.9000944396844283,
+          "G1_power_law_1971": 1.1432943927226527,
+          "G2_exponential_mr": 0.820472766784869,
+          "G3_erb_harvey_cpi_mr": 1.387891916773445,
+          "G4a_m2_ratio_mr": 0.4627503298604901,
+          "G4b_m2_cpi_coint": 0.7634861540839534,
+          "G5_real_rate_cpi_drift": 0.9934603700822752
+        },
+        "deltaVsG0ByArm": {
+          "G0_incumbent": 0,
+          "G1_power_law_1971": 0.2431999530382244,
+          "G2_exponential_mr": -0.07962167289955924,
+          "G3_erb_harvey_cpi_mr": 0.48779747708901666,
+          "G4a_m2_ratio_mr": -0.4373441098239382,
+          "G4b_m2_cpi_coint": -0.1366082856004749,
+          "G5_real_rate_cpi_drift": 0.09336593039784691
+        }
+      }
+    ]
+  },
+  "lagSensitivity": [
+    {
+      "armId": "G3_erb_harvey_cpi_mr",
+      "horizonMonths": 60,
+      "n": 214,
+      "maleLag1": 0.39608180794234416,
+      "maleLag2": 0.39600107215929226,
+      "deltaMaleVsG0Lag1": 0.011375630062456565,
+      "deltaMaleVsG0Lag2": 0.011294894279404666,
+      "deltaBootCi95LowLag2": -0.05026435537811141,
+      "deltaBootCi95HighLag2": 0.06318133281687756,
+      "bootPOneSidedLag2": 0.626874625074985,
+      "holmBootPLag2": 1,
+      "preservesNegativeSign": false
+    },
+    {
+      "armId": "G4a_m2_ratio_mr",
+      "horizonMonths": 60,
+      "n": 214,
+      "maleLag1": 0.32710705506571447,
+      "maleLag2": 0.32719435494202037,
+      "deltaMaleVsG0Lag1": -0.05759912281417312,
+      "deltaMaleVsG0Lag2": -0.05751182293786722,
+      "deltaBootCi95LowLag2": -0.12015886517382973,
+      "deltaBootCi95HighLag2": 0.014184323514277314,
+      "bootPOneSidedLag2": 0.04379124175164967,
+      "holmBootPLag2": 0.262747450509898,
+      "preservesNegativeSign": true
+    },
+    {
+      "armId": "G4b_m2_cpi_coint",
+      "horizonMonths": 60,
+      "n": 214,
+      "maleLag1": 0.39419590103377816,
+      "maleLag2": 0.3946286725584577,
+      "deltaMaleVsG0Lag1": 0.009489723153890572,
+      "deltaMaleVsG0Lag2": 0.009922494678570093,
+      "deltaBootCi95LowLag2": -0.04645675989503359,
+      "deltaBootCi95HighLag2": 0.0714830731667497,
+      "bootPOneSidedLag2": 0.6356728654269146,
+      "holmBootPLag2": 1,
+      "preservesNegativeSign": false
+    },
+    {
+      "armId": "G5_real_rate_cpi_drift",
+      "horizonMonths": 60,
+      "n": 214,
+      "maleLag1": 0.39621955569562933,
+      "maleLag2": 0.3951829793878187,
+      "deltaMaleVsG0Lag1": 0.011513377815741743,
+      "deltaMaleVsG0Lag2": 0.010476801507931122,
+      "deltaBootCi95LowLag2": -0.018546635929103224,
+      "deltaBootCi95HighLag2": 0.04524125258509972,
+      "bootPOneSidedLag2": 0.7410517896420716,
+      "holmBootPLag2": 1,
+      "preservesNegativeSign": false
+    },
+    {
+      "armId": "G3_erb_harvey_cpi_mr",
+      "horizonMonths": 120,
+      "n": 154,
+      "maleLag1": 0.5874635727758555,
+      "maleLag2": 0.5854496584205542,
+      "deltaMaleVsG0Lag1": 0.2181937607096449,
+      "deltaMaleVsG0Lag2": 0.21617984635434362,
+      "deltaBootCi95LowLag2": 0.13104036590041696,
+      "deltaBootCi95HighLag2": 0.30310679985807876,
+      "bootPOneSidedLag2": 1,
+      "holmBootPLag2": 1,
+      "preservesNegativeSign": false
+    },
+    {
+      "armId": "G4a_m2_ratio_mr",
+      "horizonMonths": 120,
+      "n": 154,
+      "maleLag1": 0.21324340566613137,
+      "maleLag2": 0.21416760153462272,
+      "deltaMaleVsG0Lag1": -0.1560264064000792,
+      "deltaMaleVsG0Lag2": -0.15510221053158785,
+      "deltaBootCi95LowLag2": -0.2889601447294688,
+      "deltaBootCi95HighLag2": -0.024973086832072614,
+      "bootPOneSidedLag2": 0.0001999600079984003,
+      "holmBootPLag2": 0.0011997600479904018,
+      "preservesNegativeSign": true
+    },
+    {
+      "armId": "G4b_m2_cpi_coint",
+      "horizonMonths": 120,
+      "n": 154,
+      "maleLag1": 0.3548537991953893,
+      "maleLag2": 0.3557098380017724,
+      "deltaMaleVsG0Lag1": -0.014416012870821282,
+      "deltaMaleVsG0Lag2": -0.013559974064438152,
+      "deltaBootCi95LowLag2": -0.07665230442963446,
+      "deltaBootCi95HighLag2": 0.04887129214595122,
+      "bootPOneSidedLag2": 0.33253349330133974,
+      "holmBootPLag2": 1,
+      "preservesNegativeSign": true
+    },
+    {
+      "armId": "G5_real_rate_cpi_drift",
+      "horizonMonths": 120,
+      "n": 154,
+      "maleLag1": 0.4663596920225791,
+      "maleLag2": 0.4659311274185377,
+      "deltaMaleVsG0Lag1": 0.09708987995636853,
+      "deltaMaleVsG0Lag2": 0.09666131535232714,
+      "deltaBootCi95LowLag2": 0.02191511624268196,
+      "deltaBootCi95HighLag2": 0.17291164187024533,
+      "bootPOneSidedLag2": 1,
+      "holmBootPLag2": 1,
+      "preservesNegativeSign": false
+    }
+  ],
+  "gateEvaluations": [
+    {
+      "armId": "G1_power_law_1971",
+      "delta120m": 0.13365999420637287,
+      "bootCi95High120m": 0.24342987392569038,
+      "holmBootP120m": 1,
+      "delta60m": 0.07350055201363181,
+      "delta120mLag2": 0.13365999420637287,
+      "holmBootPLag2_120m": 1,
+      "passes120mDelta": false,
+      "passes120mCi": false,
+      "passes120mHolm": false,
+      "passes60mGuard": false,
+      "passesLag2Sensitivity": false,
+      "passesPreRegisteredGate": false
+    },
+    {
+      "armId": "G2_exponential_mr",
+      "delta120m": -0.008594816522377313,
+      "bootCi95High120m": 0.05419608197799316,
+      "holmBootP120m": 1,
+      "delta60m": 0.015801974776036898,
+      "delta120mLag2": -0.008594816522377313,
+      "holmBootPLag2_120m": 1,
+      "passes120mDelta": false,
+      "passes120mCi": false,
+      "passes120mHolm": false,
+      "passes60mGuard": true,
+      "passesLag2Sensitivity": false,
+      "passesPreRegisteredGate": false
+    },
+    {
+      "armId": "G3_erb_harvey_cpi_mr",
+      "delta120m": 0.2181937607096449,
+      "bootCi95High120m": 0.30558826153050095,
+      "holmBootP120m": 1,
+      "delta60m": 0.011375630062456565,
+      "delta120mLag2": 0.21617984635434362,
+      "holmBootPLag2_120m": 1,
+      "passes120mDelta": false,
+      "passes120mCi": false,
+      "passes120mHolm": false,
+      "passes60mGuard": true,
+      "passesLag2Sensitivity": false,
+      "passesPreRegisteredGate": false
+    },
+    {
+      "armId": "G4a_m2_ratio_mr",
+      "delta120m": -0.1560264064000792,
+      "bootCi95High120m": -0.026322878698448366,
+      "holmBootP120m": 0.0011997600479904018,
+      "delta60m": -0.05759912281417312,
+      "delta120mLag2": -0.15510221053158785,
+      "holmBootPLag2_120m": 0.0011997600479904018,
+      "passes120mDelta": true,
+      "passes120mCi": true,
+      "passes120mHolm": true,
+      "passes60mGuard": true,
+      "passesLag2Sensitivity": true,
+      "passesPreRegisteredGate": true
+    },
+    {
+      "armId": "G4b_m2_cpi_coint",
+      "delta120m": -0.014416012870821282,
+      "bootCi95High120m": 0.047227779775523386,
+      "holmBootP120m": 1,
+      "delta60m": 0.009489723153890572,
+      "delta120mLag2": -0.013559974064438152,
+      "holmBootPLag2_120m": 1,
+      "passes120mDelta": false,
+      "passes120mCi": false,
+      "passes120mHolm": false,
+      "passes60mGuard": true,
+      "passesLag2Sensitivity": false,
+      "passesPreRegisteredGate": false
+    },
+    {
+      "armId": "G5_real_rate_cpi_drift",
+      "delta120m": 0.09708987995636853,
+      "bootCi95High120m": 0.17069605273120766,
+      "holmBootP120m": 1,
+      "delta60m": 0.011513377815741743,
+      "delta120mLag2": 0.09666131535232714,
+      "holmBootPLag2_120m": 1,
+      "passes120mDelta": false,
+      "passes120mCi": false,
+      "passes120mHolm": false,
+      "passes60mGuard": true,
+      "passesLag2Sensitivity": false,
+      "passesPreRegisteredGate": false
+    }
+  ],
+  "passingArms": [
+    "G4a_m2_ratio_mr"
+  ],
+  "liveOrigin": {
+    "ym": "2026-10",
+    "spotUsd": 4105,
+    "laggedMacroMonth": "2026-09",
+    "laggedCpi": 336.298,
+    "laggedM2": 23413.9,
+    "laggedGs10": 4.99
+  },
+  "liveProjections": [
+    {
+      "horizonMonths": 12,
+      "targetYm": "2027-10",
+      "armId": "G0_incumbent",
+      "selectedParams": {},
+      "predLogReturn": 0.08069388719575722,
+      "impliedPriceUsd": 4449.980125997279,
+      "annualizedCagrPct": 8.403900755110328,
+      "pctChangeFromSpot": 8.403900755110328
+    },
+    {
+      "horizonMonths": 12,
+      "targetYm": "2027-10",
+      "armId": "G1_power_law_1971",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.014823467274441171,
+      "impliedPriceUsd": 4166.303576398926,
+      "annualizedCagrPct": 1.493387975613314,
+      "pctChangeFromSpot": 1.493387975613314
+    },
+    {
+      "horizonMonths": 12,
+      "targetYm": "2027-10",
+      "armId": "G2_exponential_mr",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.05117889198808764,
+      "impliedPriceUsd": 4320.558321065382,
+      "annualizedCagrPct": 5.251116225709684,
+      "pctChangeFromSpot": 5.251116225709684
+    },
+    {
+      "horizonMonths": 12,
+      "targetYm": "2027-10",
+      "armId": "G3_erb_harvey_cpi_mr",
+      "selectedParams": {
+        "lambda": 0.25,
+        "tau": 120
+      },
+      "predLogReturn": 0.009266615981262095,
+      "impliedPriceUsd": 4143.216252803275,
+      "annualizedCagrPct": 0.9309683995925688,
+      "pctChangeFromSpot": 0.9309683995925688
+    },
+    {
+      "horizonMonths": 12,
+      "targetYm": "2027-10",
+      "armId": "G4a_m2_ratio_mr",
+      "selectedParams": {
+        "lambda": 0.25,
+        "tau": 120
+      },
+      "predLogReturn": 0.05365424401950586,
+      "impliedPriceUsd": 4331.266471635696,
+      "annualizedCagrPct": 5.511972512440821,
+      "pctChangeFromSpot": 5.511972512440821
+    },
+    {
+      "horizonMonths": 12,
+      "targetYm": "2027-10",
+      "armId": "G4b_m2_cpi_coint",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.05323563699306533,
+      "impliedPriceUsd": 4329.453752492238,
+      "annualizedCagrPct": 5.4678137026123785,
+      "pctChangeFromSpot": 5.4678137026123785
+    },
+    {
+      "horizonMonths": 12,
+      "targetYm": "2027-10",
+      "armId": "G5_real_rate_cpi_drift",
+      "selectedParams": {
+        "ridge": 1
+      },
+      "predLogReturn": 0.08069388719575722,
+      "impliedPriceUsd": 4449.980125997279,
+      "annualizedCagrPct": 8.403900755110328,
+      "pctChangeFromSpot": 8.403900755110328
+    },
+    {
+      "horizonMonths": 24,
+      "targetYm": "2028-10",
+      "armId": "G0_incumbent",
+      "selectedParams": {},
+      "predLogReturn": 0.12002205435767768,
+      "impliedPriceUsd": 4628.476652687313,
+      "annualizedCagrPct": 6.1848255671415275,
+      "pctChangeFromSpot": 12.752171807242707
+    },
+    {
+      "horizonMonths": 24,
+      "targetYm": "2028-10",
+      "armId": "G1_power_law_1971",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.029425054652701732,
+      "impliedPriceUsd": 4227.584532948005,
+      "annualizedCagrPct": 1.482128928970372,
+      "pctChangeFromSpot": 2.986224919561642
+    },
+    {
+      "horizonMonths": 24,
+      "targetYm": "2028-10",
+      "armId": "G2_exponential_mr",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.10235778397617527,
+      "impliedPriceUsd": 4547.435860104098,
+      "annualizedCagrPct": 5.251116225709684,
+      "pctChangeFromSpot": 10.777974667578505
+    },
+    {
+      "horizonMonths": 24,
+      "targetYm": "2028-10",
+      "armId": "G3_erb_harvey_cpi_mr",
+      "selectedParams": {
+        "lambda": 0.25,
+        "tau": 60
+      },
+      "predLogReturn": -0.02411832092837464,
+      "impliedPriceUsd": 4007.1786774039033,
+      "annualizedCagrPct": -1.1986740190180867,
+      "pctChangeFromSpot": -2.382979843997479
+    },
+    {
+      "horizonMonths": 24,
+      "targetYm": "2028-10",
+      "armId": "G4a_m2_ratio_mr",
+      "selectedParams": {
+        "lambda": 0.25,
+        "tau": 120
+      },
+      "predLogReturn": 0.10827806502569631,
+      "impliedPriceUsd": 4574.437809146659,
+      "annualizedCagrPct": 5.56313590333426,
+      "pctChangeFromSpot": 11.435756617458193
+    },
+    {
+      "horizonMonths": 24,
+      "targetYm": "2028-10",
+      "armId": "G4b_m2_cpi_coint",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.10647127398613421,
+      "impliedPriceUsd": 4566.180218019292,
+      "annualizedCagrPct": 5.467813702612578,
+      "pctChangeFromSpot": 11.23459727208993
+    },
+    {
+      "horizonMonths": 24,
+      "targetYm": "2028-10",
+      "armId": "G5_real_rate_cpi_drift",
+      "selectedParams": {
+        "ridge": 100
+      },
+      "predLogReturn": 0.17632356178860303,
+      "impliedPriceUsd": 4896.542308460967,
+      "annualizedCagrPct": 9.216479913425069,
+      "pctChangeFromSpot": 19.282394846795793
+    },
+    {
+      "horizonMonths": 60,
+      "targetYm": "2031-10",
+      "armId": "G0_incumbent",
+      "selectedParams": {},
+      "predLogReturn": 0.23768419381752165,
+      "impliedPriceUsd": 5206.406761448463,
+      "annualizedCagrPct": 4.868483266225265,
+      "pctChangeFromSpot": 26.83085898778228
+    },
+    {
+      "horizonMonths": 60,
+      "targetYm": "2031-10",
+      "armId": "G1_power_law_1971",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.07162898815837693,
+      "impliedPriceUsd": 4409.82378699432,
+      "annualizedCagrPct": 1.442890364082805,
+      "pctChangeFromSpot": 7.425670815939567
+    },
+    {
+      "horizonMonths": 60,
+      "targetYm": "2031-10",
+      "armId": "G2_exponential_mr",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.2558944599404382,
+      "impliedPriceUsd": 5302.085336260075,
+      "annualizedCagrPct": 5.251116225709684,
+      "pctChangeFromSpot": 29.161640347383067
+    },
+    {
+      "horizonMonths": 60,
+      "targetYm": "2031-10",
+      "armId": "G3_erb_harvey_cpi_mr",
+      "selectedParams": {
+        "lambda": 0.25,
+        "tau": 120
+      },
+      "predLogReturn": 0.07153552260842938,
+      "impliedPriceUsd": 4409.411639649986,
+      "annualizedCagrPct": 1.4409940986991776,
+      "pctChangeFromSpot": 7.415630685748731
+    },
+    {
+      "horizonMonths": 60,
+      "targetYm": "2031-10",
+      "armId": "G4a_m2_ratio_mr",
+      "selectedParams": {
+        "lambda": 0.25,
+        "tau": 120
+      },
+      "predLogReturn": 0.27708738194696436,
+      "impliedPriceUsd": 5415.651162565888,
+      "annualizedCagrPct": 5.6981787519771565,
+      "pctChangeFromSpot": 31.928164739729304
+    },
+    {
+      "horizonMonths": 60,
+      "targetYm": "2031-10",
+      "armId": "G4b_m2_cpi_coint",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.2661781849653311,
+      "impliedPriceUsd": 5356.891848462849,
+      "annualizedCagrPct": 5.467813702612467,
+      "pctChangeFromSpot": 30.496756357194865
+    },
+    {
+      "horizonMonths": 60,
+      "targetYm": "2031-10",
+      "armId": "G5_real_rate_cpi_drift",
+      "selectedParams": {
+        "ridge": 100
+      },
+      "predLogReturn": 0.37926121196820506,
+      "impliedPriceUsd": 5998.245170536166,
+      "annualizedCagrPct": 7.880316100751816,
+      "pctChangeFromSpot": 46.120467004535115
+    },
+    {
+      "horizonMonths": 120,
+      "targetYm": "2036-10",
+      "armId": "G0_incumbent",
+      "selectedParams": {},
+      "predLogReturn": 0.4340026676012066,
+      "impliedPriceUsd": 6335.751354853595,
+      "annualizedCagrPct": 4.4355832127171535,
+      "pctChangeFromSpot": 54.342298534801344
+    },
+    {
+      "horizonMonths": 120,
+      "targetYm": "2036-10",
+      "armId": "G1_power_law_1971",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.1375720373976641,
+      "impliedPriceUsd": 4710.423317431229,
+      "annualizedCagrPct": 1.3852269513298765,
+      "pctChangeFromSpot": 14.748436478227278
+    },
+    {
+      "horizonMonths": 120,
+      "targetYm": "2036-10",
+      "armId": "G2_exponential_mr",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.5117889198808764,
+      "impliedPriceUsd": 6848.260392931576,
+      "annualizedCagrPct": 5.251116225709684,
+      "pctChangeFromSpot": 66.82729337226736
+    },
+    {
+      "horizonMonths": 120,
+      "targetYm": "2036-10",
+      "armId": "G3_erb_harvey_cpi_mr",
+      "selectedParams": {
+        "lambda": 1,
+        "tau": 36
+      },
+      "predLogReturn": -0.7966587618228216,
+      "impliedPriceUsd": 1850.668603473953,
+      "annualizedCagrPct": -7.657516692200616,
+      "pctChangeFromSpot": -54.916720987236225
+    },
+    {
+      "horizonMonths": 120,
+      "targetYm": "2036-10",
+      "armId": "G4a_m2_ratio_mr",
+      "selectedParams": {
+        "lambda": 1,
+        "tau": 36
+      },
+      "predLogReturn": 0.22544432409002518,
+      "impliedPriceUsd": 5143.069432005695,
+      "annualizedCagrPct": 2.2800478644029676,
+      "pctChangeFromSpot": 25.287927698068067
+    },
+    {
+      "horizonMonths": 120,
+      "targetYm": "2036-10",
+      "armId": "G4b_m2_cpi_coint",
+      "selectedParams": {
+        "tau": null
+      },
+      "predLogReturn": 0.5323563699306604,
+      "impliedPriceUsd": 6990.570103806983,
+      "annualizedCagrPct": 5.467813702612467,
+      "pctChangeFromSpot": 70.29403419749045
+    },
+    {
+      "horizonMonths": 120,
+      "targetYm": "2036-10",
+      "armId": "G5_real_rate_cpi_drift",
+      "selectedParams": {
+        "ridge": 100
+      },
+      "predLogReturn": 0.5935484425210819,
+      "impliedPriceUsd": 7431.696661038969,
+      "annualizedCagrPct": 6.115171752847615,
+      "pctChangeFromSpot": 81.04011354540728
+    }
+  ]
+}

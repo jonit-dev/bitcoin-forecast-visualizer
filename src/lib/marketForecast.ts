@@ -19,6 +19,7 @@ import {
   type CsrProjection,
 } from './csrV1';
 import { GOLD_365_V2_HORIZON_DAYS, buildGold365Forecast, shouldUseGold365V2 } from './gold365V2';
+import { computeGoldM2MeanReversion } from './goldLongAnchor';
 
 export interface MarketAssetConfig {
   id: MarketAssetId;
@@ -324,6 +325,8 @@ export interface GenericModelInputs {
   momentumDays?: number;
   /** Per calendar day log drift after `momentumDays`. */
   longRunDrift?: number;
+  /** Causal long-horizon valuation mean reversion applied strictly past `momentumDays`. */
+  longRunMeanReversion?: { amplitude: number; decayDays: number };
   /**
    * Cumulative log variance per calendar day from the session term structure.
    * When present it is the forecast width everywhere (band, heatmap, summary),
@@ -334,15 +337,19 @@ export interface GenericModelInputs {
 
 /**
  * Median log return at a calendar day offset. Momentum carries for one year,
- * then a long-run 4%/yr drift; evidence = monthly gold 1972-2026, 10y MAE -42%
- * (1975-2003 origins) and -63% (2004+ origins) vs momentum forever.
+ * then a long-run 4%/yr prior plus causal Gold/M2 valuation mean reversion past
+ * 365 days; evidence = scripts/research-gold-m2-production-gate.ts.
  */
 export function genericMedianLogReturnAtDay(modelInputs: GenericModelInputs, day: number): number {
-  const { csr = null, momentumDays, longRunDrift } = modelInputs;
+  const { csr = null, momentumDays, longRunDrift, longRunMeanReversion } = modelInputs;
   if (csr) return csrMedianLogReturnAtDay(csr, day);
   const dailyDrift = modelInputs.medianDrift ?? modelInputs.drift;
   if (momentumDays === undefined) return dailyDrift * day;
-  return dailyDrift * Math.min(day, momentumDays) + (longRunDrift ?? 0) * Math.max(0, day - momentumDays);
+  const extraDays = Math.max(0, day - momentumDays);
+  const mrAdjustment = longRunMeanReversion && extraDays > 0
+    ? -longRunMeanReversion.amplitude * (1 - Math.exp(-extraDays / longRunMeanReversion.decayDays))
+    : 0;
+  return dailyDrift * Math.min(day, momentumDays) + (longRunDrift ?? 0) * extraDays + mrAdjustment;
 }
 
 /**
@@ -523,7 +530,8 @@ function generateGenericStochasticTraces(
   pathPolicy: ForecastPathPolicy,
   csr: CsrProjection | null = null,
   momentumDays?: number,
-  longRunDrift?: number
+  longRunDrift?: number,
+  longRunMeanReversion?: { amplitude: number; decayDays: number }
 ): Map<string, number[]> {
   const traces = new Map<string, number[]>();
   const last = ohlcv[ohlcv.length - 1];
@@ -577,7 +585,17 @@ function generateGenericStochasticTraces(
       } else {
         innovation = dailyVol * normalFromRng(rng);
       }
-      const driftIncrement = momentumDays !== undefined && day > momentumDays ? longRunDrift ?? 0 : drift;
+      let driftIncrement = drift;
+      if (momentumDays !== undefined && day > momentumDays) {
+        const extraDays = day - momentumDays;
+        const mrStep = longRunMeanReversion
+          ? -longRunMeanReversion.amplitude * (
+              Math.exp(-(extraDays - 1) / longRunMeanReversion.decayDays) -
+              Math.exp(-extraDays / longRunMeanReversion.decayDays)
+            )
+          : 0;
+        driftIncrement = (longRunDrift ?? 0) + mrStep;
+      }
       prices[i] *= anchorIncrement === null
         ? Math.exp(driftIncrement - 0.5 * dailyVol * dailyVol + innovation)
         : Math.exp(anchorIncrement + innovation);
@@ -675,7 +693,7 @@ function processGenericData(
   const { returns, drift, dailyVol, csr = null } = modelInputs;
   const tracesByDate = generateGenericStochasticTraces(
     assetId, ohlcv, horizon, drift, dailyVol, returns, pathPolicy, csr,
-    modelInputs.momentumDays, modelInputs.longRunDrift
+    modelInputs.momentumDays, modelInputs.longRunDrift, modelInputs.longRunMeanReversion
   );
   // Anchors are horizon-independent, so the median at day d never depends on the
   // selected horizon and switching 90d -> 180d preserves the whole 90d prefix.
@@ -703,6 +721,9 @@ function processGenericData(
     channelWindowWrite = (channelWindowWrite + 1) % channelWindowDays;
     channelWindowCount++;
   }
+  const last = ohlcv[ohlcv.length - 1];
+  const lastDate = new Date(`${last.date}T00:00:00Z`);
+  const channelSessions = buildSessionLadder(last.date, horizon);
   const data: any[] = ohlcv.map((row, index) => {
     const sma20 = index >= 19 ? mean(ohlcv.slice(index - 19, index + 1).map((d) => d.close)) : null;
     const sma50 = index >= 49 ? mean(ohlcv.slice(index - 49, index + 1).map((d) => d.close)) : null;
@@ -719,8 +740,6 @@ function processGenericData(
     };
   });
 
-  const last = ohlcv[ohlcv.length - 1];
-  const lastDate = new Date(`${last.date}T00:00:00Z`);
   data[data.length - 1].forecast = last.close;
   data[data.length - 1].forecastUpper = last.close;
   data[data.length - 1].forecastLower = last.close;
@@ -736,10 +755,12 @@ function processGenericData(
     const rangeHigh = median * Math.exp(confidenceZ * sigma);
     const candleSpread = Math.max(0.001, dailyVol * 0.25);
     const referencePrice = last.close * Math.exp(referenceLogReturnAt(day));
-    channelWindowSum += referencePrice - channelWindow[channelWindowWrite];
-    channelWindow[channelWindowWrite] = referencePrice;
-    channelWindowWrite = (channelWindowWrite + 1) % channelWindowDays;
-    channelWindowCount = Math.min(channelWindowDays, channelWindowCount + 1);
+    if (channelSessions[day] > channelSessions[day - 1]) {
+      channelWindowSum += referencePrice - channelWindow[channelWindowWrite];
+      channelWindow[channelWindowWrite] = referencePrice;
+      channelWindowWrite = (channelWindowWrite + 1) % channelWindowDays;
+      channelWindowCount = Math.min(channelWindowDays, channelWindowCount + 1);
+    }
     const channelTrend = latestChannel?.trend
       ? channelWindowSum / channelWindowCount
       : null;
@@ -791,11 +812,11 @@ function processGenericData(
  * declared median.
  */
 export function genericHeatmapDriftIncrements(modelInputs: GenericModelInputs, horizon: number): number[] {
-  const { csr = null, momentumDays, longRunDrift } = modelInputs;
+  const { csr = null, momentumDays } = modelInputs;
   const dailyDrift = modelInputs.medianDrift ?? modelInputs.drift;
   if (!csr && momentumDays !== undefined) {
     return Array.from({ length: horizon }, (_, index) =>
-      index + 1 <= momentumDays ? dailyDrift : longRunDrift ?? 0
+      genericMedianLogReturnAtDay(modelInputs, index + 1) - genericMedianLogReturnAtDay(modelInputs, index)
     );
   }
   if (!csr) return Array.from({ length: horizon }, () => dailyDrift);
@@ -825,6 +846,10 @@ export function buildGenericModelInputs(
 ): { modelInputs: GenericModelInputs; calibrationLabel: string } {
   if (assetId === 'gold') {
     const baseline = computeGoldModelInputs(ohlcv);
+    const goldM2Anchor = computeGoldM2MeanReversion(ohlcv);
+    const longRunMeanReversion = goldM2Anchor
+      ? { amplitude: goldM2Anchor.amplitude, decayDays: goldM2Anchor.decayDays }
+      : undefined;
     // Horizon-specific promotion: the direct Ridge challenger only cleared its
     // gate at 365 days, so every other horizon keeps the momentum baseline. A
     // null forecast (short snapshot, stale macro cache) also keeps the baseline.
@@ -839,6 +864,7 @@ export function buildGenericModelInputs(
           medianDrift: gold365.logReturn / GOLD_365_V2_HORIZON_DAYS,
           momentumDays: GOLD_MOMENTUM_DAYS,
           longRunDrift: GOLD_LONG_RUN_DRIFT,
+          longRunMeanReversion,
         },
         calibrationLabel: 'Direct 1Y ridge interval',
       };
@@ -848,6 +874,7 @@ export function buildGenericModelInputs(
         ...baseline,
         momentumDays: GOLD_MOMENTUM_DAYS,
         longRunDrift: GOLD_LONG_RUN_DRIFT,
+        longRunMeanReversion,
         logVarianceByDay: buildVolTermStructure(ohlcv, baseline.returns, horizon, GOLD_VOL_TERM_STRUCTURE) ?? undefined,
       },
       calibrationLabel: 'Slow momentum interval',
@@ -917,10 +944,10 @@ function generateGenericHeatmapData(
   }
 
   const sorted = Array.from(results).sort((a, b) => a - b);
-  const p05 = quantile(sorted, 0.05);
-  const p95 = quantile(sorted, 0.95);
-  const logMin = Math.log(p05);
-  const logMax = Math.log(p95);
+  const p005 = quantile(sorted, 0.005);
+  const p995 = quantile(sorted, 0.995);
+  const logMin = Math.log(p005);
+  const logMax = Math.log(p995);
   const bandSize = (logMax - logMin) / numPriceBands;
   if (!Number.isFinite(bandSize) || bandSize <= 0) return [];
 
@@ -929,7 +956,8 @@ function generateGenericHeatmapData(
     const counts = new Uint16Array(numPriceBands);
     for (let sim = 0; sim < numSimulations; sim++) {
       const logPrice = Math.log(results[sim * sampledCount + dateIndex]);
-      const band = Math.min(numPriceBands - 1, Math.max(0, Math.floor((logPrice - logMin) / bandSize)));
+      const band = Math.floor((logPrice - logMin) / bandSize);
+      if (band < 0 || band >= numPriceBands) continue;
       counts[band]++;
     }
 
