@@ -440,7 +440,12 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     seriesRefs.current.sma50?.applyOptions({ visible: showSMA });
     seriesRefs.current.volume?.applyOptions({ visible: showVolume });
     seriesRefs.current.forecastMedian?.applyOptions({ visible: showModelLine });
-    seriesRefs.current.modelLine?.applyOptions({ visible: showModelLine });
+    // BTC: solid power-law line. Generic assets: dotted channel midline, so it does not read as the solid median.
+    seriesRefs.current.modelLine?.applyOptions({
+      visible: showModelLine,
+      lineStyle: showBitcoinOverlays ? 0 : 1,
+      color: showBitcoinOverlays ? 'rgba(251, 191, 36, 0.95)' : 'rgba(251, 191, 36, 0.5)',
+    });
     seriesRefs.current.stochasticTraces.forEach((series) => {
       series.applyOptions({ visible: showScenarios });
     });

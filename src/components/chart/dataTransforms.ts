@@ -160,7 +160,9 @@ export function buildChartSeriesData(
       .map((d: any) => ({ time: d.date, value: d.stochasticTraces?.[traceIndex] }))
       .filter((point: any) => Number.isFinite(point.value) && point.value > 0)
   );
-  const modelLineData = historical
+  // Generic assets: the channel midline continues through the forecast like floor/peak,
+  // because the solid median line above starts at spot, not on this curve.
+  const modelLineData = (useForecastMedianLine ? [...historical, ...forecast] : historical)
     .filter((d: any) => d.powerLawModel != null && d.powerLawModel > 0)
     .map((d: any) => ({ time: d.date, value: d.powerLawModel }));
   const floorLineData = [...historical, ...forecast]

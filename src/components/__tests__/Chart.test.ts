@@ -204,6 +204,8 @@ describe('Chart data transforms', () => {
       { time: '2024-01-03', value: 100.5 },
       { time: '2024-01-04', value: 101 },
     ]);
+    // The channel midline continues through the forecast like floor/peak, so it does not stop at spot.
+    expect(series.modelLineData.map((point) => point.time)).toEqual(['2024-01-01', '2024-01-02', '2024-01-03', '2024-01-04']);
     // Projected candles stay near median (~100), not bounced above floorPriceModel (118/116).
     expect(series.forecastData[1].close).toBeLessThan(115);
     expect(series.forecastData[2].close).toBeLessThan(115);
