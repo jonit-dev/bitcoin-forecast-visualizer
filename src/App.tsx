@@ -161,7 +161,7 @@ export default function App() {
   const [showFloorLine, setShowFloorLine] = useState(true);
   const [showPeakLine, setShowPeakLine] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(true);
-  const [showPastForecasts, setShowPastForecasts] = useState(true);
+  const [showPastForecasts, setShowPastForecasts] = useState(false);
   const [showBuyZones, setShowBuyZones] = useState(true);
   const [showMVRV, setShowMVRV] = useState(false);
   const [showCrisisIndicator, setShowCrisisIndicator] = useState(true);

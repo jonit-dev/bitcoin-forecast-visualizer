@@ -109,6 +109,6 @@ A naive replay (call today's code on truncated price data) leaks the future. The
 - ✅ Related tests: 12 files, 61 tests pass. `tsc --noEmit` is clean. Red checks done for look-ahead, replay and toggle gate.
 - ✅ Speed: 3 to 13 ms per build. The rejected refit took 52 to 150 ms.
 - ✅ Hidden during playback and on S&P 500 and gold. With the toggle off, the chart is unchanged.
-- Owner decision on 2026-11-24: the toggle is **on by default** (overrides §3 "Default off").
+- Owner decision on 2026-11-24: the toggle stays **off by default**, as in §3. It was on by default for one deploy (`36f0471`) the same day.
 - ⚠️ Hindsight: the model constants were set with data after most origins. The toggle description says so, and the readout says "model replay".
 - Screenshots: `~/Downloads/past-forecast-overlay/` (4 files).
