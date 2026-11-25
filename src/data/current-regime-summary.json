@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-24T23:32:09.302Z",
-  "featureDate": "2026-11-23",
+  "generatedAt": "2026-11-25T23:09:49.555Z",
+  "featureDate": "2026-11-24",
   "regime": {
     "probabilities": {
       "accumulation-value": 0.3516483516483516,
@@ -28,12 +28,12 @@
   "derivativesContext": null,
   "networkContext": {
     "source": "CoinMetrics Community API",
-    "sourceDate": "2026-11-22",
-    "transferCount": 1040325,
-    "addressBalanceCount": 57221231,
-    "activeAddressShare": 0.009883813929134101,
-    "transfersPerTransaction": 1.4582693787610546,
-    "transferActivityPercentile": 0.9296718017414601,
+    "sourceDate": "2026-11-23",
+    "transferCount": 934970,
+    "addressBalanceCount": 57214839,
+    "activeAddressShare": 0.012076447510408969,
+    "transfersPerTransaction": 1.8181694432722655,
+    "transferActivityPercentile": 0.8550142307048384,
     "networkState": "speculative-congestion",
     "insight": "Transfers are high while active address share is low, which can indicate churn rather than broad demand.",
     "status": "context-only"

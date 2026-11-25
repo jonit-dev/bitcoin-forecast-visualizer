@@ -2,7 +2,7 @@
   "metadata": {
     "source": "Farside Investors Bitcoin ETF Flow - All Data",
     "status": "available",
-    "fetchedAt": "2026-11-24T23:31:45.932Z",
+    "fetchedAt": "2026-11-25T23:09:30.167Z",
     "url": "https://farside.co.uk/bitcoin-etf-flow-all-data/",
     "fields": [
       "totalFlowUSDm",
@@ -23581,11 +23581,43 @@
       "latestSourceDate": "2026-11-24",
       "availableAfter": "2026-11-25T00:00:00.000Z",
       "metrics": {
-        "totalFlowUSDm": 4,
-        "totalFlowUSD": 4000000,
-        "cumulativeFlowUSDm": 52345.399999999936,
-        "cumulativeFlowUSD": 52345399999.99994,
-        "fundSumUSDm": 4,
+        "totalFlowUSDm": -231.4,
+        "totalFlowUSD": -231400000,
+        "cumulativeFlowUSDm": 52109.999999999935,
+        "cumulativeFlowUSD": 52109999999.99993,
+        "fundSumUSDm": -231.40000000000003,
+        "fundFlowsUSDm": {
+          "IBIT": -175.3,
+          "FBTC": -44,
+          "BITB": -10.3,
+          "ARKB": -15.8,
+          "BTCO": 0,
+          "EZBC": 6.9,
+          "BRRR": 0,
+          "HODL": 0,
+          "BTCW": 0,
+          "MSBT": 3.1,
+          "GBTC": 0,
+          "BTC": 4
+        }
+      },
+      "timing": {
+        "sourceDate": "2026-11-24",
+        "conservativeAvailableAfter": "2026-11-25T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-11-25",
+      "source": "Farside Investors Bitcoin ETF Flow - All Data",
+      "latestSourceDate": "2026-11-25",
+      "availableAfter": "2026-11-26T00:00:00.000Z",
+      "metrics": {
+        "totalFlowUSDm": 0,
+        "totalFlowUSD": 0,
+        "cumulativeFlowUSDm": 52109.999999999935,
+        "cumulativeFlowUSD": 52109999999.99993,
+        "fundSumUSDm": 0,
         "fundFlowsUSDm": {
           "IBIT": 0,
           "FBTC": 0,
@@ -23598,12 +23630,12 @@
           "BTCW": 0,
           "MSBT": 0,
           "GBTC": 0,
-          "BTC": 4
+          "BTC": 0
         }
       },
       "timing": {
-        "sourceDate": "2026-11-24",
-        "conservativeAvailableAfter": "2026-11-25T00:00:00.000Z"
+        "sourceDate": "2026-11-25",
+        "conservativeAvailableAfter": "2026-11-26T00:00:00.000Z"
       },
       "missingMetrics": []
     }
