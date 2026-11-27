@@ -24,6 +24,7 @@ export interface ForecastChartProps {
   showHeatmap: boolean;
   heatmapData: HeatmapCell[];
   showBuyZones?: boolean;
+  showCycles?: boolean;
   buyZones?: BuyZoneSpan[];
   timeRange: string;
   playbackIndex: number | null;

@@ -2114,3 +2114,23 @@ existing VOO price forecast.
   - **Live GLD Snapshot (`2026-11-20`, GLD `$322.87`):** `M2 = 2026-09`, `gap = +0.3312` (`1.39x` vs expanding historical mean), `amplitude = 0.0828`.
 - **Rerun criteria:** Re-verify if FRED `M2SL` undergoes structural re-definition or if `gold-long-horizon-monthly.json` stops updating (fail-closed at `> 3` months lag automatically preserves safe `+4%/yr` fallback).
 - **Next better experiment:** Track prospective 2Y/5Y/10Y calibration once live `2026+` origins mature, and evaluate ALFRED point-in-time `M2SL` release vintages plus global M2 breadth if an international M2 feed is added.
+
+---
+
+## 2026-11-27 — BTC "peak ~500+ days after halving" overlay check
+
+- **Date:** 2026-11-27
+- **Status:** `completed — report-only; no overlay, forecast or UI change`
+- **Hypothesis:** A halving-anchored clock (peak about 1.5 years after each halving, bottom about 1.4 years before the next) adds information the chart does not already show.
+- **Data/source changes:** None. Checked-in `src/data/btc-history.json` (through 2026-11-20) and the chart's `HALVING_DATES` (H5 projected 2028-04-19).
+- **Validation setup:** Retrospective, hindsight-selected cycle extrema. Days from halving to cycle ATH, and from cycle ATL to the next halving. Not walk-forward.
+- **Report artifacts:** None (numbers below, scratch script only).
+- **Result/verdict:** Peaks 366 / 526 / 548 / 534 days after H1–H4 (2013-11-29, 2017-12-17, 2021-11-10, 2025-10-06). Bottoms 542 / 513 / 516 days before H2–H4 (2015-01-14, 2018-12-15, 2022-11-21). Last three cycles: peak ≈ H+535 ± 11d. Projection: H5 + 535d ≈ 2029-10-05 ATH; H5 − ~515d ≈ 2026-11-21 ATL. The chart already draws halving lines plus the 1,428-day pivot clock (`src/lib/cycle.ts`: ATH 2029-09-05, ATL 2026-10-07), about 30 days from the halving clock. Same signal, n = 3 usable cycles. Rejected as a separate overlay: it duplicates the existing one.
+- **Follow-up (same day): walk-forward + provenance.**
+  - Walk-forward peak timing, prior cycles only. Halving + mean prior offset: errors −155 / −100 / −52 days (C2–C4). Prior peak + 1,460 days: −14 / +36 / +34 days. The plain 4-year clock beat the halving-offset mean on every cycle.
+  - The one genuine forward hit: Rekt Capital's published (2023–2024) window "518–546 days after halving" gave 2025-09-20 → 2025-10-18. The 2025-10-06 peak landed inside it. That is n = 1.
+  - The chart's `ATL_TO_ATH_DAYS = 1064` entered git on 2026-04-04, after the 2025 peak. Its 2-day hit on 2025-10-08 is hindsight, not a forecast.
+  - Public bottom calls for this cycle cluster in Sep–Dec 2026 (CryptoQuant, Cowen ~912–922 days after H4, Willy Woo templates). No confirmed low yet.
+  - UI action (context-only, no forecast change): the existing cycle overlay got a "Halving cycle" on/off switch in Chart settings, default on. Deployed 2026-11-27.
+- **Rerun criteria:** After the H5 cycle ATH is confirmed (~2029–2030), compare halving-anchored vs 1,428-day pivot timing error on that new cycle.
+- **Next better experiment:** Same as the 2026-11-21 1,430-day audit: a frozen, origin-safe cycle-timing challenger scored on new cycles only.

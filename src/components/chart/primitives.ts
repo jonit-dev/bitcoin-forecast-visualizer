@@ -187,24 +187,33 @@ class HalvingCyclePrimitive {
   private _dates: { date: string; label: string }[];
   private _chart: any = null;
   private _paneViews: HalvingCyclePaneView[] = [];
+  private _visible = true;
+  private _requestUpdate?: () => void;
 
   constructor(dates: { date: string; label: string }[]) {
     this._dates = dates;
+  }
+
+  setVisible(visible: boolean) {
+    this._visible = visible;
+    this._requestUpdate?.();
   }
 
   updateAllViews() {
     this._paneViews = [new HalvingCyclePaneView(this._dates, this._chart)];
   }
 
-  paneViews() { return this._paneViews; }
+  paneViews() { return this._visible ? this._paneViews : []; }
 
   attached(param: any) {
     this._chart = param.chart;
+    this._requestUpdate = param.requestUpdate;
     this.updateAllViews();
   }
 
   detached() {
     this._chart = null;
+    this._requestUpdate = undefined;
     this._paneViews = [];
   }
 }
