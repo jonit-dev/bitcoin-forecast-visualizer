@@ -15,7 +15,7 @@ import {
   visibleRangeForTimeRange,
 } from './chart/dataTransforms';
 
-export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, buyZones = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast, crisisHistory = null, crisisThresholds = null, showCrisis = false, crisisEventCount, showPastForecasts = false, pastForecasts = [] }: ForecastChartProps) {
+export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, showVolume, showModelLine, showScenarios, showFloorLine, showPeakLine, showHeatmap, heatmapData, showBuyZones = true, showCycles = true, buyZones = [], timeRange, playbackIndex, mvrvData, showMVRV, showBitcoinOverlays = true, showCoreModelLine = false, probabilityForecast, crisisHistory = null, crisisThresholds = null, showCrisis = false, crisisEventCount, showPastForecasts = false, pastForecasts = [] }: ForecastChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const seriesRefs = useRef<ChartSeriesRefs>({ stochasticTraces: [] });
@@ -23,6 +23,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
   const forecastMarkersRef = useRef<any>(null);
   const heatmapPrimRef = useRef<HeatmapPrimitive | null>(null);
   const buyZonePrimRef = useRef<BuyZonePrimitive | null>(null);
+  const halvingPrimRef = useRef<HalvingCyclePrimitive | null>(null);
   const pastForecastSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const mvrvChartContainerRef = useRef<HTMLDivElement>(null);
   const mvrvChartRef = useRef<any>(null);
@@ -72,6 +73,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     if (showBitcoinOverlays) {
       const halvingPrimitive = new HalvingCyclePrimitive(HALVING_DATES);
       candlestickSeries.attachPrimitive(halvingPrimitive as any);
+      halvingPrimRef.current = halvingPrimitive;
     }
 
     // Attach probability heatmap primitive
@@ -259,6 +261,7 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
       mvrvSeriesRef.current = null;
       heatmapPrimRef.current = null;
       buyZonePrimRef.current = null;
+      halvingPrimRef.current = null;
       pastForecastSeriesRef.current = null;
       markersRef.current = null;
       forecastMarkersRef.current = null;
@@ -466,6 +469,10 @@ export const ForecastChart = React.memo(function ForecastChart({ data, showSMA, 
     const visible = showBitcoinOverlays && showBuyZones && playbackIndex === null;
     buyZonePrimRef.current.setZones(visible ? buyZones : []);
   }, [buyZones, showBuyZones, playbackIndex, showBitcoinOverlays]);
+
+  useEffect(() => {
+    halvingPrimRef.current?.setVisible(showCycles);
+  }, [showCycles, showBitcoinOverlays]);
 
   // Update past forecast candles; hidden during playback so they never show the future.
   const pastForecastsVisible = showPastForecasts && playbackIndex === null && pastForecasts.length > 0;

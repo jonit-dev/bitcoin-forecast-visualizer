@@ -163,6 +163,7 @@ export default function App() {
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPastForecasts, setShowPastForecasts] = useState(false);
   const [showBuyZones, setShowBuyZones] = useState(true);
+  const [showCycles, setShowCycles] = useState(true);
   const [showMVRV, setShowMVRV] = useState(false);
   const [showCrisisIndicator, setShowCrisisIndicator] = useState(true);
   const [chartSettingsOpen, setChartSettingsOpen] = useState(false);
@@ -358,6 +359,7 @@ export default function App() {
     ...(crisisAssessment ? [{ id: 'crisis', label: 'Crisis probability', group: 'Indicators' as const, checked: showCrisisIndicator, onChange: () => setShowCrisisIndicator(!showCrisisIndicator), description: 'Stack the imported shadow crisis probability under the price.' }] : []),
     ...(canShowBitcoinOverlays ? [
       { id: 'buy-zones', label: 'Buy zones', group: 'Bitcoin context' as const, checked: showBuyZones, onChange: () => setShowBuyZones(!showBuyZones), description: 'Show context-only historical buy zones.' },
+      { id: 'cycles', label: 'Halving cycle', group: 'Bitcoin context' as const, checked: showCycles, onChange: () => setShowCycles(!showCycles), description: 'Show halving lines, cycle phases and the 1,428-day top/bottom clock. Timing context only, fit on 3 past cycles.' },
       ...(mvrvZScoreData.length ? [{ id: 'mvrv', label: 'MVRV Z-score', group: 'Bitcoin context' as const, checked: showMVRV, onChange: () => setShowMVRV(!showMVRV), description: 'Show context-only MVRV valuation history.' }] : []),
     ] : []),
   ];
@@ -378,7 +380,7 @@ export default function App() {
           <ForecastControls horizon={horizon} options={HORIZON_OPTIONS} confidence={confidenceLevel} confidenceLabel={coefficientAwareCalibrationLabel(horizon, 'Interval Band', activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)} trustCopy={assetForecastTrustCopy(activeAssetId, horizon, activeAssetId === 'btc' ? powerLawStabilitySummary.verdict : undefined, activeAssetId === 'btc' ? reliabilitySummary.coreAssumptions : undefined)} busy={isGenerating} onHorizon={setHorizon} onConfidence={(value) => setConfidenceLevel(value as keyof typeof CONFIDENCE_Z_SCORES)} onRefresh={handleRunForecast} />
           <ChartPanel title={activeAsset.chartTitle} subtitle={`${activeAsset.instrumentLabel}. Forecast auto-refreshes when horizon or interval changes.`} range={timeRange} onRange={setTimeRange} isPlaying={isPlaying} busy={isGenerating} onPlayToggle={isPlaying ? handleStop : handlePlay} settingsTriggerRef={chartSettingsTriggerRef} settingsOpen={chartSettingsOpen} onOpenSettings={() => setChartSettingsOpen(true)} tall={crisisPaneVisible}>
             <motion.div initial={false} animate={{ opacity: isGenerating ? 0.5 : 1 }} transition={{ duration: 0.18 }} className="h-full w-full">
-              <ForecastChart data={activeDisplayData} showSMA={showSMA} showVolume={showVolume} showModelLine={showModelLine} showScenarios={showScenarios} showFloorLine={showFloorLine} showPeakLine={showPeakLine} showHeatmap={showHeatmap} heatmapData={heatmapData} showBuyZones={showBuyZones} buyZones={buyZoneSummary?.zones ?? []} timeRange={timeRange} playbackIndex={playbackIndex} mvrvData={mvrvZScoreData} showMVRV={showMVRV} showBitcoinOverlays={canShowBitcoinOverlays} probabilityForecast={adjustedProbabilityForecast} crisisHistory={crisisAssessment?.snapshot.oosHistory ?? null} crisisThresholds={crisisAssessment?.score.deploymentThresholds ?? null} showCrisis={showCrisisIndicator} crisisEventCount={crisisAssessment?.snapshot.events.count} showPastForecasts={showPastForecasts} pastForecasts={pastForecasts} />
+              <ForecastChart data={activeDisplayData} showSMA={showSMA} showVolume={showVolume} showModelLine={showModelLine} showScenarios={showScenarios} showFloorLine={showFloorLine} showPeakLine={showPeakLine} showHeatmap={showHeatmap} heatmapData={heatmapData} showBuyZones={showBuyZones} showCycles={showCycles} buyZones={buyZoneSummary?.zones ?? []} timeRange={timeRange} playbackIndex={playbackIndex} mvrvData={mvrvZScoreData} showMVRV={showMVRV} showBitcoinOverlays={canShowBitcoinOverlays} probabilityForecast={adjustedProbabilityForecast} crisisHistory={crisisAssessment?.snapshot.oosHistory ?? null} crisisThresholds={crisisAssessment?.score.deploymentThresholds ?? null} showCrisis={showCrisisIndicator} crisisEventCount={crisisAssessment?.snapshot.events.count} showPastForecasts={showPastForecasts} pastForecasts={pastForecasts} />
             </motion.div>
           </ChartPanel>
         </div>
