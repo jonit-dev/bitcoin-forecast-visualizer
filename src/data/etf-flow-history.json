@@ -2,7 +2,7 @@
   "metadata": {
     "source": "Farside Investors Bitcoin ETF Flow - All Data",
     "status": "available",
-    "fetchedAt": "2026-11-26T23:02:31.256Z",
+    "fetchedAt": "2026-11-27T22:46:15.484Z",
     "url": "https://farside.co.uk/bitcoin-etf-flow-all-data/",
     "fields": [
       "totalFlowUSDm",
@@ -23636,6 +23636,38 @@
       "timing": {
         "sourceDate": "2026-11-25",
         "conservativeAvailableAfter": "2026-11-26T00:00:00.000Z"
+      },
+      "missingMetrics": []
+    },
+    {
+      "date": "2026-11-27",
+      "source": "Farside Investors Bitcoin ETF Flow - All Data",
+      "latestSourceDate": "2026-11-27",
+      "availableAfter": "2026-11-28T00:00:00.000Z",
+      "metrics": {
+        "totalFlowUSDm": 0,
+        "totalFlowUSD": 0,
+        "cumulativeFlowUSDm": 51656.999999999935,
+        "cumulativeFlowUSD": 51656999999.99993,
+        "fundSumUSDm": 0,
+        "fundFlowsUSDm": {
+          "IBIT": 0,
+          "FBTC": 0,
+          "BITB": 0,
+          "ARKB": 0,
+          "BTCO": 0,
+          "EZBC": 0,
+          "BRRR": 0,
+          "HODL": 0,
+          "BTCW": 0,
+          "MSBT": 0,
+          "GBTC": 0,
+          "BTC": 0
+        }
+      },
+      "timing": {
+        "sourceDate": "2026-11-27",
+        "conservativeAvailableAfter": "2026-11-28T00:00:00.000Z"
       },
       "missingMetrics": []
     }
